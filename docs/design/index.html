@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en" dir="ltr" data-theme="wasl" data-mode="light" data-density="comfortable">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#F5F6F2">
+  <meta name="description" content="Wasl's themeable design system preview, built around semantic design tokens.">
+  <title>Wasl — Design System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="tokens.css">
+  <link rel="stylesheet" href="shadcn-variables.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <header class="topbar">
+    <a class="brand" href="#top" aria-label="Wasl design system home">
+      <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+      <span class="brand-wordmark">wasl</span>
+      <span class="brand-divider" aria-hidden="true"></span>
+      <span class="brand-caption">Design system</span>
+    </a>
+    <div class="topbar-controls" aria-label="Live design system controls">
+      <label class="control-label" for="theme-select">Theme</label>
+      <select id="theme-select" class="select-control">
+        <option value="wasl">Wasl Lime</option>
+        <option value="ocean">Ocean</option>
+        <option value="plum">Plum</option>
+      </select>
+      <button id="mode-toggle" class="control-button" type="button" aria-pressed="false">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.2 15.4A8.5 8.5 0 0 1 8.6 3.8 8.6 8.6 0 1 0 20.2 15.4Z"/></svg>
+        <span>Dark mode</span>
+      </button>
+      <button id="density-toggle" class="control-button" type="button" aria-pressed="false">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        <span>Compact</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="page-shell" id="top">
+    <aside class="sidebar" aria-label="Page sections">
+      <p class="sidebar-heading">FOUNDATIONS</p>
+      <a class="sidebar-link active" href="#overview"><span class="nav-dot"></span> Overview</a>
+      <a class="sidebar-link" href="#colors"><span class="nav-dot"></span> Color tokens</a>
+      <a class="sidebar-link" href="#typography"><span class="nav-dot"></span> Typography</a>
+      <a class="sidebar-link" href="#layout"><span class="nav-dot"></span> Layout & shape</a>
+      <p class="sidebar-heading sidebar-heading-spaced">COMPONENTS</p>
+      <a class="sidebar-link" href="#buttons"><span class="nav-dot"></span> Buttons & badges</a>
+      <a class="sidebar-link" href="#forms"><span class="nav-dot"></span> Form controls</a>
+      <a class="sidebar-link" href="#cards"><span class="nav-dot"></span> Community cards</a>
+      <a class="sidebar-link" href="#states"><span class="nav-dot"></span> Feedback states</a>
+      <div class="sidebar-note">
+        <span class="status-pip" aria-hidden="true"></span>
+        <div><strong>Themeable by design</strong><p>One token system. Multiple visual directions.</p></div>
+      </div>
+    </aside>
+
+    <main class="main-content" id="main-content">
+      <section class="intro-section" id="overview">
+        <div class="eyebrow"><span class="eyebrow-line"></span> WASL DESIGN SYSTEM <span class="version-pill">V1 · PREVIEW</span></div>
+        <div class="intro-grid">
+          <div class="intro-copy">
+            <h1>A calmer, clearer way to <span class="highlight-text">connect.</span></h1>
+            <p class="intro-lead">A flexible visual foundation for discovering communities, meeting people, and bringing good things together across Türkiye.</p>
+            <div class="intro-pills"><span class="pill pill-brand">Friendly, not childish</span><span class="pill">Productive density</span><span class="pill">Arabic + English</span></div>
+          </div>
+          <div class="hero-preview" aria-label="Example of Wasl's product styling">
+            <div class="hero-preview-top"><span class="mini-brand"><span class="mini-brand-mark">w</span> wasl</span><span class="live-tag"><span></span> Discover together</span></div>
+            <div class="hero-preview-body">
+              <p class="mini-overline">YOUR PEOPLE ARE OUT THERE</p>
+              <h2>Find your next<br>community.</h2>
+              <p class="mini-copy">Shared interests make a big city feel smaller.</p>
+              <div class="mini-search"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg><span>Try “football in Istanbul”</span><kbd>⌘ K</kbd></div>
+            </div>
+            <div class="hero-preview-footer"><span class="avatar-stack"><i>SA</i><i>MK</i><i>LN</i><i class="avatar-more">+2k</i></span><span>People finding their people</span></div>
+            <div class="hero-orbit orbit-one" aria-hidden="true"></div><div class="hero-orbit orbit-two" aria-hidden="true"></div>
+          </div>
+        </div>
+        <div class="decision-strip">
+          <div><span class="decision-icon">✳</span><div><strong>Soft gray + brighter lime</strong><p>Calm surfaces keep the interface easy to scan; lime marks important actions.</p></div></div>
+          <div><span class="decision-icon decision-icon-type">Aa</span><div><strong>Manrope + Tajawal</strong><p>A clean English/Arabic pairing with RTL support built in from the start.</p></div></div>
+          <div><span class="decision-icon decision-icon-token">{ }</span><div><strong>Semantic tokens first</strong><p>Colors, type, sizing, shape, shadows, and density can change without rewriting components.</p></div></div>
+        </div>
+      </section>
+
+      <section class="system-section" id="colors">
+        <div class="section-heading"><div><span class="section-number">01</span><h2>Color tokens</h2><p>Named by purpose, not by the color itself. Switch themes above to see semantic roles update.</p></div><span class="section-tag">SEMANTIC</span></div>
+        <div class="color-grid">
+          <article class="color-token"><div class="swatch swatch-primary"><span>Aa</span></div><div class="token-meta"><strong>Primary accent</strong><code>--color-primary</code><span class="token-use">Primary actions</span></div></article>
+          <article class="color-token"><div class="swatch swatch-primary-foreground"><span>Ag</span></div><div class="token-meta"><strong>On primary</strong><code>--color-on-primary</code><span class="token-use">Text on accent</span></div></article>
+          <article class="color-token"><div class="swatch swatch-canvas"><span>Canvas</span></div><div class="token-meta"><strong>App canvas</strong><code>--color-canvas</code><span class="token-use">Page background</span></div></article>
+          <article class="color-token"><div class="swatch swatch-surface"><span>Surface</span></div><div class="token-meta"><strong>Surface</strong><code>--color-surface</code><span class="token-use">Cards and panels</span></div></article>
+          <article class="color-token"><div class="swatch swatch-soft"><span>Soft</span></div><div class="token-meta"><strong>Soft surface</strong><code>--color-surface-soft</code><span class="token-use">Tags and sections</span></div></article>
+          <article class="color-token"><div class="swatch swatch-text"><span>Aa</span></div><div class="token-meta"><strong>Primary text</strong><code>--color-text</code><span class="token-use">Headings and body</span></div></article>
+          <article class="color-token"><div class="swatch swatch-muted-text"><span>Aa</span></div><div class="token-meta"><strong>Secondary text</strong><code>--color-text-muted</code><span class="token-use">Descriptions</span></div></article>
+          <article class="color-token"><div class="swatch swatch-border"><span>Line</span></div><div class="token-meta"><strong>Border</strong><code>--color-border</code><span class="token-use">Dividers and fields</span></div></article>
+          <article class="color-token"><div class="swatch swatch-success"><span>✓</span></div><div class="token-meta"><strong>Success</strong><code>--color-success</code><span class="token-use">Positive feedback</span></div></article>
+          <article class="color-token"><div class="swatch swatch-warning"><span>!</span></div><div class="token-meta"><strong>Warning</strong><code>--color-warning</code><span class="token-use">Caution states</span></div></article>
+          <article class="color-token"><div class="swatch swatch-danger"><span>×</span></div><div class="token-meta"><strong>Danger</strong><code>--color-danger</code><span class="token-use">Errors and removal</span></div></article>
+          <article class="color-token"><div class="swatch swatch-info"><span>i</span></div><div class="token-meta"><strong>Information</strong><code>--color-info</code><span class="token-use">Helpful notices</span></div></article>
+        </div>
+        <div class="token-note"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><p><strong>Contrast rule:</strong> the bright lime is paired with near-black text for readable button labels. Pale lime is reserved for quiet highlights and selected states.</p></div>
+      </section>
+
+      <section class="system-section" id="typography">
+        <div class="section-heading"><div><span class="section-number">02</span><h2>Typography</h2><p>Two carefully paired families, with their own line-height and weight tokens.</p></div><span class="section-tag">MANROPE + TAJAWAL</span></div>
+        <div class="type-specimen-grid">
+          <article class="type-specimen">
+            <div class="specimen-head"><div><span class="specimen-label">LATIN</span><h3>Manrope</h3></div><span class="font-chip">UI + headings</span></div>
+            <p class="display-sample">Find your people.</p>
+            <p class="type-body-sample">Good communities start with a shared interest. Discover a group, join an event, and make the city feel more familiar.</p>
+            <div class="weight-list"><span><b class="weight-400">Aa</b><small>Regular 400</small></span><span><b class="weight-500">Aa</b><small>Medium 500</small></span><span><b class="weight-700">Aa</b><small>Bold 700</small></span></div>
+          </article>
+          <article class="type-specimen arabic-specimen" lang="ar" dir="rtl">
+            <div class="specimen-head"><div><span class="specimen-label">العربية</span><h3>تجربة واضحة ومريحة</h3></div><span class="font-chip">Tajawal</span></div>
+            <p class="display-sample">اكتشف مجتمعك.</p>
+            <p class="type-body-sample">ابدأ باهتمام مشترك، تعرّف على أشخاص جدد، وشارك في فعاليات تجعل الحياة في المدينة أقرب وأسهل.</p>
+            <div class="weight-list"><span><b class="weight-400">عربي</b><small>عادي 400</small></span><span><b class="weight-500">عربي</b><small>متوسط 500</small></span><span><b class="weight-700">عربي</b><small>عريض 700</small></span></div>
+          </article>
+        </div>
+        <div class="type-scale-panel">
+          <div class="scale-title"><strong>Type scale</strong><span>Responsive, token-driven</span></div>
+          <div class="scale-row"><code>Display / 48</code><span class="scale-display">Community starts here</span><span class="scale-size">3rem / 1.08</span></div>
+          <div class="scale-row"><code>Heading 1 / 36</code><span class="scale-h1">Find your people</span><span class="scale-size">2.25rem / 1.2</span></div>
+          <div class="scale-row"><code>Heading 2 / 28</code><span class="scale-h2">Events worth showing up for</span><span class="scale-size">1.75rem / 1.25</span></div>
+          <div class="scale-row"><code>Body / 16</code><span class="scale-body">Find a community that shares your interests.</span><span class="scale-size">1rem / 1.5</span></div>
+          <div class="scale-row"><code>Small / 14</code><span class="scale-small">Istanbul · 24 October · 18:30</span><span class="scale-size">0.875rem / 1.45</span></div>
+        </div>
+      </section>
+
+      <section class="system-section" id="layout">
+        <div class="section-heading"><div><span class="section-number">03</span><h2>Layout, shape & motion</h2><p>Consistent spacing and geometry make components feel related across screens.</p></div><span class="section-tag">FOUNDATIONS</span></div>
+        <div class="layout-foundations-grid">
+          <article class="foundation-card"><div class="foundation-title"><strong>Spacing scale</strong><span>4px base unit</span></div><div class="spacing-list"><div class="spacing-item"><code>space-1 · 4</code><span style="--demo-size: var(--space-1)"></span></div><div class="spacing-item"><code>space-2 · 8</code><span style="--demo-size: var(--space-2)"></span></div><div class="spacing-item"><code>space-3 · 12</code><span style="--demo-size: var(--space-3)"></span></div><div class="spacing-item"><code>space-4 · 16</code><span style="--demo-size: var(--space-4)"></span></div><div class="spacing-item"><code>space-6 · 24</code><span style="--demo-size: var(--space-6)"></span></div><div class="spacing-item"><code>space-8 · 32</code><span style="--demo-size: var(--space-8)"></span></div></div></article>
+          <article class="foundation-card"><div class="foundation-title"><strong>Corner radii</strong><span>Themeable shape</span></div><div class="radius-list"><div><span class="radius-demo radius-sm"></span><code>Small</code></div><div><span class="radius-demo radius-md"></span><code>Medium</code></div><div><span class="radius-demo radius-lg"></span><code>Large</code></div><div><span class="radius-demo radius-xl"></span><code>XL</code></div><div><span class="radius-demo radius-full"></span><code>Pill</code></div></div></article>
+          <article class="foundation-card"><div class="foundation-title"><strong>Elevation</strong><span>Subtle by default</span></div><div class="shadow-list"><div class="shadow-demo shadow-1">Surface 1</div><div class="shadow-demo shadow-2">Surface 2</div><div class="shadow-demo shadow-3">Surface 3</div></div></article>
+          <article class="foundation-card motion-card"><div class="foundation-title"><strong>Motion</strong><span>Respect preferences</span></div><div class="motion-row"><span class="motion-dot"></span><div><strong>Standard</strong><code>--motion-duration-base · 180ms</code></div></div><div class="motion-row"><span class="motion-dot motion-dot-slow"></span><div><strong>Emphasis</strong><code>--motion-duration-slow · 280ms</code></div></div><p class="muted-small">Reduced-motion settings disable non-essential transitions.</p></article>
+        </div>
+        <div class="layout-rule-grid"><div><strong>Content width</strong><span>Max 1200px · readable long-form measure</span></div><div><strong>Responsive layout</strong><span>Wide desktop → tablet → mobile</span></div><div><strong>Logical CSS</strong><span>Use inline/block start/end for RTL</span></div><div><strong>Density</strong><span>Comfortable and compact presets</span></div></div>
+      </section>
+
+      <section class="system-section" id="buttons">
+        <div class="section-heading"><div><span class="section-number">04</span><h2>Buttons & badges</h2><p>Primary actions stand out. Secondary actions stay visible without competing.</p></div><span class="section-tag">INTERACTIVE</span></div>
+        <div class="component-panel">
+          <div class="component-row"><div class="component-label"><strong>Button variants</strong><span>Default size</span></div><div class="button-samples"><button class="button button-primary" type="button">Join community <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button><button class="button button-secondary" type="button">View details</button><button class="button button-outline" type="button">Learn more</button><button class="button button-ghost" type="button">Cancel</button><button class="button button-danger" type="button">Remove</button></div></div>
+          <div class="component-row"><div class="component-label"><strong>Button sizes</strong><span>Shared height tokens</span></div><div class="button-samples align-center"><button class="button button-primary button-sm" type="button">Small</button><button class="button button-primary button-md" type="button">Medium</button><button class="button button-primary button-lg" type="button">Large action</button><button class="button button-icon" type="button" aria-label="Save event"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4.5h12v16l-6-4-6 4z"/></svg></button></div></div>
+          <div class="component-row"><div class="component-label"><strong>Status badges</strong><span>Compact, readable</span></div><div class="badge-samples"><span class="badge badge-brand">New</span><span class="badge badge-success"><span></span> Open</span><span class="badge badge-warning">Almost full</span><span class="badge badge-danger">Cancelled</span><span class="badge badge-neutral">Community</span><span class="badge badge-outline">Verified organizer</span></div></div>
+          <div class="component-row"><div class="component-label"><strong>Keyboard focus</strong><span>Visible and consistent</span></div><div class="button-samples focus-sample"><button class="button button-primary demo-focus" type="button">Focused action</button><span class="muted-small">Tab through controls to see focus states.</span></div></div>
+        </div>
+      </section>
+
+      <section class="system-section" id="forms">
+        <div class="section-heading"><div><span class="section-number">05</span><h2>Form controls</h2><p>Clear labels, calm borders, and useful feedback. Inputs inherit theme and density tokens.</p></div><span class="section-tag">FORMS</span></div>
+        <div class="forms-grid">
+          <form class="form-card">
+            <div class="form-card-heading"><div><strong>Discover communities</strong><p>Try a realistic search form.</p></div><span class="form-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg></span></div>
+            <label class="field-label" for="community-search">Search by interest or location</label>
+            <div class="input-wrap"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg><input id="community-search" type="search" placeholder="e.g. hiking in Istanbul"></div>
+            <div class="field-row"><div class="field"><label class="field-label" for="city-select">City</label><select id="city-select" class="input-control"><option>Istanbul</option><option>Ankara</option><option>Izmir</option></select></div><div class="field"><label class="field-label" for="category-select">Interest</label><select id="category-select" class="input-control"><option>All interests</option><option>Sports</option><option>Education</option><option>Culture</option></select></div></div>
+            <button class="button button-primary button-full" type="button">Find communities <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+          </form>
+          <div class="form-card states-card">
+            <div class="form-card-heading"><div><strong>Input states</strong><p>Feedback should explain what to do next.</p></div></div>
+            <div class="field"><label class="field-label" for="input-default">Default</label><input class="input-control" id="input-default" type="text" placeholder="Your community name"></div>
+            <div class="field"><label class="field-label" for="input-filled">Filled</label><input class="input-control" id="input-filled" type="text" value="Istanbul Runners" readonly></div>
+            <div class="field"><label class="field-label" for="input-error">Validation error</label><input class="input-control input-error" id="input-error" type="email" value="not-an-email" aria-describedby="input-error-help"><span class="field-error" id="input-error-help">Enter a valid email address.</span></div>
+            <div class="field"><label class="field-label" for="input-disabled">Disabled</label><input class="input-control" id="input-disabled" type="text" value="Managed by organizer" disabled></div>
+            <label class="checkbox-row"><input type="checkbox" checked><span class="checkbox-visual"></span><span>Notify me about new events</span></label>
+          </div>
+        </div>
+      </section>
+
+      <section class="system-section" id="cards">
+        <div class="section-heading"><div><span class="section-number">06</span><h2>Community & event cards</h2><p>Clear hierarchy, useful details, and a visible next step without oversized UI.</p></div><span class="section-tag">DISCOVERY</span></div>
+        <div class="discovery-grid">
+          <article class="event-card">
+            <div class="event-art event-art-green"><span class="art-tag">COMMUNITY EVENT</span><div class="art-sun"></div><div class="art-hill art-hill-one"></div><div class="art-hill art-hill-two"></div><div class="art-circle"></div><span class="art-word">meet<br>outside.</span></div>
+            <div class="event-content"><div class="event-date"><span class="date-month">OCT</span><strong>24</strong></div><div class="event-copy"><span class="event-category">Outdoors · Beginner friendly</span><h3>Weekend nature walk</h3><p class="event-meta"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg> Belgrad Forest, Istanbul</p><p class="event-meta"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg> Saturday · 10:00</p></div></div>
+            <div class="event-footer"><span class="avatar-stack"><i>AM</i><i>SK</i><i>+8</i></span><span class="attendee-count">11 going</span><button class="button button-primary button-sm" type="button">View event</button></div>
+          </article>
+          <article class="community-card">
+            <div class="community-cover"><div class="community-symbol"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><span class="badge badge-on-cover">Open to join</span><div class="cover-spark cover-spark-one"></div><div class="cover-spark cover-spark-two"></div></div>
+            <div class="community-body"><div class="community-title-row"><div><span class="event-category">SPORTS · ISTANBUL</span><h3>Istanbul Runners</h3></div><button class="icon-action" type="button" aria-label="More community actions"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg></button></div><p>A friendly running community for every pace, from first 5Ks to weekend trail routes.</p><div class="community-footer"><span class="member-count"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg> 248 members</span><button class="button button-outline button-sm" type="button">Explore</button></div></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="system-section" id="states">
+        <div class="section-heading"><div><span class="section-number">07</span><h2>Feedback & system states</h2><p>Keep messages specific, accessible, and visually consistent across themes.</p></div><span class="section-tag">STATES</span></div>
+        <div class="feedback-grid">
+          <div class="alert alert-success" role="status"><span class="alert-icon">✓</span><div><strong>You're on the list!</strong><p>Your request to join Istanbul Runners has been sent to the organizers.</p></div><button class="alert-close" aria-label="Dismiss success message" type="button">×</button></div>
+          <div class="alert alert-info" role="status"><span class="alert-icon">i</span><div><strong>Complete your profile</strong><p>Add your interests to get more relevant community recommendations.</p></div><button class="alert-close" aria-label="Dismiss information message" type="button">×</button></div>
+          <div class="alert alert-warning" role="alert"><span class="alert-icon">!</span><div><strong>Almost full</strong><p>Only two places remain for this event. Join the waitlist if it fills up.</p></div></div>
+          <div class="alert alert-danger" role="alert"><span class="alert-icon">×</span><div><strong>We couldn't save that</strong><p>Check your connection and try again. Your previous information is still here.</p></div></div>
+        </div>
+        <div class="theme-contract"><div class="contract-copy"><span class="section-number">IMPLEMENTATION CONTRACT</span><h3>Theme changes should not require component rewrites.</h3><p>Components read semantic variables. Themes override token values; Tailwind and shadcn/ui use the same contract.</p></div><pre><code>&lt;html
+  data-theme="wasl"
+  data-mode="light"
+  data-density="comfortable"
+&gt;</code></pre></div>
+      </section>
+
+      <footer class="page-footer"><div class="footer-brand"><span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span><strong>wasl</strong></div><span>Design for belonging. Built to adapt.</span><a href="#top">Back to top ↑</a></footer>
+    </main>
+  </div>
+  <script src="theme-controller.js" defer></script>
+</body>
+</html>

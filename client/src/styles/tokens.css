@@ -1,0 +1,394 @@
+/* Wasl design tokens — the single source of truth for the HTML preview.
+   Components should consume semantic tokens, not raw values. */
+:root {
+  color-scheme: light;
+  /* Typography */
+  --font-family-ui: "Manrope", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-family-arabic: "Tajawal", "Noto Sans Arabic", sans-serif;
+  --font-family-heading: var(--font-family-ui);
+  --font-size-2xs: 0.6875rem;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.75rem;
+  --font-size-4xl: 2.25rem;
+  --font-size-display: clamp(2.4rem, 4vw, 3.6rem);
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  --line-height-tight: 1.12;
+  --line-height-heading: 1.22;
+  --line-height-body: 1.55;
+  --line-height-relaxed: 1.7;
+  --letter-spacing-tight: -0.045em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.06em;
+
+  /* Primitive colors — semantic theme tokens below reference these values. */
+  --color-white: #FFFFFF;
+  --color-gray-50: #F5F6F2;
+  --color-gray-100: #EEF1E8;
+  --color-gray-200: #E1E5DA;
+  --color-gray-300: #C9D0C0;
+  --color-gray-500: #858B80;
+  --color-gray-600: #656B61;
+  --color-gray-800: #2F342C;
+  --color-gray-950: #171A16;
+  --color-lime-50: #F5F9EA;
+  --color-lime-100: #E5EFC1;
+  --color-lime-200: #B7E77B;
+  --color-lime-300: #A4D85B;
+  --color-lime-400: #91C844;
+  --color-lime-500: #8CC63E;
+  --color-lime-600: #7CB62F;
+  --color-lime-700: #6D9F27;
+  --color-lime-900: #34461D;
+  --color-dark-50: #F3F6EE;
+  --color-dark-200: #BAC4B1;
+  --color-dark-300: #939F89;
+  --color-dark-600: #4B5941;
+  --color-dark-700: #343D2E;
+  --color-dark-800: #242C1E;
+  --color-dark-850: #20261C;
+  --color-dark-900: #1A1F17;
+  --color-dark-950: #12150F;
+  --color-green-100: #E4F5E9;
+  --color-green-300: #7FD19A;
+  --color-green-700: #26784A;
+  --color-green-900: #1D3828;
+  --color-amber-100: #FFF2D7;
+  --color-amber-300: #F1C46E;
+  --color-amber-700: #9A5B0A;
+  --color-amber-900: #3A2D19;
+  --color-red-100: #FCE9E7;
+  --color-red-300: #FF958B;
+  --color-red-700: #B53A32;
+  --color-red-900: #3C2423;
+  --color-blue-100: #E6F2FB;
+  --color-blue-300: #8CC7F0;
+  --color-blue-700: #2D668F;
+  --color-blue-900: #1D3040;
+
+  /* Figma text-style labels are mirrored for design handoff; runtime weights use numeric tokens. */
+  --font-style-regular: "Regular";
+  --font-style-medium: "Medium";
+  --font-style-bold: "Bold";
+  --font-style-extrabold: "ExtraBold";
+  --line-height-body-px: 24px;
+  --line-height-heading-px: 32px;
+
+  /* Spacing — 4px base */
+  --space-0: 0;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+
+  /* Shape, borders and control sizing */
+  --shape-radius-none: 0;
+  --shape-radius-sm: 0.375rem;
+  --shape-radius-md: 0.625rem;
+  --shape-radius-lg: 0.875rem;
+  --shape-radius-xl: 1.125rem;
+  --shape-radius-2xl: 1.5rem;
+  --shape-radius-pill: 999px;
+  --border-width: 1px;
+  --border-width-strong: 1.5px;
+  --focus-ring-width: 3px;
+  --control-height-sm: 2.25rem;
+  --control-height-md: 2.75rem;
+  --control-height-lg: 3.125rem;
+  --icon-size-sm: 1rem;
+  --icon-size-md: 1.25rem;
+  --icon-size-lg: 1.5rem;
+  --avatar-size-sm: 1.75rem;
+  --avatar-size-md: 2.25rem;
+  --avatar-size-lg: 3rem;
+
+  /* Layout */
+  --container-max: 75rem;
+  --container-reading: 43rem;
+  --sidebar-width: 15.25rem;
+  --layout-gap: var(--space-10);
+  --section-gap: var(--space-16);
+  --density-scale: 1;
+  --card-padding: calc(var(--space-6) * var(--density-scale));
+  --control-gap: calc(var(--space-3) * var(--density-scale));
+
+  /* Motion */
+  --motion-duration-fast: 120ms;
+  --motion-duration-base: 180ms;
+  --motion-duration-slow: 280ms;
+  --motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --motion-ease-emphasized: cubic-bezier(0.2, 0, 0, 1.1);
+
+  /* Elevation */
+  --elevation-xs: 0 1px 2px rgb(20 30 12 / 5%);
+  --elevation-sm: 0 2px 6px rgb(20 30 12 / 6%), 0 1px 2px rgb(20 30 12 / 4%);
+  --elevation-md: 0 8px 24px rgb(20 30 12 / 8%), 0 2px 6px rgb(20 30 12 / 4%);
+  --elevation-lg: 0 18px 42px rgb(20 30 12 / 12%), 0 4px 12px rgb(20 30 12 / 5%);
+  --opacity-disabled: 0.52;
+  --opacity-muted: 0.68;
+
+  /* Reusable component and layout dimensions */
+  --layout-header-height: 4.75rem;
+  --nav-item-height: var(--control-height-sm);
+  --button-padding-inline-sm: var(--space-3);
+  --button-padding-inline-md: var(--space-4);
+  --button-padding-inline-lg: var(--space-5);
+  --button-icon-size: var(--control-height-md);
+  --badge-min-height: 1.65rem;
+  --badge-padding-inline: var(--space-3);
+  --tag-min-height: 1.8rem;
+  --field-padding-inline: var(--space-3);
+  --field-padding-block: var(--space-2);
+  --avatar-overlap: -0.35rem;
+  --avatar-border-width: 2px;
+  --hero-min-height: 22rem;
+  --event-cover-height: 12rem;
+  --community-cover-height: 8.5rem;
+  --card-footer-padding: var(--space-4);
+  --alert-icon-size: 1.65rem;
+  --form-icon-size: 2.5rem;
+  --motion-hover-lift: -2px;
+
+  /* Layering */
+  --z-base: 0;
+  --z-sticky: 20;
+  --z-dropdown: 30;
+  --z-overlay: 40;
+  --z-modal: 50;
+  --z-toast: 60;
+}
+
+/* Wasl Lime — provisional brand accent: #8CC63E. */
+:root[data-theme="wasl"][data-mode="light"] {
+  color-scheme: light;
+  --color-canvas: var(--color-gray-50);
+  --color-surface: var(--color-white);
+  --color-surface-soft: var(--color-gray-100);
+  --color-surface-raised: var(--color-white);
+  --color-text: var(--color-gray-950);
+  --color-text-muted: var(--color-gray-600);
+  --color-text-subtle: var(--color-gray-500);
+  --color-border: var(--color-gray-200);
+  --color-border-strong: var(--color-gray-300);
+  --color-primary: var(--color-lime-500);
+  --color-primary-hover: var(--color-lime-600);
+  --color-primary-active: var(--color-lime-700);
+  --color-on-primary: var(--color-gray-950);
+  --color-primary-soft: var(--color-lime-100);
+  --color-primary-soft-text: var(--color-lime-900);
+  --color-ring: var(--color-lime-700);
+  --color-success: var(--color-green-700);
+  --color-success-soft: var(--color-green-100);
+  --color-warning: var(--color-amber-700);
+  --color-warning-soft: var(--color-amber-100);
+  --color-danger: var(--color-red-700);
+  --color-danger-hover: #A52F29;
+  --color-danger-soft: var(--color-red-100);
+  --color-info: var(--color-blue-700);
+  --color-info-soft: var(--color-blue-100);
+  --color-shadow: 20 30 12;
+  --shape-radius-card: var(--shape-radius-xl);
+  --shape-radius-control: var(--shape-radius-md);
+  --shape-radius-dialog: var(--shape-radius-2xl);
+  --shadow-card: var(--elevation-sm);
+  --shadow-card-hover: var(--elevation-md);
+  --shadow-popover: var(--elevation-lg);
+}
+:root[data-theme="wasl"][data-mode="dark"] {
+  color-scheme: dark;
+  --color-canvas: var(--color-dark-950);
+  --color-surface: var(--color-dark-900);
+  --color-surface-soft: var(--color-dark-800);
+  --color-surface-raised: var(--color-dark-850);
+  --color-text: var(--color-dark-50);
+  --color-text-muted: var(--color-dark-200);
+  --color-text-subtle: var(--color-dark-300);
+  --color-border: var(--color-dark-700);
+  --color-border-strong: var(--color-dark-600);
+  --color-primary: var(--color-lime-300);
+  --color-primary-hover: var(--color-lime-200);
+  --color-primary-active: var(--color-lime-400);
+  --color-on-primary: var(--color-dark-950);
+  --color-primary-soft: var(--color-dark-800);
+  --color-primary-soft-text: var(--color-lime-100);
+  --color-ring: var(--color-lime-200);
+  --color-success: var(--color-green-300);
+  --color-success-soft: var(--color-green-900);
+  --color-warning: var(--color-amber-300);
+  --color-warning-soft: var(--color-amber-900);
+  --color-danger: var(--color-red-300);
+  --color-danger-hover: #FFAAA2;
+  --color-danger-soft: var(--color-red-900);
+  --color-info: var(--color-blue-300);
+  --color-info-soft: var(--color-blue-900);
+  --color-shadow: 0 0 0;
+  --shadow-card: 0 1px 0 rgb(255 255 255 / 3%), 0 8px 24px rgb(0 0 0 / 12%);
+  --shadow-card-hover: 0 1px 0 rgb(255 255 255 / 4%), 0 12px 28px rgb(0 0 0 / 22%);
+  --shadow-popover: 0 18px 42px rgb(0 0 0 / 32%);
+}
+
+/* Alternate theme presets are demonstrations of the same token contract. */
+:root[data-theme="ocean"][data-mode="light"] {
+  color-scheme: light;
+  --color-canvas: #F3F6FA;
+  --color-surface: var(--color-white);
+  --color-surface-soft: #EAF0F8;
+  --color-surface-raised: var(--color-white);
+  --color-text: #17212E;
+  --color-text-muted: #5D6B7D;
+  --color-text-subtle: #7C8A9B;
+  --color-border: #DCE4EF;
+  --color-border-strong: #C2D0E1;
+  --color-primary: #80B6F2;
+  --color-primary-hover: #68A4E7;
+  --color-primary-active: #4B8FD9;
+  --color-on-primary: #13263D;
+  --color-primary-soft: #E1EEFD;
+  --color-primary-soft-text: #234D7C;
+  --color-ring: #4B8FD9;
+  --color-success: var(--color-green-700);
+  --color-success-soft: var(--color-green-100);
+  --color-warning: var(--color-amber-700);
+  --color-warning-soft: var(--color-amber-100);
+  --color-danger: var(--color-red-700);
+  --color-danger-hover: #A52F29;
+  --color-danger-soft: var(--color-red-100);
+  --color-info: var(--color-blue-700);
+  --color-info-soft: var(--color-blue-100);
+  --shape-radius-card: 0.625rem;
+  --shape-radius-control: 0.5rem;
+  --shape-radius-dialog: 1rem;
+  --shadow-card: 0 1px 3px rgb(28 48 74 / 7%);
+  --shadow-card-hover: 0 8px 24px rgb(28 48 74 / 11%);
+  --shadow-popover: 0 18px 42px rgb(28 48 74 / 16%);
+}
+:root[data-theme="ocean"][data-mode="dark"] {
+  color-scheme: dark;
+  --color-canvas: #111923;
+  --color-surface: #192535;
+  --color-surface-soft: #223249;
+  --color-surface-raised: #1D2B3D;
+  --color-text: #F1F6FC;
+  --color-text-muted: #B7C7D9;
+  --color-text-subtle: #8EA2B9;
+  --color-border: #34475D;
+  --color-border-strong: #4A6079;
+  --color-primary: #8FC1FA;
+  --color-primary-hover: #ACD1FB;
+  --color-primary-active: #73AEF0;
+  --color-on-primary: #142943;
+  --color-primary-soft: #203C5D;
+  --color-primary-soft-text: #C7E2FF;
+  --color-ring: #8FC1FA;
+  --color-success: var(--color-green-300);
+  --color-success-soft: var(--color-green-900);
+  --color-warning: var(--color-amber-300);
+  --color-warning-soft: var(--color-amber-900);
+  --color-danger: var(--color-red-300);
+  --color-danger-hover: #FFAAA2;
+  --color-danger-soft: var(--color-red-900);
+  --color-info: var(--color-blue-300);
+  --color-info-soft: var(--color-blue-900);
+  --shadow-card: 0 1px 0 rgb(255 255 255 / 3%), 0 8px 24px rgb(0 0 0 / 12%);
+  --shadow-card-hover: 0 1px 0 rgb(255 255 255 / 4%), 0 12px 28px rgb(0 0 0 / 22%);
+  --shadow-popover: 0 18px 42px rgb(0 0 0 / 32%);
+}
+:root[data-theme="plum"][data-mode="light"] {
+  color-scheme: light;
+  --color-canvas: #F7F4F9;
+  --color-surface: var(--color-white);
+  --color-surface-soft: #F0E8F6;
+  --color-surface-raised: var(--color-white);
+  --color-text: #241A2A;
+  --color-text-muted: #6F6376;
+  --color-text-subtle: #908496;
+  --color-border: #E5DAEB;
+  --color-border-strong: #CFBDD9;
+  --color-primary: #C3A0E8;
+  --color-primary-hover: #B38ADB;
+  --color-primary-active: #9D70CA;
+  --color-on-primary: #2C1A3B;
+  --color-primary-soft: #EFE4FA;
+  --color-primary-soft-text: #573578;
+  --color-ring: #9D70CA;
+  --color-success: var(--color-green-700);
+  --color-success-soft: var(--color-green-100);
+  --color-warning: var(--color-amber-700);
+  --color-warning-soft: var(--color-amber-100);
+  --color-danger: var(--color-red-700);
+  --color-danger-hover: #A52F29;
+  --color-danger-soft: var(--color-red-100);
+  --color-info: var(--color-blue-700);
+  --color-info-soft: var(--color-blue-100);
+  --shape-radius-card: var(--shape-radius-2xl);
+  --shape-radius-control: var(--shape-radius-lg);
+  --shape-radius-dialog: 1.75rem;
+  --shadow-card: 0 3px 12px rgb(57 32 73 / 7%);
+  --shadow-card-hover: 0 12px 30px rgb(57 32 73 / 12%);
+  --shadow-popover: 0 18px 42px rgb(57 32 73 / 17%);
+}
+:root[data-theme="plum"][data-mode="dark"] {
+  color-scheme: dark;
+  --color-canvas: #19121E;
+  --color-surface: #241A2C;
+  --color-surface-soft: #34243E;
+  --color-surface-raised: #2A1F34;
+  --color-text: #F7F1FA;
+  --color-text-muted: #C9B9D2;
+  --color-text-subtle: #A18CAD;
+  --color-border: #483652;
+  --color-border-strong: #624B70;
+  --color-primary: #D1B2F1;
+  --color-primary-hover: #E1CCF8;
+  --color-primary-active: #BD96E7;
+  --color-on-primary: #2D1C3A;
+  --color-primary-soft: #3B2948;
+  --color-primary-soft-text: #E7D5FA;
+  --color-ring: #D1B2F1;
+  --color-success: var(--color-green-300);
+  --color-success-soft: var(--color-green-900);
+  --color-warning: var(--color-amber-300);
+  --color-warning-soft: var(--color-amber-900);
+  --color-danger: var(--color-red-300);
+  --color-danger-hover: #FFAAA2;
+  --color-danger-soft: var(--color-red-900);
+  --color-info: var(--color-blue-300);
+  --color-info-soft: var(--color-blue-900);
+  --shadow-card: 0 1px 0 rgb(255 255 255 / 3%), 0 8px 24px rgb(0 0 0 / 14%);
+  --shadow-card-hover: 0 1px 0 rgb(255 255 255 / 4%), 0 12px 28px rgb(0 0 0 / 24%);
+  --shadow-popover: 0 18px 42px rgb(0 0 0 / 36%);
+}
+
+:root[data-density="compact"] {
+  --density-scale: 0.84;
+  --space-5: 1.125rem;
+  --space-6: 1.25rem;
+  --space-8: 1.75rem;
+  --control-height-sm: 2rem;
+  --control-height-md: 2.5rem;
+  --control-height-lg: 2.875rem;
+  --section-gap: var(--space-12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-duration-fast: 0ms;
+    --motion-duration-base: 0ms;
+    --motion-duration-slow: 0ms;
+  }
+}

@@ -1,0 +1,12 @@
+node_modules/
+dist/
+coverage/
+playwright-report/
+test-results/
+.env
+.env.*
+!.env.example
+server/openapi.json
+client/storybook-static/
+client/dist/
+*.tsbuildinfo

@@ -1,0 +1,509 @@
+import {
+  boolean,
+  check,
+  integer,
+  pgEnum,
+  pgSchema,
+  pgTable,
+  text,
+  timestamp,
+  unique,
+  uniqueIndex,
+  index,
+  primaryKey,
+  uuid,
+} from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
+
+export const cities = pgTable(
+  'cities',
+  {
+    id: text('id').primaryKey(),
+    nameTr: text('name_tr').notNull(),
+    nameAr: text('name_ar').notNull(),
+    nameEn: text('name_en').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [uniqueIndex('cities_name_tr_unique').on(table.nameTr)],
+);
+
+export const categories = pgTable(
+  'categories',
+  {
+    id: text('id').primaryKey(),
+    nameTr: text('name_tr').notNull(),
+    nameAr: text('name_ar').notNull(),
+    nameEn: text('name_en').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [uniqueIndex('categories_name_tr_unique').on(table.nameTr)],
+);
+
+export const communities = pgTable(
+  'communities',
+  {
+    id: text('id').primaryKey(),
+    slug: text('slug').notNull().unique(),
+    name: text('name').notNull(),
+    description: text('description').notNull(),
+    cityId: text('city_id')
+      .notNull()
+      .references(() => cities.id),
+    ownerType: text('owner_type').notNull(),
+    ownerId: text('owner_id').notNull(),
+    createdByUserId: uuid('created_by_user_id').references(() => users.id, {
+      onDelete: 'restrict',
+    }),
+    hostName: text('host_name').notNull(),
+    admissionMode: text('admission_mode').notNull(),
+    capacity: integer('capacity'),
+    archived: boolean('archived').notNull().default(false),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    check('communities_owner_type_check', sql`${table.ownerType} in ('user', 'organization')`),
+    check(
+      'communities_admission_mode_check',
+      sql`${table.admissionMode} in ('open', 'approval', 'automatic')`,
+    ),
+    check('communities_capacity_check', sql`${table.capacity} is null or ${table.capacity} > 0`),
+    index('communities_public_created_idx').on(table.archived, table.createdAt),
+    index('communities_created_by_user_id_idx').on(table.createdByUserId),
+  ],
+);
+
+export const communityCategories = pgTable(
+  'community_categories',
+  {
+    communityId: text('community_id')
+      .notNull()
+      .references(() => communities.id, { onDelete: 'cascade' }),
+    categoryId: text('category_id')
+      .notNull()
+      .references(() => categories.id),
+  },
+  (table) => [uniqueIndex('community_categories_pk').on(table.communityId, table.categoryId)],
+);
+
+export const events = pgTable(
+  'events',
+  {
+    id: text('id').primaryKey(),
+    slug: text('slug').notNull().unique(),
+    title: text('title').notNull(),
+    description: text('description').notNull(),
+    visibility: text('visibility').notNull().default('public'),
+    hostType: text('host_type').notNull(),
+    hostId: text('host_id').notNull(),
+    createdByUserId: uuid('created_by_user_id').references(() => users.id, {
+      onDelete: 'restrict',
+    }),
+    hostName: text('host_name').notNull(),
+    communityId: text('community_id').references(() => communities.id),
+    cityId: text('city_id').references(() => cities.id),
+    online: boolean('online').notNull().default(false),
+    locationName: text('location_name'),
+    startsAt: timestamp('starts_at', { withTimezone: true }).notNull(),
+    endsAt: timestamp('ends_at', { withTimezone: true }),
+    admissionMode: text('admission_mode').notNull(),
+    capacity: integer('capacity'),
+    cancelled: boolean('cancelled').notNull().default(false),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    check('events_visibility_check', sql`${table.visibility} in ('public', 'unlisted')`),
+    check(
+      'events_host_type_check',
+      sql`${table.hostType} in ('user', 'organization', 'community')`,
+    ),
+    check(
+      'events_host_relation_check',
+      sql`(${table.hostType} = 'community' and ${table.communityId} is not null and ${table.hostId} = ${table.communityId}) or (${table.hostType} in ('user', 'organization') and ${table.communityId} is null)`,
+    ),
+    check(
+      'events_location_check',
+      sql`${table.online} = true or (${table.cityId} is not null and ${table.locationName} is not null)`,
+    ),
+    check(
+      'events_dates_check',
+      sql`${table.endsAt} is null or ${table.endsAt} >= ${table.startsAt}`,
+    ),
+    check(
+      'events_admission_mode_check',
+      sql`${table.admissionMode} in ('instant', 'approval', 'automatic')`,
+    ),
+    check('events_capacity_check', sql`${table.capacity} is null or ${table.capacity} > 0`),
+    index('events_public_start_idx').on(table.visibility, table.cancelled, table.startsAt),
+    index('events_created_by_user_id_idx').on(table.createdByUserId),
+  ],
+);
+
+export const eventCategories = pgTable(
+  'event_categories',
+  {
+    eventId: text('event_id')
+      .notNull()
+      .references(() => events.id, { onDelete: 'cascade' }),
+    categoryId: text('category_id')
+      .notNull()
+      .references(() => categories.id),
+  },
+  (table) => [uniqueIndex('event_categories_pk').on(table.eventId, table.categoryId)],
+);
+
+export const organizationVerificationStatus = pgEnum('organization_verification_status', [
+  'PENDING',
+  'VERIFIED',
+  'REJECTED',
+]);
+
+export const organizations = pgTable(
+  'organizations',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    ownerUserId: uuid('owner_user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'restrict' }),
+    slug: text('slug').notNull().unique(),
+    name: text('name').notNull(),
+    description: text('description').notNull(),
+    type: text('type').notNull(),
+    cityId: text('city_id').references(() => cities.id),
+    locationName: text('location_name'),
+    websiteUrl: text('website_url'),
+    socialUrl: text('social_url'),
+    logoPath: text('logo_path'),
+    verificationStatus: organizationVerificationStatus('verification_status')
+      .notNull()
+      .default('PENDING'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    check('organizations_name_length', sql`char_length(${table.name}) between 1 and 160`),
+    check('organizations_description_length', sql`char_length(${table.description}) <= 5000`),
+    check('organizations_type_length', sql`char_length(${table.type}) between 1 and 80`),
+    check(
+      'organizations_location_name_length',
+      sql`${table.locationName} is null or char_length(${table.locationName}) <= 160`,
+    ),
+    check(
+      'organizations_website_url_length',
+      sql`${table.websiteUrl} is null or char_length(${table.websiteUrl}) <= 2048`,
+    ),
+    check(
+      'organizations_social_url_length',
+      sql`${table.socialUrl} is null or char_length(${table.socialUrl}) <= 2048`,
+    ),
+    index('organizations_owner_user_id_idx').on(table.ownerUserId),
+    index('organizations_city_id_idx').on(table.cityId),
+  ],
+).enableRLS();
+
+export const organizationAdmins = pgTable(
+  'organization_admins',
+  {
+    organizationId: uuid('organization_id')
+      .notNull()
+      .references(() => organizations.id, { onDelete: 'restrict' }),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'restrict' }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    primaryKey({
+      name: 'organization_admins_organization_user_pk',
+      columns: [table.organizationId, table.userId],
+    }),
+    index('organization_admins_user_id_idx').on(table.userId),
+  ],
+).enableRLS();
+
+export const organizationAdminInvitationStatus = pgEnum('organization_admin_invitation_status', [
+  'PENDING',
+  'ACCEPTED',
+  'REVOKED',
+]);
+
+export const organizationAdminInvitations = pgTable(
+  'organization_admin_invitations',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    organizationId: uuid('organization_id')
+      .notNull()
+      .references(() => organizations.id, { onDelete: 'restrict' }),
+    targetUserId: uuid('target_user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'restrict' }),
+    invitedByUserId: uuid('invited_by_user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'restrict' }),
+    tokenHash: text('token_hash').notNull(),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+    status: organizationAdminInvitationStatus('status').notNull().default('PENDING'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    respondedAt: timestamp('responded_at', { withTimezone: true }),
+  },
+  (table) => [
+    uniqueIndex('organization_admin_invitations_token_hash_unique').on(table.tokenHash),
+    index('organization_admin_invitations_org_status_created_idx').on(
+      table.organizationId,
+      table.status,
+      table.createdAt,
+    ),
+    index('organization_admin_invitations_target_status_expiry_idx').on(
+      table.targetUserId,
+      table.status,
+      table.expiresAt,
+    ),
+    index('organization_admin_invitations_inviter_idx').on(table.invitedByUserId),
+    check(
+      'organization_admin_invitations_token_hash_length',
+      sql`char_length(${table.tokenHash}) = 64`,
+    ),
+    check(
+      'organization_admin_invitations_expiry_after_creation',
+      sql`${table.expiresAt} > ${table.createdAt}`,
+    ),
+    check(
+      'organization_admin_invitations_distinct_users',
+      sql`${table.targetUserId} <> ${table.invitedByUserId}`,
+    ),
+    check(
+      'organization_admin_invitations_response_matches_status',
+      sql`(${table.status} = 'PENDING' and ${table.respondedAt} is null) or (${table.status} in ('ACCEPTED', 'REVOKED') and ${table.respondedAt} is not null)`,
+    ),
+  ],
+).enableRLS();
+
+export const organizationVerificationRequestStatus = pgEnum(
+  'organization_verification_request_status',
+  ['PENDING', 'APPROVED', 'REJECTED'],
+);
+
+export const organizationVerificationRequests = pgTable(
+  'organization_verification_requests',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    organizationId: uuid('organization_id')
+      .notNull()
+      .references(() => organizations.id, { onDelete: 'restrict' }),
+    requestedByUserId: uuid('requested_by_user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'restrict' }),
+    status: organizationVerificationRequestStatus('status').notNull().default('PENDING'),
+    requestNote: text('request_note'),
+    decisionNote: text('decision_note'),
+    decidedByUserId: uuid('decided_by_user_id').references(() => users.id, {
+      onDelete: 'restrict',
+    }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    decidedAt: timestamp('decided_at', { withTimezone: true }),
+  },
+  (table) => [
+    uniqueIndex('organization_verification_requests_pending_unique')
+      .on(table.organizationId)
+      .where(sql`${table.status} = 'PENDING'`),
+    index('organization_verification_requests_org_created_idx').on(
+      table.organizationId,
+      table.createdAt,
+    ),
+    index('organization_verification_requests_status_created_idx').on(
+      table.status,
+      table.createdAt,
+    ),
+    index('organization_verification_requests_requester_idx').on(table.requestedByUserId),
+    index('organization_verification_requests_decider_idx').on(table.decidedByUserId),
+    check(
+      'organization_verification_requests_request_note_length',
+      sql`${table.requestNote} is null or char_length(${table.requestNote}) <= 2000`,
+    ),
+    check(
+      'organization_verification_requests_decision_note_length',
+      sql`${table.decisionNote} is null or char_length(${table.decisionNote}) <= 2000`,
+    ),
+    check(
+      'organization_verification_requests_decision_matches_status',
+      sql`(${table.status} = 'PENDING' and ${table.decidedAt} is null and ${table.decidedByUserId} is null and ${table.decisionNote} is null) or (${table.status} in ('APPROVED', 'REJECTED') and ${table.decidedAt} is not null and ${table.decidedByUserId} is not null)`,
+    ),
+  ],
+).enableRLS();
+
+export const communityMemberStatus = pgEnum('community_member_status', [
+  'PENDING',
+  'WAITLISTED',
+  'ACTIVE',
+  'REJECTED',
+  'LEFT',
+  'REMOVED',
+]);
+export const eventRegistrationStatus = pgEnum('event_registration_status', [
+  'PENDING',
+  'WAITLISTED',
+  'ACCEPTED',
+  'REJECTED',
+  'CANCELLED_BY_USER',
+  'REMOVED_BY_ORGANIZER',
+  'ATTENDED',
+  'NO_SHOW',
+]);
+
+export const communityMemberships = pgTable(
+  'community_memberships',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    communityId: text('community_id')
+      .notNull()
+      .references(() => communities.id, { onDelete: 'restrict' }),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'restrict' }),
+    status: communityMemberStatus('status').notNull(),
+    requestedAt: timestamp('requested_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    unique('community_memberships_community_user_unique').on(table.communityId, table.userId),
+    index('community_memberships_queue_idx').on(table.communityId, table.status, table.requestedAt),
+    index('community_memberships_user_status_idx').on(table.userId, table.status),
+  ],
+).enableRLS();
+
+export const communityMembershipTransitions = pgTable(
+  'community_membership_transitions',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    membershipId: uuid('membership_id')
+      .notNull()
+      .references(() => communityMemberships.id, { onDelete: 'restrict' }),
+    fromStatus: communityMemberStatus('from_status'),
+    toStatus: communityMemberStatus('to_status').notNull(),
+    actorUserId: uuid('actor_user_id').references(() => users.id, { onDelete: 'restrict' }),
+    reason: text('reason'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index('community_membership_transitions_history_idx').on(table.membershipId, table.createdAt),
+  ],
+).enableRLS();
+
+export const eventRegistrations = pgTable(
+  'event_registrations',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    eventId: text('event_id')
+      .notNull()
+      .references(() => events.id, { onDelete: 'restrict' }),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'restrict' }),
+    status: eventRegistrationStatus('status').notNull(),
+    requestedAt: timestamp('requested_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    unique('event_registrations_event_user_unique').on(table.eventId, table.userId),
+    index('event_registrations_queue_idx').on(table.eventId, table.status, table.requestedAt),
+    index('event_registrations_user_status_idx').on(table.userId, table.status),
+  ],
+).enableRLS();
+
+export const eventRegistrationTransitions = pgTable(
+  'event_registration_transitions',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    registrationId: uuid('registration_id')
+      .notNull()
+      .references(() => eventRegistrations.id, { onDelete: 'restrict' }),
+    fromStatus: eventRegistrationStatus('from_status'),
+    toStatus: eventRegistrationStatus('to_status').notNull(),
+    actorUserId: uuid('actor_user_id').references(() => users.id, { onDelete: 'restrict' }),
+    reason: text('reason'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index('event_registration_transitions_history_idx').on(table.registrationId, table.createdAt),
+  ],
+).enableRLS();
+
+const identity = pgSchema('identity');
+
+export const accountStatus = identity.enum('account_status', [
+  'ACTIVE',
+  'SUSPENDED',
+  'DELETION_PENDING',
+  'DEACTIVATED',
+]);
+
+export const users = identity
+  .table(
+    'users',
+    {
+      id: uuid('id').primaryKey(),
+      normalizedEmail: text('normalized_email').notNull(),
+      emailVerifiedAt: timestamp('email_verified_at', { withTimezone: true }),
+      accountStatus: accountStatus('account_status').notNull().default('ACTIVE'),
+      createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+      updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+    },
+    (table) => [
+      check('users_normalized_email_is_not_empty', sql`length(${table.normalizedEmail}) > 0`),
+      check(
+        'users_normalized_email_is_lowercase',
+        sql`${table.normalizedEmail} = lower(${table.normalizedEmail})`,
+      ),
+      unique('users_normalized_email_unique').on(table.normalizedEmail),
+    ],
+  )
+  .enableRLS();
+
+export const authIdentities = identity
+  .table(
+    'auth_identities',
+    {
+      userId: uuid('user_id')
+        .notNull()
+        .references(() => users.id, { onDelete: 'restrict' }),
+      provider: text('provider').notNull(),
+      providerUserId: text('provider_user_id').notNull(),
+      createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    },
+    (table) => [
+      primaryKey({
+        name: 'auth_identities_provider_provider_user_id_pk',
+        columns: [table.provider, table.providerUserId],
+      }),
+      index('auth_identities_user_id_index').on(table.userId),
+    ],
+  )
+  .enableRLS();
+
+export const profiles = identity
+  .table(
+    'profiles',
+    {
+      id: uuid('id')
+        .primaryKey()
+        .references(() => users.id, { onDelete: 'cascade' }),
+      displayName: text('display_name').notNull(),
+      avatarPath: text('avatar_path'),
+      bio: text('bio').notNull().default(''),
+      cityId: text('city_id').references(() => cities.id),
+      interests: text('interests')
+        .array()
+        .notNull()
+        .default(sql`'{}'::text[]`),
+      createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+      updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+    },
+    (table) => [
+      check(
+        'profiles_display_name_length',
+        sql`char_length(${table.displayName}) between 1 and 80`,
+      ),
+      check('profiles_bio_length', sql`char_length(${table.bio}) <= 500`),
+      index('profiles_city_id_idx').on(table.cityId),
+    ],
+  )
+  .enableRLS();

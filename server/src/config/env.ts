@@ -1,0 +1,52 @@
+import { z } from 'zod';
+
+const optionalText = z.preprocess(
+  (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
+  z.string().min(1).optional(),
+);
+
+const environmentSchema = z
+  .object({
+    NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+    PORT: z.coerce.number().int().min(1).max(65535).default(3000),
+    CLIENT_ORIGIN: z.string().url().default('http://localhost:5173'),
+    DATABASE_URL: z.preprocess(
+      (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
+      z.string().url().optional(),
+    ),
+    SUPABASE_URL: z.preprocess(
+      (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
+      z.string().url().optional(),
+    ),
+    SUPABASE_PUBLISHABLE_KEY: optionalText,
+    SUPABASE_SECRET_KEY: optionalText,
+    SUPABASE_SERVICE_ROLE_KEY: optionalText,
+    PLATFORM_ADMIN_USER_IDS: optionalText,
+    RESEND_API_KEY: optionalText,
+    STREAM_API_KEY: optionalText,
+    STREAM_API_SECRET: optionalText,
+  })
+  .superRefine((environment, context) => {
+    if (environment.NODE_ENV === 'production') {
+      if (!environment.DATABASE_URL) {
+        context.addIssue({
+          code: 'custom',
+          path: ['DATABASE_URL'],
+          message: 'Required in production.',
+        });
+      }
+      if (environment.CLIENT_ORIGIN === 'http://localhost:5173') {
+        context.addIssue({
+          code: 'custom',
+          path: ['CLIENT_ORIGIN'],
+          message: 'Set the production client origin.',
+        });
+      }
+    }
+  });
+
+export type Environment = z.infer<typeof environmentSchema>;
+
+export function validateEnvironment(config: Record<string, unknown>): Environment {
+  return environmentSchema.parse(config);
+}
