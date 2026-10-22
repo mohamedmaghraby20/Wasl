@@ -1,0 +1,7 @@
+export { getCommunitiesMock } from './communities/communities.msw'
+export { getDiscoveryMock } from './discovery/discovery.msw'
+export { getEventsMock } from './events/events.msw'
+export { getHealthMock } from './health/health.msw'
+export { getOrganizationsMock } from './organizations/organizations.msw'
+export { getParticipationMock } from './participation/participation.msw'
+export { getUsersMock } from './users/users.msw'
