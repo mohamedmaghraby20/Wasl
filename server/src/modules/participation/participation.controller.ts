@@ -1,9 +1,26 @@
-import { BadRequestException, Controller, Get, Param, ParseUUIDPipe, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import type { FastifyRequest } from 'fastify';
 import { getAuthenticatedUser } from '../auth/authenticated-user';
 import { SupabaseAuthGuard } from '../auth/supabase-auth.guard';
-import { MembershipStateDto, MyActivityDto, ParticipantListItemDto, ParticipationCountsDto, ParticipationDecisionDto, RegistrationStateDto } from './participation.dto';
+import {
+  MembershipStateDto,
+  MyActivityDto,
+  ParticipantListItemDto,
+  ParticipationCountsDto,
+  ParticipationDecisionDto,
+  RegistrationStateDto,
+} from './participation.dto';
 import { ParticipationService } from './participation.service';
 
 @ApiTags('participation')
@@ -74,8 +91,14 @@ export class ParticipationController {
     @Param('participantId', ParseUUIDPipe) participantId: string,
     @Param('action') action: string,
   ) {
-    if (!['approve', 'reject', 'promote', 'remove'].includes(action)) throw new BadRequestException('Unsupported membership action.');
-    return this.participation.decideCommunity(getAuthenticatedUser(request), id, participantId, action as 'approve' | 'reject' | 'promote' | 'remove');
+    if (!['approve', 'reject', 'promote', 'remove'].includes(action))
+      throw new BadRequestException('Unsupported membership action.');
+    return this.participation.decideCommunity(
+      getAuthenticatedUser(request),
+      id,
+      participantId,
+      action as 'approve' | 'reject' | 'promote' | 'remove',
+    );
   }
 
   @Get('events/:id/participants')
@@ -98,7 +121,13 @@ export class ParticipationController {
     @Param('participantId', ParseUUIDPipe) participantId: string,
     @Param('action') action: string,
   ) {
-    if (!['approve', 'reject', 'promote', 'remove', 'attended', 'no-show'].includes(action)) throw new BadRequestException('Unsupported registration action.');
-    return this.participation.decideEvent(getAuthenticatedUser(request), id, participantId, action as 'approve' | 'reject' | 'promote' | 'remove' | 'attended' | 'no-show');
+    if (!['approve', 'reject', 'promote', 'remove', 'attended', 'no-show'].includes(action))
+      throw new BadRequestException('Unsupported registration action.');
+    return this.participation.decideEvent(
+      getAuthenticatedUser(request),
+      id,
+      participantId,
+      action as 'approve' | 'reject' | 'promote' | 'remove' | 'attended' | 'no-show',
+    );
   }
 }

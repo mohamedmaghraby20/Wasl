@@ -24,7 +24,9 @@ describe('SupabaseAuthGuard', () => {
       headers: { authorization: 'Bearer access-token' },
     } as Partial<FastifyRequest>;
 
-    await expect(new SupabaseAuthGuard(auth, identityService).canActivate(contextFor(request))).resolves.toBe(true);
+    await expect(
+      new SupabaseAuthGuard(auth, identityService).canActivate(contextFor(request)),
+    ).resolves.toBe(true);
     expect(authenticate).toHaveBeenCalledWith('access-token');
     expect(resolve).toHaveBeenCalledWith(verified);
     expect(request.user).toEqual(identity);

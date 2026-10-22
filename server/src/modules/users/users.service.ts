@@ -1,4 +1,10 @@
-import { BadRequestException, Inject, Injectable, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { and, eq } from 'drizzle-orm';
 import { DATABASE, type Database } from '../../db/database.module';
@@ -88,7 +94,8 @@ export class UsersService {
       const displayName = [...input.displayName.trim()]
         .filter((character) => character.charCodeAt(0) > 31 && character.charCodeAt(0) !== 127)
         .join('');
-      if (!displayName || displayName.length > 80) throw new BadRequestException('Display name is invalid.');
+      if (!displayName || displayName.length > 80)
+        throw new BadRequestException('Display name is invalid.');
       changes.displayName = displayName;
       hasChange = true;
     }
@@ -100,14 +107,20 @@ export class UsersService {
     }
     if (input.cityId !== undefined) {
       if (input.cityId !== null) {
-        const [city] = await db.select({ id: cities.id }).from(cities).where(eq(cities.id, input.cityId)).limit(1);
+        const [city] = await db
+          .select({ id: cities.id })
+          .from(cities)
+          .where(eq(cities.id, input.cityId))
+          .limit(1);
         if (!city) throw new BadRequestException('Choose a city from the available list.');
       }
       changes.cityId = input.cityId;
       hasChange = true;
     }
     if (input.interests !== undefined) {
-      const interests = [...new Set(input.interests.map((interest) => interest.trim()).filter(Boolean))];
+      const interests = [
+        ...new Set(input.interests.map((interest) => interest.trim()).filter(Boolean)),
+      ];
       if (interests.length > 20 || interests.some((interest) => interest.length > 60)) {
         throw new BadRequestException('Interests are invalid.');
       }
@@ -125,8 +138,18 @@ export class UsersService {
     return this.getCurrent(user, language);
   }
 
-  async removeUnusedAvatar(user: AuthenticatedUser, oldPath: string | null, nextPath: string | null): Promise<void> {
-    if (!oldPath || oldPath === nextPath || !this.storage || !oldPath.startsWith(`${user.authUserId}/`)) return;
+  async removeUnusedAvatar(
+    user: AuthenticatedUser,
+    oldPath: string | null,
+    nextPath: string | null,
+  ): Promise<void> {
+    if (
+      !oldPath ||
+      oldPath === nextPath ||
+      !this.storage ||
+      !oldPath.startsWith(`${user.authUserId}/`)
+    )
+      return;
     await this.storage.storage.from(PHOTO_BUCKET).remove([oldPath]);
   }
 
@@ -135,7 +158,8 @@ export class UsersService {
     if (!/^[0-9a-f-]{36}\.(?:jpg|jpeg|png|webp)$/i.test(fileName)) {
       throw new BadRequestException('Choose an image uploaded to your account.');
     }
-    if (!this.storage) throw new ServiceUnavailableException('Profile photo storage is not configured.');
+    if (!this.storage)
+      throw new ServiceUnavailableException('Profile photo storage is not configured.');
     const { data, error } = await this.storage.storage.from(PHOTO_BUCKET).download(path);
     if (error || !data) throw new BadRequestException('Upload the profile photo again.');
     if (data.size === 0 || data.size > MAX_PHOTO_BYTES) {
@@ -143,7 +167,9 @@ export class UsersService {
     }
     const signature = new Uint8Array(await data.slice(0, 12).arrayBuffer());
     const isJpeg = signature[0] === 0xff && signature[1] === 0xd8 && signature[2] === 0xff;
-    const isPng = [137, 80, 78, 71, 13, 10, 26, 10].every((byte, index) => signature[index] === byte);
+    const isPng = [137, 80, 78, 71, 13, 10, 26, 10].every(
+      (byte, index) => signature[index] === byte,
+    );
     const isWebp =
       signature.length >= 12 &&
       String.fromCharCode(...signature.slice(0, 4)) === 'RIFF' &&

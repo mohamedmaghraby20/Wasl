@@ -8,7 +8,12 @@ interface AuthContextValue {
   loading: boolean;
   user: User | null;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (displayName: string, email: string, password: string, returnTo: string) => Promise<boolean>;
+  signUp: (
+    displayName: string,
+    email: string,
+    password: string,
+    returnTo: string,
+  ) => Promise<boolean>;
   signOut: () => Promise<void>;
 }
 

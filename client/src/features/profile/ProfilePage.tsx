@@ -59,8 +59,12 @@ export function ProfilePage(): React.JSX.Element {
         <div className="min-w-0 space-y-5">
           <div>
             <p className="text-sm text-muted-foreground">{t('profileNameLabel')}</p>
-            <h2 className="mt-1 break-words font-heading text-2xl font-bold">{person.displayName}</h2>
-            {person.cityName && <p className="mt-1 text-sm text-muted-foreground">{person.cityName}</p>}
+            <h2 className="mt-1 break-words font-heading text-2xl font-bold">
+              {person.displayName}
+            </h2>
+            {person.cityName && (
+              <p className="mt-1 text-sm text-muted-foreground">{person.cityName}</p>
+            )}
           </div>
 
           <div className="grid gap-1">

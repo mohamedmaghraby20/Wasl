@@ -17,14 +17,22 @@ vi.mock('@/api/generated/participation/participation', () => ({
   useParticipationControllerEventParticipants: mocks.participants,
   useParticipationControllerCommunityCounts: mocks.counts,
   useParticipationControllerEventCounts: mocks.counts,
-  useParticipationControllerCommunityDecision: () => ({ mutateAsync: mocks.decision, isPending: false }),
-  useParticipationControllerEventDecision: () => ({ mutateAsync: mocks.decision, isPending: false }),
+  useParticipationControllerCommunityDecision: () => ({
+    mutateAsync: mocks.decision,
+    isPending: false,
+  }),
+  useParticipationControllerEventDecision: () => ({
+    mutateAsync: mocks.decision,
+    isPending: false,
+  }),
 }));
 
 function renderPanel(): void {
   render(
     <I18nextProvider i18n={i18n}>
-      <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+      <QueryClientProvider
+        client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
+      >
         <OrganizerParticipationPanel kind="communities" resourceId="community-1" />
       </QueryClientProvider>
     </I18nextProvider>,
@@ -36,7 +44,15 @@ describe('OrganizerParticipationPanel', () => {
     vi.clearAllMocks();
     await i18n.changeLanguage('en');
     mocks.participants.mockReturnValue({
-      data: [{ id: 'membership-1', userId: 'user-1', displayName: 'Samira', status: 'PENDING', requestedAt: '2026-10-01T00:00:00Z' }],
+      data: [
+        {
+          id: 'membership-1',
+          userId: 'user-1',
+          displayName: 'Samira',
+          status: 'PENDING',
+          requestedAt: '2026-10-01T00:00:00Z',
+        },
+      ],
       isPending: false,
       isError: false,
       refetch: vi.fn(),
@@ -60,6 +76,10 @@ describe('OrganizerParticipationPanel', () => {
     expect(screen.getByText('10')).toBeVisible();
     await user.click(screen.getByRole('button', { name: 'Approve' }));
 
-    expect(mocks.decision).toHaveBeenCalledWith({ id: 'community-1', participantId: 'membership-1', action: 'approve' });
+    expect(mocks.decision).toHaveBeenCalledWith({
+      id: 'community-1',
+      participantId: 'membership-1',
+      action: 'approve',
+    });
   });
 });

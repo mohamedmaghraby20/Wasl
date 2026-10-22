@@ -30,14 +30,19 @@ describe('UsersService', () => {
       email: 'private@example.com',
     };
     const db = { select: vi.fn(() => selectQuery([row])) };
-    const service = new UsersService(db as unknown as Database, undefined, 'https://wasl.supabase.co');
+    const service = new UsersService(
+      db as unknown as Database,
+      undefined,
+      'https://wasl.supabase.co',
+    );
 
     const result = await service.getPublic(row.id, 'en');
 
     expect(result).toEqual({
       id: row.id,
       displayName: row.displayName,
-      avatarUrl: 'https://wasl.supabase.co/storage/v1/object/public/profile-photos/auth-id/00000000-0000-4000-8000-000000000000.png',
+      avatarUrl:
+        'https://wasl.supabase.co/storage/v1/object/public/profile-photos/auth-id/00000000-0000-4000-8000-000000000000.png',
       bio: row.bio,
       cityId: row.cityId,
       cityName: row.cityName,
@@ -53,7 +58,9 @@ describe('UsersService', () => {
     const user: AuthenticatedUser = { id: 'local-id', authUserId: 'auth-user-id' };
 
     await expect(
-      service.updateCurrent(user, { avatarPath: 'other-user/00000000-0000-4000-8000-000000000000.png' }),
+      service.updateCurrent(user, {
+        avatarPath: 'other-user/00000000-0000-4000-8000-000000000000.png',
+      }),
     ).rejects.toBeInstanceOf(BadRequestException);
   });
 });

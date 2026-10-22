@@ -19,7 +19,10 @@ vi.mock('@/features/auth/AuthProvider', () => ({ useAuth: mocks.useAuth }));
 vi.mock('@/api/generated/participation/participation', () => ({
   useParticipationControllerMyActivity: mocks.useActivity,
   useParticipationControllerLeaveCommunity: () => ({ mutateAsync: mocks.leave, isPending: false }),
-  useParticipationControllerCancelEventRegistration: () => ({ mutateAsync: mocks.cancel, isPending: false }),
+  useParticipationControllerCancelEventRegistration: () => ({
+    mutateAsync: mocks.cancel,
+    isPending: false,
+  }),
 }));
 
 function renderPage(): void {
@@ -29,7 +32,9 @@ function renderPage(): void {
       <UnheadProvider head={createHead()}>
         <QueryClientProvider client={queryClient}>
           <MemoryRouter initialEntries={['/activity']}>
-            <Routes><Route path="/activity" element={<MyActivityPage />} /></Routes>
+            <Routes>
+              <Route path="/activity" element={<MyActivityPage />} />
+            </Routes>
           </MemoryRouter>
         </QueryClientProvider>
       </UnheadProvider>
@@ -44,14 +49,23 @@ describe('MyActivityPage', () => {
     mocks.useAuth.mockReturnValue({ user: { id: 'user-1' }, loading: false });
     mocks.leave.mockResolvedValue({ status: 'LEFT' });
     mocks.cancel.mockResolvedValue({ status: 'CANCELLED_BY_USER' });
-    vi.stubGlobal('confirm', vi.fn(() => true));
+    vi.stubGlobal(
+      'confirm',
+      vi.fn(() => true),
+    );
   });
 
   it('shows both empty states when the user has no participation', () => {
-    mocks.useActivity.mockReturnValue({ data: { communities: [], events: [] }, isPending: false, isError: false });
+    mocks.useActivity.mockReturnValue({
+      data: { communities: [], events: [] },
+      isPending: false,
+      isError: false,
+    });
     renderPage();
 
-    expect(screen.getByText('You have not joined or requested to join a Community yet.')).toBeVisible();
+    expect(
+      screen.getByText('You have not joined or requested to join a Community yet.'),
+    ).toBeVisible();
     expect(screen.getByText('You have not registered for an Event yet.')).toBeVisible();
   });
 
@@ -59,8 +73,26 @@ describe('MyActivityPage', () => {
     const user = userEvent.setup();
     mocks.useActivity.mockReturnValue({
       data: {
-        communities: [{ id: 'community-1', slug: 'students', name: 'Student Circle', status: 'ACTIVE', requestedAt: '2026-10-01T00:00:00Z' }],
-        events: [{ id: 'event-1', slug: 'meetup', title: 'Community meetup', startsAt: '2026-11-01T18:00:00Z', cancelled: false, status: 'WAITLISTED', requestedAt: '2026-10-01T00:00:00Z' }],
+        communities: [
+          {
+            id: 'community-1',
+            slug: 'students',
+            name: 'Student Circle',
+            status: 'ACTIVE',
+            requestedAt: '2026-10-01T00:00:00Z',
+          },
+        ],
+        events: [
+          {
+            id: 'event-1',
+            slug: 'meetup',
+            title: 'Community meetup',
+            startsAt: '2026-11-01T18:00:00Z',
+            cancelled: false,
+            status: 'WAITLISTED',
+            requestedAt: '2026-10-01T00:00:00Z',
+          },
+        ],
       },
       isPending: false,
       isError: false,
@@ -71,6 +103,9 @@ describe('MyActivityPage', () => {
     expect(screen.getByText('You are on the waitlist')).toBeVisible();
     await user.click(screen.getByRole('button', { name: 'Leave community' }));
     expect(mocks.leave).toHaveBeenCalledWith({ id: 'community-1' });
-    expect(screen.getByRole('link', { name: 'Community meetup' })).toHaveAttribute('href', '/events/meetup');
+    expect(screen.getByRole('link', { name: 'Community meetup' })).toHaveAttribute(
+      'href',
+      '/events/meetup',
+    );
   });
 });

@@ -23,7 +23,8 @@ const SUPABASE_PUBLIC_URL = 'SUPABASE_PUBLIC_URL';
       useFactory: (config: ConfigService) => {
         const url = config.get<string>('SUPABASE_URL');
         const key =
-          config.get<string>('SUPABASE_SECRET_KEY') ?? config.get<string>('SUPABASE_SERVICE_ROLE_KEY');
+          config.get<string>('SUPABASE_SECRET_KEY') ??
+          config.get<string>('SUPABASE_SERVICE_ROLE_KEY');
         if (!url || !key) return undefined;
         return createClient(url, key, {
           auth: { autoRefreshToken: false, persistSession: false, detectSessionInUrl: false },

@@ -1,18 +1,36 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class MembershipStateDto {
-  @ApiProperty({ enum: ['PENDING', 'WAITLISTED', 'ACTIVE', 'REJECTED', 'LEFT', 'REMOVED'], nullable: true }) status!: string | null;
+  @ApiProperty({
+    enum: ['PENDING', 'WAITLISTED', 'ACTIVE', 'REJECTED', 'LEFT', 'REMOVED'],
+    nullable: true,
+  })
+  status!: string | null;
 }
 
 export class RegistrationStateDto {
-  @ApiProperty({ enum: ['PENDING', 'WAITLISTED', 'ACCEPTED', 'REJECTED', 'CANCELLED_BY_USER', 'REMOVED_BY_ORGANIZER', 'ATTENDED', 'NO_SHOW'], nullable: true }) status!: string | null;
+  @ApiProperty({
+    enum: [
+      'PENDING',
+      'WAITLISTED',
+      'ACCEPTED',
+      'REJECTED',
+      'CANCELLED_BY_USER',
+      'REMOVED_BY_ORGANIZER',
+      'ATTENDED',
+      'NO_SHOW',
+    ],
+    nullable: true,
+  })
+  status!: string | null;
 }
 
 export class CommunityActivityItemDto {
   @ApiProperty({ format: 'uuid' }) id!: string;
   @ApiProperty() name!: string;
   @ApiProperty() slug!: string;
-  @ApiProperty({ enum: ['PENDING', 'WAITLISTED', 'ACTIVE', 'REJECTED', 'LEFT', 'REMOVED'] }) status!: string;
+  @ApiProperty({ enum: ['PENDING', 'WAITLISTED', 'ACTIVE', 'REJECTED', 'LEFT', 'REMOVED'] })
+  status!: string;
   @ApiProperty({ format: 'date-time' }) requestedAt!: string;
 }
 
@@ -22,7 +40,19 @@ export class EventActivityItemDto {
   @ApiProperty() slug!: string;
   @ApiProperty({ format: 'date-time' }) startsAt!: string;
   @ApiProperty() cancelled!: boolean;
-  @ApiProperty({ enum: ['PENDING', 'WAITLISTED', 'ACCEPTED', 'REJECTED', 'CANCELLED_BY_USER', 'REMOVED_BY_ORGANIZER', 'ATTENDED', 'NO_SHOW'] }) status!: string;
+  @ApiProperty({
+    enum: [
+      'PENDING',
+      'WAITLISTED',
+      'ACCEPTED',
+      'REJECTED',
+      'CANCELLED_BY_USER',
+      'REMOVED_BY_ORGANIZER',
+      'ATTENDED',
+      'NO_SHOW',
+    ],
+  })
+  status!: string;
   @ApiProperty({ format: 'date-time' }) requestedAt!: string;
 }
 

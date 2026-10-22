@@ -1,10 +1,20 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { ArrayMaxSize, IsArray, IsOptional, IsString, MaxLength, MinLength, ValidateIf } from 'class-validator';
+import {
+  ArrayMaxSize,
+  IsArray,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+  ValidateIf,
+} from 'class-validator';
 
 export class CurrentUserDto {
   @ApiProperty({ format: 'uuid' }) id!: string;
   @ApiProperty() email!: string;
-  @ApiPropertyOptional({ type: String, nullable: true, format: 'date-time' }) emailVerifiedAt!: string | null;
+  @ApiPropertyOptional({ type: String, nullable: true, format: 'date-time' }) emailVerifiedAt!:
+    | string
+    | null;
   @ApiProperty() displayName!: string;
   @ApiPropertyOptional({ type: String, nullable: true }) avatarUrl!: string | null;
   @ApiProperty() bio!: string;

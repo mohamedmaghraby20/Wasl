@@ -10,7 +10,11 @@ export function PublicUserProfilePage(): React.JSX.Element {
   const { t, i18n } = useTranslation();
   const { id = '' } = useParams();
   const lang = languageCode(i18n.language);
-  const profile = useUsersControllerPublicProfile(id, { lang }, { query: { enabled: Boolean(id) } });
+  const profile = useUsersControllerPublicProfile(
+    id,
+    { lang },
+    { query: { enabled: Boolean(id) } },
+  );
   useHead({
     title: profile.data?.displayName ?? t('publicProfileTitle'),
     meta: [{ name: 'description', content: profile.data?.bio || t('publicProfileIntro') }],
@@ -28,7 +32,11 @@ export function PublicUserProfilePage(): React.JSX.Element {
     <article className="mx-auto max-w-(--container-reading) space-y-7">
       <header className="grid gap-5 border-b border-border pb-6 sm:grid-cols-[8rem_1fr] sm:items-center">
         {person.avatarUrl ? (
-          <img alt="" className="size-28 rounded-full border border-border object-cover" src={person.avatarUrl} />
+          <img
+            alt=""
+            className="size-28 rounded-full border border-border object-cover"
+            src={person.avatarUrl}
+          />
         ) : (
           <div className="grid size-28 place-items-center rounded-full bg-primary-soft text-3xl font-bold text-primary-soft-text">
             {initials || <CircleUserRound aria-hidden="true" size={42} />}
@@ -36,8 +44,12 @@ export function PublicUserProfilePage(): React.JSX.Element {
         )}
         <div>
           <p className="text-sm text-muted-foreground">{t('publicProfileTitle')}</p>
-          <h1 className="mt-1 break-words font-heading text-3xl font-bold tracking-tight">{person.displayName}</h1>
-          {person.cityName && <p className="mt-2 text-sm text-muted-foreground">{person.cityName}</p>}
+          <h1 className="mt-1 break-words font-heading text-3xl font-bold tracking-tight">
+            {person.displayName}
+          </h1>
+          {person.cityName && (
+            <p className="mt-2 text-sm text-muted-foreground">{person.cityName}</p>
+          )}
         </div>
       </header>
       <section className="grid gap-2">

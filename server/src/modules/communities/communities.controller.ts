@@ -1,9 +1,25 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Post, Put, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  Put,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import type { FastifyRequest } from 'fastify';
 import { getAuthenticatedUser } from '../auth/authenticated-user';
 import { SupabaseAuthGuard } from '../auth/supabase-auth.guard';
-import { CreatedResourceDto, CreateCommunityDto, ManagedCommunityDto, UpdateCommunityDto } from './communities.dto';
+import {
+  CreatedResourceDto,
+  CreateCommunityDto,
+  ManagedCommunityDto,
+  UpdateCommunityDto,
+} from './communities.dto';
 import { CommunitiesService } from './communities.service';
 
 @ApiTags('communities')
@@ -28,7 +44,11 @@ export class CommunitiesController {
   @Put(':id')
   @UseGuards(SupabaseAuthGuard)
   @ApiOkResponse({ type: CreatedResourceDto })
-  update(@Req() request: FastifyRequest, @Param('id', ParseUUIDPipe) id: string, @Body() input: UpdateCommunityDto) {
+  update(
+    @Req() request: FastifyRequest,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() input: UpdateCommunityDto,
+  ) {
     return this.communities.update(getAuthenticatedUser(request), id, input);
   }
 

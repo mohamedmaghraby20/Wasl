@@ -33,11 +33,11 @@ describe('SupabaseIdentityService', () => {
     const service = new SupabaseIdentityService(db as unknown as Database);
 
     const result = await service.resolve({
-        authUserId,
-        email: 'member@example.com',
-        emailVerifiedAt: new Date('2026-10-21T12:00:00Z'),
-        displayName: 'Member Name',
-      });
+      authUserId,
+      email: 'member@example.com',
+      emailVerifiedAt: new Date('2026-10-21T12:00:00Z'),
+      displayName: 'Member Name',
+    });
     expect(result).toEqual({ id: expect.any(String), authUserId });
     expect(result.id).not.toBe(authUserId);
     expect(inserted).toEqual([
@@ -50,7 +50,10 @@ describe('SupabaseIdentityService', () => {
   it('blocks suspended identities before creating a profile', async () => {
     const tx = {
       execute: vi.fn(),
-      select: vi.fn().mockImplementationOnce(() => query([{ userId: 'local-id' }])).mockImplementationOnce(() => query([{ status: 'SUSPENDED' }])),
+      select: vi
+        .fn()
+        .mockImplementationOnce(() => query([{ userId: 'local-id' }]))
+        .mockImplementationOnce(() => query([{ status: 'SUSPENDED' }])),
       insert: vi.fn(),
       update: vi.fn(() => ({ set: () => ({ where: vi.fn() }) })),
     };

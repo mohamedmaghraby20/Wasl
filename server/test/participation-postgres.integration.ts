@@ -8,7 +8,8 @@ import type { AuthenticatedUser } from '../src/modules/auth/authenticated-user';
 import { ParticipationService } from '../src/modules/participation/participation.service';
 
 const connectionString = process.env.DATABASE_URL;
-if (!connectionString) throw new Error('DATABASE_URL is required to run isolated participation concurrency checks.');
+if (!connectionString)
+  throw new Error('DATABASE_URL is required to run isolated participation concurrency checks.');
 
 const testSchema = `wasl_phase4_${randomUUID().replaceAll('-', '')}`;
 const identityIds: string[] = [];
@@ -45,11 +46,16 @@ async function createTestTables(pool: Pool): Promise<void> {
     'event_registrations',
     'event_registration_transitions',
   ]) {
-    await pool.query(`create table ${schemaName}.${quoteIdentifier(table)} (like public.${quoteIdentifier(table)} including all)`);
+    await pool.query(
+      `create table ${schemaName}.${quoteIdentifier(table)} (like public.${quoteIdentifier(table)} including all)`,
+    );
   }
 }
 
-async function seedResources(pool: Pool, ownerId: string): Promise<{ communityId: string; eventId: string }> {
+async function seedResources(
+  pool: Pool,
+  ownerId: string,
+): Promise<{ communityId: string; eventId: string }> {
   const communityId = randomUUID();
   const eventId = randomUUID();
   const qualifiedSchema = quoteIdentifier(testSchema);
@@ -82,7 +88,9 @@ async function main(): Promise<void> {
     const users = await makeUsers(setupPool, 12);
     const { communityId, eventId } = await seedResources(setupPool, users[0]!.id);
 
-    const communityResults = await Promise.all(users.map((user) => service.joinCommunity(user, communityId)));
+    const communityResults = await Promise.all(
+      users.map((user) => service.joinCommunity(user, communityId)),
+    );
     assert.equal(communityResults.filter((result) => result.status === 'ACTIVE').length, 3);
     assert.equal(communityResults.filter((result) => result.status === 'WAITLISTED').length, 9);
     const communityRows = await setupPool.query<{ count: string }>(
@@ -91,12 +99,16 @@ async function main(): Promise<void> {
     );
     assert.equal(Number(communityRows.rows[0]?.count), users.length);
 
-    const activeTestUser = users[communityResults.findIndex((result) => result.status === 'ACTIVE')]!;
+    const activeTestUser =
+      users[communityResults.findIndex((result) => result.status === 'ACTIVE')]!;
     const duplicateResults = await Promise.all([
       service.joinCommunity(activeTestUser, communityId),
       service.joinCommunity(activeTestUser, communityId),
     ]);
-    assert.deepEqual(duplicateResults.map((result) => result.status), ['ACTIVE', 'ACTIVE']);
+    assert.deepEqual(
+      duplicateResults.map((result) => result.status),
+      ['ACTIVE', 'ACTIVE'],
+    );
     const duplicateRows = await setupPool.query<{ count: string }>(
       `select count(*)::text as count from ${qualifiedSchema}.community_memberships where community_id = $1 and user_id = $2`,
       [communityId, activeTestUser.id],
@@ -111,7 +123,9 @@ async function main(): Promise<void> {
       `select user_id from ${qualifiedSchema}.community_memberships where community_id = $1 and status = 'ACTIVE' order by requested_at, id limit 2`,
       [communityId],
     );
-    const leaveUsers = activeCommunity.rows.map((row) => users.find((user) => user.id === row.user_id));
+    const leaveUsers = activeCommunity.rows.map((row) =>
+      users.find((user) => user.id === row.user_id),
+    );
     assert.ok(leaveUsers.every((user): user is AuthenticatedUser => Boolean(user)));
     assert.equal(oldestWaiting.rows.length, 2);
     await Promise.all(leaveUsers.map((user) => service.leaveCommunity(user, communityId)));
@@ -126,15 +140,21 @@ async function main(): Promise<void> {
     );
     assert.equal(Number(activeAfterLeaves.rows[0]?.count), 3);
 
-    const eventResults = await Promise.all(users.map((user) => service.registerForEvent(user, eventId)));
+    const eventResults = await Promise.all(
+      users.map((user) => service.registerForEvent(user, eventId)),
+    );
     assert.equal(eventResults.filter((result) => result.status === 'ACCEPTED').length, 2);
     assert.equal(eventResults.filter((result) => result.status === 'WAITLISTED').length, 10);
-    const acceptedTestUser = users[eventResults.findIndex((result) => result.status === 'ACCEPTED')]!;
+    const acceptedTestUser =
+      users[eventResults.findIndex((result) => result.status === 'ACCEPTED')]!;
     const duplicateRegistrations = await Promise.all([
       service.registerForEvent(acceptedTestUser, eventId),
       service.registerForEvent(acceptedTestUser, eventId),
     ]);
-    assert.deepEqual(duplicateRegistrations.map((result) => result.status), ['ACCEPTED', 'ACCEPTED']);
+    assert.deepEqual(
+      duplicateRegistrations.map((result) => result.status),
+      ['ACCEPTED', 'ACCEPTED'],
+    );
     const duplicateRegistrationRows = await setupPool.query<{ count: string }>(
       `select count(*)::text as count from ${qualifiedSchema}.event_registrations where event_id = $1 and user_id = $2`,
       [eventId, acceptedTestUser.id],
@@ -154,7 +174,9 @@ async function main(): Promise<void> {
       `select user_id from ${qualifiedSchema}.event_registrations where event_id = $1 and status = 'ACCEPTED' order by requested_at, id limit 2`,
       [eventId],
     );
-    const cancelUsers = acceptedEventUser.rows.map((row) => users.find((user) => user.id === row.user_id));
+    const cancelUsers = acceptedEventUser.rows.map((row) =>
+      users.find((user) => user.id === row.user_id),
+    );
     assert.ok(cancelUsers.every((user): user is AuthenticatedUser => Boolean(user)));
     assert.equal(oldestEventWaiting.rows.length, 2);
     await Promise.all(cancelUsers.map((user) => service.cancelEventRegistration(user, eventId)));
@@ -169,7 +191,9 @@ async function main(): Promise<void> {
     );
     assert.equal(Number(acceptedAfterCancels.rows[0]?.count), 2);
 
-    console.log('Participation PostgreSQL concurrency checks passed in an isolated temporary schema.');
+    console.log(
+      'Participation PostgreSQL concurrency checks passed in an isolated temporary schema.',
+    );
   } finally {
     await testPool?.end();
     try {
@@ -177,7 +201,9 @@ async function main(): Promise<void> {
     } finally {
       try {
         if (identityIds.length) {
-          await setupPool.query('delete from identity.users where id = any($1::uuid[])', [identityIds]);
+          await setupPool.query('delete from identity.users where id = any($1::uuid[])', [
+            identityIds,
+          ]);
         }
       } finally {
         await setupPool.end();
@@ -187,6 +213,8 @@ async function main(): Promise<void> {
 }
 
 void main().catch((error: unknown) => {
-  console.error(error instanceof Error ? error.message : 'Participation PostgreSQL concurrency checks failed.');
+  console.error(
+    error instanceof Error ? error.message : 'Participation PostgreSQL concurrency checks failed.',
+  );
   process.exitCode = 1;
 });

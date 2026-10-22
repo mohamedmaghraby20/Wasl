@@ -58,11 +58,16 @@ export function OrganizerParticipationPanel({
   const busy = communityDecision.isPending || eventDecision.isPending;
 
   return (
-    <section className="grid gap-4 border-t border-border pt-5" aria-labelledby="organizer-participation-heading">
+    <section
+      className="grid gap-4 border-t border-border pt-5"
+      aria-labelledby="organizer-participation-heading"
+    >
       <h2 id="organizer-participation-heading" className="font-heading text-xl font-bold">
         {kind === 'communities' ? t('manageMembers') : t('manageRegistrations')}
       </h2>
-      {isPending ? <p role="status">{t('loadingParticipation')}</p> : isError ? (
+      {isPending ? (
+        <p role="status">{t('loadingParticipation')}</p>
+      ) : isError ? (
         <QueryError
           message={t('loadOrganizerParticipationError')}
           onRetry={() => {
@@ -75,36 +80,98 @@ export function OrganizerParticipationPanel({
           <dl className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             <Count label={t('countPending')} value={counts.data.PENDING} />
             <Count label={t('countWaitlisted')} value={counts.data.WAITLISTED} />
-            <Count label={kind === 'communities' ? t('countActive') : t('countAccepted')} value={kind === 'communities' ? counts.data.ACTIVE : counts.data.ACCEPTED} />
-            <Count label={t('capacityLabel')} value={counts.data.capacity === 'unlimited' ? t('unlimited') : counts.data.capacity} />
+            <Count
+              label={kind === 'communities' ? t('countActive') : t('countAccepted')}
+              value={kind === 'communities' ? counts.data.ACTIVE : counts.data.ACCEPTED}
+            />
+            <Count
+              label={t('capacityLabel')}
+              value={counts.data.capacity === 'unlimited' ? t('unlimited') : counts.data.capacity}
+            />
           </dl>
           {participants.data.length ? (
             <ul className="grid gap-3">
               {participants.data.map((participant) => (
-                <li key={participant.id} className="flex flex-wrap items-center justify-between gap-3 rounded-(--shape-radius-card) border border-border bg-card p-4">
+                <li
+                  key={participant.id}
+                  className="flex flex-wrap items-center justify-between gap-3 rounded-(--shape-radius-card) border border-border bg-card p-4"
+                >
                   <div className="grid gap-1">
                     <p className="font-semibold">{participant.displayName}</p>
-                    <p className="text-sm text-muted-foreground">{t(`participationStatus_${participant.status}`)}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {t(`participationStatus_${participant.status}`)}
+                    </p>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {participant.status === 'PENDING' && (
                       <>
-                        <Button disabled={busy} onClick={() => void decide(participant.id, 'approve')} variant="outline">{t('approveParticipant')}</Button>
-                        <Button disabled={busy} onClick={() => void decide(participant.id, 'reject')} variant="outline">{t('rejectParticipant')}</Button>
+                        <Button
+                          disabled={busy}
+                          onClick={() => void decide(participant.id, 'approve')}
+                          variant="outline"
+                        >
+                          {t('approveParticipant')}
+                        </Button>
+                        <Button
+                          disabled={busy}
+                          onClick={() => void decide(participant.id, 'reject')}
+                          variant="outline"
+                        >
+                          {t('rejectParticipant')}
+                        </Button>
                       </>
                     )}
                     {participant.status === 'WAITLISTED' && (
                       <>
-                        {counts.data.admissionMode === 'approval' && <Button disabled={busy} onClick={() => void decide(participant.id, 'promote')} variant="outline">{t('promoteParticipant')}</Button>}
-                        <Button disabled={busy} onClick={() => void decide(participant.id, 'reject')} variant="outline">{t('rejectParticipant')}</Button>
+                        {counts.data.admissionMode === 'approval' && (
+                          <Button
+                            disabled={busy}
+                            onClick={() => void decide(participant.id, 'promote')}
+                            variant="outline"
+                          >
+                            {t('promoteParticipant')}
+                          </Button>
+                        )}
+                        <Button
+                          disabled={busy}
+                          onClick={() => void decide(participant.id, 'reject')}
+                          variant="outline"
+                        >
+                          {t('rejectParticipant')}
+                        </Button>
                       </>
                     )}
-                    {(kind === 'communities' ? participant.status === 'ACTIVE' : ['ACCEPTED', 'ATTENDED', 'NO_SHOW'].includes(participant.status)) && (
+                    {(kind === 'communities'
+                      ? participant.status === 'ACTIVE'
+                      : ['ACCEPTED', 'ATTENDED', 'NO_SHOW'].includes(participant.status)) && (
                       <>
-                        {kind === 'events' && eventStarted && participant.status !== 'ATTENDED' && <Button disabled={busy} onClick={() => void decide(participant.id, 'attended')} variant="outline">{t('markAttended')}</Button>}
-                        {kind === 'events' && eventStarted && participant.status !== 'NO_SHOW' && <Button disabled={busy} onClick={() => void decide(participant.id, 'no-show')} variant="outline">{t('markNoShow')}</Button>}
+                        {kind === 'events' && eventStarted && participant.status !== 'ATTENDED' && (
+                          <Button
+                            disabled={busy}
+                            onClick={() => void decide(participant.id, 'attended')}
+                            variant="outline"
+                          >
+                            {t('markAttended')}
+                          </Button>
+                        )}
+                        {kind === 'events' && eventStarted && participant.status !== 'NO_SHOW' && (
+                          <Button
+                            disabled={busy}
+                            onClick={() => void decide(participant.id, 'no-show')}
+                            variant="outline"
+                          >
+                            {t('markNoShow')}
+                          </Button>
+                        )}
                         {(kind === 'communities' || participant.status === 'ACCEPTED') && (
-                          <Button className="text-destructive" disabled={busy} onClick={() => void decide(participant.id, 'remove')} variant="outline">{t('removeParticipant')}</Button>
+                          <Button
+                            className="text-destructive"
+                            disabled={busy}
+                            onClick={() => void decide(participant.id, 'remove')}
+                            variant="outline"
+                          >
+                            {t('removeParticipant')}
+                          </Button>
                         )}
                       </>
                     )}
@@ -112,7 +179,11 @@ export function OrganizerParticipationPanel({
                 </li>
               ))}
             </ul>
-          ) : <p className="rounded-(--shape-radius-card) border border-dashed border-border p-5 text-sm text-muted-foreground">{t('noParticipantsYet')}</p>}
+          ) : (
+            <p className="rounded-(--shape-radius-card) border border-dashed border-border p-5 text-sm text-muted-foreground">
+              {t('noParticipantsYet')}
+            </p>
+          )}
         </>
       )}
     </section>

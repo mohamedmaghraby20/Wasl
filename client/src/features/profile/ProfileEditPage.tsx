@@ -61,9 +61,12 @@ export function ProfileEditPage(): React.JSX.Element {
       interests: profile.data.interests.join(', '),
     });
   }, [form, profile.data]);
-  useEffect(() => () => {
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
-  }, [previewUrl]);
+  useEffect(
+    () => () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    },
+    [previewUrl],
+  );
 
   if (!loading && !user) {
     const returnTo = `${location.pathname}${location.search}${location.hash}`;
@@ -82,10 +85,12 @@ export function ProfileEditPage(): React.JSX.Element {
         if (!supabase || !user) throw new Error('profile-storage-unavailable');
         const extension = await profileImageExtension(selectedPhoto);
         uploadedPath = `${user.id}/${crypto.randomUUID()}.${extension}`;
-        const { error } = await supabase.storage.from('profile-photos').upload(uploadedPath, selectedPhoto, {
-          contentType: selectedPhoto.type,
-          upsert: false,
-        });
+        const { error } = await supabase.storage
+          .from('profile-photos')
+          .upload(uploadedPath, selectedPhoto, {
+            contentType: selectedPhoto.type,
+            upsert: false,
+          });
         if (error) throw error;
       }
 
@@ -95,7 +100,10 @@ export function ProfileEditPage(): React.JSX.Element {
           displayName: values.displayName,
           bio: values.bio,
           cityId: values.cityId || null,
-          interests: values.interests.split(',').map((interest) => interest.trim()).filter(Boolean),
+          interests: values.interests
+            .split(',')
+            .map((interest) => interest.trim())
+            .filter(Boolean),
           ...(avatarPath !== undefined ? { avatarPath } : {}),
         },
         params: { lang },
@@ -130,11 +138,19 @@ export function ProfileEditPage(): React.JSX.Element {
       </Link>
       <header className="border-b border-border pb-5">
         <h1 className="font-heading text-3xl font-bold tracking-tight">{t('editProfile')}</h1>
-        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t('profileEditIntro')}</p>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+          {t('profileEditIntro')}
+        </p>
       </header>
 
-      <form className="grid gap-7" onSubmit={(event) => void form.handleSubmit((values) => void saveProfile(values))(event)}>
-        <section aria-labelledby="profile-photo-heading" className="grid gap-3 sm:grid-cols-[8rem_1fr] sm:items-center">
+      <form
+        className="grid gap-7"
+        onSubmit={(event) => void form.handleSubmit((values) => void saveProfile(values))(event)}
+      >
+        <section
+          aria-labelledby="profile-photo-heading"
+          className="grid gap-3 sm:grid-cols-[8rem_1fr] sm:items-center"
+        >
           <div className="grid size-28 place-items-center overflow-hidden rounded-full border border-border bg-primary-soft text-3xl font-bold text-primary-soft-text">
             {photoSource ? (
               <img alt="" className="size-full object-cover" src={photoSource} />
@@ -143,7 +159,9 @@ export function ProfileEditPage(): React.JSX.Element {
             )}
           </div>
           <div className="grid justify-items-start gap-2">
-            <h2 className="text-sm font-semibold" id="profile-photo-heading">{t('profilePhoto')}</h2>
+            <h2 className="text-sm font-semibold" id="profile-photo-heading">
+              {t('profilePhoto')}
+            </h2>
             <p className="text-sm text-muted-foreground">{t('profilePhotoHint')}</p>
             <div className="flex flex-wrap gap-2">
               <label className="inline-flex min-h-(--control-height-md) cursor-pointer items-center gap-2 rounded-md border border-input px-3 text-sm font-semibold hover:bg-secondary focus-within:ring-(length:--focus-ring-width) focus-within:ring-ring">
@@ -179,8 +197,21 @@ export function ProfileEditPage(): React.JSX.Element {
         <div className="grid gap-5 sm:grid-cols-2">
           <label className={labelClass} htmlFor="profile-display-name">
             <span>{t('profileNameLabel')}</span>
-            <input aria-describedby={form.formState.errors.displayName ? 'profile-display-name-error' : undefined} aria-invalid={Boolean(form.formState.errors.displayName)} className={inputClass} id="profile-display-name" maxLength={80} {...form.register('displayName')} />
-            {form.formState.errors.displayName && <span className="text-xs text-destructive" id="profile-display-name-error">{t('profileNameInvalid')}</span>}
+            <input
+              aria-describedby={
+                form.formState.errors.displayName ? 'profile-display-name-error' : undefined
+              }
+              aria-invalid={Boolean(form.formState.errors.displayName)}
+              className={inputClass}
+              id="profile-display-name"
+              maxLength={80}
+              {...form.register('displayName')}
+            />
+            {form.formState.errors.displayName && (
+              <span className="text-xs text-destructive" id="profile-display-name-error">
+                {t('profileNameInvalid')}
+              </span>
+            )}
           </label>
           <label className={labelClass} htmlFor="profile-city">
             <span>{t('profileCity')}</span>
@@ -192,27 +223,58 @@ export function ProfileEditPage(): React.JSX.Element {
                 </option>
               ))}
             </select>
-            {cities.isError && <span className="text-xs text-destructive">{t('profileCitiesError')}</span>}
+            {cities.isError && (
+              <span className="text-xs text-destructive">{t('profileCitiesError')}</span>
+            )}
           </label>
         </div>
 
         <label className={labelClass} htmlFor="profile-bio">
           <span>{t('profileAbout')}</span>
-          <textarea aria-describedby={form.formState.errors.bio ? 'profile-bio-error' : undefined} aria-invalid={Boolean(form.formState.errors.bio)} className={`${inputClass} min-h-32 resize-y`} id="profile-bio" maxLength={500} {...form.register('bio')} />
-          {form.formState.errors.bio && <span className="text-xs text-destructive" id="profile-bio-error">{t('formFieldInvalid')}</span>}
+          <textarea
+            aria-describedby={form.formState.errors.bio ? 'profile-bio-error' : undefined}
+            aria-invalid={Boolean(form.formState.errors.bio)}
+            className={`${inputClass} min-h-32 resize-y`}
+            id="profile-bio"
+            maxLength={500}
+            {...form.register('bio')}
+          />
+          {form.formState.errors.bio && (
+            <span className="text-xs text-destructive" id="profile-bio-error">
+              {t('formFieldInvalid')}
+            </span>
+          )}
           <span className="text-xs font-normal text-muted-foreground">{t('profileBioHint')}</span>
         </label>
 
         <label className={labelClass} htmlFor="profile-interests">
           <span>{t('profileInterests')}</span>
-          <input className={inputClass} id="profile-interests" maxLength={1200} {...form.register('interests')} />
-          <span className="text-xs font-normal text-muted-foreground">{t('profileInterestsHint')}</span>
+          <input
+            className={inputClass}
+            id="profile-interests"
+            maxLength={1200}
+            {...form.register('interests')}
+          />
+          <span className="text-xs font-normal text-muted-foreground">
+            {t('profileInterestsHint')}
+          </span>
         </label>
 
-        {formError && <p className="rounded-md border border-destructive bg-destructive/10 p-3 text-sm text-destructive" role="alert">{formError}</p>}
+        {formError && (
+          <p
+            className="rounded-md border border-destructive bg-destructive/10 p-3 text-sm text-destructive"
+            role="alert"
+          >
+            {formError}
+          </p>
+        )}
         <div className="flex flex-wrap justify-end gap-3 border-t border-border pt-5">
-          <Button asChild variant="outline"><Link to="/profile">{t('cancel')}</Link></Button>
-          <Button disabled={update.isPending} type="submit">{update.isPending ? t('savingProfile') : t('saveProfile')}</Button>
+          <Button asChild variant="outline">
+            <Link to="/profile">{t('cancel')}</Link>
+          </Button>
+          <Button disabled={update.isPending} type="submit">
+            {update.isPending ? t('savingProfile') : t('saveProfile')}
+          </Button>
         </div>
       </form>
     </section>

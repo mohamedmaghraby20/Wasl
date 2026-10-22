@@ -15,4 +15,5 @@ docs/context/
 docs/design/
 docs/IMPLEMENTATION_GUIDE.md
 server/openapi.json
+server/drizzle/meta/
 skills-lock.json

@@ -21,7 +21,13 @@ const communityTransitions: Record<CommunityStatus | 'NEW', ReadonlySet<Communit
 
 const eventTransitions: Record<EventStatus | 'NEW', ReadonlySet<EventStatus>> = {
   NEW: new Set(['PENDING', 'WAITLISTED', 'ACCEPTED']),
-  PENDING: new Set(['WAITLISTED', 'ACCEPTED', 'REJECTED', 'CANCELLED_BY_USER', 'REMOVED_BY_ORGANIZER']),
+  PENDING: new Set([
+    'WAITLISTED',
+    'ACCEPTED',
+    'REJECTED',
+    'CANCELLED_BY_USER',
+    'REMOVED_BY_ORGANIZER',
+  ]),
   WAITLISTED: new Set(['ACCEPTED', 'REJECTED', 'CANCELLED_BY_USER', 'REMOVED_BY_ORGANIZER']),
   ACCEPTED: new Set(['CANCELLED_BY_USER', 'REMOVED_BY_ORGANIZER', 'ATTENDED', 'NO_SHOW']),
   REJECTED: new Set(['PENDING', 'WAITLISTED', 'ACCEPTED']),
