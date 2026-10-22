@@ -1,0 +1,1 @@
+ALTER TABLE "events" ADD CONSTRAINT "events_host_relation_check" CHECK (("events"."host_type" = 'community' and "events"."community_id" is not null) or ("events"."host_type" in ('user', 'organization') and "events"."community_id" is null));

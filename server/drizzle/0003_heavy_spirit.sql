@@ -1,0 +1,2 @@
+ALTER TABLE "events" DROP CONSTRAINT "events_host_relation_check";--> statement-breakpoint
+ALTER TABLE "events" ADD CONSTRAINT "events_host_relation_check" CHECK (("events"."host_type" = 'community' and "events"."community_id" is not null and "events"."host_id" = "events"."community_id") or ("events"."host_type" in ('user', 'organization') and "events"."community_id" is null));
