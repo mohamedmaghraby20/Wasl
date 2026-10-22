@@ -83,7 +83,7 @@ The phase records report these checks passed at the time of completion:
 - `corepack pnpm test:participation:postgres` — capacity/concurrency/FIFO checks with temporary schema cleanup
 - `corepack pnpm --filter @wasl/web test:e2e` — two Chromium navigation/mobile Arabic RTL checks
 
-See [phase-3.md](phase-3.md) and [phase-4.md](phase-4.md) for exact scope and caveats. The E2E checks are not an authenticated end-to-end participation journey; Phase 4 reports unavailable `/api` proxy requests during that browser run because Nest was not started. The client build has a recorded main-bundle size warning (599.33 kB minified). These were reported as follow-ups, not blockers to the completed phase criteria.
+See [phase-3.md](phase-3.md) and [phase-4.md](phase-4.md) for exact scope and caveats. The E2E checks are not an authenticated end-to-end participation journey; Phase 4 reports unavailable `/api` proxy requests during that browser run because Nest was not started. The client build previously reported a main-bundle size warning (599.33 kB minified); the current Vite configuration splits vendor, router, query, i18n, icon and Supabase chunks, and the latest build is warning-free. These were reported as follow-ups, not blockers to the completed phase criteria.
 
 ## Open follow-ups and constraints
 
@@ -93,7 +93,7 @@ See [phase-3.md](phase-3.md) and [phase-4.md](phase-4.md) for exact scope and ca
 - **Production remains future work:** no production deployment URLs, hosting configuration, or release validation are present. The implementation guide reserves CI/CD, staging and go-live for Phase 8.
 - **Phase 2 stale environment wording:** update that record when convenient so it no longer calls the owner-confirmed development project “production.”
 - `docs/MULTI_AGENT_WORKFLOW.md` retains coordination guidance for possible future delegation, but its active mode and task ledger are reconciled to the owner's current single-agent, sequential instruction.
-- Current `git status --short` shows project paths as untracked (`??`) rather than a clean tracked checkout. Preserve existing files and do not assume commits/branches exist. The root instructions prohibit initializing Git or configuring CI/CD before the final implementation phase.
+- **Git history exists for Phases 1-5.** The repository now has five sequential commits from Phase 1 through Phase 5, and `git status --short` is clean. Because the worktree was entirely untracked before those commits, the phase boundaries are retrospective file groupings rather than replayed snapshots; shared files carry their final content in the phase where they were introduced. Do not rewrite this history to "correct" it without owner approval.
 
 ## Guidance for the next agent and parallel work
 

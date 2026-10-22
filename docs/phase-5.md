@@ -39,3 +39,12 @@
 ## Scope note
 
 No live browser or authenticated API smoke journey was run for this phase. Verification is automated tests, the isolated PostgreSQL concurrency script, the database checks above, typecheck, lint, and the production build. No deployment configuration was added; this phase targets local development against the configured development database.
+
+## Post-phase cleanup
+
+The two remaining tooling warnings were removed after this record was written:
+
+- `client/src/test/setup.ts` now stubs jsdom `window.scrollTo`, so the discovery tests run without the not-implemented warning.
+- `client/vite.config.ts` now splits vendor, router, query, i18n, icon and Supabase chunks. The latest build emitted no chunk-size warning; the largest chunks were `vendor` at 346.05 kB, `supabase` at 134.02 kB, and `router` at 80.83 kB.
+
+Re-ran `corepack pnpm test` (128 tests), `corepack pnpm typecheck`, `corepack pnpm lint`, and `corepack pnpm build`; all passed.
