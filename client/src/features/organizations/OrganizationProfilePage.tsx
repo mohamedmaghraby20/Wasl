@@ -8,6 +8,8 @@ import {
 } from '@/api/generated/organizations/organizations';
 import { ApiError } from '@/api/fetcher';
 import { QueryError } from '@/components/feedback/QueryError';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { languageCode } from '@/features/resources/resource-utils';
 
@@ -41,16 +43,30 @@ export function OrganizationProfilePage(): React.JSX.Element {
     link: [{ rel: 'canonical', href: `${window.location.origin}/organizations/${slug}` }],
   });
 
-  if (profile.isPending) return <p role="status">{t('loadingOrganization')}</p>;
+  if (profile.isPending)
+    return (
+      <p className="text-sm text-text-muted" role="status">
+        {t('loadingOrganization')}
+      </p>
+    );
   if (profile.isError) {
     if (profile.error instanceof ApiError && profile.error.status === 404) {
-      return <p role="alert">{t('organizationNotFound')}</p>;
+      return (
+        <p className="rounded-(--shape-radius-card) border border-border bg-card p-5" role="alert">
+          {t('organizationNotFound')}
+        </p>
+      );
     }
     return (
       <QueryError message={t('organizationLoadError')} onRetry={() => void profile.refetch()} />
     );
   }
-  if (!organization) return <p role="alert">{t('organizationNotFound')}</p>;
+  if (!organization)
+    return (
+      <p className="rounded-(--shape-radius-card) border border-border bg-card p-5" role="alert">
+        {t('organizationNotFound')}
+      </p>
+    );
 
   const location = [organization.locationName, organization.cityName].filter(Boolean).join(', ');
   const websiteUrl = safeExternalUrl(organization.websiteUrl);
@@ -61,108 +77,111 @@ export function OrganizationProfilePage(): React.JSX.Element {
   };
 
   return (
-    <article className="mx-auto max-w-(--container-reading) space-y-8">
-      <header className="grid gap-5 border-b border-border pb-7 sm:grid-cols-[9rem_1fr] sm:items-center">
+    <article className="mx-auto grid max-w-(--container-reading) gap-6">
+      <header className="flex flex-wrap items-center gap-5 rounded-(--shape-radius-card) border border-border bg-card p-6 shadow-xs">
         {organization.logoUrl ? (
           <img
             alt=""
-            className="size-32 rounded-(--shape-radius-card) border border-border bg-card object-cover"
+            className="size-24 shrink-0 rounded-(--shape-radius-card) border border-border bg-card object-cover"
             src={organization.logoUrl}
           />
         ) : (
-          <div className="grid size-32 place-items-center rounded-(--shape-radius-card) border border-border bg-primary-soft text-primary-soft-text">
-            <Building2 aria-hidden="true" size={48} />
+          <div className="grid size-24 shrink-0 place-items-center rounded-(--shape-radius-card) border border-border bg-primary-soft text-primary-soft-text">
+            <Building2 aria-hidden="true" size={38} />
           </div>
         )}
-        <div className="min-w-0">
-          <p className="text-sm text-muted-foreground">{organization.type}</p>
-          <div className="mt-1 flex flex-wrap items-center gap-3">
-            <h1 className="break-words font-heading text-3xl font-bold tracking-tight">
-              {organization.name}
-            </h1>
-            <span
-              className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-semibold ${organization.verificationStatus === 'VERIFIED' ? 'bg-primary-soft text-primary-soft-text' : 'bg-secondary text-muted-foreground'}`}
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-semibold uppercase tracking-wide text-text-subtle">
+            {organization.type}
+          </p>
+          <div className="mt-1 flex flex-wrap items-center gap-2">
+            <h1 className="break-words text-3xl font-extrabold">{organization.name}</h1>
+            <Badge
+              variant={organization.verificationStatus === 'VERIFIED' ? 'success' : 'neutral'}
             >
-              {organization.verificationStatus === 'VERIFIED' && (
-                <BadgeCheck aria-hidden="true" size={16} />
-              )}
+              {organization.verificationStatus === 'VERIFIED' ? (
+                <BadgeCheck aria-hidden="true" />
+              ) : null}
               {t(`organizationVerification_${organization.verificationStatus}`)}
-            </span>
+            </Badge>
           </div>
-          {location && (
-            <p className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
-              <MapPin aria-hidden="true" size={17} />
+          {location ? (
+            <p className="mt-2 inline-flex items-center gap-1.5 text-sm text-text-muted">
+              <MapPin aria-hidden="true" className="size-4" />
               {location}
             </p>
-          )}
-          {canManage && (
-            <Link
-              className="mt-4 inline-flex min-h-(--control-height-md) items-center gap-2 rounded-(--shape-radius-control) border border-border px-3 text-sm font-semibold hover:bg-secondary focus-visible:outline focus-visible:outline-2 focus-visible:ring-ring"
-              to={`/organizations/${organization.slug}/manage`}
-            >
-              <Settings2 aria-hidden="true" size={16} />
+          ) : null}
+        </div>
+        {canManage ? (
+          <Button asChild variant="outline">
+            <Link to={`/organizations/${organization.slug}/manage`}>
+              <Settings2 aria-hidden="true" />
               {t('manageOrganization')}
             </Link>
-          )}
-        </div>
+          </Button>
+        ) : null}
       </header>
 
-      <section className="grid gap-2">
-        <h2 className="font-heading text-lg font-semibold">{t('organizationAbout')}</h2>
-        <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
-          {organization.description}
-        </p>
-      </section>
-
-      {(websiteUrl || socialUrl) && (
-        <section className="grid gap-3">
-          <h2 className="font-heading text-lg font-semibold">{t('organizationLinks')}</h2>
-          <ul className="flex flex-wrap gap-3">
-            {websiteUrl && (
-              <li>
-                <a
-                  className="inline-flex min-h-(--control-height-md) items-center gap-2 rounded-(--shape-radius-control) border border-border px-3 text-sm font-semibold hover:bg-secondary focus-visible:outline focus-visible:outline-2 focus-visible:ring-ring"
-                  href={websiteUrl}
-                  rel="noreferrer"
-                  target="_blank"
-                >
-                  <Globe2 aria-hidden="true" size={17} />
-                  {t('organizationWebsite')}
-                  <ExternalLink aria-hidden="true" size={15} />
-                </a>
-              </li>
-            )}
-            {socialUrl && (
-              <li>
-                <a
-                  className="inline-flex min-h-(--control-height-md) items-center gap-2 rounded-(--shape-radius-control) border border-border px-3 text-sm font-semibold hover:bg-secondary focus-visible:outline focus-visible:outline-2 focus-visible:ring-ring"
-                  href={socialUrl}
-                  rel="noreferrer"
-                  target="_blank"
-                >
-                  <Globe2 aria-hidden="true" size={17} />
-                  {t('organizationSocial')}
-                  <ExternalLink aria-hidden="true" size={15} />
-                </a>
-              </li>
-            )}
-          </ul>
+      <div className="grid gap-5 rounded-(--shape-radius-card) border border-border bg-card p-6 shadow-xs">
+        <section className="grid gap-1.5">
+          <h2 className="text-sm font-semibold">{t('organizationAbout')}</h2>
+          <p className="whitespace-pre-wrap text-sm leading-relaxed text-text-muted">
+            {organization.description}
+          </p>
         </section>
-      )}
 
-      <section className="grid gap-4 border-t border-border pt-7">
-        <h2 className="font-heading text-lg font-semibold">{t('organizationPublicResources')}</h2>
+        {websiteUrl || socialUrl ? (
+          <section className="grid gap-2 border-t border-border pt-4">
+            <h2 className="text-sm font-semibold">{t('organizationLinks')}</h2>
+            <ul className="flex flex-wrap gap-2">
+              {websiteUrl ? (
+                <li>
+                  <a
+                    className="inline-flex h-10 items-center gap-2 rounded-(--shape-radius-control) border border-border bg-background px-3.5 text-sm font-medium text-text transition-colors hover:border-border-strong hover:bg-surface-soft"
+                    href={websiteUrl}
+                    rel="noreferrer"
+                    target="_blank"
+                  >
+                    <Globe2 aria-hidden="true" className="size-4 text-text-subtle" />
+                    {t('organizationWebsite')}
+                    <ExternalLink aria-hidden="true" className="size-3.5 text-text-subtle" />
+                  </a>
+                </li>
+              ) : null}
+              {socialUrl ? (
+                <li>
+                  <a
+                    className="inline-flex h-10 items-center gap-2 rounded-(--shape-radius-control) border border-border bg-background px-3.5 text-sm font-medium text-text transition-colors hover:border-border-strong hover:bg-surface-soft"
+                    href={socialUrl}
+                    rel="noreferrer"
+                    target="_blank"
+                  >
+                    <Globe2 aria-hidden="true" className="size-4 text-text-subtle" />
+                    {t('organizationSocial')}
+                    <ExternalLink aria-hidden="true" className="size-3.5 text-text-subtle" />
+                  </a>
+                </li>
+              ) : null}
+            </ul>
+          </section>
+        ) : null}
+      </div>
+
+      <section className="grid gap-4 rounded-(--shape-radius-card) border border-border bg-card p-6 shadow-xs">
+        <h2 className="text-lg font-semibold">{t('organizationPublicResources')}</h2>
         {organization.resources.length ? (
           <div className="grid gap-6 sm:grid-cols-2">
             {(['communities', 'events'] as const).map((kind) =>
               resources[kind].length ? (
                 <section className="grid content-start gap-2" key={kind}>
-                  <h3 className="text-sm font-semibold text-muted-foreground">{t(kind)}</h3>
+                  <h3 className="text-xs font-semibold uppercase tracking-wide text-text-subtle">
+                    {t(kind)}
+                  </h3>
                   <ul className="grid gap-2">
                     {resources[kind].map((resource) => (
                       <li key={`${resource.kind}-${resource.slug}`}>
                         <Link
-                          className="block rounded-(--shape-radius-control) border border-border bg-card px-3 py-2 text-sm font-semibold hover:bg-secondary focus-visible:outline focus-visible:outline-2 focus-visible:ring-ring"
+                          className="block rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm font-medium text-text transition-colors hover:border-border-strong hover:bg-surface-soft"
                           to={`/${kind}/${resource.slug}`}
                         >
                           {resource.name}
@@ -175,7 +194,7 @@ export function OrganizationProfilePage(): React.JSX.Element {
             )}
           </div>
         ) : (
-          <p className="text-sm text-muted-foreground">{t('organizationResourcesEmpty')}</p>
+          <p className="text-sm text-text-muted">{t('organizationResourcesEmpty')}</p>
         )}
       </section>
     </article>

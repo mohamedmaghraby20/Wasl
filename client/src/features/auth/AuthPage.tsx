@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
+import { Field } from '@/components/ui/Field';
+import { Input } from '@/components/ui/Input';
 import { authErrorMessage, useAuth } from './AuthProvider';
 
 export function safeReturnPath(search: string): string {
@@ -109,38 +111,36 @@ export function AuthPage(): React.JSX.Element {
             {t(isSignUp ? 'authCreateDescription' : 'authSignInDescription')}
           </p>
 
-          {!configured && (
+          {!configured ? (
             <p
-              className="mt-6 rounded-md border border-border bg-muted p-3 text-sm text-muted-foreground"
+              className="mt-6 rounded-lg bg-warning-soft px-3 py-2 text-sm text-warning"
               role="alert"
             >
               {t('authNotConfigured')}
             </p>
-          )}
-          {error && (
+          ) : null}
+          {error ? (
             <p
-              className="mt-6 rounded-md border border-destructive bg-destructive/10 p-3 text-sm text-destructive"
+              className="mt-6 rounded-lg bg-danger-soft px-3 py-2 text-sm font-medium text-danger"
               role="alert"
             >
               {error}
             </p>
-          )}
-          {notice && (
+          ) : null}
+          {notice ? (
             <p
-              className="mt-6 rounded-md border border-primary bg-accent p-3 text-sm text-accent-foreground"
+              className="mt-6 rounded-lg bg-success-soft px-3 py-2 text-sm font-medium text-success"
               role="status"
             >
               {notice}
             </p>
-          )}
+          ) : null}
 
-          <form className="mt-7 space-y-5" onSubmit={(event) => void submit(event)}>
-            {isSignUp && (
-              <label className="block space-y-2 text-sm font-semibold" htmlFor="auth-display-name">
-                <span>{t('authDisplayName')}</span>
-                <input
+          <form className="mt-7 grid gap-5" onSubmit={(event) => void submit(event)}>
+            {isSignUp ? (
+              <Field id="auth-display-name" label={t('authDisplayName')}>
+                <Input
                   autoComplete="name"
-                  className="min-h-(--control-height-lg) w-full rounded-(--shape-radius-control) border border-input bg-background px-3 text-base font-normal text-foreground outline-none transition-shadow placeholder:text-muted-foreground focus-visible:ring-(length:--focus-ring-width) focus-visible:ring-ring"
                   id="auth-display-name"
                   maxLength={80}
                   minLength={1}
@@ -149,25 +149,21 @@ export function AuthPage(): React.JSX.Element {
                   type="text"
                   value={displayName}
                 />
-              </label>
-            )}
-            <label className="block space-y-2 text-sm font-semibold" htmlFor="auth-email">
-              <span>{t('authEmail')}</span>
-              <input
+              </Field>
+            ) : null}
+            <Field id="auth-email" label={t('authEmail')}>
+              <Input
                 autoComplete="email"
-                className="min-h-(--control-height-lg) w-full rounded-(--shape-radius-control) border border-input bg-background px-3 text-base font-normal text-foreground outline-none transition-shadow placeholder:text-muted-foreground focus-visible:ring-(length:--focus-ring-width) focus-visible:ring-ring"
                 id="auth-email"
                 onChange={(event) => setEmail(event.currentTarget.value)}
                 required
                 type="email"
                 value={email}
               />
-            </label>
-            <label className="block space-y-2 text-sm font-semibold" htmlFor="auth-password">
-              <span>{t('authPassword')}</span>
-              <input
+            </Field>
+            <Field id="auth-password" label={t('authPassword')}>
+              <Input
                 autoComplete={isSignUp ? 'new-password' : 'current-password'}
-                className="min-h-(--control-height-lg) w-full rounded-(--shape-radius-control) border border-input bg-background px-3 text-base font-normal text-foreground outline-none transition-shadow placeholder:text-muted-foreground focus-visible:ring-(length:--focus-ring-width) focus-visible:ring-ring"
                 id="auth-password"
                 minLength={isSignUp ? 8 : undefined}
                 onChange={(event) => setPassword(event.currentTarget.value)}
@@ -175,9 +171,9 @@ export function AuthPage(): React.JSX.Element {
                 type="password"
                 value={password}
               />
-            </label>
+            </Field>
             <Button
-              className="w-full"
+              block
               disabled={!configured || busy || Boolean(notice)}
               type="submit"
             >
@@ -185,10 +181,10 @@ export function AuthPage(): React.JSX.Element {
             </Button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-muted-foreground">
+          <p className="mt-6 text-center text-sm text-text-muted">
             {t(isSignUp ? 'authHaveAccount' : 'authNeedAccount')}{' '}
             <Link
-              className="font-semibold text-foreground underline decoration-primary decoration-2 underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:ring-ring"
+              className="font-semibold text-primary-soft-text underline decoration-primary/40 decoration-2 underline-offset-4 transition-colors hover:decoration-primary"
               to={{ pathname: isSignUp ? '/sign-in' : '/sign-up', search: location.search }}
             >
               {t(isSignUp ? 'authSignIn' : 'authCreateAccount')}

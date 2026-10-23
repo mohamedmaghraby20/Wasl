@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createHead, UnheadProvider } from '@unhead/react/client';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { I18nextProvider } from 'react-i18next';
 import { MemoryRouter, Route, Routes } from 'react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -60,7 +61,8 @@ describe('CommunityFormPage organization host choice', () => {
     mocks.update.mockReturnValue({ mutateAsync: vi.fn(), isPending: false });
   });
 
-  it('offers only organizations returned by the authorized current-user API', () => {
+  it('offers only organizations returned by the authorized current-user API', async () => {
+    const user = userEvent.setup();
     mocks.mineOrganizations.mockReturnValue({
       data: [
         { id: 'org-owner', slug: 'owner-group', name: 'Owner Group', role: 'OWNER' },
@@ -71,8 +73,9 @@ describe('CommunityFormPage organization host choice', () => {
     renderPage();
 
     const host = screen.getByLabelText('Organization (optional)');
-    expect(host).toHaveDisplayValue('My account');
-    expect(screen.getByRole('option', { name: 'Owner Group (Owner)' })).toBeInTheDocument();
+    expect(host).toHaveTextContent('My account');
+    await user.click(host);
+    expect(await screen.findByRole('option', { name: 'Owner Group (Owner)' })).toBeInTheDocument();
     expect(screen.getByRole('option', { name: 'Admin Group (Admin)' })).toBeInTheDocument();
     expect(screen.queryByRole('option', { name: /Unrelated/ })).not.toBeInTheDocument();
   });

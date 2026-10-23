@@ -86,7 +86,8 @@ describe('OrganizationCreatePage', () => {
     await user.type(screen.getByLabelText('Organization name'), 'Wasl Students');
     await user.type(screen.getByLabelText('Description'), 'Student activities in Ankara.');
     await user.type(screen.getByLabelText('Organization type'), 'Student association');
-    await user.selectOptions(screen.getByLabelText('City'), 'ankara');
+    await user.click(screen.getByLabelText('City'));
+    await user.click(await screen.findByRole('option', { name: 'Ankara' }));
     await user.type(screen.getByLabelText('Location (optional)'), 'Kızılay');
     await user.type(screen.getByLabelText('Website'), 'https://wasl.example.test');
     await user.click(screen.getByRole('button', { name: 'Create organization' }));

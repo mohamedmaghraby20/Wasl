@@ -1,11 +1,15 @@
-import { Search } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { CategoryPublicDto, CityPublicDto } from '@/api/generated/wasl-client.schemas';
-import { Button } from '@/components/ui/Button';
 import { QueryError } from '@/components/feedback/QueryError';
+import { Button } from '@/components/ui/Button';
+import { DatePicker } from '@/components/ui/DatePicker';
+import { Select } from '@/components/ui/Select';
 import { localizedName } from '@/features/resources/resource-utils';
 import type { DiscoveryKind } from './discovery-utils';
+
+const filterControlClass = 'shrink-0 sm:w-44';
 
 export function DiscoveryFilters({
   kind,
@@ -54,111 +58,130 @@ export function DiscoveryFilters({
 
   return (
     <form
-      className="grid gap-3 rounded-(--shape-radius-card) bg-card p-4 shadow-(--shadow-card) sm:grid-cols-2 lg:grid-cols-5"
       aria-label={t('discoveryTitle')}
-      role="search"
+      className="grid gap-3 rounded-(--shape-radius-card) border border-border bg-card p-3 shadow-xs sm:p-4"
       onSubmit={(event) => {
         event.preventDefault();
         onSearch(searchDraft.trim());
       }}
+      role="search"
     >
-      <label className="flex items-center gap-2 rounded-md border border-border px-3 focus-within:outline focus-within:outline-2 focus-within:outline-ring">
-        <Search aria-hidden="true" size={17} />
-        <span className="sr-only">{t('search')}</span>
-        <input
-          className="min-w-0 flex-1 bg-transparent py-2 outline-none"
-          placeholder={t('searchHint')}
-          type="search"
-          value={searchDraft}
-          onChange={(event) => setSearchDraft(event.target.value)}
-        />
-      </label>
-      <Button type="submit" variant="outline">
-        {t('search')}
-      </Button>
-      <label className="grid gap-1 text-sm">
-        <span>{t('allCities')}</span>
-        <select
-          className="rounded-md border border-border bg-background px-3 py-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
-          aria-busy={citiesPending}
-          disabled={citiesPending || citiesError || !cities}
-          value={cityValue}
-          onChange={(event) => onFilterChange('city', event.target.value)}
-        >
-          <option value="">{citiesPending ? t('loadingCities') : t('allCities')}</option>
-          {cities?.map((city) => (
-            <option key={city.id} value={city.id}>
-              {localizedName(city, i18n.language)}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label className="grid gap-1 text-sm">
-        <span>{t('allCategories')}</span>
-        <select
-          className="rounded-md border border-border bg-background px-3 py-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
-          aria-busy={categoriesPending}
-          disabled={categoriesPending || categoriesError || !categories}
-          value={categoryValue}
-          onChange={(event) => onFilterChange('category', event.target.value)}
-        >
-          <option value="">
-            {categoriesPending ? t('loadingCategories') : t('allCategories')}
-          </option>
-          {categories?.map((category) => (
-            <option key={category.id} value={category.id}>
-              {localizedName(category, i18n.language)}
-            </option>
-          ))}
-        </select>
-      </label>
-      {kind !== 'communities' && (
-        <>
-          <label className="grid gap-1 text-sm">
-            <span>{t('fromDate')}</span>
-            <input
-              className="rounded-md border border-border bg-background px-3 py-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
-              type="date"
-              value={fromValue}
-              onChange={(event) => onFilterChange('from', event.target.value)}
-            />
-          </label>
-          <label className="grid gap-1 text-sm">
-            <span>{t('toDate')}</span>
-            <input
-              className="rounded-md border border-border bg-background px-3 py-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
-              type="date"
-              value={toValue}
-              min={fromValue || undefined}
-              onChange={(event) => onFilterChange('to', event.target.value)}
-            />
-          </label>
-        </>
-      )}
-      {citiesError && (
-        <QueryError
-          message={t('loadError', { resource: t('allCities').toLocaleLowerCase(i18n.language) })}
-          onRetry={onRetryCities}
-        />
-      )}
-      {categoriesError && (
-        <QueryError
-          message={t('loadError', {
-            resource: t('allCategories').toLocaleLowerCase(i18n.language),
-          })}
-          onRetry={onRetryCategories}
-        />
-      )}
-      {showClear && (
-        <Button
-          className="sm:col-span-2 lg:col-span-5"
-          onClick={onClear}
-          type="button"
-          variant="outline"
-        >
-          {t('clearFilters')}
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <div className="relative flex-1">
+          <Search
+            aria-hidden="true"
+            className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-text-subtle"
+          />
+          <input
+            aria-label={t('search')}
+            className="h-11 w-full rounded-(--shape-radius-control) border border-input bg-background ps-9 pe-9 text-sm text-text shadow-xs transition-[border-color,box-shadow] duration-(--motion-duration-fast) placeholder:text-text-subtle hover:border-border-strong aria-invalid:border-danger"
+            onChange={(event) => setSearchDraft(event.target.value)}
+            placeholder={t('searchHint')}
+            type="search"
+            value={searchDraft}
+          />
+          {searchDraft ? (
+            <button
+              aria-label={t('clearSearch')}
+              className="absolute end-2 top-1/2 grid size-7 -translate-y-1/2 place-items-center rounded-full text-text-subtle transition-colors hover:bg-surface-soft hover:text-text"
+              onClick={() => {
+                setSearchDraft('');
+                onSearch('');
+              }}
+              tabIndex={-1}
+              title={t('clearSearch')}
+              type="button"
+            >
+              <X aria-hidden="true" className="size-4" />
+            </button>
+          ) : null}
+        </div>
+        <Button className="sm:px-6" type="submit">
+          <Search aria-hidden="true" className="hidden sm:block" />
+          {t('search')}
         </Button>
-      )}
+      </div>
+
+      <div className="grid grid-cols-2 items-center gap-2 sm:flex sm:flex-wrap">
+        <Select
+          aria-busy={citiesPending}
+          aria-label={t('allCities')}
+          className={filterControlClass}
+          disabled={citiesPending || citiesError || !cities}
+          onValueChange={(value) => onFilterChange('city', value)}
+          options={(cities ?? []).map((city) => ({
+            value: city.id,
+            label: localizedName(city, i18n.language),
+          }))}
+          placeholder={citiesPending ? t('loadingCities') : t('allCities')}
+          value={cityValue}
+        />
+        <Select
+          aria-busy={categoriesPending}
+          aria-label={t('allCategories')}
+          className={filterControlClass}
+          disabled={categoriesPending || categoriesError || !categories}
+          onValueChange={(value) => onFilterChange('category', value)}
+          options={(categories ?? []).map((category) => ({
+            value: category.id,
+            label: localizedName(category, i18n.language),
+          }))}
+          placeholder={categoriesPending ? t('loadingCategories') : t('allCategories')}
+          value={categoryValue}
+        />
+        {kind !== 'communities' ? (
+          <>
+            <DatePicker
+              className="w-full shrink-0 sm:w-44"
+              label={t('fromDate')}
+              onChange={(value) => onFilterChange('from', value)}
+              placeholder={t('fromDate')}
+              value={fromValue}
+            />
+            <DatePicker
+              className="w-full shrink-0 sm:w-44"
+              label={t('toDate')}
+              min={fromValue}
+              onChange={(value) => onFilterChange('to', value)}
+              placeholder={t('toDate')}
+              value={toValue}
+            />
+          </>
+        ) : null}
+        {showClear ? (
+          <Button
+            className="col-span-2 justify-self-start text-text-muted sm:col-span-1"
+            onClick={onClear}
+            size="sm"
+            type="button"
+            variant="ghost"
+          >
+            <X aria-hidden="true" />
+            {t('clearFilters')}
+          </Button>
+        ) : null}
+      </div>
+
+      {citiesError || categoriesError ? (
+        <div className="grid gap-2 sm:grid-cols-2">
+          {citiesError ? (
+            <QueryError
+              message={t('loadError', {
+                resource: t('allCities').toLocaleLowerCase(i18n.language),
+              })}
+              onRetry={onRetryCities}
+            />
+          ) : null}
+          {categoriesError ? (
+            <QueryError
+              message={t('loadError', {
+                resource: t('allCategories').toLocaleLowerCase(i18n.language),
+              })}
+              onRetry={onRetryCategories}
+            />
+          ) : null}
+        </div>
+      ) : null}
     </form>
   );
 }

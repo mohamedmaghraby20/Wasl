@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useId, useState } from 'react';
 import { z } from 'zod';
 import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 
 const emailSchema = z.object({ email: z.string().email() });
 type EmailForm = z.infer<typeof emailSchema>;
@@ -32,27 +33,26 @@ export function EmailValidationForm(): React.JSX.Element {
       <label className="text-sm font-semibold" htmlFor={emailId}>
         {t('exampleFormLabel')}
       </label>
-      <input
+      <Input
         aria-describedby={
           errors.email ? `${emailId}-error` : isValid ? `${emailId}-success` : undefined
         }
-        className="min-h-(--control-height-md) rounded-(--shape-radius-control) border border-input bg-background px-(--field-padding-inline) outline-none focus-visible:ring-(length:--focus-ring-width) focus-visible:ring-ring"
+        aria-invalid={Boolean(errors.email)}
+        autoComplete="email"
         id={emailId}
         type="email"
-        autoComplete="email"
-        aria-invalid={Boolean(errors.email)}
         {...register('email', { onChange: () => setIsValid(false) })}
       />
-      {errors.email && (
-        <p className="text-sm text-destructive" id={`${emailId}-error`} role="alert">
+      {errors.email ? (
+        <p className="text-sm font-medium text-danger" id={`${emailId}-error`} role="alert">
           {t('exampleFormError')}
         </p>
-      )}
-      {isValid && (
-        <p className="text-sm text-[var(--color-success)]" id={`${emailId}-success`} role="status">
+      ) : null}
+      {isValid ? (
+        <p className="text-sm font-medium text-success" id={`${emailId}-success`} role="status">
           {t('exampleFormSuccess')}
         </p>
-      )}
+      ) : null}
       <Button type="submit">{t('exampleFormSubmit')}</Button>
     </form>
   );

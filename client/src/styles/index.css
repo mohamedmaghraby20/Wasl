@@ -2,6 +2,10 @@
 
 :root {
   font-family: var(--font-family-ui);
+  font-synthesis-weight: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  scrollbar-gutter: stable;
 }
 :root[data-theme='wasl'] {
   background: var(--color-canvas);
@@ -12,16 +16,85 @@
 * {
   box-sizing: border-box;
 }
+html {
+  scroll-behavior: smooth;
+}
 body {
   margin: 0;
   min-width: 20rem;
   background: var(--color-canvas);
+  color: var(--color-text);
+  line-height: var(--line-height-body);
+}
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-family-heading);
+  line-height: var(--line-height-heading);
+  letter-spacing: var(--letter-spacing-tight);
+  text-wrap: balance;
+}
+p {
+  text-wrap: pretty;
 }
 button,
-input {
+input,
+select,
+textarea {
   font: inherit;
+  color: inherit;
 }
 a {
   color: inherit;
   text-decoration: none;
+}
+::selection {
+  background: var(--color-primary-soft);
+  color: var(--color-primary-soft-text);
+}
+
+/* One focus treatment for every interactive element. Components no longer need
+   to re-declare an outline, which is what produced the mixed black brand rings. */
+:where(a, button, summary, [role='button'], [role='menuitem'], [role='option'], [tabindex]):focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 2px;
+}
+:where(input, select, textarea):focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 1px;
+}
+/* Options inside open popovers show focus through their highlighted row.
+   An extra ring there reads as a doubled border inside the panel. */
+:where(
+  [role='option'],
+  [role='menuitem'],
+  [role='menuitemcheckbox'],
+  [role='menuitemradio']
+):focus-visible {
+  outline: none;
+}
+
+/* Native select and date controls only appear as a fallback; every app form
+   control is a styled component. Keep the fallback consistent if one slips in. */
+input[type='date']::-webkit-calendar-picker-indicator,
+input[type='datetime-local']::-webkit-calendar-picker-indicator {
+  opacity: 0.55;
+  cursor: pointer;
+}
+input[type='search']::-webkit-search-cancel-button {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

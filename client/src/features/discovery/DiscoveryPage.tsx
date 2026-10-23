@@ -1,6 +1,5 @@
 ﻿import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
-import { Button } from '@/components/ui/Button';
 import { DiscoveryFilters } from './DiscoveryFilters';
 import { DiscoverySection } from './DiscoverySection';
 import { usePageMetadata } from './usePageMetadata';
@@ -28,33 +27,44 @@ export function DiscoveryPage(): React.JSX.Element {
 
   usePageMetadata(title, t('discoverIntro'));
 
-  return (
-    <section className="grid gap-6" aria-labelledby="discovery-title">
-      <header>
-        <p className="text-sm font-semibold text-[var(--color-primary-soft-text)]">Wasl</p>
-        <h1 id="discovery-title" className="mt-1 text-3xl font-bold">
-          {title}
-        </h1>
-        <p className="mt-2 text-[color:var(--color-text-muted)]">{t('discoverIntro')}</p>
-      </header>
+  const tabs = [
+    { key: 'all', label: t('discover'), to: allPath },
+    { key: 'communities', label: t('communities'), to: communityPath },
+    { key: 'events', label: t('events'), to: eventPath },
+  ];
 
-      <nav aria-label={t('resourceTypesNavigation')} className="flex flex-wrap gap-2">
-        <Button asChild variant={kind === 'all' ? 'primary' : 'outline'}>
-          <Link aria-current={kind === 'all' ? 'page' : undefined} to={allPath}>
-            {t('discover')}
-          </Link>
-        </Button>
-        <Button asChild variant={kind === 'communities' ? 'primary' : 'outline'}>
-          <Link aria-current={kind === 'communities' ? 'page' : undefined} to={communityPath}>
-            {t('communities')}
-          </Link>
-        </Button>
-        <Button asChild variant={kind === 'events' ? 'primary' : 'outline'}>
-          <Link aria-current={kind === 'events' ? 'page' : undefined} to={eventPath}>
-            {t('events')}
-          </Link>
-        </Button>
-      </nav>
+  return (
+    <section className="grid gap-8" aria-labelledby="discovery-title">
+      <header className="grid gap-4">
+        <div className="grid gap-2">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary-soft-text">
+            {t('brand')}
+          </p>
+          <h1 className="text-3xl font-extrabold sm:text-4xl" id="discovery-title">
+            {title}
+          </h1>
+          <p className="max-w-2xl text-text-muted">{t('discoverIntro')}</p>
+        </div>
+
+        <nav aria-label={t('resourceTypesNavigation')}>
+          <div className="inline-flex flex-wrap items-center gap-1 rounded-full border border-border bg-surface-soft p-1">
+            {tabs.map((tab) => (
+              <Link
+                aria-current={kind === tab.key ? 'page' : undefined}
+                className={
+                  kind === tab.key
+                    ? 'rounded-full bg-card px-4 py-1.5 text-sm font-semibold text-text shadow-xs'
+                    : 'rounded-full px-4 py-1.5 text-sm font-medium text-text-muted transition-colors hover:text-text'
+                }
+                key={tab.key}
+                to={tab.to}
+              >
+                {tab.label}
+              </Link>
+            ))}
+          </div>
+        </nav>
+      </header>
 
       <DiscoveryFilters
         kind={kind}

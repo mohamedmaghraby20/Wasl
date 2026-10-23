@@ -17,8 +17,16 @@ import {
   useDiscoveryControllerCommunity,
 } from '@/api/generated/discovery/discovery';
 import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { Checkbox } from '@/components/ui/Checkbox';
+import { Field } from '@/components/ui/Field';
+import { Input } from '@/components/ui/Input';
+import { Label } from '@/components/ui/Label';
+import { Select } from '@/components/ui/Select';
+import { Textarea } from '@/components/ui/Textarea';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { languageCode } from '@/features/resources/resource-utils';
+import { cn } from '@/lib/cn';
 
 const formSchema = z.object({
   name: z.string().trim().min(1).max(100),
@@ -84,13 +92,21 @@ export function CommunityFormPage(): React.JSX.Element {
     const returnTo = `${location.pathname}${location.search}${location.hash}`;
     return <Navigate replace to={`/sign-in?returnTo=${encodeURIComponent(returnTo)}`} />;
   }
-  if (loading || (editing && existing.isPending)) return <p role="status">{t('authWorking')}</p>;
-  if (editing && existing.isError) return <p role="alert">{t('resourceEditLoadError')}</p>;
+  if (loading || (editing && existing.isPending))
+    return (
+      <p className="text-sm text-text-muted" role="status">
+        {t('authWorking')}
+      </p>
+    );
+  if (editing && existing.isError)
+    return (
+      <p className="text-sm font-medium text-danger" role="alert">
+        {t('resourceEditLoadError')}
+      </p>
+    );
 
-  const inputClass =
-    'min-h-(--control-height-lg) w-full rounded-(--shape-radius-control) border border-input bg-background px-3 py-2 text-base outline-none focus-visible:ring-(length:--focus-ring-width) focus-visible:ring-ring';
-  const labelClass = 'grid gap-2 text-sm font-semibold';
   const categoryIds = form.watch('categoryIds');
+  const errors = form.formState.errors;
 
   const save = async (values: FormValues): Promise<void> => {
     setFormError('');
@@ -114,206 +130,225 @@ export function CommunityFormPage(): React.JSX.Element {
   };
 
   return (
-    <section className="mx-auto max-w-(--container-reading) space-y-7">
+    <section className="mx-auto grid max-w-(--container-reading) gap-6">
       <Link
-        className="inline-flex min-h-(--control-height-md) items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+        className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-text-muted transition-colors hover:text-text"
         to={editing ? `/communities/${existing.data!.slug}` : '/create'}
       >
-        <ArrowLeft aria-hidden="true" size={17} />
+        <ArrowLeft aria-hidden="true" className="size-4 rtl:rotate-180" />
         {t(editing ? 'backToCommunity' : 'backToCreate')}
       </Link>
-      <header className="border-b border-border pb-5">
-        <h1 className="font-heading text-3xl font-bold tracking-tight">
+      <header className="grid gap-2">
+        <h1 className="text-3xl font-extrabold">
           {t(editing ? 'editCommunity' : 'createCommunityTitle')}
         </h1>
-        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          {t('communityFormIntro')}
-        </p>
+        <p className="text-sm leading-relaxed text-text-muted">{t('communityFormIntro')}</p>
       </header>
 
-      <form
-        className="grid gap-5"
-        onSubmit={(event) => void form.handleSubmit((values) => void save(values))(event)}
-      >
-        {Object.keys(form.formState.errors).length > 0 && (
-          <p
-            className="rounded-md border border-destructive bg-destructive/10 p-3 text-sm text-destructive"
-            role="alert"
-          >
-            {t('formValidationError')}
-          </p>
-        )}
-        {!editing && (
-          <label className={labelClass} htmlFor="community-organization">
-            <span>{t('resourceOrganizationHost')}</span>
-            <select
-              className={inputClass}
-              id="community-organization"
-              {...form.register('organizationId')}
-            >
-              <option value="">{t('hostAsYourself')}</option>
-              {organizations.data?.map((organization) => (
-                <option key={organization.id} value={organization.id}>
-                  {organization.name} ({t(`organizationRole_${organization.role}`)})
-                </option>
-              ))}
-            </select>
-            {organizations.isError && (
-              <span className="text-xs font-normal text-destructive">
-                {t('managedOrganizationsLoadError')}
-              </span>
-            )}
-          </label>
-        )}
-        <label className={labelClass} htmlFor="community-name">
-          <span>{t('communityName')}</span>
-          <input
-            aria-describedby={form.formState.errors.name ? 'community-name-error' : undefined}
-            aria-invalid={Boolean(form.formState.errors.name)}
-            className={inputClass}
-            id="community-name"
-            maxLength={100}
-            required
-            {...form.register('name')}
-          />
-          {form.formState.errors.name && (
-            <span className="text-xs text-destructive" id="community-name-error">
-              {t('formFieldInvalid')}
-            </span>
-          )}
-        </label>
-        <label className={labelClass} htmlFor="community-description">
-          <span>{t('description')}</span>
-          <textarea
-            aria-describedby={
-              form.formState.errors.description ? 'community-description-error' : undefined
-            }
-            aria-invalid={Boolean(form.formState.errors.description)}
-            className={`${inputClass} min-h-36 resize-y`}
-            id="community-description"
-            maxLength={5000}
-            required
-            {...form.register('description')}
-          />
-          {form.formState.errors.description && (
-            <span className="text-xs text-destructive" id="community-description-error">
-              {t('formFieldInvalid')}
-            </span>
-          )}
-        </label>
-        <div className="grid gap-5 sm:grid-cols-2">
-          <label className={labelClass} htmlFor="community-city">
-            <span>{t('profileCity')}</span>
-            <select
-              aria-describedby={form.formState.errors.cityId ? 'community-city-error' : undefined}
-              aria-invalid={Boolean(form.formState.errors.cityId)}
-              className={inputClass}
-              id="community-city"
-              required
-              {...form.register('cityId')}
-            >
-              <option value="">{t('profileCityEmpty')}</option>
-              {cities.data?.map((city) => (
-                <option key={city.id} value={city.id}>
-                  {lang === 'ar' ? city.nameAr : lang === 'tr' ? city.nameTr : city.nameEn}
-                </option>
-              ))}
-            </select>
-            {form.formState.errors.cityId && (
-              <span className="text-xs text-destructive" id="community-city-error">
-                {t('formFieldInvalid')}
-              </span>
-            )}
-          </label>
-          <label className={labelClass} htmlFor="community-admission">
-            <span>{t('admissionPolicy')}</span>
-            <select
-              className={inputClass}
-              id="community-admission"
-              {...form.register('admissionMode')}
-            >
-              <option value="open">{t('admissionOpen')}</option>
-              <option value="approval">{t('admissionApproval')}</option>
-              <option value="automatic">{t('admissionAutomatic')}</option>
-            </select>
-          </label>
-        </div>
-        <label className={labelClass} htmlFor="community-capacity">
-          <span>{t('capacityOptional')}</span>
-          <input
-            aria-describedby={
-              form.formState.errors.capacity ? 'community-capacity-error' : undefined
-            }
-            aria-invalid={Boolean(form.formState.errors.capacity)}
-            className={inputClass}
-            id="community-capacity"
-            inputMode="numeric"
-            max="10000"
-            min="1"
-            type="number"
-            {...form.register('capacity')}
-          />
-          {form.formState.errors.capacity && (
-            <span className="text-xs text-destructive" id="community-capacity-error">
-              {t('formFieldInvalid')}
-            </span>
-          )}
-        </label>
-        <fieldset
-          aria-describedby={
-            form.formState.errors.categoryIds ? 'community-categories-error' : undefined
-          }
-          className="grid gap-3"
+      <Card>
+        <form
+          className="grid gap-6 p-5 sm:p-7"
+          onSubmit={(event) => void form.handleSubmit((values) => void save(values))(event)}
         >
-          <legend className="mb-3 text-sm font-semibold">{t('chooseCategories')}</legend>
-          {categories.data?.map((category) => (
-            <label
-              className="flex min-h-11 items-center gap-3 border-b border-border py-2 text-sm"
-              key={category.id}
+          {Object.keys(errors).length > 0 ? (
+            <p
+              className="rounded-lg bg-danger-soft px-3 py-2 text-sm font-medium text-danger"
+              role="alert"
             >
-              <input
-                checked={categoryIds.includes(category.id)}
-                onChange={(event) => {
-                  const next = event.currentTarget.checked
-                    ? [...categoryIds, category.id]
-                    : categoryIds.filter((idValue) => idValue !== category.id);
-                  form.setValue('categoryIds', next, { shouldDirty: true, shouldValidate: true });
-                }}
-                type="checkbox"
-              />
-              {lang === 'ar' ? category.nameAr : lang === 'tr' ? category.nameTr : category.nameEn}
-            </label>
-          ))}
-          {categories.isError && (
-            <p className="text-sm text-destructive">{t('categoriesLoadError')}</p>
-          )}
-          {form.formState.errors.categoryIds && (
-            <p className="text-xs text-destructive" id="community-categories-error">
-              {t('formFieldInvalid')}
+              {t('formValidationError')}
             </p>
-          )}
-        </fieldset>
-        {formError && (
-          <p
-            className="rounded-md border border-destructive bg-destructive/10 p-3 text-sm text-destructive"
-            role="alert"
+          ) : null}
+
+          {!editing ? (
+            <Field
+              error={organizations.isError ? t('managedOrganizationsLoadError') : undefined}
+              id="community-organization"
+              label={t('resourceOrganizationHost')}
+            >
+              <Select
+                id="community-organization"
+                onValueChange={(value) =>
+                  form.setValue('organizationId', value === '__self__' ? '' : value, {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  })
+                }
+                options={[
+                  { value: '__self__', label: t('hostAsYourself') },
+                  ...(organizations.data ?? []).map((organization) => ({
+                    value: organization.id,
+                    label: `${organization.name} (${t(`organizationRole_${organization.role}`)})`,
+                  })),
+                ]}
+                value={form.watch('organizationId') || '__self__'}
+              />
+            </Field>
+          ) : null}
+
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field error={errors.name ? t('formFieldInvalid') : undefined} id="community-name" label={t('communityName')} required>
+              <Input
+                aria-describedby={errors.name ? 'community-name-error' : undefined}
+                aria-invalid={Boolean(errors.name)}
+                id="community-name"
+                maxLength={100}
+                required
+                {...form.register('name')}
+              />
+            </Field>
+            <Field
+              error={errors.capacity ? t('formFieldInvalid') : undefined}
+              id="community-capacity"
+              label={t('capacityOptional')}
+            >
+              <Input
+                aria-describedby={errors.capacity ? 'community-capacity-error' : undefined}
+                aria-invalid={Boolean(errors.capacity)}
+                id="community-capacity"
+                inputMode="numeric"
+                max="10000"
+                min="1"
+                type="number"
+                {...form.register('capacity')}
+              />
+            </Field>
+          </div>
+
+          <Field
+            error={errors.description ? t('formFieldInvalid') : undefined}
+            id="community-description"
+            label={t('description')}
+            required
           >
-            {formError}
-          </p>
-        )}
-        <div className="flex justify-end gap-3 border-t border-border pt-5">
-          <Button asChild variant="outline">
-            <Link to={editing ? `/communities/${existing.data!.slug}` : '/create'}>
-              {t('cancel')}
-            </Link>
-          </Button>
-          <Button disabled={create.isPending || update.isPending} type="submit">
-            {create.isPending || update.isPending
-              ? t('savingResource')
-              : t(editing ? 'saveChanges' : 'publishCommunity')}
-          </Button>
-        </div>
-      </form>
+            <Textarea
+              aria-describedby={errors.description ? 'community-description-error' : undefined}
+              aria-invalid={Boolean(errors.description)}
+              id="community-description"
+              maxLength={5000}
+              required
+              {...form.register('description')}
+            />
+          </Field>
+
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field
+              error={errors.cityId ? t('formFieldInvalid') : undefined}
+              id="community-city"
+              label={t('profileCity')}
+              required
+            >
+              <Select
+                aria-describedby={errors.cityId ? 'community-city-error' : undefined}
+                aria-invalid={Boolean(errors.cityId)}
+                id="community-city"
+                onValueChange={(value) =>
+                  form.setValue('cityId', value, { shouldDirty: true, shouldValidate: true })
+                }
+                options={(cities.data ?? []).map((city) => ({
+                  value: city.id,
+                  label: lang === 'ar' ? city.nameAr : lang === 'tr' ? city.nameTr : city.nameEn,
+                }))}
+                placeholder={t('profileCityEmpty')}
+                value={form.watch('cityId')}
+              />
+            </Field>
+            <Field id="community-admission" label={t('admissionPolicy')}>
+              <Select
+                id="community-admission"
+                onValueChange={(value) =>
+                  form.setValue('admissionMode', value as FormValues['admissionMode'], {
+                    shouldDirty: true,
+                  })
+                }
+                options={[
+                  { value: 'open', label: t('admissionOpen') },
+                  { value: 'approval', label: t('admissionApproval') },
+                  { value: 'automatic', label: t('admissionAutomatic') },
+                ]}
+                value={form.watch('admissionMode')}
+              />
+            </Field>
+          </div>
+
+          <fieldset
+            aria-describedby={errors.categoryIds ? 'community-categories-error' : undefined}
+            className="grid gap-3"
+          >
+            <legend className="text-sm font-medium text-text">{t('chooseCategories')}</legend>
+            <div className="flex flex-wrap gap-2">
+              {categories.data?.map((category) => {
+                const checked = categoryIds.includes(category.id);
+                const categoryName =
+                  lang === 'ar' ? category.nameAr : lang === 'tr' ? category.nameTr : category.nameEn;
+                return (
+                  <div
+                    className={cn(
+                      'flex items-center gap-2 rounded-full border px-3 py-1.5 transition-colors',
+                      checked
+                        ? 'border-primary/40 bg-primary-soft'
+                        : 'border-border bg-surface-soft hover:border-border-strong',
+                    )}
+                    key={category.id}
+                  >
+                    <Checkbox
+                      checked={checked}
+                      id={`category-${category.id}`}
+                      onCheckedChange={(next) => {
+                        const nextIds = next
+                          ? [...categoryIds, category.id]
+                          : categoryIds.filter((idValue) => idValue !== category.id);
+                        form.setValue('categoryIds', nextIds, {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        });
+                      }}
+                    />
+                    <Label
+                      className={cn(
+                        'cursor-pointer text-sm font-medium',
+                        checked ? 'text-primary-soft-text' : 'text-text-muted',
+                      )}
+                      htmlFor={`category-${category.id}`}
+                    >
+                      {categoryName}
+                    </Label>
+                  </div>
+                );
+              })}
+            </div>
+            {categories.isError ? (
+              <p className="text-xs font-medium text-danger">{t('categoriesLoadError')}</p>
+            ) : null}
+            {errors.categoryIds ? (
+              <p className="text-xs font-medium text-danger" id="community-categories-error">
+                {t('formFieldInvalid')}
+              </p>
+            ) : null}
+          </fieldset>
+
+          {formError ? (
+            <p
+              className="rounded-lg bg-danger-soft px-3 py-2 text-sm font-medium text-danger"
+              role="alert"
+            >
+              {formError}
+            </p>
+          ) : null}
+
+          <div className="flex flex-wrap justify-end gap-3 border-t border-border pt-5">
+            <Button asChild variant="outline">
+              <Link to={editing ? `/communities/${existing.data!.slug}` : '/create'}>
+                {t('cancel')}
+              </Link>
+            </Button>
+            <Button disabled={create.isPending || update.isPending} type="submit">
+              {create.isPending || update.isPending
+                ? t('savingResource')
+                : t(editing ? 'saveChanges' : 'publishCommunity')}
+            </Button>
+          </div>
+        </form>
+      </Card>
     </section>
   );
 }

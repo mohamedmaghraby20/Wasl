@@ -1,6 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useHead } from '@unhead/react';
 import { ArrowLeft, Copy, Mail, Pencil, UserPlus, X } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, Navigate, useLocation, useParams } from 'react-router';
@@ -24,9 +25,46 @@ import {
 } from '@/api/generated/organizations/organizations';
 import { ApiError } from '@/api/fetcher';
 import { QueryError } from '@/components/feedback/QueryError';
+import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { Field } from '@/components/ui/Field';
+import { Input } from '@/components/ui/Input';
+import { Select } from '@/components/ui/Select';
+import { Textarea } from '@/components/ui/Textarea';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { languageCode } from '@/features/resources/resource-utils';
+
+const dangerButtonClass =
+  'border-danger/30 text-danger hover:bg-danger-soft hover:text-danger';
+
+function ManageSection({
+  id,
+  title,
+  description,
+  children,
+}: {
+  id: string;
+  title: string;
+  description?: string;
+  children: ReactNode;
+}): React.JSX.Element {
+  return (
+    <section
+      aria-labelledby={id}
+      className="grid gap-4 rounded-(--shape-radius-card) border border-border bg-card p-5 shadow-xs sm:p-6"
+    >
+      <div className="grid gap-1">
+        <h2 className="text-lg font-semibold" id={id}>
+          {title}
+        </h2>
+        {description ? (
+          <p className="text-sm leading-relaxed text-text-muted">{description}</p>
+        ) : null}
+      </div>
+      {children}
+    </section>
+  );
+}
 
 export function OrganizationManagePage(): React.JSX.Element {
   const { t, i18n } = useTranslation();
@@ -74,18 +112,35 @@ export function OrganizationManagePage(): React.JSX.Element {
     return <Navigate replace to={`/sign-in?returnTo=${encodeURIComponent(returnTo)}`} />;
   }
   if (authLoading || profile.isPending || mine.isPending) {
-    return <p role="status">{t('loadingOrganization')}</p>;
+    return (
+      <p className="text-sm text-text-muted" role="status">
+        {t('loadingOrganization')}
+      </p>
+    );
   }
   if (profile.isError || !organization) {
     return (
       <QueryError message={t('organizationEditLoadError')} onRetry={() => void profile.refetch()} />
     );
   }
-  if (!role) return <p role="alert">{t('organizationManagementForbidden')}</p>;
+  if (!role)
+    return (
+      <p className="rounded-(--shape-radius-card) border border-border bg-card p-5 text-sm font-medium text-danger" role="alert">
+        {t('organizationManagementForbidden')}
+      </p>
+    );
 
   const admins = managers.data?.filter((manager) => manager.role === 'ADMIN') ?? [];
   const latestVerification = verificationRequests.data?.[0];
   const verificationPending = latestVerification?.status === 'PENDING';
+  const statusVariant =
+    organization.verificationStatus === 'VERIFIED'
+      ? 'success'
+      : verificationPending
+        ? 'warning'
+        : organization.verificationStatus === 'REJECTED'
+          ? 'danger'
+          : 'neutral';
 
   const inviteAdmin = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
@@ -217,49 +272,49 @@ export function OrganizationManagePage(): React.JSX.Element {
     }
   };
 
-  const inputClass =
-    'min-h-(--control-height-lg) w-full rounded-(--shape-radius-control) border border-input bg-background px-3 py-2 text-base outline-none focus-visible:ring-(length:--focus-ring-width) focus-visible:ring-ring';
-
   return (
-    <section className="mx-auto max-w-(--container-reading) space-y-8">
+    <section className="mx-auto grid max-w-4xl gap-6">
       <Link
-        className="inline-flex min-h-(--control-height-md) items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+        className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-text-muted transition-colors hover:text-text"
         to={`/organizations/${organization.slug}`}
       >
-        <ArrowLeft aria-hidden="true" size={17} />
+        <ArrowLeft aria-hidden="true" className="size-4 rtl:rotate-180" />
         {t('backToOrganization')}
       </Link>
-      <header className="border-b border-border pb-5">
-        <p className="text-sm text-muted-foreground">{t('organizationRole_' + role)}</p>
-        <h1 className="font-heading text-3xl font-bold tracking-tight">{organization.name}</h1>
-        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          {t('organizationManageIntro')}
-        </p>
-        <div className="mt-4 flex flex-wrap gap-3">
-          <Button asChild variant="outline">
-            <Link to={`/organizations/${organization.slug}/edit`}>
-              <Pencil aria-hidden="true" size={16} />
-              {t('editOrganization')}
-            </Link>
-          </Button>
+
+      <header className="grid gap-3 sm:flex sm:items-start sm:justify-between">
+        <div className="grid gap-2">
+          <Badge className="w-fit" variant="primary">
+            {t('organizationRole_' + role)}
+          </Badge>
+          <h1 className="text-3xl font-extrabold">{organization.name}</h1>
+          <p className="max-w-(--container-reading) text-sm leading-relaxed text-text-muted">
+            {t('organizationManageIntro')}
+          </p>
         </div>
+        <Button asChild variant="outline">
+          <Link to={`/organizations/${organization.slug}/edit`}>
+            <Pencil aria-hidden="true" />
+            {t('editOrganization')}
+          </Link>
+        </Button>
       </header>
 
-      <section aria-labelledby="organization-verification-heading" className="grid gap-4">
-        <h2 className="font-heading text-xl font-bold" id="organization-verification-heading">
-          {t('organizationVerification')}
-        </h2>
-        <p className="text-sm">
-          {t('organizationVerificationStatusLabel')}:{' '}
-          <span className="font-semibold">
+      <ManageSection
+        description={t('organizationVerificationHint')}
+        id="organization-verification-heading"
+        title={t('organizationVerification')}
+      >
+        <div className="flex flex-wrap items-center gap-2 text-sm">
+          <span className="text-text-muted">{t('organizationVerificationStatusLabel')}:</span>
+          <Badge variant={statusVariant}>
             {t(`organizationVerification_${organization.verificationStatus}`)}
-          </span>
-        </p>
-        <p className="text-sm leading-relaxed text-muted-foreground">
-          {t('organizationVerificationHint')}
-        </p>
+          </Badge>
+        </div>
         {verificationRequests.isPending ? (
-          <p role="status">{t('loadingOrganizationVerification')}</p>
+          <p className="text-sm text-text-muted" role="status">
+            {t('loadingOrganizationVerification')}
+          </p>
         ) : verificationRequests.isError ? (
           <QueryError
             message={t('organizationVerificationLoadError')}
@@ -267,39 +322,41 @@ export function OrganizationManagePage(): React.JSX.Element {
           />
         ) : (
           <>
-            {verificationPending && latestVerification && (
-              <p className="text-sm text-muted-foreground">
+            {verificationPending && latestVerification ? (
+              <p className="text-sm text-text-muted">
                 {t('organizationVerificationPendingSince', {
                   date: new Date(latestVerification.createdAt).toLocaleDateString(i18n.language, {
                     dateStyle: 'medium',
                   }),
                 })}
               </p>
-            )}
-            {latestVerification?.status === 'REJECTED' && (
-              <p className="rounded-md border border-border bg-muted/40 p-3 text-sm">
+            ) : null}
+            {latestVerification?.status === 'REJECTED' ? (
+              <p className="rounded-lg bg-warning-soft px-3 py-2 text-sm text-warning">
                 {latestVerification.decisionNote
                   ? t('organizationVerificationRejectedNote', {
                       note: latestVerification.decisionNote,
                     })
                   : t('organizationVerificationNoDecisionNote')}
               </p>
-            )}
+            ) : null}
             {organization.verificationStatus === 'VERIFIED' ? (
-              <p className="rounded-md border border-border bg-card p-3 text-sm">
+              <p className="rounded-lg bg-success-soft px-3 py-2 text-sm text-success">
                 {t('organizationVerifiedHint')}
               </p>
             ) : verificationPending ? null : (
               <form className="grid gap-3" onSubmit={(event) => void submitVerification(event)}>
-                <label className="grid gap-2 text-sm font-semibold">
-                  <span>{t('organizationVerificationNote')}</span>
-                  <textarea
-                    className={`${inputClass} min-h-28`}
+                <Field
+                  id="organization-verification-note"
+                  label={t('organizationVerificationNote')}
+                >
+                  <Textarea
+                    id="organization-verification-note"
                     maxLength={2000}
                     onChange={(event) => setVerificationNote(event.currentTarget.value)}
                     value={verificationNote}
                   />
-                </label>
+                </Field>
                 <Button
                   className="justify-self-start"
                   disabled={requestVerification.isPending}
@@ -311,96 +368,91 @@ export function OrganizationManagePage(): React.JSX.Element {
                 </Button>
               </form>
             )}
-            {verificationError && (
+            {verificationError ? (
               <p
-                className="rounded-md border border-destructive bg-destructive/10 p-3 text-sm text-destructive"
+                className="rounded-lg bg-danger-soft px-3 py-2 text-sm font-medium text-danger"
                 role="alert"
               >
                 {verificationError}
               </p>
-            )}
+            ) : null}
           </>
         )}
-      </section>
+      </ManageSection>
 
-      <section aria-labelledby="organization-managers-heading" className="grid gap-4">
-        <h2 className="font-heading text-xl font-bold" id="organization-managers-heading">
-          {t('organizationManagers')}
-        </h2>
+      <ManageSection id="organization-managers-heading" title={t('organizationManagers')}>
         {managers.isPending ? (
-          <p role="status">{t('loadingOrganizationManagers')}</p>
+          <p className="text-sm text-text-muted" role="status">
+            {t('loadingOrganizationManagers')}
+          </p>
         ) : managers.isError ? (
           <QueryError
             message={t('organizationManagersLoadError')}
             onRetry={() => void managers.refetch()}
           />
         ) : (
-          <ul className="grid gap-3">
+          <ul className="divide-y divide-border rounded-lg border border-border">
             {managers.data.map((manager) => (
               <li
-                className="flex flex-wrap items-center justify-between gap-3 rounded-(--shape-radius-card) border border-border bg-card p-4"
+                className="flex flex-wrap items-center justify-between gap-3 px-4 py-3"
                 key={manager.userId}
               >
-                <div className="grid gap-1">
-                  <p className="font-semibold">
+                <div className="grid gap-0.5">
+                  <p className="font-medium text-text">
                     {manager.displayName ?? t('organizationManagerUnnamed')}
                   </p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs text-text-subtle">
                     {t(`organizationRole_${manager.role}`)}
                   </p>
                 </div>
-                {isOwner && manager.role === 'ADMIN' && (
+                {isOwner && manager.role === 'ADMIN' ? (
                   <Button
-                    className="text-destructive"
+                    className={dangerButtonClass}
                     disabled={removeAdmin.isPending}
                     onClick={() => void remove(manager.userId)}
+                    size="sm"
                     variant="outline"
                   >
-                    <X aria-hidden="true" size={16} />
+                    <X aria-hidden="true" />
                     {t('removeAdmin')}
                   </Button>
-                )}
+                ) : null}
               </li>
             ))}
           </ul>
         )}
-      </section>
+      </ManageSection>
 
       {isOwner ? (
         <>
-          <section
-            aria-labelledby="organization-transfer-heading"
-            className="grid gap-4 border-t border-border pt-7"
+          <ManageSection
+            description={t('organizationTransferHint')}
+            id="organization-transfer-heading"
+            title={t('organizationTransferOwnership')}
           >
-            <h2 className="font-heading text-xl font-bold" id="organization-transfer-heading">
-              {t('organizationTransferOwnership')}
-            </h2>
-            <p className="text-sm leading-relaxed text-muted-foreground">
-              {t('organizationTransferHint')}
-            </p>
             {admins.length ? (
               <form
                 className="grid gap-3 sm:flex sm:items-end"
                 onSubmit={(event) => void transfer(event)}
               >
-                <label className="grid flex-1 gap-2 text-sm font-semibold">
-                  <span>{t('organizationTransferTarget')}</span>
-                  <select
-                    className={inputClass}
-                    onChange={(event) => setTransferTargetId(event.currentTarget.value)}
-                    required
+                <Field
+                  className="flex-1"
+                  id="organization-transfer-target"
+                  label={t('organizationTransferTarget')}
+                >
+                  <Select
+                    id="organization-transfer-target"
+                    onValueChange={setTransferTargetId}
+                    options={admins.map((admin) => ({
+                      value: admin.userId,
+                      label: admin.displayName ?? t('organizationManagerUnnamed'),
+                    }))}
+                    placeholder={t('organizationTransferChooseAdmin')}
                     value={transferTargetId}
-                  >
-                    <option value="">{t('organizationTransferChooseAdmin')}</option>
-                    {admins.map((admin) => (
-                      <option key={admin.userId} value={admin.userId}>
-                        {admin.displayName ?? t('organizationManagerUnnamed')}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+                  />
+                </Field>
                 <Button
-                  className="text-destructive"
+                  className={dangerButtonClass}
                   disabled={transferOwnership.isPending || !transferTargetId}
                   type="submit"
                   variant="outline"
@@ -411,99 +463,99 @@ export function OrganizationManagePage(): React.JSX.Element {
                 </Button>
               </form>
             ) : (
-              <p className="rounded-(--shape-radius-card) border border-dashed border-border p-5 text-sm text-muted-foreground">
+              <p className="rounded-lg border border-dashed border-border p-5 text-sm text-text-muted">
                 {t('organizationTransferNeedsAdmin')}
               </p>
             )}
-            {transferError && (
+            {transferError ? (
               <p
-                className="rounded-md border border-destructive bg-destructive/10 p-3 text-sm text-destructive"
+                className="rounded-lg bg-danger-soft px-3 py-2 text-sm font-medium text-danger"
                 role="alert"
               >
                 {transferError}
               </p>
-            )}
-          </section>
+            ) : null}
+          </ManageSection>
 
-          <section
-            aria-labelledby="organization-invite-heading"
-            className="grid gap-4 border-t border-border pt-7"
+          <ManageSection
+            description={t('organizationInviteHint')}
+            id="organization-invite-heading"
+            title={t('organizationInviteAdmin')}
           >
-            <h2 className="font-heading text-xl font-bold" id="organization-invite-heading">
-              {t('organizationInviteAdmin')}
-            </h2>
-            <p className="text-sm text-muted-foreground">{t('organizationInviteHint')}</p>
             <form
               className="grid gap-3 sm:flex sm:items-end"
               onSubmit={(event) => void inviteAdmin(event)}
             >
-              <label className="grid flex-1 gap-2 text-sm font-semibold">
-                <span>{t('organizationInviteEmail')}</span>
-                <input
-                  className={inputClass}
+              <Field
+                className="flex-1"
+                id="organization-invite-email"
+                label={t('organizationInviteEmail')}
+              >
+                <Input
+                  id="organization-invite-email"
                   maxLength={320}
                   onChange={(event) => setEmail(event.currentTarget.value)}
                   required
                   type="email"
                   value={email}
                 />
-              </label>
+              </Field>
               <Button disabled={invite.isPending || !email.trim()} type="submit">
-                <UserPlus aria-hidden="true" size={16} />
+                <UserPlus aria-hidden="true" />
                 {invite.isPending ? t('organizationInviteSending') : t('organizationInviteAction')}
               </Button>
             </form>
-            {formError && (
+            {formError ? (
               <p
-                className="rounded-md border border-destructive bg-destructive/10 p-3 text-sm text-destructive"
+                className="rounded-lg bg-danger-soft px-3 py-2 text-sm font-medium text-danger"
                 role="alert"
               >
                 {formError}
               </p>
-            )}
-            {invitationLink && (
-              <div className="grid gap-2 rounded-(--shape-radius-card) border border-border bg-card p-4">
-                <p className="text-sm font-semibold">{t('organizationInviteCreated')}</p>
-                <p className="break-all text-sm text-muted-foreground">{invitationLink}</p>
+            ) : null}
+            {invitationLink ? (
+              <div className="grid gap-2 rounded-lg bg-surface-soft p-4">
+                <p className="text-sm font-semibold text-text">{t('organizationInviteCreated')}</p>
+                <p className="break-all text-sm text-text-muted">{invitationLink}</p>
                 <Button
                   className="justify-self-start"
                   onClick={() => void copyInvitationLink()}
+                  size="sm"
                   variant="outline"
                 >
-                  <Copy aria-hidden="true" size={16} />
+                  <Copy aria-hidden="true" />
                   {t('copyInvitationLink')}
                 </Button>
               </div>
-            )}
-          </section>
+            ) : null}
+          </ManageSection>
 
-          <section
-            aria-labelledby="organization-invitations-heading"
-            className="grid gap-4 border-t border-border pt-7"
+          <ManageSection
+            id="organization-invitations-heading"
+            title={t('organizationPendingInvitations')}
           >
-            <h2 className="font-heading text-xl font-bold" id="organization-invitations-heading">
-              {t('organizationPendingInvitations')}
-            </h2>
             {invitations.isPending ? (
-              <p role="status">{t('loadingOrganizationInvitations')}</p>
+              <p className="text-sm text-text-muted" role="status">
+                {t('loadingOrganizationInvitations')}
+              </p>
             ) : invitations.isError ? (
               <QueryError
                 message={t('organizationInvitationsLoadError')}
                 onRetry={() => void invitations.refetch()}
               />
             ) : invitations.data.length ? (
-              <ul className="grid gap-3">
+              <ul className="divide-y divide-border rounded-lg border border-border">
                 {invitations.data.map((invitation) => (
                   <li
-                    className="flex flex-wrap items-center justify-between gap-3 rounded-(--shape-radius-card) border border-border bg-card p-4"
+                    className="flex flex-wrap items-center justify-between gap-3 px-4 py-3"
                     key={invitation.id}
                   >
-                    <div className="grid gap-1">
-                      <p className="flex items-center gap-2 font-semibold">
-                        <Mail aria-hidden="true" size={16} />
+                    <div className="grid gap-0.5">
+                      <p className="flex items-center gap-2 font-medium text-text">
+                        <Mail aria-hidden="true" className="size-4 text-text-subtle" />
                         {invitation.targetDisplayName ?? t('organizationManagerUnnamed')}
                       </p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-xs text-text-subtle">
                         {t('organizationInvitationExpires', {
                           date: new Date(invitation.expiresAt).toLocaleDateString(i18n.language, {
                             dateStyle: 'medium',
@@ -512,26 +564,27 @@ export function OrganizationManagePage(): React.JSX.Element {
                       </p>
                     </div>
                     <Button
-                      className="text-destructive"
+                      className={dangerButtonClass}
                       disabled={revokeInvitation.isPending}
                       onClick={() => void revoke(invitation.id)}
+                      size="sm"
                       variant="outline"
                     >
-                      <X aria-hidden="true" size={16} />
+                      <X aria-hidden="true" />
                       {t('revokeInvitation')}
                     </Button>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="rounded-(--shape-radius-card) border border-dashed border-border p-5 text-sm text-muted-foreground">
+              <p className="rounded-lg border border-dashed border-border p-5 text-sm text-text-muted">
                 {t('organizationNoPendingInvitations')}
               </p>
             )}
-          </section>
+          </ManageSection>
         </>
       ) : (
-        <p className="border-t border-border pt-7 text-sm text-muted-foreground">
+        <p className="rounded-(--shape-radius-card) border border-border bg-card p-5 text-sm text-text-muted">
           {t('organizationAdminsOwnerOnly')}
         </p>
       )}

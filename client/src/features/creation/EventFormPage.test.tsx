@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createHead, UnheadProvider } from '@unhead/react/client';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { I18nextProvider } from 'react-i18next';
 import { MemoryRouter, Route, Routes } from 'react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -71,18 +72,23 @@ describe('EventFormPage organization host choice', () => {
     mocks.update.mockReturnValue({ mutateAsync: vi.fn(), isPending: false });
   });
 
-  it('offers authorized organizations and keeps the selected host exclusive', () => {
+  it('offers authorized organizations and keeps the selected host exclusive', async () => {
+    const user = userEvent.setup();
     renderPage();
 
     const communityHost = screen.getByLabelText('Host this event as');
     const organizationHost = screen.getByLabelText('Organization (optional)');
-    expect(screen.getByRole('option', { name: 'My group (Admin)' })).toBeInTheDocument();
-    expect(screen.queryByRole('option', { name: /Unrelated/ })).not.toBeInTheDocument();
+    expect(communityHost).toHaveTextContent('My account');
 
-    fireEvent.change(communityHost, { target: { value: 'community-1' } });
-    expect(communityHost).toHaveValue('community-1');
-    fireEvent.change(organizationHost, { target: { value: 'org-1' } });
-    expect(organizationHost).toHaveValue('org-1');
-    expect(communityHost).toHaveValue('');
+    await user.click(organizationHost);
+    expect(await screen.findByRole('option', { name: 'My group (Admin)' })).toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: /Unrelated/ })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('option', { name: 'My group (Admin)' }));
+    expect(organizationHost).toHaveTextContent('My group (Admin)');
+
+    await user.click(communityHost);
+    await user.click(await screen.findByRole('option', { name: 'My community' }));
+    expect(communityHost).toHaveTextContent('My community');
+    expect(organizationHost).toHaveTextContent('No organization');
   });
 });

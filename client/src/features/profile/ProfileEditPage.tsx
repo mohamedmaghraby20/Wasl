@@ -15,6 +15,11 @@ import {
 import { useDiscoveryControllerCities } from '@/api/generated/discovery/discovery';
 import { QueryError } from '@/components/feedback/QueryError';
 import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { Field } from '@/components/ui/Field';
+import { Input } from '@/components/ui/Input';
+import { Select } from '@/components/ui/Select';
+import { Textarea } from '@/components/ui/Textarea';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { languageCode } from '@/features/resources/resource-utils';
 import { profileImageExtension } from './profile-utils';
@@ -72,7 +77,12 @@ export function ProfileEditPage(): React.JSX.Element {
     const returnTo = `${location.pathname}${location.search}${location.hash}`;
     return <Navigate replace to={`/sign-in?returnTo=${encodeURIComponent(returnTo)}`} />;
   }
-  if (loading || profile.isPending) return <p role="status">{t('loadingProfile')}</p>;
+  if (loading || profile.isPending)
+    return (
+      <p className="text-sm text-text-muted" role="status">
+        {t('loadingProfile')}
+      </p>
+    );
   if (profile.isError) {
     return <QueryError message={t('profileLoadError')} onRetry={() => void profile.refetch()} />;
   }
@@ -121,162 +131,152 @@ export function ProfileEditPage(): React.JSX.Element {
     }
   };
 
-  const inputClass =
-    'min-h-(--control-height-lg) w-full rounded-(--shape-radius-control) border border-input bg-background px-3 py-2 text-base outline-none focus-visible:ring-(length:--focus-ring-width) focus-visible:ring-ring';
-  const labelClass = 'grid gap-2 text-sm font-semibold';
   const photoSource = previewUrl ?? (removePhoto ? null : profile.data.avatarUrl);
   const initials = profile.data.displayName.trim().slice(0, 1).toLocaleUpperCase(i18n.language);
+  const cityOptions = (cities.data ?? []).map((city) => ({
+    value: city.id,
+    label: lang === 'ar' ? city.nameAr : lang === 'tr' ? city.nameTr : city.nameEn,
+  }));
 
   return (
-    <section className="mx-auto max-w-(--container-reading) space-y-7">
+    <section className="mx-auto grid max-w-(--container-reading) gap-6">
       <Link
-        className="inline-flex min-h-(--control-height-md) items-center gap-2 text-sm text-muted-foreground hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:ring-ring"
+        className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-text-muted transition-colors hover:text-text"
         to="/profile"
       >
-        <ArrowLeft aria-hidden="true" size={17} />
+        <ArrowLeft aria-hidden="true" className="size-4 rtl:rotate-180" />
         {t('backToProfile')}
       </Link>
-      <header className="border-b border-border pb-5">
-        <h1 className="font-heading text-3xl font-bold tracking-tight">{t('editProfile')}</h1>
-        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          {t('profileEditIntro')}
-        </p>
+      <header className="grid gap-2">
+        <h1 className="text-3xl font-extrabold">{t('editProfile')}</h1>
+        <p className="text-sm leading-relaxed text-text-muted">{t('profileEditIntro')}</p>
       </header>
 
-      <form
-        className="grid gap-7"
-        onSubmit={(event) => void form.handleSubmit((values) => void saveProfile(values))(event)}
-      >
-        <section
-          aria-labelledby="profile-photo-heading"
-          className="grid gap-3 sm:grid-cols-[8rem_1fr] sm:items-center"
+      <Card>
+        <form
+          className="grid gap-6 p-5 sm:p-7"
+          onSubmit={(event) => void form.handleSubmit((values) => void saveProfile(values))(event)}
         >
-          <div className="grid size-28 place-items-center overflow-hidden rounded-full border border-border bg-primary-soft text-3xl font-bold text-primary-soft-text">
-            {photoSource ? (
-              <img alt="" className="size-full object-cover" src={photoSource} />
-            ) : (
-              initials || <CircleUserRound aria-hidden="true" size={42} />
-            )}
-          </div>
-          <div className="grid justify-items-start gap-2">
-            <h2 className="text-sm font-semibold" id="profile-photo-heading">
-              {t('profilePhoto')}
-            </h2>
-            <p className="text-sm text-muted-foreground">{t('profilePhotoHint')}</p>
-            <div className="flex flex-wrap gap-2">
-              <label className="inline-flex min-h-(--control-height-md) cursor-pointer items-center gap-2 rounded-md border border-input px-3 text-sm font-semibold hover:bg-secondary focus-within:ring-(length:--focus-ring-width) focus-within:ring-ring">
-                <Camera aria-hidden="true" size={16} />
-                {t('choosePhoto')}
-                <input
-                  accept="image/jpeg,image/png,image/webp"
-                  className="sr-only"
-                  onChange={(event) => {
-                    setSelectedPhoto(event.currentTarget.files?.[0] ?? null);
-                    setRemovePhoto(false);
-                  }}
-                  type="file"
-                />
-              </label>
-              {profile.data.avatarUrl && !removePhoto && (
-                <Button
-                  onClick={() => {
-                    setSelectedPhoto(null);
-                    setRemovePhoto(true);
-                  }}
-                  type="button"
-                  variant="outline"
-                >
-                  <X aria-hidden="true" size={16} />
-                  {t('removePhoto')}
-                </Button>
+          <section
+            aria-labelledby="profile-photo-heading"
+            className="grid gap-4 sm:grid-cols-[7rem_1fr] sm:items-center"
+          >
+            <div className="grid size-24 place-items-center overflow-hidden rounded-full border border-border bg-primary-soft text-3xl font-bold text-primary-soft-text">
+              {photoSource ? (
+                <img alt="" className="size-full object-cover" src={photoSource} />
+              ) : (
+                initials || <CircleUserRound aria-hidden="true" size={38} />
               )}
             </div>
-          </div>
-        </section>
+            <div className="grid justify-items-start gap-2">
+              <h2 className="text-sm font-semibold text-text" id="profile-photo-heading">
+                {t('profilePhoto')}
+              </h2>
+              <p className="text-sm text-text-muted">{t('profilePhotoHint')}</p>
+              <div className="flex flex-wrap gap-2">
+                <label className="inline-flex h-11 cursor-pointer items-center gap-2 rounded-(--shape-radius-control) border border-input bg-background px-4 text-sm font-semibold text-text transition-colors hover:bg-surface-soft has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-background">
+                  <Camera aria-hidden="true" className="size-4" />
+                  {t('choosePhoto')}
+                  <input
+                    accept="image/jpeg,image/png,image/webp"
+                    className="sr-only"
+                    onChange={(event) => {
+                      setSelectedPhoto(event.currentTarget.files?.[0] ?? null);
+                      setRemovePhoto(false);
+                    }}
+                    type="file"
+                  />
+                </label>
+                {profile.data.avatarUrl && !removePhoto ? (
+                  <Button
+                    onClick={() => {
+                      setSelectedPhoto(null);
+                      setRemovePhoto(true);
+                    }}
+                    type="button"
+                    variant="outline"
+                  >
+                    <X aria-hidden="true" />
+                    {t('removePhoto')}
+                  </Button>
+                ) : null}
+              </div>
+            </div>
+          </section>
 
-        <div className="grid gap-5 sm:grid-cols-2">
-          <label className={labelClass} htmlFor="profile-display-name">
-            <span>{t('profileNameLabel')}</span>
-            <input
-              aria-describedby={
-                form.formState.errors.displayName ? 'profile-display-name-error' : undefined
-              }
-              aria-invalid={Boolean(form.formState.errors.displayName)}
-              className={inputClass}
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field
+              error={form.formState.errors.displayName ? t('profileNameInvalid') : undefined}
               id="profile-display-name"
-              maxLength={80}
-              {...form.register('displayName')}
-            />
-            {form.formState.errors.displayName && (
-              <span className="text-xs text-destructive" id="profile-display-name-error">
-                {t('profileNameInvalid')}
-              </span>
-            )}
-          </label>
-          <label className={labelClass} htmlFor="profile-city">
-            <span>{t('profileCity')}</span>
-            <select className={inputClass} id="profile-city" {...form.register('cityId')}>
-              <option value="">{t('profileCityEmpty')}</option>
-              {cities.data?.map((city) => (
-                <option key={city.id} value={city.id}>
-                  {lang === 'ar' ? city.nameAr : lang === 'tr' ? city.nameTr : city.nameEn}
-                </option>
-              ))}
-            </select>
-            {cities.isError && (
-              <span className="text-xs text-destructive">{t('profileCitiesError')}</span>
-            )}
-          </label>
-        </div>
+              label={t('profileNameLabel')}
+            >
+              <Input
+                aria-describedby={
+                  form.formState.errors.displayName ? 'profile-display-name-error' : undefined
+                }
+                aria-invalid={Boolean(form.formState.errors.displayName)}
+                id="profile-display-name"
+                maxLength={80}
+                {...form.register('displayName')}
+              />
+            </Field>
+            <Field
+              error={cities.isError ? t('profileCitiesError') : undefined}
+              id="profile-city"
+              label={t('profileCity')}
+            >
+              <Select
+                disabled={cities.isPending || cities.isError}
+                id="profile-city"
+                onValueChange={(value) =>
+                  form.setValue('cityId', value === '__none__' ? '' : value, {
+                    shouldDirty: true,
+                  })
+                }
+                options={[{ value: '__none__', label: t('profileCityEmpty') }, ...cityOptions]}
+                value={form.watch('cityId') || '__none__'}
+              />
+            </Field>
+          </div>
 
-        <label className={labelClass} htmlFor="profile-bio">
-          <span>{t('profileAbout')}</span>
-          <textarea
-            aria-describedby={form.formState.errors.bio ? 'profile-bio-error' : undefined}
-            aria-invalid={Boolean(form.formState.errors.bio)}
-            className={`${inputClass} min-h-32 resize-y`}
+          <Field
+            error={form.formState.errors.bio ? t('formFieldInvalid') : undefined}
+            hint={t('profileBioHint')}
             id="profile-bio"
-            maxLength={500}
-            {...form.register('bio')}
-          />
-          {form.formState.errors.bio && (
-            <span className="text-xs text-destructive" id="profile-bio-error">
-              {t('formFieldInvalid')}
-            </span>
-          )}
-          <span className="text-xs font-normal text-muted-foreground">{t('profileBioHint')}</span>
-        </label>
-
-        <label className={labelClass} htmlFor="profile-interests">
-          <span>{t('profileInterests')}</span>
-          <input
-            className={inputClass}
-            id="profile-interests"
-            maxLength={1200}
-            {...form.register('interests')}
-          />
-          <span className="text-xs font-normal text-muted-foreground">
-            {t('profileInterestsHint')}
-          </span>
-        </label>
-
-        {formError && (
-          <p
-            className="rounded-md border border-destructive bg-destructive/10 p-3 text-sm text-destructive"
-            role="alert"
+            label={t('profileAbout')}
           >
-            {formError}
-          </p>
-        )}
-        <div className="flex flex-wrap justify-end gap-3 border-t border-border pt-5">
-          <Button asChild variant="outline">
-            <Link to="/profile">{t('cancel')}</Link>
-          </Button>
-          <Button disabled={update.isPending} type="submit">
-            {update.isPending ? t('savingProfile') : t('saveProfile')}
-          </Button>
-        </div>
-      </form>
+            <Textarea
+              aria-describedby={form.formState.errors.bio ? 'profile-bio-error' : undefined}
+              aria-invalid={Boolean(form.formState.errors.bio)}
+              id="profile-bio"
+              maxLength={500}
+              {...form.register('bio')}
+            />
+          </Field>
+
+          <Field hint={t('profileInterestsHint')} id="profile-interests" label={t('profileInterests')}>
+            <Input id="profile-interests" maxLength={1200} {...form.register('interests')} />
+          </Field>
+
+          {formError ? (
+            <p
+              className="rounded-lg bg-danger-soft px-3 py-2 text-sm font-medium text-danger"
+              role="alert"
+            >
+              {formError}
+            </p>
+          ) : null}
+
+          <div className="flex flex-wrap justify-end gap-3 border-t border-border pt-5">
+            <Button asChild variant="outline">
+              <Link to="/profile">{t('cancel')}</Link>
+            </Button>
+            <Button disabled={update.isPending} type="submit">
+              {update.isPending ? t('savingProfile') : t('saveProfile')}
+            </Button>
+          </div>
+        </form>
+      </Card>
     </section>
   );
 }

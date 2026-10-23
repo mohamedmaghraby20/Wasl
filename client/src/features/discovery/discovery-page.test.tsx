@@ -257,24 +257,25 @@ describe('DiscoveryPage', () => {
     mockDiscoveryApi();
     renderPage();
 
-    await screen.findByRole('option', { name: 'Ankara' });
-    await user.selectOptions(screen.getByRole('combobox', { name: 'All cities' }), 'ankara');
+    await user.click(screen.getByRole('combobox', { name: 'All cities' }));
+    await user.click(await screen.findByRole('option', { name: 'Ankara' }));
 
     await waitFor(() =>
       expect(screen.getByLabelText('Current URL')).toHaveTextContent('/discover?city=ankara'),
     );
+    expect(screen.getByRole('combobox', { name: 'All cities' })).toHaveTextContent('Ankara');
 
     await user.click(screen.getByRole('button', { name: 'Back' }));
     await waitFor(() =>
       expect(screen.getByLabelText('Current URL')).toHaveTextContent('/discover'),
     );
-    expect(screen.getByRole('combobox', { name: 'All cities' })).toHaveValue('');
+    expect(screen.getByRole('combobox', { name: 'All cities' })).toHaveTextContent('All cities');
 
     await user.click(screen.getByRole('button', { name: 'Forward' }));
     await waitFor(() =>
       expect(screen.getByLabelText('Current URL')).toHaveTextContent('/discover?city=ankara'),
     );
-    expect(screen.getByRole('combobox', { name: 'All cities' })).toHaveValue('ankara');
+    expect(screen.getByRole('combobox', { name: 'All cities' })).toHaveTextContent('Ankara');
   });
 
   it('keeps document language and direction synchronized with Arabic', async () => {

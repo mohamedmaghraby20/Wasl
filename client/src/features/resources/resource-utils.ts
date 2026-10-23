@@ -33,3 +33,19 @@ export function formatTurkeyDateTime(
     timeZone: 'Europe/Istanbul',
   }).format(new Date(value));
 }
+
+/** Calendar pieces for card headers, always rendered in Türkiye time. */
+export function turkeyDateParts(
+  value: string,
+  language: string,
+): { day: string; month: string; weekday: string; time: string } {
+  const date = new Date(value);
+  const part = (options: Intl.DateTimeFormatOptions): string =>
+    new Intl.DateTimeFormat(language, { ...options, timeZone: 'Europe/Istanbul' }).format(date);
+  return {
+    day: part({ day: 'numeric' }),
+    month: part({ month: 'short' }),
+    weekday: part({ weekday: 'short' }),
+    time: part({ hour: '2-digit', minute: '2-digit' }),
+  };
+}

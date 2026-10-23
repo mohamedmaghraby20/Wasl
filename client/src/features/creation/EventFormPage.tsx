@@ -18,8 +18,17 @@ import {
   useDiscoveryControllerEvent,
 } from '@/api/generated/discovery/discovery';
 import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { Checkbox } from '@/components/ui/Checkbox';
+import { DateTimePicker } from '@/components/ui/DateTimePicker';
+import { Field } from '@/components/ui/Field';
+import { Input } from '@/components/ui/Input';
+import { Label } from '@/components/ui/Label';
+import { Select } from '@/components/ui/Select';
+import { Textarea } from '@/components/ui/Textarea';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { languageCode } from '@/features/resources/resource-utils';
+import { cn } from '@/lib/cn';
 import { fromTurkeyDateTime, parseCapacity, toTurkeyIso } from './creation-utils';
 
 const formSchema = z
@@ -52,6 +61,8 @@ const formSchema = z
   });
 
 type FormValues = z.infer<typeof formSchema>;
+
+const HOST_SELF = '__self__';
 
 export function EventFormPage(): React.JSX.Element {
   const { t, i18n } = useTranslation();
@@ -116,22 +127,31 @@ export function EventFormPage(): React.JSX.Element {
     const returnTo = `${location.pathname}${location.search}${location.hash}`;
     return <Navigate replace to={`/sign-in?returnTo=${encodeURIComponent(returnTo)}`} />;
   }
-  if (loading || (editing && existing.isPending)) return <p role="status">{t('authWorking')}</p>;
-  if (editing && existing.isError) return <p role="alert">{t('resourceEditLoadError')}</p>;
+  if (loading || (editing && existing.isPending))
+    return (
+      <p className="text-sm text-text-muted" role="status">
+        {t('authWorking')}
+      </p>
+    );
+  if (editing && existing.isError)
+    return (
+      <p className="text-sm font-medium text-danger" role="alert">
+        {t('resourceEditLoadError')}
+      </p>
+    );
 
-  const inputClass =
-    'min-h-(--control-height-lg) w-full rounded-(--shape-radius-control) border border-input bg-background px-3 py-2 text-base outline-none focus-visible:ring-(length:--focus-ring-width) focus-visible:ring-ring';
-  const labelClass = 'grid gap-2 text-sm font-semibold';
   const categoryIds = form.watch('categoryIds');
   const online = form.watch('online');
+  const errors = form.formState.errors;
+  const startsAt = form.watch('startsAt');
 
   const save = async (values: FormValues): Promise<void> => {
     setFormError('');
-    let startsAt: string;
-    let endsAt: string | null;
+    let startsAtIso: string;
+    let endsAtIso: string | null;
     try {
-      startsAt = toTurkeyIso(values.startsAt);
-      endsAt = values.endsAt ? toTurkeyIso(values.endsAt) : null;
+      startsAtIso = toTurkeyIso(values.startsAt);
+      endsAtIso = values.endsAt ? toTurkeyIso(values.endsAt) : null;
     } catch {
       setFormError(t('eventDateInvalid'));
       form.setError('startsAt', { type: 'validate', message: 'invalid' });
@@ -142,8 +162,8 @@ export function EventFormPage(): React.JSX.Element {
       description: values.description,
       categoryIds: values.categoryIds,
       visibility: values.visibility,
-      startsAt,
-      endsAt,
+      startsAt: startsAtIso,
+      endsAt: endsAtIso,
       online: values.online,
       cityId: values.online ? null : values.cityId || null,
       locationName: values.online ? null : values.locationName,
@@ -167,300 +187,343 @@ export function EventFormPage(): React.JSX.Element {
   };
 
   return (
-    <section className="mx-auto max-w-(--container-reading) space-y-7">
+    <section className="mx-auto grid max-w-(--container-reading) gap-6">
       <Link
-        className="inline-flex min-h-(--control-height-md) items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+        className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-text-muted transition-colors hover:text-text"
         to={editing ? `/events/${existing.data!.slug}` : '/create'}
       >
-        <ArrowLeft aria-hidden="true" size={17} />
+        <ArrowLeft aria-hidden="true" className="size-4 rtl:rotate-180" />
         {t(editing ? 'backToEvent' : 'backToCreate')}
       </Link>
-      <header className="border-b border-border pb-5">
-        <h1 className="font-heading text-3xl font-bold tracking-tight">
-          {t(editing ? 'editEvent' : 'createEventTitle')}
-        </h1>
-        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t('eventFormIntro')}</p>
+      <header className="grid gap-2">
+        <h1 className="text-3xl font-extrabold">{t(editing ? 'editEvent' : 'createEventTitle')}</h1>
+        <p className="text-sm leading-relaxed text-text-muted">{t('eventFormIntro')}</p>
       </header>
 
-      <form
-        className="grid gap-5"
-        onSubmit={(event) => void form.handleSubmit((values) => void save(values))(event)}
-      >
-        {Object.keys(form.formState.errors).length > 0 && (
-          <p
-            className="rounded-md border border-destructive bg-destructive/10 p-3 text-sm text-destructive"
-            role="alert"
-          >
-            {t('formValidationError')}
-          </p>
-        )}
-        <label className={labelClass} htmlFor="event-title">
-          <span>{t('eventName')}</span>
-          <input
-            aria-describedby={form.formState.errors.title ? 'event-title-error' : undefined}
-            aria-invalid={Boolean(form.formState.errors.title)}
-            className={inputClass}
-            id="event-title"
-            maxLength={160}
-            required
-            {...form.register('title')}
-          />
-          {form.formState.errors.title && (
-            <span className="text-xs text-destructive" id="event-title-error">
-              {t('formFieldInvalid')}
-            </span>
-          )}
-        </label>
-        <label className={labelClass} htmlFor="event-description">
-          <span>{t('description')}</span>
-          <textarea
-            aria-describedby={
-              form.formState.errors.description ? 'event-description-error' : undefined
-            }
-            aria-invalid={Boolean(form.formState.errors.description)}
-            className={`${inputClass} min-h-36 resize-y`}
-            id="event-description"
-            maxLength={5000}
-            required
-            {...form.register('description')}
-          />
-          {form.formState.errors.description && (
-            <span className="text-xs text-destructive" id="event-description-error">
-              {t('formFieldInvalid')}
-            </span>
-          )}
-        </label>
-
-        {!editing && (
-          <>
-            <label className={labelClass} htmlFor="event-host">
-              <span>{t('eventHost')}</span>
-              <select
-                className={inputClass}
-                id="event-host"
-                {...form.register('communityId', {
-                  onChange: () => form.setValue('organizationId', ''),
-                })}
-              >
-                <option value="">{t('hostAsYourself')}</option>
-                {communities.data?.map((community) => (
-                  <option key={community.id} value={community.id}>
-                    {community.name}
-                  </option>
-                ))}
-              </select>
-              {communities.isError && (
-                <span className="text-xs font-normal text-destructive">
-                  {t('managedCommunitiesLoadError')}
-                </span>
-              )}
-            </label>
-            <label className={labelClass} htmlFor="event-organization-host">
-              <span>{t('resourceOrganizationHost')}</span>
-              <select
-                className={inputClass}
-                id="event-organization-host"
-                {...form.register('organizationId', {
-                  onChange: () => form.setValue('communityId', ''),
-                })}
-              >
-                <option value="">{t('organizationNoHost')}</option>
-                {organizations.data?.map((organization) => (
-                  <option key={organization.id} value={organization.id}>
-                    {organization.name} ({t(`organizationRole_${organization.role}`)})
-                  </option>
-                ))}
-              </select>
-              {organizations.isError && (
-                <span className="text-xs font-normal text-destructive">
-                  {t('managedOrganizationsLoadError')}
-                </span>
-              )}
-            </label>
-          </>
-        )}
-
-        <div className="grid gap-5 sm:grid-cols-2">
-          <label className={labelClass} htmlFor="event-visibility">
-            <span>{t('eventVisibility')}</span>
-            <select className={inputClass} id="event-visibility" {...form.register('visibility')}>
-              <option value="public">{t('eventPublic')}</option>
-              <option value="unlisted">{t('eventUnlisted')}</option>
-            </select>
-          </label>
-          <label className={labelClass} htmlFor="event-admission">
-            <span>{t('admissionPolicy')}</span>
-            <select className={inputClass} id="event-admission" {...form.register('admissionMode')}>
-              <option value="instant">{t('admissionInstant')}</option>
-              <option value="approval">{t('admissionApproval')}</option>
-              <option value="automatic">{t('admissionAutomatic')}</option>
-            </select>
-          </label>
-        </div>
-
-        <p className="text-sm text-muted-foreground">{t('eventTimeZoneHint')}</p>
-        <div className="grid gap-5 sm:grid-cols-2">
-          <label className={labelClass} htmlFor="event-starts-at">
-            <span>{t('eventStartsAt')}</span>
-            <input
-              aria-describedby={
-                form.formState.errors.startsAt ? 'event-starts-at-error' : undefined
-              }
-              aria-invalid={Boolean(form.formState.errors.startsAt)}
-              className={inputClass}
-              id="event-starts-at"
-              required
-              type="datetime-local"
-              {...form.register('startsAt')}
-            />
-            {form.formState.errors.startsAt && (
-              <span className="text-xs text-destructive" id="event-starts-at-error">
-                {t('formFieldInvalid')}
-              </span>
-            )}
-          </label>
-          <label className={labelClass} htmlFor="event-ends-at">
-            <span>{t('eventEndsAt')}</span>
-            <input
-              aria-describedby={form.formState.errors.endsAt ? 'event-ends-at-error' : undefined}
-              aria-invalid={Boolean(form.formState.errors.endsAt)}
-              className={inputClass}
-              id="event-ends-at"
-              type="datetime-local"
-              {...form.register('endsAt')}
-            />
-            {form.formState.errors.endsAt && (
-              <span className="text-xs text-destructive" id="event-ends-at-error">
-                {t('formFieldInvalid')}
-              </span>
-            )}
-          </label>
-        </div>
-
-        <label className="flex min-h-12 items-center gap-3 border-y border-border py-3 text-sm font-semibold">
-          <input type="checkbox" {...form.register('online')} />
-          {t('eventOnline')}
-        </label>
-        {!online && (
-          <div className="grid gap-5 sm:grid-cols-2">
-            <label className={labelClass} htmlFor="event-city">
-              <span>{t('profileCity')}</span>
-              <select
-                aria-describedby={form.formState.errors.cityId ? 'event-city-error' : undefined}
-                aria-invalid={Boolean(form.formState.errors.cityId)}
-                className={inputClass}
-                id="event-city"
-                required
-                {...form.register('cityId')}
-              >
-                <option value="">{t('profileCityEmpty')}</option>
-                {cities.data?.map((city) => (
-                  <option key={city.id} value={city.id}>
-                    {lang === 'ar' ? city.nameAr : lang === 'tr' ? city.nameTr : city.nameEn}
-                  </option>
-                ))}
-              </select>
-              {form.formState.errors.cityId && (
-                <span className="text-xs text-destructive" id="event-city-error">
-                  {t('formFieldInvalid')}
-                </span>
-              )}
-            </label>
-            <label className={labelClass} htmlFor="event-location">
-              <span>{t('eventLocation')}</span>
-              <input
-                aria-describedby={
-                  form.formState.errors.locationName ? 'event-location-error' : undefined
-                }
-                aria-invalid={Boolean(form.formState.errors.locationName)}
-                className={inputClass}
-                id="event-location"
-                maxLength={200}
-                required
-                {...form.register('locationName')}
-              />
-              {form.formState.errors.locationName && (
-                <span className="text-xs text-destructive" id="event-location-error">
-                  {t('formFieldInvalid')}
-                </span>
-              )}
-            </label>
-          </div>
-        )}
-        <label className={labelClass} htmlFor="event-capacity">
-          <span>{t('capacityOptional')}</span>
-          <input
-            aria-describedby={form.formState.errors.capacity ? 'event-capacity-error' : undefined}
-            aria-invalid={Boolean(form.formState.errors.capacity)}
-            className={inputClass}
-            id="event-capacity"
-            inputMode="numeric"
-            max="10000"
-            min="1"
-            type="number"
-            {...form.register('capacity')}
-          />
-          {form.formState.errors.capacity && (
-            <span className="text-xs text-destructive" id="event-capacity-error">
-              {t('formFieldInvalid')}
-            </span>
-          )}
-        </label>
-
-        <fieldset
-          aria-describedby={
-            form.formState.errors.categoryIds ? 'event-categories-error' : undefined
-          }
-          className="grid gap-3"
+      <Card>
+        <form
+          className="grid gap-6 p-5 sm:p-7"
+          onSubmit={(event) => void form.handleSubmit((values) => void save(values))(event)}
         >
-          <legend className="mb-3 text-sm font-semibold">{t('chooseCategories')}</legend>
-          {categories.data?.map((category) => (
-            <label
-              className="flex min-h-11 items-center gap-3 border-b border-border py-2 text-sm"
-              key={category.id}
+          {Object.keys(errors).length > 0 ? (
+            <p
+              className="rounded-lg bg-danger-soft px-3 py-2 text-sm font-medium text-danger"
+              role="alert"
             >
-              <input
-                checked={categoryIds.includes(category.id)}
-                onChange={(event) => {
-                  const next = event.currentTarget.checked
-                    ? [...categoryIds, category.id]
-                    : categoryIds.filter((idValue) => idValue !== category.id);
-                  form.setValue('categoryIds', next, { shouldDirty: true, shouldValidate: true });
-                }}
-                type="checkbox"
-              />
-              {lang === 'ar' ? category.nameAr : lang === 'tr' ? category.nameTr : category.nameEn}
-            </label>
-          ))}
-          {categories.isError && (
-            <p className="text-sm text-destructive">{t('categoriesLoadError')}</p>
-          )}
-          {form.formState.errors.categoryIds && (
-            <p className="text-xs text-destructive" id="event-categories-error">
-              {t('formFieldInvalid')}
+              {t('formValidationError')}
             </p>
-          )}
-        </fieldset>
+          ) : null}
 
-        {formError && (
-          <p
-            className="rounded-md border border-destructive bg-destructive/10 p-3 text-sm text-destructive"
-            role="alert"
+          <div className="grid gap-5 sm:grid-cols-[1.6fr_1fr]">
+            <Field
+              error={errors.title ? t('formFieldInvalid') : undefined}
+              id="event-title"
+              label={t('eventName')}
+              required
+            >
+              <Input
+                aria-describedby={errors.title ? 'event-title-error' : undefined}
+                aria-invalid={Boolean(errors.title)}
+                id="event-title"
+                maxLength={160}
+                required
+                {...form.register('title')}
+              />
+            </Field>
+            <Field
+              error={errors.capacity ? t('formFieldInvalid') : undefined}
+              id="event-capacity"
+              label={t('capacityOptional')}
+            >
+              <Input
+                aria-describedby={errors.capacity ? 'event-capacity-error' : undefined}
+                aria-invalid={Boolean(errors.capacity)}
+                id="event-capacity"
+                inputMode="numeric"
+                max="10000"
+                min="1"
+                type="number"
+                {...form.register('capacity')}
+              />
+            </Field>
+          </div>
+
+          <Field
+            error={errors.description ? t('formFieldInvalid') : undefined}
+            id="event-description"
+            label={t('description')}
+            required
           >
-            {formError}
-          </p>
-        )}
-        <div className="flex justify-end gap-3 border-t border-border pt-5">
-          <Button asChild variant="outline">
-            <Link to={editing ? `/events/${existing.data!.slug}` : '/create'}>{t('cancel')}</Link>
-          </Button>
-          <Button disabled={create.isPending || update.isPending} type="submit">
-            {create.isPending || update.isPending
-              ? t('savingResource')
-              : t(editing ? 'saveChanges' : 'publishEvent')}
-          </Button>
-        </div>
-      </form>
+            <Textarea
+              aria-describedby={errors.description ? 'event-description-error' : undefined}
+              aria-invalid={Boolean(errors.description)}
+              id="event-description"
+              maxLength={5000}
+              required
+              {...form.register('description')}
+            />
+          </Field>
+
+          {!editing ? (
+            <div className="grid gap-5 sm:grid-cols-2">
+              <Field
+                error={communities.isError ? t('managedCommunitiesLoadError') : undefined}
+                id="event-host"
+                label={t('eventHost')}
+              >
+                <Select
+                  id="event-host"
+                  onValueChange={(value) => {
+                    form.setValue('communityId', value === HOST_SELF ? '' : value, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    });
+                    if (value !== HOST_SELF) {
+                      form.setValue('organizationId', '', { shouldDirty: true });
+                    }
+                  }}
+                  options={[
+                    { value: HOST_SELF, label: t('hostAsYourself') },
+                    ...(communities.data ?? []).map((community) => ({
+                      value: community.id,
+                      label: community.name,
+                    })),
+                  ]}
+                  value={form.watch('communityId') || HOST_SELF}
+                />
+              </Field>
+              <Field
+                error={organizations.isError ? t('managedOrganizationsLoadError') : undefined}
+                id="event-organization-host"
+                label={t('resourceOrganizationHost')}
+              >
+                <Select
+                  id="event-organization-host"
+                  onValueChange={(value) => {
+                    form.setValue('organizationId', value === HOST_SELF ? '' : value, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    });
+                    if (value !== HOST_SELF) {
+                      form.setValue('communityId', '', { shouldDirty: true });
+                    }
+                  }}
+                  options={[
+                    { value: HOST_SELF, label: t('organizationNoHost') },
+                    ...(organizations.data ?? []).map((organization) => ({
+                      value: organization.id,
+                      label: `${organization.name} (${t(`organizationRole_${organization.role}`)})`,
+                    })),
+                  ]}
+                  value={form.watch('organizationId') || HOST_SELF}
+                />
+              </Field>
+            </div>
+          ) : null}
+
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field id="event-visibility" label={t('eventVisibility')}>
+              <Select
+                id="event-visibility"
+                onValueChange={(value) =>
+                  form.setValue('visibility', value as FormValues['visibility'], {
+                    shouldDirty: true,
+                  })
+                }
+                options={[
+                  { value: 'public', label: t('eventPublic') },
+                  { value: 'unlisted', label: t('eventUnlisted') },
+                ]}
+                value={form.watch('visibility')}
+              />
+            </Field>
+            <Field id="event-admission" label={t('admissionPolicy')}>
+              <Select
+                id="event-admission"
+                onValueChange={(value) =>
+                  form.setValue('admissionMode', value as FormValues['admissionMode'], {
+                    shouldDirty: true,
+                  })
+                }
+                options={[
+                  { value: 'instant', label: t('admissionInstant') },
+                  { value: 'approval', label: t('admissionApproval') },
+                  { value: 'automatic', label: t('admissionAutomatic') },
+                ]}
+                value={form.watch('admissionMode')}
+              />
+            </Field>
+          </div>
+
+          <p className="text-xs font-medium text-text-subtle">{t('eventTimeZoneHint')}</p>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field
+              error={errors.startsAt ? t('formFieldInvalid') : undefined}
+              id="event-starts-at"
+              label={t('eventStartsAt')}
+              required
+            >
+              <DateTimePicker
+                aria-describedby={errors.startsAt ? 'event-starts-at-error' : undefined}
+                aria-invalid={Boolean(errors.startsAt)}
+                id="event-starts-at"
+                label={t('eventStartsAt')}
+                onChange={(value) =>
+                  form.setValue('startsAt', value, { shouldDirty: true, shouldValidate: true })
+                }
+                value={startsAt}
+              />
+            </Field>
+            <Field
+              error={errors.endsAt ? t('formFieldInvalid') : undefined}
+              id="event-ends-at"
+              label={t('eventEndsAt')}
+            >
+              <DateTimePicker
+                aria-describedby={errors.endsAt ? 'event-ends-at-error' : undefined}
+                aria-invalid={Boolean(errors.endsAt)}
+                id="event-ends-at"
+                label={t('eventEndsAt')}
+                minDate={startsAt.split('T')[0]}
+                onChange={(value) =>
+                  form.setValue('endsAt', value, { shouldDirty: true, shouldValidate: true })
+                }
+                value={form.watch('endsAt')}
+              />
+            </Field>
+          </div>
+
+          <div className="flex items-center gap-3 rounded-lg border border-border bg-surface-soft px-3 py-2.5">
+            <Checkbox
+              checked={online}
+              id="event-online"
+              onCheckedChange={(checked) =>
+                form.setValue('online', checked === true, { shouldDirty: true })
+              }
+            />
+            <Label className="cursor-pointer font-medium" htmlFor="event-online">
+              {t('eventOnline')}
+            </Label>
+          </div>
+
+          {!online ? (
+            <div className="grid gap-5 sm:grid-cols-2">
+              <Field
+                error={errors.cityId ? t('formFieldInvalid') : undefined}
+                id="event-city"
+                label={t('profileCity')}
+                required
+              >
+                <Select
+                  aria-describedby={errors.cityId ? 'event-city-error' : undefined}
+                  aria-invalid={Boolean(errors.cityId)}
+                  id="event-city"
+                  onValueChange={(value) =>
+                    form.setValue('cityId', value, { shouldDirty: true, shouldValidate: true })
+                  }
+                  options={(cities.data ?? []).map((city) => ({
+                    value: city.id,
+                    label: lang === 'ar' ? city.nameAr : lang === 'tr' ? city.nameTr : city.nameEn,
+                  }))}
+                  placeholder={t('profileCityEmpty')}
+                  value={form.watch('cityId')}
+                />
+              </Field>
+              <Field
+                error={errors.locationName ? t('formFieldInvalid') : undefined}
+                id="event-location"
+                label={t('eventLocation')}
+                required
+              >
+                <Input
+                  aria-describedby={errors.locationName ? 'event-location-error' : undefined}
+                  aria-invalid={Boolean(errors.locationName)}
+                  id="event-location"
+                  maxLength={200}
+                  required
+                  {...form.register('locationName')}
+                />
+              </Field>
+            </div>
+          ) : null}
+
+          <fieldset
+            aria-describedby={errors.categoryIds ? 'event-categories-error' : undefined}
+            className="grid gap-3"
+          >
+            <legend className="text-sm font-medium text-text">{t('chooseCategories')}</legend>
+            <div className="flex flex-wrap gap-2">
+              {categories.data?.map((category) => {
+                const checked = categoryIds.includes(category.id);
+                const categoryName =
+                  lang === 'ar' ? category.nameAr : lang === 'tr' ? category.nameTr : category.nameEn;
+                return (
+                  <div
+                    className={cn(
+                      'flex items-center gap-2 rounded-full border px-3 py-1.5 transition-colors',
+                      checked
+                        ? 'border-primary/40 bg-primary-soft'
+                        : 'border-border bg-surface-soft hover:border-border-strong',
+                    )}
+                    key={category.id}
+                  >
+                    <Checkbox
+                      checked={checked}
+                      id={`event-category-${category.id}`}
+                      onCheckedChange={(next) => {
+                        const nextIds = next
+                          ? [...categoryIds, category.id]
+                          : categoryIds.filter((idValue) => idValue !== category.id);
+                        form.setValue('categoryIds', nextIds, {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        });
+                      }}
+                    />
+                    <Label
+                      className={cn(
+                        'cursor-pointer text-sm font-medium',
+                        checked ? 'text-primary-soft-text' : 'text-text-muted',
+                      )}
+                      htmlFor={`event-category-${category.id}`}
+                    >
+                      {categoryName}
+                    </Label>
+                  </div>
+                );
+              })}
+            </div>
+            {categories.isError ? (
+              <p className="text-xs font-medium text-danger">{t('categoriesLoadError')}</p>
+            ) : null}
+            {errors.categoryIds ? (
+              <p className="text-xs font-medium text-danger" id="event-categories-error">
+                {t('formFieldInvalid')}
+              </p>
+            ) : null}
+          </fieldset>
+
+          {formError ? (
+            <p
+              className="rounded-lg bg-danger-soft px-3 py-2 text-sm font-medium text-danger"
+              role="alert"
+            >
+              {formError}
+            </p>
+          ) : null}
+
+          <div className="flex flex-wrap justify-end gap-3 border-t border-border pt-5">
+            <Button asChild variant="outline">
+              <Link to={editing ? `/events/${existing.data!.slug}` : '/create'}>{t('cancel')}</Link>
+            </Button>
+            <Button disabled={create.isPending || update.isPending} type="submit">
+              {create.isPending || update.isPending
+                ? t('savingResource')
+                : t(editing ? 'saveChanges' : 'publishEvent')}
+            </Button>
+          </div>
+        </form>
+      </Card>
     </section>
   );
 }

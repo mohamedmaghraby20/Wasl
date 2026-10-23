@@ -240,7 +240,8 @@ describe('OrganizationManagePage', () => {
     const confirm = vi.spyOn(window, 'confirm').mockReturnValue(true);
     renderPage();
 
-    await user.selectOptions(screen.getByLabelText('New owner'), 'admin-1');
+    await user.click(screen.getByLabelText('New owner'));
+    await user.click(await screen.findByRole('option', { name: 'Admin Name' }));
     await user.click(screen.getByRole('button', { name: 'Transfer ownership' }));
 
     await waitFor(() =>
