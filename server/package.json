@@ -33,16 +33,17 @@
     "pg": "8.16.3",
     "reflect-metadata": "0.2.2",
     "rxjs": "7.8.2",
+    "stream-chat": "9.54.0",
     "zod": "4.1.12"
   },
   "devDependencies": {
     "@nestjs/cli": "11.0.10",
     "@nestjs/testing": "11.1.6",
-    "dotenv": "16.6.1",
     "@swc/cli": "0.7.8",
     "@swc/core": "1.13.5",
     "@types/node": "24.5.2",
     "@types/pg": "8.15.5",
+    "dotenv": "16.6.1",
     "drizzle-kit": "0.31.4",
     "tsx": "4.20.5"
   }

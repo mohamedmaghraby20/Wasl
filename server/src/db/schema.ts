@@ -1,6 +1,7 @@
 import {
   boolean,
   check,
+  foreignKey,
   integer,
   pgEnum,
   pgSchema,
@@ -150,6 +151,205 @@ export const eventCategories = pgTable(
   },
   (table) => [uniqueIndex('event_categories_pk').on(table.eventId, table.categoryId)],
 );
+
+export const discussionThreads = pgTable(
+  'discussion_threads',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    eventId: text('event_id').references(() => events.id, { onDelete: 'restrict' }),
+    communityId: text('community_id').references(() => communities.id, { onDelete: 'restrict' }),
+    authorUserId: uuid('author_user_id').references(() => users.id, { onDelete: 'restrict' }),
+    title: text('title'),
+    body: text('body'),
+    archivedAt: timestamp('archived_at', { withTimezone: true }),
+    archivedByUserId: uuid('archived_by_user_id').references(() => users.id, {
+      onDelete: 'restrict',
+    }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex('discussion_threads_event_unique').on(table.eventId),
+    index('discussion_threads_community_created_idx').on(table.communityId, table.createdAt),
+    index('discussion_threads_author_idx').on(table.authorUserId),
+    check(
+      'discussion_threads_parent_check',
+      sql`(${table.eventId} is not null and ${table.communityId} is null and ${table.authorUserId} is null and ${table.title} is null and ${table.body} is null) or (${table.eventId} is null and ${table.communityId} is not null and ${table.authorUserId} is not null and ${table.title} is not null and ${table.body} is not null)`,
+    ),
+    check(
+      'discussion_threads_title_length',
+      sql`${table.title} is null or char_length(${table.title}) between 1 and 160`,
+    ),
+    check(
+      'discussion_threads_body_length',
+      sql`${table.body} is null or char_length(${table.body}) between 1 and 5000`,
+    ),
+    check(
+      'discussion_threads_archive_check',
+      sql`(${table.archivedAt} is null and ${table.archivedByUserId} is null) or (${table.archivedAt} is not null and ${table.archivedByUserId} is not null)`,
+    ),
+    index('discussion_threads_archived_by_idx').on(table.archivedByUserId),
+  ],
+).enableRLS();
+
+export const discussionPosts = pgTable(
+  'discussion_posts',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    threadId: uuid('thread_id')
+      .notNull()
+      .references(() => discussionThreads.id, { onDelete: 'restrict' }),
+    authorUserId: uuid('author_user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'restrict' }),
+    body: text('body').notNull(),
+    depth: integer('depth').notNull().default(0),
+    parentId: uuid('parent_id'),
+    parentDepth: integer('parent_depth'),
+    deletedAt: timestamp('deleted_at', { withTimezone: true }),
+    deletedByUserId: uuid('deleted_by_user_id').references(() => users.id, {
+      onDelete: 'restrict',
+    }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    unique('discussion_posts_parent_target_unique').on(table.id, table.depth, table.threadId),
+    foreignKey({
+      name: 'discussion_posts_root_parent_fk',
+      columns: [table.parentId, table.parentDepth, table.threadId],
+      foreignColumns: [table.id, table.depth, table.threadId],
+    }).onDelete('restrict'),
+    index('discussion_posts_thread_created_idx').on(table.threadId, table.createdAt),
+    index('discussion_posts_parent_created_idx').on(table.parentId, table.createdAt),
+    index('discussion_posts_author_idx').on(table.authorUserId),
+    index('discussion_posts_deleted_by_idx').on(table.deletedByUserId),
+    check('discussion_posts_body_length', sql`char_length(${table.body}) between 1 and 5000`),
+    check(
+      'discussion_posts_reply_depth_check',
+      sql`(${table.depth} = 0 and ${table.parentId} is null and ${table.parentDepth} is null) or (${table.depth} = 1 and ${table.parentId} is not null and ${table.parentDepth} = 0)`,
+    ),
+    check(
+      'discussion_posts_deletion_check',
+      sql`(${table.deletedAt} is null and ${table.deletedByUserId} is null) or (${table.deletedAt} is not null and ${table.deletedByUserId} is not null)`,
+    ),
+  ],
+).enableRLS();
+
+export const messagingUserMappings = pgTable(
+  'messaging_user_mappings',
+  {
+    userId: uuid('user_id')
+      .primaryKey()
+      .references(() => users.id, { onDelete: 'restrict' }),
+    providerUserId: text('provider_user_id').notNull().unique(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    check(
+      'messaging_user_mappings_provider_id_length',
+      sql`char_length(${table.providerUserId}) between 1 and 100`,
+    ),
+  ],
+).enableRLS();
+
+export const messagingConversations = pgTable(
+  'messaging_conversations',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    kind: text('kind').notNull(),
+    communityId: text('community_id').references(() => communities.id, { onDelete: 'restrict' }),
+    eventId: text('event_id').references(() => events.id, { onDelete: 'restrict' }),
+    dmUserLowId: uuid('dm_user_low_id').references(() => users.id, { onDelete: 'restrict' }),
+    dmUserHighId: uuid('dm_user_high_id').references(() => users.id, { onDelete: 'restrict' }),
+    providerChannelId: text('provider_channel_id').notNull().unique(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex('messaging_conversations_community_unique').on(table.communityId),
+    uniqueIndex('messaging_conversations_event_unique').on(table.eventId),
+    uniqueIndex('messaging_conversations_dm_pair_unique').on(table.dmUserLowId, table.dmUserHighId),
+    index('messaging_conversations_dm_high_idx').on(table.dmUserHighId),
+    check(
+      'messaging_conversations_provider_id_length',
+      sql`char_length(${table.providerChannelId}) between 1 and 100`,
+    ),
+    check(
+      'messaging_conversations_kind_check',
+      sql`(${table.kind} = 'community' and ${table.communityId} is not null and ${table.eventId} is null and ${table.dmUserLowId} is null and ${table.dmUserHighId} is null) or (${table.kind} = 'event' and ${table.eventId} is not null and ${table.communityId} is null and ${table.dmUserLowId} is null and ${table.dmUserHighId} is null) or (${table.kind} = 'dm' and ${table.communityId} is null and ${table.eventId} is null and ${table.dmUserLowId} is not null and ${table.dmUserHighId} is not null and ${table.dmUserLowId} < ${table.dmUserHighId})`,
+    ),
+  ],
+).enableRLS();
+
+export const messagingMemberSync = pgTable(
+  'messaging_member_sync',
+  {
+    conversationId: uuid('conversation_id')
+      .notNull()
+      .references(() => messagingConversations.id, { onDelete: 'restrict' }),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'restrict' }),
+    providerMember: boolean('provider_member').notNull().default(false),
+    desiredMember: boolean('desired_member').notNull().default(true),
+    lastError: text('last_error'),
+    lastCheckedAt: timestamp('last_checked_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    primaryKey({ name: 'messaging_member_sync_pk', columns: [table.conversationId, table.userId] }),
+    index('messaging_member_sync_user_idx').on(table.userId),
+    index('messaging_member_sync_checked_idx').on(table.lastCheckedAt),
+    check(
+      'messaging_member_sync_error_length',
+      sql`${table.lastError} is null or char_length(${table.lastError}) <= 2000`,
+    ),
+  ],
+).enableRLS();
+
+export const messagingUserBlocks = pgTable(
+  'messaging_user_blocks',
+  {
+    blockerUserId: uuid('blocker_user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'restrict' }),
+    blockedUserId: uuid('blocked_user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'restrict' }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    primaryKey({
+      name: 'messaging_user_blocks_pk',
+      columns: [table.blockerUserId, table.blockedUserId],
+    }),
+    index('messaging_user_blocks_blocked_idx').on(table.blockedUserId),
+    check('messaging_user_blocks_not_self', sql`${table.blockerUserId} <> ${table.blockedUserId}`),
+  ],
+).enableRLS();
+
+export const messagingReports = pgTable(
+  'messaging_reports',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    reporterUserId: uuid('reporter_user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'restrict' }),
+    reportedUserId: uuid('reported_user_id').references(() => users.id, { onDelete: 'restrict' }),
+    conversationId: uuid('conversation_id').references(() => messagingConversations.id, {
+      onDelete: 'restrict',
+    }),
+    reason: text('reason').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index('messaging_reports_reporter_created_idx').on(table.reporterUserId, table.createdAt),
+    index('messaging_reports_conversation_created_idx').on(table.conversationId, table.createdAt),
+    check('messaging_reports_reason_length', sql`char_length(${table.reason}) between 1 and 2000`),
+    check(
+      'messaging_reports_target_check',
+      sql`${table.reportedUserId} is not null or ${table.conversationId} is not null`,
+    ),
+  ],
+).enableRLS();
 
 export const organizationVerificationStatus = pgEnum('organization_verification_status', [
   'PENDING',

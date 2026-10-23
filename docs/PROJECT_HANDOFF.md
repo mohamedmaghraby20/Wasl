@@ -1,6 +1,6 @@
 # Wasl project progress and agent handoff
 
-**Snapshot date:** 2026-10-22  
+**Snapshot date:** 2026-10-23  
 **Purpose:** Give the next coding agent a reliable starting point and a progress ledger to update. This snapshot was checked against the implementation guide, phase records, package scripts, migrations, and current repository layout. Update it as tasks are completed; the implementation guide remains the source of requirements.
 
 ## Current status
@@ -14,11 +14,11 @@ Wasl is a bilingual (Arabic/English) community and event discovery and participa
 | 3. Accounts, profiles, first content creation        |          50–72 | Complete    | [phase-3.md](phase-3.md)                      |
 | 4. Participation, approvals, capacity                |          73–95 | Complete    | [phase-4.md](phase-4.md)                      |
 | 5. Organizations, ownership and staff                |         96–112 | Complete    | [phase-5.md](phase-5.md)                      |
-| 6. Discussions and chat                              |        113–131 | Not started | Requirements are in `IMPLEMENTATION_GUIDE.md` |
+| 6. Discussions and chat                              |        113–131 | Complete    | [phase-6.md](phase-6.md)                      |
 | 7. Notifications, moderation, privacy and compliance |        132–149 | Not started | Requirements are in `IMPLEMENTATION_GUIDE.md` |
 | 8. Hardening and launch                              |        150–164 | Not started | Requirements are in `IMPLEMENTATION_GUIDE.md` |
 
-**Next work:** Begin Phase 6 at Task 113 after reading its acceptance criteria and dependencies in `docs/IMPLEMENTATION_GUIDE.md`. Phase 5 is complete: Tasks 96–112 added Organization data, public profiles, profile management, authorized resource hosting, creator audit fields, invitations and role-aware management, transactional ownership transfer, platform-reviewed verification requests, and inherited authority for Organization-owned Communities/Events. Execution is sequential by the owner's instruction; do not delegate unless the owner asks to resume multi-agent work.
+**Next work:** Begin Phase 7 at Task 132 after reading its acceptance criteria and dependencies in `docs/IMPLEMENTATION_GUIDE.md`. Phase 6 is complete: Tasks 113–131 added native PostgreSQL discussions for Events and Communities, Stream-backed group chat for Communities and Events, direct messages with block and report, durable membership reconciliation, and the Messages screen. The only unverified area is live provider behavior, which needs Stream credentials and dashboard permissions (see Open follow-ups). Execution is sequential by the owner's instruction; do not delegate unless the owner asks to resume multi-agent work.
 
 ## Completed work
 
@@ -40,6 +40,8 @@ Wasl is a bilingual (Arabic/English) community and event discovery and participa
 - **Phase 5, Task 107:** added Owner/Admin manager listing and Owner-only admin removal (`GET /organizations/:id/admins`, `DELETE /organizations/:id/admins/:userId`), with the owner protected from removal and non-managers denied. The invitation acceptance response now includes the organization slug. Added `/organizations/:slug/manage` (role-aware roster, Owner-only invite/pending-invitation/revoke/remove controls, acceptance-link copy, and owner-only messaging for admins) and `/organizations/invitations/accept` (single-use token acceptance through the signed-in personal account). The public profile shows a management link only to that organization's Owner/Admin, and the edit page is reachable from management. English and Arabic strings were added. Focused verification: 28 organization server tests and 18 organization client tests passed; workspace tests passed with 108 tests (67 server, 41 client); workspace typecheck, lint and production build passed; `db:generate` reported no schema changes, so no migration was needed. The production build retains the existing large main-chunk warning (611.89 kB minified).
 - **Phase 5, Tasks 108–112:** added transactional ownership transfer (`POST /organizations/:id/ownership-transfer`) with an active-Admin target, owner-only authorization, previous-owner-to-Admin behavior, and a single-owner invariant; verification request APIs (`GET`/`POST /organizations/:id/verification-requests`) and platform-admin queue/decision APIs (`GET /organizations/verification-requests`, `PATCH /organizations/verification-requests/:requestId`) behind the new `PlatformAdminGuard`; the management-page transfer and verification UI with EN/AR strings; and inherited authority for Organization-owned Communities, Organization-hosted Events, and Events hosted by Organization-owned Communities. Added `organization_verification_requests` with RLS, zero direct client grants, a partial unique pending-request index, and migration `0012_known_scarlet_witch.sql`, which was applied to the configured development database. Platform decisions require the server-only `PLATFORM_ADMIN_USER_IDS` allowlist of Wasl user IDs; an empty value grants no platform access. Verification: workspace tests passed with 128 tests (84 server across 14 files, 44 client across 15 files); `test:organizations:postgres` passed concurrent ownership-transfer, pending-request and decision checks in an isolated temporary schema; typecheck, lint and production build passed; `db:generate` reported no schema changes. The production build retains the main-chunk warning (615.83 kB minified). Full details are in [phase-5.md](phase-5.md).
 
+- **Phase 6, Tasks 113–131:** added native PostgreSQL discussions (`discussion_threads`, `discussion_posts`) with one Event thread per Event, Community topics, one-level replies, author edit/removal, manager moderation, explicit close, and server-enforced eligibility. Added Stream-backed Community and Event chat with stable Wasl-to-Stream identity mapping, server-only credentials, channel-scoped moderator roles, fail-closed token issuance behind `STREAM_PERMISSIONS_VERIFIED`, durable desired-versus-provider membership reconciliation with a 30-second retry worker, direct messages, blocking, and reporting. Migrations `0013`–`0016` enable RLS and revoke direct client grants and were applied to the configured development database. Verification: workspace tests passed with 160 tests (108 server across 19 files, 52 client across 19 files); `test:discussions:postgres` and `test:messaging:postgres` passed in isolated temporary schemas; 3 Chromium E2E tests passed; typecheck, lint, build and `db:generate` passed. The entry chunk is 418.38 kB with no circular-chunk warnings; the lazy `MessagesPage` chunk is 1,755.63 kB because it carries the Stream SDK, and its size warning is accepted. Full details are in [phase-6.md](phase-6.md).
+
 The phase records are the detailed evidence. Their checks are historical results recorded at completion; they were not rerun while preparing this handoff.
 
 ## Architecture and user/data flow
@@ -47,7 +49,7 @@ The phase records are the detailed evidence. Their checks are historical results
 - `client/`: React 19 + Vite SPA, React Router, TanStack Query, bilingual UI and generated Orval API clients.
 - `server/`: NestJS on Fastify. Feature modules own endpoints, validation, authorization, business logic and persistence. Supabase Auth verifies identity; it does not replace Wasl’s resource-scoped authorization.
 - `shared/`: cross-package contracts and types.
-- `server/src/db/schema.ts`: Drizzle database schema. `server/drizzle/`: ordered SQL migrations. The current migration chain contains `0000` through `0012`.
+- `server/src/db/schema.ts`: Drizzle database schema. `server/drizzle/`: ordered SQL migrations. The current migration chain contains `0000` through `0016`.
 - Typical read: browser route → generated API client → same-origin `/api` → Nest controller/service → PostgreSQL → response rendered by the client.
 - Typical authenticated action: browser obtains Supabase Auth session → sends access token to Nest → Nest verifies token and resolves/provisions the Wasl user → service checks resource-level permission and applies the action/transaction → database state is returned to the UI.
 - Profile photos upload to Supabase Storage from the browser using the public client configuration; the server validates ownership, file type/signature and size before persisting the object path. Privileged keys and database credentials remain server-side.
@@ -58,7 +60,7 @@ Never query PostgreSQL from client code or place authoritative authorization/bus
 
 The configured Supabase project is the **development database used by the local app**, per the owner’s clarification. The phase 2 record and some older setup notes incorrectly call it “production”; treat those labels as stale. No production frontend/API deployment or production hosting URL has been provided, and no deployment has been configured. Do not infer that the connected project is a production target.
 
-Migrations through `0012` were applied to the configured development project during Phase 5 (Task 105 and the verification workflow). `0007_revoke_participation_client_access.sql` revokes direct client-role table access to participation data; the server retains access through its configured database role. Phase 3 reports the `profile-photos` bucket and its owner-scoped upload controls.
+Migrations through `0016` were applied to the configured development project; `0013`–`0016` cover Phase 6 discussions and messaging. `0007_revoke_participation_client_access.sql` revokes direct client-role table access to participation data; the server retains access through its configured database role. Phase 3 reports the `profile-photos` bucket and its owner-scoped upload controls.
 
 For later schema work, follow the repository’s Drizzle workflow and verify the target before applying changes:
 
@@ -87,17 +89,19 @@ See [phase-3.md](phase-3.md) and [phase-4.md](phase-4.md) for exact scope and ca
 
 ## Open follow-ups and constraints
 
-- **Phase 5 is complete.** Tasks 96–112 are recorded in [phase-5.md](phase-5.md). Phase 6 (Tasks 113–131) is next.
+- **Phase 5 is complete.** Tasks 96–112 are recorded in [phase-5.md](phase-5.md).
+- **Phase 6 is complete except live provider verification.** Tasks 113–131 are recorded in [phase-6.md](phase-6.md). Phase 7 (Tasks 132–149) is next.
+- **Stream credentials and permissions are still unset.** `STREAM_API_KEY`, `STREAM_API_SECRET`, and `STREAM_PERMISSIONS_VERIFIED` belong in the ignored server `.env`; the owner will supply them. Keep `STREAM_PERMISSIONS_VERIFIED=false` until Stream's user and channel grants are confirmed to deny non-members, because `/messaging/session` returns `503` while it is false. After enabling it, verify token refresh, eligible and denied group-chat access, revocation retry during a provider outage, and the DM/block/report flow against the real provider. None of that has been run.
 - **Platform verification access is environment-configured.** `PLATFORM_ADMIN_USER_IDS` is a server-only, comma-separated allowlist of Wasl user IDs. An empty value means no platform administrators, so verification decisions return `403`. This allowlist is the Phase 5 implementation; the Phase 7 admin console and stronger platform-admin security (for example MFA) remain Task 144 work.
 - **Supabase Auth hardening:** Phase 3 reports leaked-password protection is disabled. Enable it in the Supabase project’s Auth password-security settings before production. It is a dashboard/Auth configuration item, not a SQL migration; do not claim it was fixed.
 - **Production remains future work:** no production deployment URLs, hosting configuration, or release validation are present. The implementation guide reserves CI/CD, staging and go-live for Phase 8.
 - **Phase 2 stale environment wording:** update that record when convenient so it no longer calls the owner-confirmed development project “production.”
 - `docs/MULTI_AGENT_WORKFLOW.md` retains coordination guidance for possible future delegation, but its active mode and task ledger are reconciled to the owner's current single-agent, sequential instruction.
-- **Git history exists for Phases 1-5.** The repository now has five sequential commits from Phase 1 through Phase 5, and `git status --short` is clean. Because the worktree was entirely untracked before those commits, the phase boundaries are retrospective file groupings rather than replayed snapshots; shared files carry their final content in the phase where they were introduced. Do not rewrite this history to "correct" it without owner approval.
+- **Git history exists for Phases 1-6.** The repository has sequential commits for Phase 1 through Phase 6, and `git status --short` reflects only later uncommitted work. Because the worktree was entirely untracked before those commits, the phase boundaries are retrospective file groupings rather than replayed snapshots; shared files carry their final content in the phase where they were introduced. Do not rewrite this history to "correct" it without owner approval.
 
 ## Guidance for the next agent and parallel work
 
-Read `AGENTS.md`, `docs/IMPLEMENTATION_GUIDE.md`, relevant `docs/context/` materials, and the complete Phase 6 task descriptions before editing. Follow global task order and dependencies. Preserve current work; keep changes focused and include focused tests and exact verification evidence as required by the repository instructions.
+Read `AGENTS.md`, `docs/IMPLEMENTATION_GUIDE.md`, relevant `docs/context/` materials, and the complete Phase 7 task descriptions before editing. Follow global task order and dependencies. Preserve current work; keep changes focused and include focused tests and exact verification evidence as required by the repository instructions.
 
 Parallel agents can help only after the lead confirms dependencies, stable API/schema contracts and separate file ownership. Assign one owner for each shared contract, migration batch, generated API output and root configuration change. Do not let multiple agents concurrently edit migrations or generated files. Client work may proceed against an agreed API contract, but integration must verify the real API/database flow. The lead agent integrates results, checks migrations and generated output, runs verification, updates this handoff and the phase/workflow records, and does not mark a task complete merely because code exists.
 
@@ -115,6 +119,8 @@ corepack pnpm db:migrate
 corepack pnpm api:generate
 corepack pnpm test:e2e
 corepack pnpm test:organizations:postgres
+corepack pnpm test:discussions:postgres
+corepack pnpm test:messaging:postgres
 ```
 
 Run the checks relevant to each task and report actual results. Do not describe the historical checks above as newly run.

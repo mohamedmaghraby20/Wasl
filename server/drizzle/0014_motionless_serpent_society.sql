@@ -1,0 +1,4 @@
+ALTER TABLE "discussion_threads" ADD COLUMN "archived_by_user_id" uuid;--> statement-breakpoint
+ALTER TABLE "discussion_threads" ADD CONSTRAINT "discussion_threads_archived_by_user_id_users_id_fk" FOREIGN KEY ("archived_by_user_id") REFERENCES "identity"."users"("id") ON DELETE restrict ON UPDATE no action;--> statement-breakpoint
+CREATE INDEX "discussion_threads_archived_by_idx" ON "discussion_threads" USING btree ("archived_by_user_id");--> statement-breakpoint
+ALTER TABLE "discussion_threads" ADD CONSTRAINT "discussion_threads_archive_check" CHECK (("discussion_threads"."archived_at" is null and "discussion_threads"."archived_by_user_id" is null) or ("discussion_threads"."archived_at" is not null and "discussion_threads"."archived_by_user_id" is not null));

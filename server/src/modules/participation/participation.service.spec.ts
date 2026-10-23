@@ -46,7 +46,7 @@ describe('ParticipationService', () => {
       {} as EventsService,
     );
 
-    await expect(service.joinCommunity(user, 'community')).resolves.toEqual({ status: 'ACTIVE' });
+    await expect(service.joinCommunity(user, 'community')).resolves.toEqual({ status: 'ACTIVE', messagingSyncPending: false });
     expect(tx.select).toHaveBeenCalledTimes(2);
     expect(tx.update).not.toHaveBeenCalled();
     expect(tx.insert).not.toHaveBeenCalled();
@@ -80,7 +80,7 @@ describe('ParticipationService', () => {
       {} as EventsService,
     );
 
-    await expect(service.registerForEvent(user, 'event')).resolves.toEqual({ status: 'ACCEPTED' });
+    await expect(service.registerForEvent(user, 'event')).resolves.toEqual({ status: 'ACCEPTED', messagingSyncPending: false });
     expect(tx.select).toHaveBeenCalledTimes(2);
     expect(tx.update).not.toHaveBeenCalled();
     expect(tx.insert).not.toHaveBeenCalled();
@@ -156,7 +156,7 @@ describe('ParticipationService', () => {
       {} as EventsService,
     );
 
-    await expect(service.leaveCommunity(user, 'community')).resolves.toEqual({ status: 'LEFT' });
+    await expect(service.leaveCommunity(user, 'community')).resolves.toEqual({ status: 'LEFT', messagingSyncPending: false });
     expect(changes).toEqual([
       { status: 'LEFT', updatedAt: expect.any(Date) },
       { status: 'ACTIVE', updatedAt: expect.any(Date) },

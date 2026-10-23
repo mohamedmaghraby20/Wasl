@@ -12,6 +12,8 @@ import { CommunitiesModule } from './modules/communities/communities.module';
 import { EventsModule } from './modules/events/events.module';
 import { ParticipationModule } from './modules/participation/participation.module';
 import { OrganizationsModule } from './modules/organizations/organizations.module';
+import { DiscussionsModule } from './modules/discussions/discussions.module';
+import { MessagingModule } from './modules/messaging/messaging.module';
 
 @Module({
   imports: [
@@ -24,6 +26,8 @@ import { OrganizationsModule } from './modules/organizations/organizations.modul
     EventsModule,
     ParticipationModule,
     OrganizationsModule,
+    DiscussionsModule,
+    MessagingModule,
     DiscoveryModule,
     HealthModule,
   ],

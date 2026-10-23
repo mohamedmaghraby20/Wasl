@@ -641,6 +641,7 @@ export const MembershipStateDtoStatus = {
 export interface MembershipStateDto {
   /** @nullable */
   status: MembershipStateDtoStatus;
+  messagingSyncPending: boolean;
 }
 
 /**
@@ -663,6 +664,7 @@ export const RegistrationStateDtoStatus = {
 export interface RegistrationStateDto {
   /** @nullable */
   status: RegistrationStateDtoStatus;
+  messagingSyncPending: boolean;
 }
 
 export interface ParticipantListItemDto {
@@ -692,6 +694,133 @@ export interface ParticipationCountsDto {
 export interface ParticipationDecisionDto {
   participantId: string;
   status: string;
+  messagingSyncPending: boolean;
+}
+
+export interface MessagingSessionDto {
+  apiKey: string;
+  userId: string;
+  token: string;
+  expiresAt: string;
+}
+
+export type MessagingConversationItemDtoKind = typeof MessagingConversationItemDtoKind[keyof typeof MessagingConversationItemDtoKind];
+
+
+export const MessagingConversationItemDtoKind = {
+  community: 'community',
+  event: 'event',
+  dm: 'dm',
+} as const;
+
+export interface MessagingConversationItemDto {
+  id: string;
+  kind: MessagingConversationItemDtoKind;
+  channelId: string;
+  /** @nullable */
+  communityId: string | null;
+  /** @nullable */
+  eventId: string | null;
+  /** @nullable */
+  otherUserId: string | null;
+  /** @nullable */
+  title: string | null;
+}
+
+export interface CreateDirectMessageDto {
+  recipientUserId: string;
+}
+
+export interface MessagingChannelDto {
+  conversationId: string;
+  channelId: string;
+  channelType: string;
+}
+
+export interface BlockUserDto {
+  userId: string;
+}
+
+export interface MessagingBlockResultDto {
+  blocked: boolean;
+  syncPending: boolean;
+}
+
+export interface MessagingBlockedUserDto {
+  userId: string;
+  displayName: string;
+  createdAt: string;
+}
+
+export interface ReportConversationDto {
+  reason: string;
+}
+
+export interface MessagingReportResultDto {
+  id: string;
+}
+
+export interface DiscussionPostDto {
+  id: string;
+  /** @nullable */
+  parentId?: string | null;
+  authorId: string;
+  authorName: string;
+  /** @nullable */
+  body?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DiscussionPostPageDto {
+  items: DiscussionPostDto[];
+  page: number;
+  pageSize: number;
+  hasMore: boolean;
+  total: number;
+  closed: boolean;
+}
+
+export interface CreateDiscussionPostDto {
+  body: string;
+  parentId?: string;
+}
+
+export interface UpdateDiscussionPostDto {
+  body: string;
+}
+
+export interface CommunityTopicDto {
+  id: string;
+  title: string;
+  body: string;
+  authorId: string;
+  authorName: string;
+  createdAt: string;
+  archived: boolean;
+}
+
+export interface CommunityTopicPageDto {
+  items: CommunityTopicDto[];
+  page: number;
+  pageSize: number;
+  hasMore: boolean;
+}
+
+export interface CommunityTopicDetailsDto {
+  id: string;
+  title: string;
+  body: string;
+  authorId: string;
+  authorName: string;
+  createdAt: string;
+  archived: boolean;
+  posts: DiscussionPostPageDto;
+}
+
+export interface CreateCommunityTopicDto {
+  title: string;
+  body: string;
 }
 
 export interface CityPublicDto {
@@ -906,4 +1035,17 @@ export const DiscoveryControllerEventLang = {
   ar: 'ar',
   tr: 'tr',
 } as const;
+
+export type DiscussionsControllerListEventPostsParams = {
+page?: number;
+pageSize?: number;
+};
+
+export type CommunityDiscussionsControllerListParams = {
+page?: number;
+};
+
+export type CommunityDiscussionsControllerDetailsParams = {
+page?: number;
+};
 

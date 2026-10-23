@@ -25,8 +25,25 @@ const environmentSchema = z
     RESEND_API_KEY: optionalText,
     STREAM_API_KEY: optionalText,
     STREAM_API_SECRET: optionalText,
+    STREAM_PERMISSIONS_VERIFIED: z.enum(['true', 'false']).default('false'),
   })
   .superRefine((environment, context) => {
+    if (environment.STREAM_PERMISSIONS_VERIFIED === 'true') {
+      if (!environment.STREAM_API_KEY) {
+        context.addIssue({
+          code: 'custom',
+          path: ['STREAM_API_KEY'],
+          message: 'Required when Stream messaging permissions are verified.',
+        });
+      }
+      if (!environment.STREAM_API_SECRET) {
+        context.addIssue({
+          code: 'custom',
+          path: ['STREAM_API_SECRET'],
+          message: 'Required when Stream messaging permissions are verified.',
+        });
+      }
+    }
     if (environment.NODE_ENV === 'production') {
       if (!environment.DATABASE_URL) {
         context.addIssue({

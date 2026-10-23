@@ -6,6 +6,7 @@ export class MembershipStateDto {
     nullable: true,
   })
   status!: string | null;
+  @ApiProperty() messagingSyncPending!: boolean;
 }
 
 export class RegistrationStateDto {
@@ -23,6 +24,7 @@ export class RegistrationStateDto {
     nullable: true,
   })
   status!: string | null;
+  @ApiProperty() messagingSyncPending!: boolean;
 }
 
 export class CommunityActivityItemDto {
@@ -88,4 +90,5 @@ export class ParticipationCountsDto {
 export class ParticipationDecisionDto {
   @ApiProperty({ format: 'uuid' }) participantId!: string;
   @ApiProperty() status!: string;
+  @ApiProperty() messagingSyncPending!: boolean;
 }

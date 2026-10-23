@@ -3,6 +3,7 @@ import {
   Inject,
   Injectable,
   NotFoundException,
+  Optional,
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { and, asc, count, desc, eq, inArray } from 'drizzle-orm';
@@ -19,6 +20,7 @@ import {
 import type { AuthenticatedUser } from '../auth/authenticated-user';
 import { CommunitiesService } from '../communities/communities.service';
 import { EventsService } from '../events/events.service';
+import { MessagingService } from '../messaging/messaging.service';
 import {
   assertCommunityTransition,
   assertEventTransition,
@@ -33,11 +35,12 @@ export class ParticipationService {
     @Inject(DATABASE) private readonly db: Database | undefined,
     private readonly communitiesService: CommunitiesService,
     private readonly eventsService: EventsService,
+    @Optional() private readonly messaging?: MessagingService,
   ) {}
 
   async joinCommunity(user: AuthenticatedUser, communityId: string) {
     const db = this.database();
-    return db.transaction(async (tx) => {
+    const result = await db.transaction(async (tx) => {
       const [community] = await tx
         .select({
           id: communities.id,
@@ -108,11 +111,16 @@ export class ParticipationService {
       });
       return { status };
     });
+    const messagingSyncPending = await this.messaging?.reconcileResourceAccess(
+      'community',
+      communityId,
+    );
+    return { ...result, messagingSyncPending: messagingSyncPending ?? false };
   }
 
   async leaveCommunity(user: AuthenticatedUser, communityId: string) {
     const db = this.database();
-    return db.transaction(async (tx) => {
+    const result = await db.transaction(async (tx) => {
       const [community] = await tx
         .select({
           id: communities.id,
@@ -152,11 +160,16 @@ export class ParticipationService {
         await this.promoteCommunityWaitlist(tx, communityId, community.capacity);
       return { status: 'LEFT' as const };
     });
+    const messagingSyncPending = await this.messaging?.reconcileResourceAccess(
+      'community',
+      communityId,
+    );
+    return { ...result, messagingSyncPending: messagingSyncPending ?? false };
   }
 
   async registerForEvent(user: AuthenticatedUser, eventId: string) {
     const db = this.database();
-    return db.transaction(async (tx) => {
+    const result = await db.transaction(async (tx) => {
       const [event] = await tx
         .select({
           id: events.id,
@@ -223,11 +236,13 @@ export class ParticipationService {
       });
       return { status };
     });
+    const messagingSyncPending = await this.messaging?.reconcileResourceAccess('event', eventId);
+    return { ...result, messagingSyncPending: messagingSyncPending ?? false };
   }
 
   async cancelEventRegistration(user: AuthenticatedUser, eventId: string) {
     const db = this.database();
-    return db.transaction(async (tx) => {
+    const result = await db.transaction(async (tx) => {
       const [event] = await tx
         .select({
           id: events.id,
@@ -265,6 +280,8 @@ export class ParticipationService {
       }
       return { status: 'CANCELLED_BY_USER' as const };
     });
+    const messagingSyncPending = await this.messaging?.reconcileResourceAccess('event', eventId);
+    return { ...result, messagingSyncPending: messagingSyncPending ?? false };
   }
 
   async myCommunityStatus(user: AuthenticatedUser, communityId: string) {
@@ -402,7 +419,7 @@ export class ParticipationService {
     action: 'approve' | 'reject' | 'promote' | 'remove',
   ) {
     await this.communitiesService.assertCanManage(user.id, communityId);
-    return this.database().transaction(async (tx) => {
+    const result = await this.database().transaction(async (tx) => {
       const [community] = await tx
         .select({
           id: communities.id,
@@ -462,6 +479,11 @@ export class ParticipationService {
       }
       return { participantId: membershipId, status };
     });
+    const messagingSyncPending = await this.messaging?.reconcileResourceAccess(
+      'community',
+      communityId,
+    );
+    return { ...result, messagingSyncPending: messagingSyncPending ?? false };
   }
 
   async decideEvent(
@@ -471,7 +493,7 @@ export class ParticipationService {
     action: 'approve' | 'reject' | 'promote' | 'remove' | 'attended' | 'no-show',
   ) {
     await this.eventsService.assertCanManageById(user, eventId);
-    return this.database().transaction(async (tx) => {
+    const result = await this.database().transaction(async (tx) => {
       const [event] = await tx
         .select({
           id: events.id,
@@ -545,6 +567,8 @@ export class ParticipationService {
       }
       return { participantId: registrationId, status };
     });
+    const messagingSyncPending = await this.messaging?.reconcileResourceAccess('event', eventId);
+    return { ...result, messagingSyncPending: messagingSyncPending ?? false };
   }
 
   private async communityHasCapacity(

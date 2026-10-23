@@ -43,6 +43,13 @@ export const router = createBrowserRouter([
         },
       },
       {
+        path: 'communities/:id/topics/:topicId',
+        lazy: async () => {
+          const { CommunityTopicPage } = await import('@/features/discussions/CommunityTopicPage');
+          return { Component: CommunityTopicPage };
+        },
+      },
+      {
         path: 'events/:id',
         lazy: async () => {
           const { ResourceDetailsPage } = await import('@/features/discovery/ResourceDetailsPage');
@@ -61,6 +68,13 @@ export const router = createBrowserRouter([
         lazy: async () => {
           const { MyActivityPage } = await import('@/features/participation/MyActivityPage');
           return { Component: MyActivityPage };
+        },
+      },
+      {
+        path: 'messages',
+        lazy: async () => {
+          const { MessagesPage } = await import('@/features/messaging/MessagesPage');
+          return { Component: MessagesPage };
         },
       },
       {

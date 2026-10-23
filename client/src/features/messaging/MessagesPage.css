@@ -1,0 +1,58 @@
+.wasl-messaging {
+  --str-chat__primary-color: var(--color-primary-soft-text);
+  --str-chat__active-primary-color: var(--color-primary-active);
+  --str-chat__surface-color: var(--color-surface);
+  --str-chat__secondary-surface-color: var(--color-surface-soft);
+  --str-chat__text-color: var(--color-text);
+  --str-chat__secondary-text-color: var(--color-text-muted);
+  --str-chat__border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.wasl-messaging .str-chat {
+  height: 100%;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.wasl-messaging .str-chat__channel-list-messenger,
+.wasl-messaging .str-chat__channel-list,
+.wasl-messaging .str-chat__main-panel {
+  min-width: 0;
+}
+
+.wasl-messaging .str-chat__message-composer {
+  border-color: var(--color-border);
+  background: var(--color-surface);
+}
+
+.wasl-messaging .str-chat__message-composer textarea {
+  color: var(--color-text);
+}
+
+.wasl-messaging button:focus-visible,
+.wasl-messaging textarea:focus-visible,
+.wasl-messaging input:focus-visible {
+  outline: 2px solid var(--color-primary-active);
+  outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  .wasl-messaging .str-chat > .grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .wasl-messaging nav[aria-label] {
+    display: flex;
+    max-width: 100%;
+    overflow-x: auto;
+    border-inline-end: 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .wasl-messaging nav[aria-label] button {
+    flex: 0 0 auto;
+    width: min(12rem, 70vw);
+  }
+}

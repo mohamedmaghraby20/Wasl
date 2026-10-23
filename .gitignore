@@ -10,3 +10,6 @@ server/openapi.json
 client/storybook-static/
 client/dist/
 *.tsbuildinfo
+__pycache__/
+*.pyc
+.opencode/skills/*/scripts/bin/

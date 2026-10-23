@@ -46,9 +46,15 @@ export function OrganizerParticipationPanel({
     if (action === 'remove' && !window.confirm(t('confirmRemoveParticipant'))) return;
     try {
       if (kind === 'communities') {
-        await communityDecision.mutateAsync({ id: resourceId, participantId, action });
+        const result = await communityDecision.mutateAsync({
+          id: resourceId,
+          participantId,
+          action,
+        });
+        if (result.messagingSyncPending) toast.warning(t('messagingSyncPending'));
       } else {
-        await eventDecision.mutateAsync({ id: resourceId, participantId, action });
+        const result = await eventDecision.mutateAsync({ id: resourceId, participantId, action });
+        if (result.messagingSyncPending) toast.warning(t('messagingSyncPending'));
       }
       await queryClient.invalidateQueries();
     } catch {

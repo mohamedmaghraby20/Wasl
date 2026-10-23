@@ -21,7 +21,6 @@ export default defineConfig({
           if (id.includes('@tanstack')) return 'query';
           if (id.includes('react-router')) return 'router';
           if (id.includes('lucide-react')) return 'icons';
-          return 'vendor';
         },
       },
     },

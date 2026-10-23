@@ -1,3 +1,14 @@
+import { useState } from 'react';
+import {
+  ArrowLeft,
+  CalendarDays,
+  MapPin,
+  MessageSquare,
+  Share2,
+  Ticket,
+  UsersRound,
+  Video,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
@@ -22,7 +33,9 @@ import {
   useDiscoveryControllerEvent,
 } from '@/api/generated/discovery/discovery';
 import { ApiError } from '@/api/fetcher';
+import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { QueryError } from '@/components/feedback/QueryError';
 import {
   formatTurkeyDateTime,
@@ -34,6 +47,12 @@ import {
 import { usePageMetadata } from './usePageMetadata';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { OrganizerParticipationPanel } from '@/features/participation/OrganizerParticipationPanel';
+import { EventDiscussion } from '@/features/discussions/EventDiscussion';
+import { CommunityTopics } from '@/features/discussions/CommunityTopics';
+import {
+  useMessagingControllerCommunity,
+  useMessagingControllerEvent,
+} from '@/api/generated/messaging/messaging';
 
 export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX.Element {
   const { t, i18n } = useTranslation();
@@ -86,6 +105,9 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
   const leaveCommunity = useParticipationControllerLeaveCommunity();
   const registerForEvent = useParticipationControllerRegisterForEvent();
   const cancelRegistration = useParticipationControllerCancelEventRegistration();
+  const openCommunityChat = useMessagingControllerCommunity();
+  const openEventChat = useMessagingControllerEvent();
+  const [chatError, setChatError] = useState(false);
   const resourceName = t(kind === 'events' ? 'event' : 'community').toLocaleLowerCase(
     i18n.language,
   );
@@ -124,7 +146,21 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
     }
   };
 
-  if (query.isPending) return <p role="status">{t('loadingDetails')}</p>;
+  if (query.isPending) {
+    return (
+      <div className="mx-auto grid max-w-(--container-reading) gap-4" role="status">
+        <span className="sr-only">{t('loadingDetails')}</span>
+        <Skeleton className="h-4 w-28" />
+        <div className="grid gap-4 rounded-(--shape-radius-card) border border-border bg-card p-6 shadow-sm sm:p-8">
+          <Skeleton className="h-5 w-24 rounded-full" />
+          <Skeleton className="h-9 w-2/3" />
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-5/6" />
+          <Skeleton className="mt-2 h-14 w-full rounded-xl" />
+        </div>
+      </div>
+    );
+  }
   if (query.isError) {
     if (!(query.error instanceof ApiError && query.error.status === 404)) {
       return (
@@ -135,12 +171,26 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
       );
     }
     return (
-      <div role="alert" className="rounded-lg border border-border bg-card p-5">
-        {t('notFoundResource', { resource: resourceName })}
+      <div
+        className="mx-auto grid max-w-(--container-reading) justify-items-center gap-3 rounded-(--shape-radius-card) border border-border bg-card px-6 py-12 text-center"
+        role="alert"
+      >
+        <p className="text-base font-semibold">
+          {t('notFoundResource', { resource: resourceName })}
+        </p>
+        <Button asChild size="sm" variant="outline">
+          <Link to={`/${kind}`}>{t('backTo', { resource: t(kind) })}</Link>
+        </Button>
       </div>
     );
   }
-  if (!item) return <p role="alert">{t('notFoundResource', { resource: resourceName })}</p>;
+  if (!item) {
+    return (
+      <p className="rounded-(--shape-radius-card) border border-border bg-card p-5" role="alert">
+        {t('notFoundResource', { resource: resourceName })}
+      </p>
+    );
+  }
 
   const eventItem = 'startsAt' in item ? item : undefined;
   const communityItem = 'startsAt' in item ? undefined : item;
@@ -201,6 +251,7 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
   const participationError = kind === 'communities' ? communityStatus.isError : eventStatus.isError;
   const runParticipationAction = async (): Promise<void> => {
     try {
+      let messagingSyncPending = false;
       if (kind === 'communities') {
         if (
           participationStatus === 'ACTIVE' ||
@@ -208,9 +259,13 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
           participationStatus === 'WAITLISTED'
         ) {
           if (!window.confirm(t('confirmLeaveCommunity'))) return;
-          await leaveCommunity.mutateAsync({ id: item.id });
+          messagingSyncPending = Boolean(
+            (await leaveCommunity.mutateAsync({ id: item.id })).messagingSyncPending,
+          );
         } else {
-          await joinCommunity.mutateAsync({ id: item.id });
+          messagingSyncPending = Boolean(
+            (await joinCommunity.mutateAsync({ id: item.id })).messagingSyncPending,
+          );
         }
       } else if (
         participationStatus === 'ACCEPTED' ||
@@ -218,11 +273,16 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
         participationStatus === 'WAITLISTED'
       ) {
         if (!window.confirm(t('confirmCancelRegistration'))) return;
-        await cancelRegistration.mutateAsync({ id: item.id });
+        messagingSyncPending = Boolean(
+          (await cancelRegistration.mutateAsync({ id: item.id })).messagingSyncPending,
+        );
       } else {
-        await registerForEvent.mutateAsync({ id: item.id });
+        messagingSyncPending = Boolean(
+          (await registerForEvent.mutateAsync({ id: item.id })).messagingSyncPending,
+        );
       }
       await queryClient.invalidateQueries();
+      if (messagingSyncPending) toast.warning(t('messagingSyncPending'));
     } catch {
       toast.error(t('participationActionError'));
     }
@@ -232,6 +292,22 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
     leaveCommunity.isPending ||
     registerForEvent.isPending ||
     cancelRegistration.isPending;
+  const participationLeaving =
+    kind === 'communities'
+      ? ['ACTIVE', 'PENDING', 'WAITLISTED'].includes(participationStatus ?? '')
+      : ['ACCEPTED', 'PENDING', 'WAITLISTED'].includes(participationStatus ?? '');
+  const openChat = async (): Promise<void> => {
+    if (!user) return;
+    setChatError(false);
+    try {
+      if (eventItem) await openEventChat.mutateAsync({ id: eventItem.id });
+      else await openCommunityChat.mutateAsync({ id: communityItem!.id });
+      await queryClient.invalidateQueries();
+      void navigate('/messages');
+    } catch {
+      setChatError(true);
+    }
+  };
   const admissionLabels: Record<string, string> = {
     open: 'admissionOpen',
     instant: 'admissionInstant',
@@ -240,76 +316,120 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
   };
   const admissionLabel = admissionLabels[item.admissionMode] ?? 'admissionUnknown';
   return (
-    <article className="mx-auto grid max-w-(--container-reading) gap-5 rounded-(--shape-radius-dialog) bg-card p-(--card-padding) shadow-(--shadow-card)">
-      <Link
-        className="text-sm text-[color:var(--color-primary-soft-text)] hover:underline"
-        to={`/${kind}`}
-      >
-        {t('backTo', { resource: t(kind) })}
-      </Link>
-      <ul className="flex flex-wrap gap-2" aria-label={t('allCategories')}>
-        {item.categories.map((category) => (
-          <li key={category.id} className="rounded-full bg-secondary px-2.5 py-1 text-xs">
-            {localizedName(category, i18n.language)}
-          </li>
-        ))}
-      </ul>
-      <h1 className="text-3xl font-bold">{localizedResourceTitle(item)}</h1>
-      <p className="whitespace-pre-wrap text-[color:var(--color-text-muted)]">{item.description}</p>
-      <p>
-        <span>{t('hostedByLabel')} </span>
-        {hostPath ? (
-          <Link
-            className="font-semibold underline decoration-primary underline-offset-4"
-            to={hostPath}
-          >
-            {item.hostName}
-          </Link>
-        ) : (
-          item.hostName
-        )}
-      </p>
-      {eventItem && (
-        <div className="grid gap-1 rounded-(--shape-radius-control) bg-primary-soft p-4">
-          <p className="font-semibold">
-            {formatTurkeyDateTime(eventItem.startsAt, i18n.language, 'full')}
+    <article className="mx-auto grid max-w-(--container-reading) gap-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Link
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-text-muted transition-colors hover:text-text"
+          to={`/${kind}`}
+        >
+          <ArrowLeft aria-hidden="true" className="size-4 rtl:rotate-180" />
+          {t('backTo', { resource: t(kind) })}
+        </Link>
+        <Button onClick={() => void copyShareLink()} size="sm" variant="outline">
+          <Share2 aria-hidden="true" />
+          {t('copyShare')}
+        </Button>
+      </div>
+
+      <header className="grid gap-5 rounded-(--shape-radius-card) border border-border bg-card p-6 shadow-sm sm:p-8">
+        <div className="grid gap-3">
+          {item.categories.length > 0 ? (
+            <ul aria-label={t('allCategories')} className="flex flex-wrap gap-1.5">
+              {item.categories.map((category) => (
+                <li key={category.id}>
+                  <Badge variant="primary">{localizedName(category, i18n.language)}</Badge>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          <h1 className="text-3xl font-extrabold sm:text-4xl">{localizedResourceTitle(item)}</h1>
+          <p className="text-sm text-text-muted">
+            <span>{t('hostedByLabel')} </span>
+            {hostPath ? (
+              <Link
+                className="font-semibold text-primary-soft-text underline decoration-primary/40 decoration-2 underline-offset-4 transition-colors hover:decoration-primary"
+                to={hostPath}
+              >
+                {item.hostName}
+              </Link>
+            ) : (
+              <span className="font-medium text-text">{item.hostName}</span>
+            )}
           </p>
-          {eventItem.endsAt && (
-            <p className="text-sm text-[color:var(--color-text-muted)]">
-              {t('endsAt', {
-                date: formatTurkeyDateTime(eventItem.endsAt, i18n.language, 'full'),
-              })}
-            </p>
-          )}
         </div>
-      )}
-      <p>
-        {eventItem?.online
-          ? t('online')
-          : eventItem?.locationName
-            ? `${eventItem.locationName}, ${item.cityName ?? ''}`.replace(/, $/, '')
-            : item.cityName}
-      </p>
-      {!eventItem?.cancelled && <p>{t('admission', { mode: t(admissionLabel) })}</p>}
-      {item.capacity !== undefined && item.capacity !== null && (
-        <p>{t('capacity', { capacity: item.capacity })}</p>
-      )}
-      {eventItem?.cancelled && (
-        <p role="status" className="font-semibold text-destructive">
-          {t('cancelledMessage')}
+        <p className="whitespace-pre-wrap text-sm leading-relaxed text-text-muted">
+          {item.description}
         </p>
-      )}
-      {isManager && (
-        <div className="flex flex-wrap gap-3 border-t border-border pt-5">
-          {eventItem ? (
-            <>
-              {!eventItem.cancelled && (
+        {eventItem ? (
+          <div className="flex items-start gap-3 rounded-xl bg-primary-soft px-4 py-3 text-primary-soft-text">
+            <CalendarDays aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
+            <div className="grid gap-0.5 text-sm">
+              <p className="font-semibold">
+                {formatTurkeyDateTime(eventItem.startsAt, i18n.language, 'full')}
+              </p>
+              {eventItem.endsAt ? (
+                <p className="text-xs opacity-80">
+                  {t('endsAt', {
+                    date: formatTurkeyDateTime(eventItem.endsAt, i18n.language, 'full'),
+                  })}
+                </p>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
+        {eventItem?.cancelled ? (
+          <p
+            className="rounded-lg bg-danger-soft px-3 py-2 text-sm font-medium text-danger"
+            role="status"
+          >
+            {t('cancelledMessage')}
+          </p>
+        ) : null}
+      </header>
+
+      <section className="grid gap-3 sm:grid-cols-3">
+        <div className="flex items-start gap-3 rounded-(--shape-radius-card) border border-border bg-card p-4">
+          {eventItem?.online ? (
+            <Video aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-text-subtle" />
+          ) : (
+            <MapPin aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-text-subtle" />
+          )}
+          <p className="text-sm font-medium text-text">
+            {eventItem?.online
+              ? t('online')
+              : eventItem?.locationName
+                ? `${eventItem.locationName}, ${item.cityName ?? ''}`.replace(/, $/, '')
+                : item.cityName}
+          </p>
+        </div>
+        {!eventItem?.cancelled ? (
+          <div className="flex items-start gap-3 rounded-(--shape-radius-card) border border-border bg-card p-4">
+            <Ticket aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-text-subtle" />
+            <p className="text-sm font-medium text-text">
+              {t('admission', { mode: t(admissionLabel) })}
+            </p>
+          </div>
+        ) : null}
+        {item.capacity !== undefined && item.capacity !== null ? (
+          <div className="flex items-start gap-3 rounded-(--shape-radius-card) border border-border bg-card p-4">
+            <UsersRound aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-text-subtle" />
+            <p className="text-sm font-medium text-text">
+              {t('capacity', { capacity: item.capacity })}
+            </p>
+          </div>
+        ) : null}
+      </section>
+      {isManager ? (
+        <section className="grid gap-4 rounded-(--shape-radius-card) border border-border bg-card p-5">
+          <div className="flex flex-wrap gap-3">
+            {eventItem ? (
+              !eventItem.cancelled ? (
                 <>
                   <Button asChild variant="outline">
                     <Link to={`/events/${item.id}/edit`}>{t('editEvent')}</Link>
                   </Button>
                   <Button
-                    className="text-destructive"
+                    className="border-danger/30 text-danger hover:bg-danger-soft hover:text-danger"
                     disabled={cancelEvent.isPending}
                     onClick={() => void cancel()}
                     variant="outline"
@@ -317,61 +437,67 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
                     {t('cancelEventAction')}
                   </Button>
                 </>
-              )}
-            </>
-          ) : (
-            <>
-              <Button asChild variant="outline">
-                <Link to={`/communities/${item.id}/edit`}>{t('editCommunity')}</Link>
-              </Button>
-              <Button
-                className="text-destructive"
-                disabled={archiveCommunity.isPending}
-                onClick={() => void archive()}
-                variant="outline"
-              >
-                {t('archiveCommunity')}
-              </Button>
-            </>
-          )}
-        </div>
-      )}
-      {isManager && (
-        <OrganizerParticipationPanel
-          kind={kind}
-          resourceId={item.id}
-          eventStarted={Boolean(eventItem && new Date(eventItem.startsAt).getTime() <= Date.now())}
-        />
-      )}
+              ) : null
+            ) : (
+              <>
+                <Button asChild variant="outline">
+                  <Link to={`/communities/${item.id}/edit`}>{t('editCommunity')}</Link>
+                </Button>
+                <Button
+                  className="border-danger/30 text-danger hover:bg-danger-soft hover:text-danger"
+                  disabled={archiveCommunity.isPending}
+                  onClick={() => void archive()}
+                  variant="outline"
+                >
+                  {t('archiveCommunity')}
+                </Button>
+              </>
+            )}
+          </div>
+          <OrganizerParticipationPanel
+            kind={kind}
+            resourceId={item.id}
+            eventStarted={Boolean(
+              eventItem && new Date(eventItem.startsAt).getTime() <= Date.now(),
+            )}
+          />
+        </section>
+      ) : null}
       {!isManager &&
         !eventItem?.cancelled &&
         !(eventItem && new Date(eventItem.startsAt).getTime() <= Date.now()) && (
-          <section className="grid gap-3 border-t border-border pt-5" aria-live="polite">
+          <section
+            aria-live="polite"
+            className="grid gap-3 rounded-(--shape-radius-card) border border-border bg-card p-5"
+          >
             {user ? (
               participationPending ? (
-                <p role="status">{t('loadingParticipation')}</p>
+                <p className="text-sm text-text-muted" role="status">
+                  {t('loadingParticipation')}
+                </p>
               ) : participationError ? (
-                <p role="alert" className="text-sm text-destructive">
+                <p className="text-sm font-medium text-danger" role="alert">
                   {t('participationActionError')}
                 </p>
               ) : (
                 <>
-                  {participationStatus && (
-                    <p role="status" className="font-semibold">
+                  {participationStatus ? (
+                    <p className="text-sm font-medium text-text" role="status">
                       {t(`participationStatus_${participationStatus}`)}
                     </p>
-                  )}
+                  ) : null}
                   {!(eventItem && ['ATTENDED', 'NO_SHOW'].includes(participationStatus ?? '')) && (
                     <Button
+                      className="w-fit"
                       disabled={participationBusy}
                       onClick={() => void runParticipationAction()}
-                      variant="outline"
+                      variant={participationLeaving ? 'outline' : 'primary'}
                     >
                       {kind === 'communities'
-                        ? ['ACTIVE', 'PENDING', 'WAITLISTED'].includes(participationStatus ?? '')
+                        ? participationLeaving
                           ? t('leaveCommunity')
                           : t('joinCommunity')
-                        : ['ACCEPTED', 'PENDING', 'WAITLISTED'].includes(participationStatus ?? '')
+                        : participationLeaving
                           ? t('cancelRegistration')
                           : t('registerForEvent')}
                     </Button>
@@ -379,7 +505,7 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
                 </>
               )
             ) : (
-              <Button asChild variant="outline">
+              <Button asChild className="w-fit">
                 <Link
                   to={{ pathname: '/sign-in', search: `?returnTo=${encodeURIComponent(returnTo)}` }}
                 >
@@ -389,9 +515,47 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
             )}
           </section>
         )}
-      <Button variant="outline" onClick={() => void copyShareLink()}>
-        {t('copyShare')}
-      </Button>
+      {user &&
+        !eventItem?.cancelled &&
+        (isManager ||
+          (kind === 'communities'
+            ? participationStatus === 'ACTIVE'
+            : participationStatus === 'ACCEPTED')) && (
+          <section className="flex flex-wrap items-center gap-3">
+            <Button
+              className="w-fit"
+              disabled={openCommunityChat.isPending || openEventChat.isPending}
+              onClick={() => void openChat()}
+              variant="outline"
+            >
+              <MessageSquare aria-hidden="true" />
+              {t('openResourceChat')}
+            </Button>
+            {chatError ? (
+              <p className="text-sm font-medium text-danger" role="alert">
+                {t('resourceChatError')}
+              </p>
+            ) : null}
+          </section>
+        )}
+      {communityItem && (
+        <CommunityTopics
+          communityId={communityItem.id}
+          canPost={Boolean(user && (isManager || participationStatus === 'ACTIVE'))}
+        />
+      )}
+      {eventItem && (
+        <EventDiscussion
+          eventId={eventItem.id}
+          signedIn={Boolean(user)}
+          canPost={Boolean(
+            user && (isManager || (!eventItem.cancelled && participationStatus === 'ACCEPTED')),
+          )}
+          returnTo={returnTo}
+          viewerId={currentUser.data?.id}
+          moderator={Boolean(isManager)}
+        />
+      )}
     </article>
   );
 }
