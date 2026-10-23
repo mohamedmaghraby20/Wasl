@@ -198,4 +198,52 @@ describe('messaging token boundary', () => {
     );
     expect(stream.removeMember).not.toHaveBeenCalled();
   });
+
+  it('grants a channel-scoped moderator role to an Event manager', async () => {
+    const responses = [
+      [{ id: 'event-1' }],
+      [{ status: 'ACTIVE' }],
+      [{ closed: false }],
+      [{ name: 'Mariam' }],
+      [{ id: 'conversation-1', channelId: 'wasl_conversation1' }],
+      [{ status: 'ACTIVE' }],
+      [{ closed: false }],
+    ];
+    const select = mockSelect(responses);
+    const insert = vi.fn(() => ({
+      values: () => ({
+        onConflictDoNothing: () => Promise.resolve(),
+        onConflictDoUpdate: () => Promise.resolve(),
+      }),
+    }));
+    const db = { select, insert } as unknown as Database;
+    const config = { get: () => 'true' } as unknown as ConfigService;
+    const stream = {
+      upsertUser: vi.fn(() => Promise.resolve()),
+      ensureChannel: vi.fn(() => Promise.resolve()),
+      setMemberRole: vi.fn(() => Promise.resolve()),
+      addMember: vi.fn(() => Promise.resolve()),
+      removeMember: vi.fn(() => Promise.resolve()),
+    };
+    const eventManager = {
+      assertCanManageById: () => Promise.resolve(),
+    } as unknown as EventsService;
+    const service = new MessagingService(
+      db,
+      config,
+      stream as unknown as StreamChatAdapter,
+      undefined!,
+      eventManager,
+    );
+
+    await service.openResourceChannel(user, 'event', 'event-1');
+
+    expect(stream.setMemberRole).toHaveBeenCalledTimes(1);
+    expect(stream.setMemberRole).toHaveBeenCalledWith(
+      'wasl_conversation1',
+      'wasl_a7289f17c7fe479eadff85716c9a9730',
+      true,
+    );
+    expect(stream.addMember).not.toHaveBeenCalled();
+  });
 });

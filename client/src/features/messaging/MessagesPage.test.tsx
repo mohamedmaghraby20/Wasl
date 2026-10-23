@@ -1,17 +1,22 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { I18nextProvider } from 'react-i18next';
 import { MemoryRouter } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { messagingControllerSession } from '@/api/generated/messaging/messaging';
+import { ApiError } from '@/api/fetcher';
 import { i18n } from '@/lib/i18n';
 import { MessagesPage } from './MessagesPage';
 
 const stream = vi.hoisted(() => ({
+  handlers: {} as Record<string, (event: { online?: boolean }) => void>,
   connectUser: vi.fn(() => Promise.resolve()),
   disconnectUser: vi.fn(() => Promise.resolve()),
   queryChannels: vi.fn(() => Promise.resolve([{ cid: 'messaging:channel-1' }])),
-  on: vi.fn(),
+  on: vi.fn((event: string, handler: (payload: { online?: boolean }) => void) => {
+    stream.handlers[event] = handler;
+  }),
   off: vi.fn(),
 }));
 
@@ -112,5 +117,25 @@ describe('MessagesPage', () => {
         data: { recipientUserId: 'recipient-id' },
       }),
     );
+  });
+
+  it('explains that messaging setup is pending when the session endpoint reports 503', async () => {
+    vi.mocked(messagingControllerSession).mockRejectedValueOnce(
+      new ApiError('Messaging is not configured.', 503),
+    );
+
+    renderPage();
+
+    expect(await screen.findByText(/Messaging is not enabled yet/)).toBeVisible();
+  });
+
+  it('shows the reconnect state when the realtime connection goes offline', async () => {
+    renderPage();
+    await screen.findByRole('heading', { name: 'Messages' });
+    await waitFor(() => expect(stream.handlers['connection.changed']).toBeTypeOf('function'));
+
+    act(() => stream.handlers['connection.changed']!({ online: false }));
+
+    expect(await screen.findByText(/Connection lost/)).toBeVisible();
   });
 });

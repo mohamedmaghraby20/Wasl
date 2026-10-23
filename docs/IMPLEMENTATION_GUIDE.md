@@ -164,9 +164,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 2, 4 and 5: infrastructure/quality in this document.
 
 **Acceptance criteria:**
-- [ ] No existing work is overwritten; missing foundation is identified.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] No existing work is overwritten; missing foundation is identified.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** None.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -178,9 +178,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 2, 4 and 5: infrastructure/quality in this document.
 
 **Acceptance criteria:**
-- [ ] pnpm discovers every workspace and lockfile is reproducible.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] pnpm discovers every workspace and lockfile is reproducible.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 1.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -192,9 +192,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 2, 4 and 5: infrastructure/quality in this document.
 
 **Acceptance criteria:**
-- [ ] Directories exist without moving or deleting user design artifacts.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Directories exist without moving or deleting user design artifacts.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 2.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -206,9 +206,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 2, 4 and 5: infrastructure/quality in this document.
 
 **Acceptance criteria:**
-- [ ] Client and server use consistent strict TS settings.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Client and server use consistent strict TS settings.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 3.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -220,9 +220,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 2, 4 and 5: infrastructure/quality in this document.
 
 **Acceptance criteria:**
-- [ ] Root lint and format checks run without modifying generated files.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Root lint and format checks run without modifying generated files.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 4.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -234,9 +234,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 2, 4 and 5: infrastructure/quality in this document.
 
 **Acceptance criteria:**
-- [ ] pnpm client dev and build work.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] pnpm client dev and build work.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 5.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -248,9 +248,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 2, 4 and 5: infrastructure/quality in this document.
 
 **Acceptance criteria:**
-- [ ] Server starts and returns minimal health response.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Server starts and returns minimal health response.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 6.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -262,9 +262,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 2, 4 and 5: infrastructure/quality in this document.
 
 **Acceptance criteria:**
-- [ ] Local configuration validates and no secrets are committed.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Local configuration validates and no secrets are committed.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 7.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -276,9 +276,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 2, 4 and 5: infrastructure/quality in this document.
 
 **Acceptance criteria:**
-- [ ] Module boundaries and imports follow architecture design.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Module boundaries and imports follow architecture design.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 8.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -290,9 +290,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 2, 4 and 5: infrastructure/quality in this document.
 
 **Acceptance criteria:**
-- [ ] Connection smoke test and migration generation work locally.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Connection smoke test and migration generation work locally.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 9.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -304,9 +304,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 2, 4 and 5: infrastructure/quality in this document.
 
 **Acceptance criteria:**
-- [ ] Invalid request gets safe consistent error and headers are present.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Invalid request gets safe consistent error and headers are present.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 10.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -318,9 +318,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 2, 4 and 5: infrastructure/quality in this document.
 
 **Acceptance criteria:**
-- [ ] OpenAPI document is generated with valid shapes.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] OpenAPI document is generated with valid shapes.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 11.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -332,9 +332,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 2, 4 and 5: infrastructure/quality in this document.
 
 **Acceptance criteria:**
-- [ ] Client and server resolve shared package.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Client and server resolve shared package.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 12.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -346,9 +346,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 2, 4 and 5: infrastructure/quality in this document.
 
 **Acceptance criteria:**
-- [ ] Generated client compiles without manually duplicating API DTOs.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Generated client compiles without manually duplicating API DTOs.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 13.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -360,9 +360,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 2, 4 and 5: infrastructure/quality in this document.
 
 **Acceptance criteria:**
-- [ ] Client can perform typed request and cache response.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Client can perform typed request and cache response.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 14.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -374,9 +374,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 2, 4 and 5: infrastructure/quality in this document.
 
 **Acceptance criteria:**
-- [ ] Direct route navigation and refresh work.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Direct route navigation and refresh work.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 15.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -388,9 +388,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 2, 4 and 5: infrastructure/quality in this document.
 
 **Acceptance criteria:**
-- [ ] A styled accessible base component renders.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] A styled accessible base component renders.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 16.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -402,9 +402,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 2, 4 and 5: infrastructure/quality in this document.
 
 **Acceptance criteria:**
-- [ ] Theme uses approved semantic tokens without hard-coded rival palette.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Theme uses approved semantic tokens without hard-coded rival palette.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 17.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -416,9 +416,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 2, 4 and 5: infrastructure/quality in this document.
 
 **Acceptance criteria:**
-- [ ] Language switch changes content and direction.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Language switch changes content and direction.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 18.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -430,9 +430,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 2, 4 and 5: infrastructure/quality in this document.
 
 **Acceptance criteria:**
-- [ ] Icons and accessible feedback render; no redundant global server-data store.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Icons and accessible feedback render; no redundant global server-data store.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 19.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -444,9 +444,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 2, 4 and 5: infrastructure/quality in this document.
 
 **Acceptance criteria:**
-- [ ] A small sample form validates and announces errors.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] A small sample form validates and announces errors.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 20.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -458,9 +458,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 2, 4 and 5: infrastructure/quality in this document.
 
 **Acceptance criteria:**
-- [ ] Local test commands pass for one representative client/server test.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Local test commands pass for one representative client/server test.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 21.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -472,9 +472,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 2, 4 and 5: infrastructure/quality in this document.
 
 **Acceptance criteria:**
-- [ ] Sample browser test and design-system story run locally.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Sample browser test and design-system story run locally.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 22.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -486,9 +486,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 2, 4 and 5: infrastructure/quality in this document.
 
 **Acceptance criteria:**
-- [ ] Local credentials work; privileged keys stay on server.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Local credentials work; privileged keys stay on server.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 23.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -500,9 +500,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 2, 4 and 5: infrastructure/quality in this document.
 
 **Acceptance criteria:**
-- [ ] Repeat runs do not duplicate seeded data.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Repeat runs do not duplicate seeded data.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 24.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -516,9 +516,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Discovery and UX; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Location lookups are localized and not Istanbul-only.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Location lookups are localized and not Istanbul-only.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 25.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -530,9 +530,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Discovery and UX; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Every resource can have a category and translated labels.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Every resource can have a category and translated labels.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 26.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -544,9 +544,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Discovery and UX; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Database constraints reject invalid owner/capacity states.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Database constraints reject invalid owner/capacity states.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 27.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -558,9 +558,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Discovery and UX; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Unlisted status and host relations are persisted correctly.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Unlisted status and host relations are persisted correctly.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 28.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -572,9 +572,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Discovery and UX; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Unauthenticated requests return sanitized public data.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Unauthenticated requests return sanitized public data.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 29.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -586,9 +586,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Discovery and UX; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Unlisted events are never returned by public listing.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Unlisted events are never returned by public listing.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 30.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -600,9 +600,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Discovery and UX; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Missing or archived resources follow visibility policy.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Missing or archived resources follow visibility policy.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 31.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -614,9 +614,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Discovery and UX; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Unlisted direct link works; no private data exposed.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Unlisted direct link works; no private data exposed.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 32.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -628,9 +628,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Discovery and UX; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Keyboard/mobile navigation and RTL verified.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Keyboard/mobile navigation and RTL verified.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 33.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -642,9 +642,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Discovery and UX; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Visitor understands discovery without sign-in.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Visitor understands discovery without sign-in.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 34.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -656,9 +656,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Discovery and UX; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Cards navigate to community details.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Cards navigate to community details.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 35.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -670,9 +670,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Discovery and UX; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Cards show date, place/online, host and navigation.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Cards show date, place/online, host and navigation.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 36.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -684,9 +684,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Discovery and UX; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Details work without login and status is understandable.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Details work without login and status is understandable.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 37.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -698,9 +698,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Discovery and UX; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Public and unlisted URLs work; cancelled status distinct.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Public and unlisted URLs work; cancelled status distinct.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 38.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -712,9 +712,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Discovery and UX; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Keyword queries match expected records and stay paginated.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Keyword queries match expected records and stay paginated.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 39.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -726,9 +726,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Discovery and UX; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Combining filters returns matching results.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Combining filters returns matching results.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 40.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -740,9 +740,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Discovery and UX; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Results match selected date range and Türkiye time behavior.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Results match selected date range and Türkiye time behavior.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 41.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -754,9 +754,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Discovery and UX; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Visitor can switch community/event result types.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Visitor can switch community/event result types.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 42.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -768,9 +768,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Discovery and UX; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Refresh/back/share retain filters and show correct records.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Refresh/back/share retain filters and show correct records.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 43.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -782,9 +782,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Discovery and UX; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] No privileged verification documents or admin data exposed.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] No privileged verification documents or admin data exposed.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 44.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -796,9 +796,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Discovery and UX; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Email and private account data never appear.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Email and private account data never appear.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 45.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -810,9 +810,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Discovery and UX; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Public pages have meaningful metadata; unlisted pages noindex.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Public pages have meaningful metadata; unlisted pages noindex.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 46.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -824,9 +824,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Discovery and UX; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] No confidential or unlisted URLs in sitemap.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] No confidential or unlisted URLs in sitemap.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 47.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -838,9 +838,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Discovery and UX; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Both API and browser tests cover public flows.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Both API and browser tests cover public flows.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 48.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -854,9 +854,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Identity/profiles; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Forged/expired credentials fail and valid session resolves user.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Forged/expired credentials fail and valid session resolves user.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 49.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -868,9 +868,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Identity/profiles; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] New/existing users authenticate successfully.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] New/existing users authenticate successfully.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 50.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -882,9 +882,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Identity/profiles; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Sign-in returns user to action context safely.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Sign-in returns user to action context safely.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 51.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -896,9 +896,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Identity/profiles; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Auth identity maps to one app user.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Auth identity maps to one app user.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 52.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -910,9 +910,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Identity/profiles; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Anon request denied and response contains only authorized fields.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Anon request denied and response contains only authorized fields.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 53.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -924,9 +924,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Identity/profiles; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Authenticated user sees own data.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Authenticated user sees own data.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 54.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -938,9 +938,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Identity/profiles; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Other users cannot edit profile; invalid fields rejected.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Other users cannot edit profile; invalid fields rejected.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 55.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -952,9 +952,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Identity/profiles; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Editing persists and validation is accessible.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Editing persists and validation is accessible.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 56.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -966,9 +966,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Identity/profiles; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Private email/security attributes stay hidden.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Private email/security attributes stay hidden.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 57.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -980,9 +980,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Identity/profiles; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Profile media uploads securely without trusting client MIME alone.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Profile media uploads securely without trusting client MIME alone.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 58.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -994,9 +994,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Identity/profiles; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Upload errors handled and no oversized data proxy through API.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Upload errors handled and no oversized data proxy through API.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 59.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1008,9 +1008,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Identity/profiles; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Authorized user creates public community with correct ownership.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Authorized user creates public community with correct ownership.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 60.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1022,9 +1022,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Identity/profiles; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Signed-in user creates community and reaches details page.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Signed-in user creates community and reaches details page.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 61.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1036,9 +1036,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Identity/profiles; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Independent event works without a community.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Independent event works without a community.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 62.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1050,9 +1050,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Identity/profiles; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] User can create and share public/unlisted event.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] User can create and share public/unlisted event.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 63.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1064,9 +1064,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Identity/profiles; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Unauthorized user cannot attach event to community.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Unauthorized user cannot attach event to community.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 64.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1078,9 +1078,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Identity/profiles; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Only authorized host options appear.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Only authorized host options appear.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 65.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1092,9 +1092,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Identity/profiles; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Archive never silently destroys membership data.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Archive never silently destroys membership data.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 66.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1106,9 +1106,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Identity/profiles; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Members are not shown privileged management controls.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Members are not shown privileged management controls.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 67.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1120,9 +1120,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Identity/profiles; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Cancellation idempotent and status stays visible.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Cancellation idempotent and status stays visible.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 68.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1134,9 +1134,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Identity/profiles; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Cancelled event visibly differs from future active events.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Cancelled event visibly differs from future active events.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 69.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1148,9 +1148,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Identity/profiles; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Visitor directed to auth; user can choose community or event.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Visitor directed to auth; user can choose community or event.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 70.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1162,9 +1162,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3: Identity/profiles; Communities; Events in this document.
 
 **Acceptance criteria:**
-- [ ] Authorized create/edit works and unauthorized writes denied.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Authorized create/edit works and unauthorized writes denied.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 71.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1178,9 +1178,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Participation invariants and concurrency in this document.
 
 **Acceptance criteria:**
-- [ ] No duplicate current membership and allowed states persisted.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] No duplicate current membership and allowed states persisted.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 72.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1192,9 +1192,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Participation invariants and concurrency in this document.
 
 **Acceptance criteria:**
-- [ ] No duplicate active registration and statuses constrained.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] No duplicate active registration and statuses constrained.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 73.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1206,9 +1206,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Participation invariants and concurrency in this document.
 
 **Acceptance criteria:**
-- [ ] Illegal or repeated transitions do not corrupt state.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Illegal or repeated transitions do not corrupt state.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 74.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1220,9 +1220,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Participation invariants and concurrency in this document.
 
 **Acceptance criteria:**
-- [ ] Repeated join cannot duplicate membership.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Repeated join cannot duplicate membership.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 75.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1234,9 +1234,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Participation invariants and concurrency in this document.
 
 **Acceptance criteria:**
-- [ ] Repeated registration remains one record.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Repeated registration remains one record.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 76.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1248,9 +1248,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Participation invariants and concurrency in this document.
 
 **Acceptance criteria:**
-- [ ] User sees Active/Accepted and sign-in interruption works.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] User sees Active/Accepted and sign-in interruption works.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 77.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1262,9 +1262,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Participation invariants and concurrency in this document.
 
 **Acceptance criteria:**
-- [ ] Only participant can change own record and privileges update.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Only participant can change own record and privileges update.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 78.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1276,9 +1276,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Participation invariants and concurrency in this document.
 
 **Acceptance criteria:**
-- [ ] No other user's private participation returned.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] No other user's private participation returned.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 79.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1290,9 +1290,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Participation invariants and concurrency in this document.
 
 **Acceptance criteria:**
-- [ ] Status badges match backend state and page handles empty state.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Status badges match backend state and page handles empty state.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 80.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1304,9 +1304,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Participation invariants and concurrency in this document.
 
 **Acceptance criteria:**
-- [ ] Concurrent requests cannot exceed accepted/active capacity.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Concurrent requests cannot exceed accepted/active capacity.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 81.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1318,9 +1318,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Participation invariants and concurrency in this document.
 
 **Acceptance criteria:**
-- [ ] Waitlisted participant does not consume capacity or member privileges.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Waitlisted participant does not consume capacity or member privileges.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 82.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1332,9 +1332,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Participation invariants and concurrency in this document.
 
 **Acceptance criteria:**
-- [ ] Correct FIFO order and capacity guarantee under concurrency.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Correct FIFO order and capacity guarantee under concurrency.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 83.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1346,9 +1346,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Participation invariants and concurrency in this document.
 
 **Acceptance criteria:**
-- [ ] Repeated requests do not create duplicates.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Repeated requests do not create duplicates.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 84.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1360,9 +1360,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Participation invariants and concurrency in this document.
 
 **Acceptance criteria:**
-- [ ] Unauthorized decisions rejected and status history recorded.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Unauthorized decisions rejected and status history recorded.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 85.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1374,9 +1374,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Participation invariants and concurrency in this document.
 
 **Acceptance criteria:**
-- [ ] No automatic FIFO promotion overrides manual selection.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] No automatic FIFO promotion overrides manual selection.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 86.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1388,9 +1388,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Participation invariants and concurrency in this document.
 
 **Acceptance criteria:**
-- [ ] Statuses and authorization match backend.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Statuses and authorization match backend.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 87.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1402,9 +1402,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Participation invariants and concurrency in this document.
 
 **Acceptance criteria:**
-- [ ] Attendee state updates without refresh and errors visible.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Attendee state updates without refresh and errors visible.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 88.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1416,9 +1416,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Participation invariants and concurrency in this document.
 
 **Acceptance criteria:**
-- [ ] Removed participant loses privileges and history retained.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Removed participant loses privileges and history retained.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 89.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1430,9 +1430,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Participation invariants and concurrency in this document.
 
 **Acceptance criteria:**
-- [ ] Aggregates reflect current states, not history duplicates.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Aggregates reflect current states, not history duplicates.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 90.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1444,9 +1444,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Participation invariants and concurrency in this document.
 
 **Acceptance criteria:**
-- [ ] Counts match data and no advanced analytics dashboard built.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Counts match data and no advanced analytics dashboard built.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 91.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1458,9 +1458,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Participation invariants and concurrency in this document.
 
 **Acceptance criteria:**
-- [ ] Nonaccepted users cannot be marked attended.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Nonaccepted users cannot be marked attended.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 92.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1472,9 +1472,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Participation invariants and concurrency in this document.
 
 **Acceptance criteria:**
-- [ ] State preserved and accessible status shown.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] State preserved and accessible status shown.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 93.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1486,9 +1486,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Participation invariants and concurrency in this document.
 
 **Acceptance criteria:**
-- [ ] No overbooking, stale privileges or inconsistent states.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] No overbooking, stale privileges or inconsistent states.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 94.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1502,9 +1502,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Organizations and verification in this document.
 
 **Acceptance criteria:**
-- [ ] One current owner and scoped admin uniqueness enforced.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] One current owner and scoped admin uniqueness enforced.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 95.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1516,9 +1516,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Organizations and verification in this document.
 
 **Acceptance criteria:**
-- [ ] Visitors see public organization without private members.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Visitors see public organization without private members.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 96.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1530,9 +1530,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Organizations and verification in this document.
 
 **Acceptance criteria:**
-- [ ] Public view follows design tokens and RTL.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Public view follows design tokens and RTL.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 97.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1544,9 +1544,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Organizations and verification in this document.
 
 **Acceptance criteria:**
-- [ ] Organization persists independently of owner identity.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Organization persists independently of owner identity.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 98.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1558,9 +1558,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Organizations and verification in this document.
 
 **Acceptance criteria:**
-- [ ] User can register organization without separate login.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] User can register organization without separate login.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 99.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1572,9 +1572,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Organizations and verification in this document.
 
 **Acceptance criteria:**
-- [ ] Unauthorized users cannot change organization.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Unauthorized users cannot change organization.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 100.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1586,9 +1586,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Organizations and verification in this document.
 
 **Acceptance criteria:**
-- [ ] Changes appear on public profile.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Changes appear on public profile.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 101.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1600,9 +1600,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Organizations and verification in this document.
 
 **Acceptance criteria:**
-- [ ] Resource displays organization identity and actor audit maintained.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Resource displays organization identity and actor audit maintained.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 102.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1614,9 +1614,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Organizations and verification in this document.
 
 **Acceptance criteria:**
-- [ ] No unauthorized organization appears.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] No unauthorized organization appears.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 103.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1628,9 +1628,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Organizations and verification in this document.
 
 **Acceptance criteria:**
-- [ ] Tokens are single-use/expiring and not exposed in logs.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Tokens are single-use/expiring and not exposed in logs.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 104.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1642,9 +1642,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Organizations and verification in this document.
 
 **Acceptance criteria:**
-- [ ] Admin permissions activate only after proper acceptance.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Admin permissions activate only after proper acceptance.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 105.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1656,9 +1656,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Organizations and verification in this document.
 
 **Acceptance criteria:**
-- [ ] Admin cannot remove owner or alter owner-only settings.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Admin cannot remove owner or alter owner-only settings.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 106.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1670,9 +1670,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Organizations and verification in this document.
 
 **Acceptance criteria:**
-- [ ] Exactly one owner after concurrent/failed transfers.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Exactly one owner after concurrent/failed transfers.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 107.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1684,9 +1684,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Organizations and verification in this document.
 
 **Acceptance criteria:**
-- [ ] Transfer is reflected without recreating resources.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Transfer is reflected without recreating resources.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 108.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1698,9 +1698,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Organizations and verification in this document.
 
 **Acceptance criteria:**
-- [ ] Unverified org may operate according to approved policy.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Unverified org may operate according to approved policy.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 109.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1712,9 +1712,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Organizations and verification in this document.
 
 **Acceptance criteria:**
-- [ ] No false verified badge or exposed evidence.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] No false verified badge or exposed evidence.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 110.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1726,9 +1726,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Organizations and verification in this document.
 
 **Acceptance criteria:**
-- [ ] Permission changes take effect promptly across resources.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Permission changes take effect promptly across resources.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 111.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1742,9 +1742,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Communication and discussions in this document.
 
 **Acceptance criteria:**
-- [ ] Schema prevents deeper nesting and handles lifecycle.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Schema prevents deeper nesting and handles lifecycle.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 112.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1756,9 +1756,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Communication and discussions in this document.
 
 **Acceptance criteria:**
-- [ ] Visitor read follows parent visibility and exposes only safe author data.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Visitor read follows parent visibility and exposes only safe author data.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 113.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1770,9 +1770,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Communication and discussions in this document.
 
 **Acceptance criteria:**
-- [ ] Discussion is readable without Stream dependency.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Discussion is readable without Stream dependency.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 114.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1784,9 +1784,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Communication and discussions in this document.
 
 **Acceptance criteria:**
-- [ ] Unauthorized posts rejected and edits do not bypass permissions.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Unauthorized posts rejected and edits do not bypass permissions.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 115.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1798,9 +1798,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Communication and discussions in this document.
 
 **Acceptance criteria:**
-- [ ] Comment appears after success with correct author.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Comment appears after success with correct author.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 116.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1812,9 +1812,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Communication and discussions in this document.
 
 **Acceptance criteria:**
-- [ ] Topics stored in PostgreSQL and associated with community.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Topics stored in PostgreSQL and associated with community.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 117.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1826,9 +1826,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Communication and discussions in this document.
 
 **Acceptance criteria:**
-- [ ] UI follows membership/visibility behavior.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] UI follows membership/visibility behavior.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 118.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1840,9 +1840,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Communication and discussions in this document.
 
 **Acceptance criteria:**
-- [ ] No scope escalation or unauthorized deletion.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] No scope escalation or unauthorized deletion.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 119.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1854,9 +1854,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Communication and discussions in this document.
 
 **Acceptance criteria:**
-- [ ] No Stream IDs replace domain identifiers.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] No Stream IDs replace domain identifiers.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 120.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1868,9 +1868,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Communication and discussions in this document.
 
 **Acceptance criteria:**
-- [ ] Stream secret never exposed to browser.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Stream secret never exposed to browser.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 121.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1882,9 +1882,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Communication and discussions in this document.
 
 **Acceptance criteria:**
-- [ ] Pending/Waitlisted/Removed access denied.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Pending/Waitlisted/Removed access denied.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 122.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1896,9 +1896,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Communication and discussions in this document.
 
 **Acceptance criteria:**
-- [ ] Cancelled/rejected/removed users cannot access restricted chat.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Cancelled/rejected/removed users cannot access restricted chat.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 123.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1910,9 +1910,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Communication and discussions in this document.
 
 **Acceptance criteria:**
-- [ ] Revoked participant cannot retain chat access after failure.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Revoked participant cannot retain chat access after failure.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 124.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1924,9 +1924,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Communication and discussions in this document.
 
 **Acceptance criteria:**
-- [ ] Other client features contain no direct Stream imports.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Other client features contain no direct Stream imports.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 125.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1938,9 +1938,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Communication and discussions in this document.
 
 **Acceptance criteria:**
-- [ ] Chats update realtime; empty/error/offline states usable.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Chats update realtime; empty/error/offline states usable.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 126.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1952,9 +1952,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Communication and discussions in this document.
 
 **Acceptance criteria:**
-- [ ] Users can start DMs without exposing provider credentials.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Users can start DMs without exposing provider credentials.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 127.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1966,9 +1966,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Communication and discussions in this document.
 
 **Acceptance criteria:**
-- [ ] Blocked users cannot continue disallowed communication.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Blocked users cannot continue disallowed communication.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 128.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1980,9 +1980,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Communication and discussions in this document.
 
 **Acceptance criteria:**
-- [ ] Moderator cannot obtain unrelated admin rights.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Moderator cannot obtain unrelated admin rights.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 129.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -1994,9 +1994,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Section 3: Communication and discussions in this document.
 
 **Acceptance criteria:**
-- [ ] No privilege leak, protected secret leak or silent provisioning failure.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] No privilege leak, protected secret leak or silent provisioning failure.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 130.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
