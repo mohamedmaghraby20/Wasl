@@ -161,6 +161,8 @@ When the user corrects your approach, append a one-line rule here before ending 
 - Use PascalCase filenames for React component modules; keep tests and Storybook stories in their existing naming pattern.
 - Identify deployment origins and migration targets from environment files, deployment configuration, and connected provider metadata before asking the user; distinguish confirmed values from environment intent that remains unlabeled.
 - Complete each requested task or phase end to end, including required database schema changes, migrations, and verification, before starting the next phase.
+- During a verification or fix pass, close only the stated checks; do not add features, refactors, or new polish opportunities until those checks pass.
+- Let Vite split lazily routed SDKs naturally; a `manualChunks` catch-all `vendor` hoists them into the eager bundle and cross-assigning their sub-dependencies produces circular-chunk warnings.
 
 ---
 
