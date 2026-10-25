@@ -2010,9 +2010,9 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Applicable requirements:** Sections 3–4: Notifications, moderation, privacy and security in this document.
 
 **Acceptance criteria:**
-- [ ] No duplicate delivery for same idempotent event.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] No duplicate delivery for same idempotent event.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 131.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.

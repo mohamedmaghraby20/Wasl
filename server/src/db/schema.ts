@@ -351,6 +351,78 @@ export const messagingReports = pgTable(
   ],
 ).enableRLS();
 
+export const notifications = pgTable(
+  'notifications',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    recipientUserId: uuid('recipient_user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'restrict' }),
+    eventKey: text('event_key').notNull(),
+    type: text('type').notNull(),
+    contextType: text('context_type').notNull(),
+    contextId: text('context_id').notNull(),
+    readAt: timestamp('read_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex('notifications_recipient_event_unique').on(table.recipientUserId, table.eventKey),
+    index('notifications_recipient_created_idx').on(table.recipientUserId, table.createdAt),
+    index('notifications_recipient_unread_idx')
+      .on(table.recipientUserId, table.createdAt)
+      .where(sql`${table.readAt} is null`),
+    check('notifications_event_key_length', sql`char_length(${table.eventKey}) between 1 and 200`),
+    check('notifications_type_length', sql`char_length(${table.type}) between 1 and 80`),
+    check(
+      'notifications_context_type_check',
+      sql`${table.contextType} in ('community', 'event', 'organization')`,
+    ),
+    check(
+      'notifications_context_id_length',
+      sql`char_length(${table.contextId}) between 1 and 160`,
+    ),
+  ],
+).enableRLS();
+
+export const notificationEmailDeliveries = pgTable(
+  'notification_email_deliveries',
+  {
+    notificationId: uuid('notification_id')
+      .primaryKey()
+      .references(() => notifications.id, { onDelete: 'restrict' }),
+    status: text('status').notNull().default('PENDING'),
+    attemptCount: integer('attempt_count').notNull().default(0),
+    nextAttemptAt: timestamp('next_attempt_at', { withTimezone: true }).notNull().defaultNow(),
+    lastAttemptAt: timestamp('last_attempt_at', { withTimezone: true }),
+    sentAt: timestamp('sent_at', { withTimezone: true }),
+    providerMessageId: text('provider_message_id'),
+    lastError: text('last_error'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index('notification_email_deliveries_due_idx')
+      .on(table.nextAttemptAt)
+      .where(sql`${table.status} in ('PENDING', 'RETRY')`),
+    check(
+      'notification_email_deliveries_status_check',
+      sql`${table.status} in ('PENDING', 'RETRY', 'SENT', 'FAILED')`,
+    ),
+    check('notification_email_deliveries_attempt_count_check', sql`${table.attemptCount} >= 0`),
+    check(
+      'notification_email_deliveries_sent_check',
+      sql`(${table.status} = 'SENT' and ${table.sentAt} is not null) or (${table.status} <> 'SENT' and ${table.sentAt} is null)`,
+    ),
+    check(
+      'notification_email_deliveries_provider_id_length',
+      sql`${table.providerMessageId} is null or char_length(${table.providerMessageId}) between 1 and 200`,
+    ),
+    check(
+      'notification_email_deliveries_error_length',
+      sql`${table.lastError} is null or char_length(${table.lastError}) <= 2000`,
+    ),
+  ],
+).enableRLS();
+
 export const organizationVerificationStatus = pgEnum('organization_verification_status', [
   'PENDING',
   'VERIFIED',
