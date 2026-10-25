@@ -65,7 +65,9 @@ async function main(): Promise<void> {
         const participation = new ParticipationService(
           tx as unknown as Database,
           {} as CommunitiesService,
-          { assertCanManageById: () => Promise.resolve({ id: eventId }) } as unknown as EventsService,
+          {
+            assertCanManageById: () => Promise.resolve({ id: eventId }),
+          } as unknown as EventsService,
           undefined,
           service,
         );
@@ -92,7 +94,9 @@ async function main(): Promise<void> {
         const pendingUser = randomUUID();
         const waitlistedUser = randomUUID();
         for (const other of [pendingUser, waitlistedUser]) {
-          await tx.execute(sql`insert into identity.users (id, normalized_email) values (${other}, ${`notice-${other}@example.test`})`);
+          await tx.execute(
+            sql`insert into identity.users (id, normalized_email) values (${other}, ${`notice-${other}@example.test`})`,
+          );
         }
         await tx.insert(schema.eventRegistrations).values([
           { eventId, userId: pendingUser, status: 'PENDING' },
@@ -108,7 +112,11 @@ async function main(): Promise<void> {
         await eventManagement.cancel(organizer, eventId);
         for (const expectedRecipient of [recipient, pendingUser, waitlistedUser]) {
           const rows = await service.list(expectedRecipient);
-          assert.equal(rows.filter((row) => row.type === 'event_cancelled' && row.contextId === eventId).length, 1);
+          assert.equal(
+            rows.filter((row) => row.type === 'event_cancelled' && row.contextId === eventId)
+              .length,
+            1,
+          );
         }
         const [notice] = await tx
           .select({ id: schema.notifications.id })
@@ -124,10 +132,12 @@ async function main(): Promise<void> {
         const worker = new NotificationEmailWorker(
           tx as unknown as Database,
           { get: () => 'http://localhost:5173' } as unknown as ConfigService,
-          { send: (input: { text: string }) => {
-            sentMessages.push(input);
-            return Promise.resolve('mock-provider-id');
-          } } as unknown as ResendEmailAdapter,
+          {
+            send: (input: { text: string }) => {
+              sentMessages.push(input);
+              return Promise.resolve('mock-provider-id');
+            },
+          } as unknown as ResendEmailAdapter,
         );
         await worker.processPending();
         const [sent] = await tx
@@ -138,28 +148,63 @@ async function main(): Promise<void> {
         assert.equal(sent?.attemptCount, 1);
         assert.equal(sent?.providerMessageId, 'mock-provider-id');
         assert.ok(sentMessages.some((message) => message.text.includes(`/events/${eventId}`)));
-        const retryId = await service.create(tx, {
-          ...event,
-          eventKey: `event-transition:${randomUUID()}`,
-          contextId: eventId,
-        }, true);
+        const retryId = await service.create(
+          tx,
+          {
+            ...event,
+            eventKey: `event-transition:${randomUUID()}`,
+            contextId: eventId,
+          },
+          true,
+        );
         assert.ok(retryId);
         const failingWorker = new NotificationEmailWorker(
           tx as unknown as Database,
           { get: () => 'http://localhost:5173' } as unknown as ConfigService,
-          { send: () => Promise.reject(new Error('simulated provider outage')) } as unknown as ResendEmailAdapter,
+          {
+            send: () => Promise.reject(new Error('simulated provider outage')),
+          } as unknown as ResendEmailAdapter,
         );
         await failingWorker.processPending();
-        const [retry] = await tx.select().from(schema.notificationEmailDeliveries)
+        const [retry] = await tx
+          .select()
+          .from(schema.notificationEmailDeliveries)
           .where(eq(schema.notificationEmailDeliveries.notificationId, retryId));
         assert.equal(retry?.status, 'RETRY');
         assert.equal(retry?.attemptCount, 1);
         assert.ok(retry.nextAttemptAt > new Date());
+        const suspendedId = await service.create(
+          tx,
+          {
+            ...event,
+            eventKey: `event-transition:${randomUUID()}`,
+            recipientUserId: pendingUser,
+            contextId: eventId,
+          },
+          true,
+        );
+        assert.ok(suspendedId);
+        await tx
+          .update(schema.users)
+          .set({ accountStatus: 'SUSPENDED' })
+          .where(eq(schema.users.id, pendingUser));
+        const sendCount = sentMessages.length;
+        await worker.processPending();
+        const [suppressed] = await tx
+          .select()
+          .from(schema.notificationEmailDeliveries)
+          .where(eq(schema.notificationEmailDeliveries.notificationId, suspendedId));
+        assert.equal(suppressed?.status, 'FAILED');
+        assert.equal(sentMessages.length, sendCount, 'suspended recipients must not be emailed');
+        await worker.processPending();
+        assert.equal(sentMessages.length, sendCount, 'archived email must not be sent again');
         throw rollback;
       }),
       (error: unknown) => error === rollback,
     );
-    console.log('Notification creation, replay, owner listing and read access passed.');
+    console.log(
+      'Notification creation, replay, recipient isolation, delivery retry and suspended-recipient suppression passed.',
+    );
   } finally {
     await pool.end();
   }

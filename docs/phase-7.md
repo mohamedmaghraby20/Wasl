@@ -38,3 +38,7 @@ Until these are approved and implemented, Phase 7 cannot be honestly marked comp
 - `corepack pnpm db:migrate` succeeded on the configured development database; `corepack pnpm db:generate` found no pending schema changes. No production migration was attempted.
 - `corepack pnpm exec prettier --check` on the newly changed Phase 7 modules, admin screen/tests, router and this record: passed after formatting.
 - Impeccable UI detector on the admin screen returned `[]`. No authenticated browser visual review was possible without a configured platform admin and second factor; this is not visual sign-off.
+
+### Follow-up verification
+
+- `corepack pnpm --filter @wasl/server exec tsx test/notifications.integration.ts` passed with additional rolled-back checks that a suspended recipient is not emailed and an archived notification is not sent again. Live Resend delivery remains unverified.
