@@ -1,0 +1,25 @@
+# Wasl MVP recovery rehearsal (draft)
+
+**Status:** Task 157 preparation, **not a completed restore test**. Operator, RTO/RPO, backup plan, isolated restore target and production rollback approval are outstanding in [MVP_PRODUCTION_OWNER_HANDOFF.md](MVP_PRODUCTION_OWNER_HANDOFF.md). Do not run destructive commands on the development or production project while following this draft. Recheck Supabase and Render instructions against the deployed plans and versions before use.
+
+## Preconditions and evidence to collect
+
+1. Record incident ID, UTC start time, current Git commit, environment and project reference. Have a second operator independently confirm the target. Never paste database connection strings, auth tokens, test identities or backups into a ticket or this file.
+2. Identify the **last verified** database backup and its timestamp from the target project's Supabase Backups page. Check its plan's retention/PITR rules. A database backup does **not** contain Supabase Storage object bytes: record the separately verified object recovery method. Capture the migration journal state and the currently deployed Render release before any change.
+3. Agree on intended RPO/RTO and the safe restore destination. Use a disposable, access-controlled **nonproduction** project/schema for rehearsal and synthetic test records; never restore over a production project to practice. Check whether Auth/Storage metadata, queues, and external Stream/Resend state require separate reconciliation.
+
+## Rehearsal in an isolated environment
+
+1. Create the isolated destination and a synthetic fixture representing an account, resource, participation state, notification and upload. Confirm its identifier cannot collide with a real user or production domain. Back up/rehearse using the provider-approved export/restore procedure for the selected Supabase plan; do not blindly copy credentials or provider project IDs from development.
+2. Before restoring, verify the backup includes the expected pre-rehearsal data and check the destination's project reference, hostname and database role. Restore **only** to the isolated destination. Record start/end time, provider status and any errors. Recover object bytes separately, since database metadata alone does not recover a deleted object.
+3. Validate the restored data and schema: authentication works with the matching Auth instance; the synthetic resource and historical participation match the fixture; migration history matches the code version; access controls/RLS and client-role grants still deny private-table reads; public/private projections have no leaks. Use the appropriate target-specific server variables and check `/api/v1/health` plus database-backed reads. The current health endpoint is only a process response, not a database readiness proof.
+4. Check follow-on state: queued notification deliveries are not silently lost or duplicated; the pgmq worker can resume idempotently; Stream membership is reconciled from Wasl authorization; Resend provider status is checked without sending duplicate real mail. Record discrepancies and fix the recovery procedure before claiming a passing rehearsal.
+5. Stop or dispose of only the isolated destination with explicit operator approval. Save redacted results, restore duration, actual data-loss window, test fixture assertions and provider dashboards/links in access-controlled evidence. Compare observed values with approved RTO/RPO; if they are missing, the rehearsal is informative but cannot pass the release gate.
+
+## Deployment and migration rollback decision
+
+- A Render application rollback is not a database rollback. Drizzle migrations in `server/drizzle/` run **forward** via `server/src/db/migrate.ts`; the repository does not establish tested `down` migrations. Do not run `git reset --hard`, reapply a historical migration to production, or restore a whole production database merely to roll back application code.
+- Before a production migration, record a verified backup and compare the schema at the **confirmed production target** with the expected migration journal. Review whether the older application version can run against the newer schema. If not, prepare an approved forward-compatible fix or a specifically rehearsed restore plan; get owner authorization for any production data-loss/downtime tradeoff.
+- On an incident: protect the data first; stop harmful writes or pause the affected service only with the incident operator's approval. Roll back Render to the last known-good compatible release when possible. Reconcile queued email/Stream membership after recovery, then rerun non-destructive public, auth and authorized action smoke checks. Write down operator, cause, mitigations and follow-up tests.
+
+**Completion evidence still needed:** a dated isolated restore rehearsal with measured RTO/RPO, Storage-object recovery verification, migration recovery exercise, and signed operator acceptance. No production restore or backup export was performed by creating this file.

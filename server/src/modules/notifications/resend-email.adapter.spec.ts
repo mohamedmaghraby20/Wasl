@@ -54,4 +54,21 @@ describe('ResendEmailAdapter', () => {
     } as unknown as ConfigService);
     await expect(adapter.send(input)).rejects.toThrow('Email provider rejected delivery.');
   });
+
+  it('recovers after a provider outage without changing the delivery idempotency key', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockRejectedValueOnce(new Error('simulated network outage'))
+      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ id: 'provider-id' }) });
+    vi.stubGlobal('fetch', fetchMock);
+    const adapter = new ResendEmailAdapter({
+      get: (name: string) => (name === 'RESEND_API_KEY' ? 'secret-key' : 'no-reply@example.test'),
+    } as unknown as ConfigService);
+    await expect(adapter.send(input)).rejects.toThrow('simulated network outage');
+    await expect(adapter.send(input)).resolves.toBe('provider-id');
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    for (const [, options] of fetchMock.mock.calls as Array<[string, RequestInit]>) {
+      expect(new Headers(options.headers).get('Idempotency-Key')).toBe(input.id);
+    }
+  });
 });
