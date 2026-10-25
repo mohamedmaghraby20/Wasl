@@ -27,8 +27,10 @@ import type {
   CurrentUserDto,
   PublicUserProfileDto,
   UpdateProfileDto,
+  UserSearchResultDto,
   UsersControllerCurrentParams,
   UsersControllerPublicProfileParams,
+  UsersControllerSearchParams,
   UsersControllerUpdateParams
 } from '../wasl-client.schemas';
 
@@ -244,7 +246,108 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getUsersControllerUpdateMutationOptions(options), queryClient);
     }
-    export const getUsersControllerPublicProfileUrl = (id: string,
+    export const getUsersControllerSearchUrl = (params: UsersControllerSearchParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/users/search?${stringifiedParams}` : `/api/v1/users/search`
+}
+
+export const usersControllerSearch = async (params: UsersControllerSearchParams, options?: Parameters<typeof waslFetch>[1]): Promise<UserSearchResultDto[]> => {
+
+  return waslFetch<UserSearchResultDto[]>(getUsersControllerSearchUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getUsersControllerSearchQueryKey = (params?: UsersControllerSearchParams,) => {
+    return [
+    `/api/v1/users/search`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getUsersControllerSearchQueryOptions = <TData = Awaited<ReturnType<typeof usersControllerSearch>>, TError = unknown>(params: UsersControllerSearchParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersControllerSearch>>, TError, TData>>, request?: SecondParameter<typeof waslFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getUsersControllerSearchQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof usersControllerSearch>>> = ({ signal }) => usersControllerSearch(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof usersControllerSearch>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type UsersControllerSearchQueryResult = NonNullable<Awaited<ReturnType<typeof usersControllerSearch>>>
+export type UsersControllerSearchQueryError = unknown
+
+
+export function useUsersControllerSearch<TData = Awaited<ReturnType<typeof usersControllerSearch>>, TError = unknown>(
+ params: UsersControllerSearchParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersControllerSearch>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof usersControllerSearch>>,
+          TError,
+          Awaited<ReturnType<typeof usersControllerSearch>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof waslFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useUsersControllerSearch<TData = Awaited<ReturnType<typeof usersControllerSearch>>, TError = unknown>(
+ params: UsersControllerSearchParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersControllerSearch>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof usersControllerSearch>>,
+          TError,
+          Awaited<ReturnType<typeof usersControllerSearch>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof waslFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useUsersControllerSearch<TData = Awaited<ReturnType<typeof usersControllerSearch>>, TError = unknown>(
+ params: UsersControllerSearchParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersControllerSearch>>, TError, TData>>, request?: SecondParameter<typeof waslFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useUsersControllerSearch<TData = Awaited<ReturnType<typeof usersControllerSearch>>, TError = unknown>(
+ params: UsersControllerSearchParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersControllerSearch>>, TError, TData>>, request?: SecondParameter<typeof waslFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getUsersControllerSearchQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+export const getUsersControllerPublicProfileUrl = (id: string,
     params?: UsersControllerPublicProfileParams,) => {
   const normalizedParams = new URLSearchParams();
 

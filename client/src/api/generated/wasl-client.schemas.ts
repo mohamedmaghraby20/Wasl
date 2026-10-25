@@ -36,6 +36,13 @@ export interface UpdateProfileDto {
   avatarPath?: string | null;
 }
 
+export interface UserSearchResultDto {
+  id: string;
+  displayName: string;
+  /** @nullable */
+  avatarUrl?: string | null;
+}
+
 export interface PublicUserProfileDto {
   id: string;
   displayName: string;
@@ -458,6 +465,32 @@ export interface PublicOrganizationDto {
   resources: OrganizationResourceLinkDto[];
 }
 
+export type NotificationDtoContextType = typeof NotificationDtoContextType[keyof typeof NotificationDtoContextType];
+
+
+export const NotificationDtoContextType = {
+  community: 'community',
+  event: 'event',
+  organization: 'organization',
+} as const;
+
+export interface NotificationDto {
+  id: string;
+  type: string;
+  contextType: NotificationDtoContextType;
+  contextId: string;
+  /** @nullable */
+  href: string | null;
+  /** @nullable */
+  readAt: string | null;
+  createdAt: string;
+}
+
+export interface ReadNotificationDto {
+  id: string;
+  readAt: string;
+}
+
 export type CreateEventDtoVisibility = typeof CreateEventDtoVisibility[keyof typeof CreateEventDtoVisibility];
 
 
@@ -823,6 +856,73 @@ export interface CreateCommunityTopicDto {
   body: string;
 }
 
+export type CreateReportDtoTargetType = typeof CreateReportDtoTargetType[keyof typeof CreateReportDtoTargetType];
+
+
+export const CreateReportDtoTargetType = {
+  user: 'user',
+  community: 'community',
+  event: 'event',
+  organization: 'organization',
+  post: 'post',
+} as const;
+
+export interface CreateReportDto {
+  targetType: CreateReportDtoTargetType;
+  targetId: string;
+  /**
+     * @minLength 1
+     * @maxLength 2000
+     */
+  reason: string;
+}
+
+export interface CreatedReportDto {
+  id: string;
+}
+
+export interface ReportReviewDto {
+  id: string;
+  targetType: string;
+  targetId: string;
+  reason: string;
+  status: string;
+  reporterUserId: string;
+  createdAt: string;
+  /** @nullable */
+  decidedByUserId: string | null;
+  /** @nullable */
+  decisionNote: string | null;
+  /** @nullable */
+  decidedAt: string | null;
+}
+
+export type DecideReportDtoAction = typeof DecideReportDtoAction[keyof typeof DecideReportDtoAction];
+
+
+export const DecideReportDtoAction = {
+  DISMISSED: 'DISMISSED',
+  SUSPEND_USER: 'SUSPEND_USER',
+  RESTORE_USER: 'RESTORE_USER',
+  ARCHIVE_COMMUNITY: 'ARCHIVE_COMMUNITY',
+  CANCEL_EVENT: 'CANCEL_EVENT',
+} as const;
+
+export interface DecideReportDto {
+  action: DecideReportDtoAction;
+  /** @maxLength 2000 */
+  note?: string;
+}
+
+export interface ModerationPermissionsDto {
+  manager: boolean;
+  moderator: boolean;
+}
+
+export interface ModeratorUserDto {
+  userId: string;
+}
+
 export interface CityPublicDto {
   id: string;
   nameEn: string;
@@ -859,6 +959,8 @@ export interface CommunityPageDto {
   items: CommunityPublicDto[];
   page: number;
   pageSize: number;
+  total: number;
+  hasMore: boolean;
 }
 
 export interface EventPublicDto {
@@ -893,6 +995,8 @@ export interface EventPageDto {
   items: EventPublicDto[];
   page: number;
   pageSize: number;
+  total: number;
+  hasMore: boolean;
 }
 
 export type HealthResponseDtoStatus = typeof HealthResponseDtoStatus[keyof typeof HealthResponseDtoStatus];
@@ -932,6 +1036,13 @@ export const UsersControllerUpdateLang = {
   ar: 'ar',
   tr: 'tr',
 } as const;
+
+export type UsersControllerSearchParams = {
+/**
+ * Display name to search for
+ */
+q: string;
+};
 
 export type UsersControllerPublicProfileParams = {
 lang?: UsersControllerPublicProfileLang;

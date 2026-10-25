@@ -46,7 +46,10 @@ describe('ParticipationService', () => {
       {} as EventsService,
     );
 
-    await expect(service.joinCommunity(user, 'community')).resolves.toEqual({ status: 'ACTIVE', messagingSyncPending: false });
+    await expect(service.joinCommunity(user, 'community')).resolves.toEqual({
+      status: 'ACTIVE',
+      messagingSyncPending: false,
+    });
     expect(tx.select).toHaveBeenCalledTimes(2);
     expect(tx.update).not.toHaveBeenCalled();
     expect(tx.insert).not.toHaveBeenCalled();
@@ -80,7 +83,10 @@ describe('ParticipationService', () => {
       {} as EventsService,
     );
 
-    await expect(service.registerForEvent(user, 'event')).resolves.toEqual({ status: 'ACCEPTED', messagingSyncPending: false });
+    await expect(service.registerForEvent(user, 'event')).resolves.toEqual({
+      status: 'ACCEPTED',
+      messagingSyncPending: false,
+    });
     expect(tx.select).toHaveBeenCalledTimes(2);
     expect(tx.update).not.toHaveBeenCalled();
     expect(tx.insert).not.toHaveBeenCalled();
@@ -143,7 +149,10 @@ describe('ParticipationService', () => {
       insert: vi.fn(() => ({
         values: vi.fn((value: unknown) => {
           transitions.push(value);
-          return Promise.resolve([]);
+          return {
+            returning: vi.fn().mockResolvedValue([{ id: 'transition' }]),
+            then: (resolve: (value: unknown[]) => unknown) => Promise.resolve([]).then(resolve),
+          };
         }),
       })),
     };
@@ -156,7 +165,10 @@ describe('ParticipationService', () => {
       {} as EventsService,
     );
 
-    await expect(service.leaveCommunity(user, 'community')).resolves.toEqual({ status: 'LEFT', messagingSyncPending: false });
+    await expect(service.leaveCommunity(user, 'community')).resolves.toEqual({
+      status: 'LEFT',
+      messagingSyncPending: false,
+    });
     expect(changes).toEqual([
       { status: 'LEFT', updatedAt: expect.any(Date) },
       { status: 'ACTIVE', updatedAt: expect.any(Date) },

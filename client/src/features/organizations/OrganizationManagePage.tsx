@@ -27,6 +27,7 @@ import { ApiError } from '@/api/fetcher';
 import { QueryError } from '@/components/feedback/QueryError';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { Field } from '@/components/ui/Field';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
@@ -104,6 +105,7 @@ export function OrganizationManagePage(): React.JSX.Element {
   const [transferError, setTransferError] = useState('');
   const [verificationNote, setVerificationNote] = useState('');
   const [verificationError, setVerificationError] = useState('');
+  const { confirm, dialog } = useConfirm();
 
   useHead({ title: t('manageOrganization') });
 
@@ -178,7 +180,15 @@ export function OrganizationManagePage(): React.JSX.Element {
   };
 
   const revoke = async (invitationId: string): Promise<void> => {
-    if (!window.confirm(t('confirmRevokeInvitation'))) return;
+    if (
+      !(await confirm({
+        title: t('revokeInvitation'),
+        description: t('confirmRevokeInvitation'),
+        confirmLabel: t('revokeInvitation'),
+        destructive: true,
+      }))
+    )
+      return;
     try {
       await revokeInvitation.mutateAsync({ id: organization.id, invitationId });
       toast.success(t('organizationInvitationRevoked'));
@@ -191,7 +201,15 @@ export function OrganizationManagePage(): React.JSX.Element {
   };
 
   const remove = async (userId: string): Promise<void> => {
-    if (!window.confirm(t('confirmRemoveAdmin'))) return;
+    if (
+      !(await confirm({
+        title: t('removeAdmin'),
+        description: t('confirmRemoveAdmin'),
+        confirmLabel: t('removeAdmin'),
+        destructive: true,
+      }))
+    )
+      return;
     try {
       await removeAdmin.mutateAsync({ id: organization.id, userId });
       toast.success(t('organizationAdminRemoved'));
@@ -212,11 +230,14 @@ export function OrganizationManagePage(): React.JSX.Element {
       return;
     }
     if (
-      !window.confirm(
-        t('confirmOwnershipTransfer', {
+      !(await confirm({
+        title: t('organizationTransferOwnership'),
+        description: t('confirmOwnershipTransfer', {
           name: target.displayName ?? t('organizationManagerUnnamed'),
         }),
-      )
+        confirmLabel: t('organizationTransferOwnership'),
+        destructive: true,
+      }))
     )
       return;
     try {
@@ -275,7 +296,7 @@ export function OrganizationManagePage(): React.JSX.Element {
   return (
     <section className="mx-auto grid max-w-4xl gap-6">
       <Link
-        className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-text-muted transition-colors hover:text-text"
+        className="inline-flex min-h-11 w-fit items-center gap-1.5 text-sm font-medium text-text-muted transition-colors hover:text-text"
         to={`/organizations/${organization.slug}`}
       >
         <ArrowLeft aria-hidden="true" className="size-4 rtl:rotate-180" />
@@ -327,6 +348,7 @@ export function OrganizationManagePage(): React.JSX.Element {
                 {t('organizationVerificationPendingSince', {
                   date: new Date(latestVerification.createdAt).toLocaleDateString(i18n.language, {
                     dateStyle: 'medium',
+                    timeZone: 'Europe/Istanbul',
                   }),
                 })}
               </p>
@@ -559,6 +581,7 @@ export function OrganizationManagePage(): React.JSX.Element {
                         {t('organizationInvitationExpires', {
                           date: new Date(invitation.expiresAt).toLocaleDateString(i18n.language, {
                             dateStyle: 'medium',
+                            timeZone: 'Europe/Istanbul',
                           }),
                         })}
                       </p>
@@ -588,6 +611,7 @@ export function OrganizationManagePage(): React.JSX.Element {
           {t('organizationAdminsOwnerOnly')}
         </p>
       )}
+      {dialog}
     </section>
   );
 }

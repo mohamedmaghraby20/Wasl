@@ -423,6 +423,55 @@ export const notificationEmailDeliveries = pgTable(
   ],
 ).enableRLS();
 
+export const moderationReports = pgTable(
+  'moderation_reports',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    reporterUserId: uuid('reporter_user_id').notNull().references(() => users.id, { onDelete: 'restrict' }),
+    targetType: text('target_type').notNull(),
+    targetId: text('target_id').notNull(),
+    reason: text('reason').notNull(),
+    status: text('status').notNull().default('OPEN'),
+    decidedByUserId: uuid('decided_by_user_id').references(() => users.id, { onDelete: 'restrict' }),
+    decisionNote: text('decision_note'),
+    decidedAt: timestamp('decided_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index('moderation_reports_status_created_idx').on(table.status, table.createdAt),
+    index('moderation_reports_reporter_created_idx').on(table.reporterUserId, table.createdAt),
+    index('moderation_reports_target_idx').on(table.targetType, table.targetId),
+    index('moderation_reports_decider_idx').on(table.decidedByUserId),
+    check('moderation_reports_target_type_check', sql`${table.targetType} in ('user', 'community', 'event', 'organization', 'post')`),
+    check('moderation_reports_target_id_length', sql`char_length(${table.targetId}) between 1 and 160`),
+    check('moderation_reports_reason_length', sql`char_length(${table.reason}) between 1 and 2000`),
+    check('moderation_reports_status_check', sql`${table.status} in ('OPEN', 'ACTIONED', 'DISMISSED')`),
+    check('moderation_reports_decision_note_length', sql`${table.decisionNote} is null or char_length(${table.decisionNote}) <= 2000`),
+    check('moderation_reports_decision_check', sql`(${table.status} = 'OPEN' and ${table.decidedByUserId} is null and ${table.decidedAt} is null and ${table.decisionNote} is null) or (${table.status} <> 'OPEN' and ${table.decidedByUserId} is not null and ${table.decidedAt} is not null)`),
+  ],
+).enableRLS();
+
+export const resourceModerators = pgTable(
+  'resource_moderators',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    communityId: text('community_id').references(() => communities.id, { onDelete: 'restrict' }),
+    eventId: text('event_id').references(() => events.id, { onDelete: 'restrict' }),
+    userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'restrict' }),
+    assignedByUserId: uuid('assigned_by_user_id').notNull().references(() => users.id, { onDelete: 'restrict' }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex('resource_moderators_community_user_unique').on(table.communityId, table.userId),
+    uniqueIndex('resource_moderators_event_user_unique').on(table.eventId, table.userId),
+    index('resource_moderators_event_idx').on(table.eventId),
+    index('resource_moderators_user_idx').on(table.userId),
+    index('resource_moderators_assigner_idx').on(table.assignedByUserId),
+    check('resource_moderators_scope_check', sql`(${table.communityId} is not null and ${table.eventId} is null) or (${table.communityId} is null and ${table.eventId} is not null)`),
+    check('resource_moderators_not_self', sql`${table.userId} <> ${table.assignedByUserId}`),
+  ],
+).enableRLS();
+
 export const organizationVerificationStatus = pgEnum('organization_verification_status', [
   'PENDING',
   'VERIFIED',

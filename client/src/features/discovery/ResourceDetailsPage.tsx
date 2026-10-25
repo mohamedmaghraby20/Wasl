@@ -35,6 +35,7 @@ import {
 import { ApiError } from '@/api/fetcher';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { QueryError } from '@/components/feedback/QueryError';
 import {
@@ -49,6 +50,8 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { OrganizerParticipationPanel } from '@/features/participation/OrganizerParticipationPanel';
 import { EventDiscussion } from '@/features/discussions/EventDiscussion';
 import { CommunityTopics } from '@/features/discussions/CommunityTopics';
+import { ReportAction } from '@/features/moderation/ReportAction';
+import { useModeratorAssignmentsControllerPermissions } from '@/api/generated/moderation/moderation';
 import {
   useMessagingControllerCommunity,
   useMessagingControllerEvent,
@@ -74,6 +77,9 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
   );
   const query = kind === 'communities' ? community : event;
   const item = query.data;
+  const scopedPermissions = useModeratorAssignmentsControllerPermissions(kind === 'events' ? 'event' : 'community', item?.id ?? '', {
+    query: { enabled: Boolean(user && item) },
+  });
   const currentUser = useUsersControllerCurrent(
     { lang: language },
     { query: { enabled: Boolean(user) } },
@@ -108,6 +114,7 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
   const openCommunityChat = useMessagingControllerCommunity();
   const openEventChat = useMessagingControllerEvent();
   const [chatError, setChatError] = useState(false);
+  const { confirm, dialog } = useConfirm();
   const resourceName = t(kind === 'events' ? 'event' : 'community').toLocaleLowerCase(
     i18n.language,
   );
@@ -223,7 +230,15 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
         ? `/organizations/${communityItem.organizationSlug}`
         : undefined;
   const archive = async (): Promise<void> => {
-    if (!window.confirm(t('confirmArchiveCommunity'))) return;
+    if (
+      !(await confirm({
+        title: t('archiveCommunity'),
+        description: t('confirmArchiveCommunity'),
+        confirmLabel: t('archiveCommunity'),
+        destructive: true,
+      }))
+    )
+      return;
     try {
       await archiveCommunity.mutateAsync({ id: item.id });
       await queryClient.invalidateQueries();
@@ -234,7 +249,15 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
     }
   };
   const cancel = async (): Promise<void> => {
-    if (!window.confirm(t('confirmCancelEvent'))) return;
+    if (
+      !(await confirm({
+        title: t('cancelEventAction'),
+        description: t('confirmCancelEvent'),
+        confirmLabel: t('cancelEventAction'),
+        destructive: true,
+      }))
+    )
+      return;
     try {
       await cancelEvent.mutateAsync({ id: item.id });
       await queryClient.invalidateQueries();
@@ -258,7 +281,15 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
           participationStatus === 'PENDING' ||
           participationStatus === 'WAITLISTED'
         ) {
-          if (!window.confirm(t('confirmLeaveCommunity'))) return;
+          if (
+            !(await confirm({
+              title: t('leaveCommunity'),
+              description: t('confirmLeaveCommunity'),
+              confirmLabel: t('leaveCommunity'),
+              destructive: true,
+            }))
+          )
+            return;
           messagingSyncPending = Boolean(
             (await leaveCommunity.mutateAsync({ id: item.id })).messagingSyncPending,
           );
@@ -272,7 +303,15 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
         participationStatus === 'PENDING' ||
         participationStatus === 'WAITLISTED'
       ) {
-        if (!window.confirm(t('confirmCancelRegistration'))) return;
+        if (
+          !(await confirm({
+            title: t('cancelRegistration'),
+            description: t('confirmCancelRegistration'),
+            confirmLabel: t('cancelRegistration'),
+            destructive: true,
+          }))
+        )
+          return;
         messagingSyncPending = Boolean(
           (await cancelRegistration.mutateAsync({ id: item.id })).messagingSyncPending,
         );
@@ -319,7 +358,7 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
     <article className="mx-auto grid max-w-(--container-reading) gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Link
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-text-muted transition-colors hover:text-text"
+          className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-text-muted transition-colors hover:text-text"
           to={`/${kind}`}
         >
           <ArrowLeft aria-hidden="true" className="size-4 rtl:rotate-180" />
@@ -329,12 +368,13 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
           <Share2 aria-hidden="true" />
           {t('copyShare')}
         </Button>
+        <ReportAction targetType={kind === 'events' ? 'event' : 'community'} targetId={item.id} />
       </div>
 
       <header className="grid gap-5 rounded-(--shape-radius-card) border border-border bg-card p-6 shadow-sm sm:p-8">
         <div className="grid gap-3">
           {item.categories.length > 0 ? (
-            <ul aria-label={t('allCategories')} className="flex flex-wrap gap-1.5">
+            <ul aria-label={t('categoriesLabel')} className="flex flex-wrap gap-1.5">
               {item.categories.map((category) => (
                 <li key={category.id}>
                   <Badge variant="primary">{localizedName(category, i18n.language)}</Badge>
@@ -388,12 +428,15 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
       </header>
 
       <section className="grid gap-3 sm:grid-cols-3">
-        <div className="flex items-start gap-3 rounded-(--shape-radius-card) border border-border bg-card p-4">
-          {eventItem?.online ? (
-            <Video aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-text-subtle" />
-          ) : (
-            <MapPin aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-text-subtle" />
-          )}
+        <div className="grid content-start gap-1 rounded-(--shape-radius-card) border border-border bg-card p-4">
+          <p className="inline-flex items-center gap-1.5 text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-text-subtle">
+            {eventItem?.online ? (
+              <Video aria-hidden="true" className="size-3.5 shrink-0" />
+            ) : (
+              <MapPin aria-hidden="true" className="size-3.5 shrink-0" />
+            )}
+            {eventItem ? t('detailLocation') : t('detailCity')}
+          </p>
           <p className="text-sm font-medium text-text">
             {eventItem?.online
               ? t('online')
@@ -403,18 +446,22 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
           </p>
         </div>
         {!eventItem?.cancelled ? (
-          <div className="flex items-start gap-3 rounded-(--shape-radius-card) border border-border bg-card p-4">
-            <Ticket aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-text-subtle" />
-            <p className="text-sm font-medium text-text">
-              {t('admission', { mode: t(admissionLabel) })}
+          <div className="grid content-start gap-1 rounded-(--shape-radius-card) border border-border bg-card p-4">
+            <p className="inline-flex items-center gap-1.5 text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-text-subtle">
+              <Ticket aria-hidden="true" className="size-3.5 shrink-0" />
+              {t('detailAdmission')}
             </p>
+            <p className="text-sm font-medium text-text">{t(admissionLabel)}</p>
           </div>
         ) : null}
         {item.capacity !== undefined && item.capacity !== null ? (
-          <div className="flex items-start gap-3 rounded-(--shape-radius-card) border border-border bg-card p-4">
-            <UsersRound aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-text-subtle" />
+          <div className="grid content-start gap-1 rounded-(--shape-radius-card) border border-border bg-card p-4">
+            <p className="inline-flex items-center gap-1.5 text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-text-subtle">
+              <UsersRound aria-hidden="true" className="size-3.5 shrink-0" />
+              {t('capacityLabel')}
+            </p>
             <p className="text-sm font-medium text-text">
-              {t('capacity', { capacity: item.capacity })}
+              {t('capacityValue', { capacity: item.capacity })}
             </p>
           </div>
         ) : null}
@@ -468,7 +515,7 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
         !(eventItem && new Date(eventItem.startsAt).getTime() <= Date.now()) && (
           <section
             aria-live="polite"
-            className="grid gap-3 rounded-(--shape-radius-card) border border-border bg-card p-5"
+            className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3 rounded-(--shape-radius-card) border border-border bg-card p-4"
           >
             {user ? (
               participationPending ? (
@@ -553,9 +600,11 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
           )}
           returnTo={returnTo}
           viewerId={currentUser.data?.id}
-          moderator={Boolean(isManager)}
+          moderator={Boolean(isManager || scopedPermissions.data?.moderator)}
+          canEditOthers={Boolean(isManager)}
         />
       )}
+      {dialog}
     </article>
   );
 }

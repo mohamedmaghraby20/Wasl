@@ -12,9 +12,11 @@ import {
   useDiscussionsControllerUpdate,
 } from '@/api/generated/discussions/discussions';
 import { Button } from '@/components/ui/Button';
+import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { Field } from '@/components/ui/Field';
 import { Textarea } from '@/components/ui/Textarea';
 import { QueryError } from '@/components/feedback/QueryError';
+import { ReportAction } from '@/features/moderation/ReportAction';
 
 export function EventDiscussion({
   eventId,
@@ -23,6 +25,7 @@ export function EventDiscussion({
   returnTo = '',
   viewerId,
   moderator = false,
+  canEditOthers = false,
 }: {
   eventId: string;
   signedIn?: boolean;
@@ -30,6 +33,7 @@ export function EventDiscussion({
   returnTo?: string;
   viewerId?: string | undefined;
   moderator?: boolean;
+  canEditOthers?: boolean;
 }): React.JSX.Element {
   const { t, i18n } = useTranslation();
   const [page, setPage] = useState(1);
@@ -38,6 +42,7 @@ export function EventDiscussion({
   const [error, setError] = useState(false);
   const [posted, setPosted] = useState(false);
   const [editing, setEditing] = useState<{ id: string; body: string } | null>(null);
+  const { confirm, dialog } = useConfirm();
   const queryClient = useQueryClient();
   const query = useDiscussionsControllerListEventPosts(eventId, { page });
   const createPost = useDiscussionsControllerCreateEventPost();
@@ -65,7 +70,15 @@ export function EventDiscussion({
     }
   };
   const remove = async (postId: string) => {
-    if (!window.confirm(t('confirmRemoveComment'))) return;
+    if (
+      !(await confirm({
+        title: t('removeComment'),
+        description: t('confirmRemoveComment'),
+        confirmLabel: t('removeComment'),
+        destructive: true,
+      }))
+    )
+      return;
     setError(false);
     try {
       await removePost.mutateAsync({ id: eventId, postId });
@@ -75,7 +88,14 @@ export function EventDiscussion({
     }
   };
   const close = async () => {
-    if (!window.confirm(t('confirmCloseDiscussion'))) return;
+    if (
+      !(await confirm({
+        title: t('closeDiscussion'),
+        description: t('confirmCloseDiscussion'),
+        confirmLabel: t('closeDiscussion'),
+      }))
+    )
+      return;
     setError(false);
     try {
       await closeDiscussion.mutateAsync({ id: eventId });
@@ -192,7 +212,7 @@ export function EventDiscussion({
                 ) : null}
                 {(moderator || viewerId === post.authorId) && post.body ? (
                   <div className="flex flex-wrap gap-2">
-                    {moderator || canPost ? (
+                    {canEditOthers || (viewerId === post.authorId && canPost) ? (
                       <Button
                         onClick={() => setEditing({ id: post.id, body: post.body! })}
                         size="sm"
@@ -213,6 +233,7 @@ export function EventDiscussion({
                     </Button>
                   </div>
                 ) : null}
+                {post.body && viewerId !== post.authorId ? <ReportAction targetType="post" targetId={post.id} /> : null}
                 {canPost && !post.parentId && post.body ? (
                   <Button
                     className="w-fit"
@@ -293,9 +314,7 @@ export function EventDiscussion({
             {t('postEventComment')}
           </Button>
         </form>
-      ) : query.data?.closed ? (
-        <p className="text-sm text-text-muted">{t('discussionClosed')}</p>
-      ) : signedIn ? (
+      ) : query.data?.closed ? null : signedIn ? (
         <p className="text-sm text-text-muted">{t('discussionPostingEligibility')}</p>
       ) : (
         <Link
@@ -305,6 +324,7 @@ export function EventDiscussion({
           {t('signInToComment')}
         </Link>
       )}
+      {dialog}
     </section>
   );
 }

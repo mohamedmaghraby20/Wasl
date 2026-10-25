@@ -4,8 +4,12 @@ import type { FastifyRequest } from 'fastify';
 import { describe, expect, it } from 'vitest';
 import { PlatformAdminGuard } from './platform-admin.guard';
 
-function contextFor(userId?: string): ExecutionContext {
-  const request = { user: userId ? { id: userId, authUserId: 'auth-id' } : undefined };
+function contextFor(userId?: string, aal = 'aal2'): ExecutionContext {
+  const claims = Buffer.from(JSON.stringify({ aal })).toString('base64url');
+  const request = {
+    user: userId ? { id: userId, authUserId: 'auth-id' } : undefined,
+    headers: { authorization: `Bearer header.${claims}.signature` },
+  };
   return {
     switchToHttp: () => ({ getRequest: () => request as FastifyRequest }),
   } as unknown as ExecutionContext;
@@ -29,6 +33,15 @@ describe('PlatformAdminGuard', () => {
       ForbiddenException,
     );
     expect(() => guardFor('').canActivate(contextFor('admin-a'))).toThrow(ForbiddenException);
+  });
+
+  it('requires second-factor assurance even for an allowlisted user', () => {
+    expect(() => guardFor('admin-a').canActivate(contextFor('admin-a', 'aal1'))).toThrow(
+      ForbiddenException,
+    );
+    expect(() => guardFor('admin-a').canActivate(contextFor('admin-a', ''))).toThrow(
+      ForbiddenException,
+    );
   });
 
   it('rejects a request without an authenticated Wasl user', () => {

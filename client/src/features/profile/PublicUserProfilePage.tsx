@@ -11,6 +11,7 @@ import { languageCode } from '@/features/resources/resource-utils';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { ReportAction } from '@/features/moderation/ReportAction';
 
 export function PublicUserProfilePage(): React.JSX.Element {
   const { t, i18n } = useTranslation();
@@ -75,6 +76,7 @@ export function PublicUserProfilePage(): React.JSX.Element {
             </Link>
           </Button>
         ) : null}
+        {currentUser.data?.id !== id ? <ReportAction targetType="user" targetId={id} /> : null}
       </header>
 
       <div className="grid gap-5 rounded-(--shape-radius-card) border border-border bg-card p-6 shadow-xs">

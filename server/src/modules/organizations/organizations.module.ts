@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createClient } from '@supabase/supabase-js';
 import { AuthModule } from '../auth/auth.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 import { OrganizationsController } from './organizations.controller';
 import {
   ORGANIZATION_STORAGE_CLIENT,
@@ -10,7 +11,7 @@ import {
 } from './organizations.service';
 
 @Module({
-  imports: [AuthModule],
+  imports: [AuthModule, NotificationsModule],
   controllers: [OrganizationsController],
   providers: [
     OrganizationsService,

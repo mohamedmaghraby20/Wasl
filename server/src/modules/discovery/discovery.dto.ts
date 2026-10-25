@@ -51,10 +51,14 @@ export class CommunityPageDto {
   @ApiProperty({ type: [CommunityPublicDto] }) items!: CommunityPublicDto[];
   @ApiProperty() page!: number;
   @ApiProperty() pageSize!: number;
+  @ApiProperty() total!: number;
+  @ApiProperty() hasMore!: boolean;
 }
 
 export class EventPageDto {
   @ApiProperty({ type: [EventPublicDto] }) items!: EventPublicDto[];
   @ApiProperty() page!: number;
   @ApiProperty() pageSize!: number;
+  @ApiProperty() total!: number;
+  @ApiProperty() hasMore!: boolean;
 }

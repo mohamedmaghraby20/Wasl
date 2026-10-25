@@ -14,7 +14,12 @@ import type { FastifyRequest } from 'fastify';
 import { getAuthenticatedUser } from '../auth/authenticated-user';
 import { SupabaseAuthGuard } from '../auth/supabase-auth.guard';
 import { UsersService } from './users.service';
-import { CurrentUserDto, PublicUserProfileDto, UpdateProfileDto } from './users.dto';
+import {
+  CurrentUserDto,
+  PublicUserProfileDto,
+  UpdateProfileDto,
+  UserSearchResultDto,
+} from './users.dto';
 
 @Controller('users')
 @ApiTags('users')
@@ -47,6 +52,14 @@ export class UsersController {
       input.avatarPath === undefined ? oldAvatar : input.avatarPath,
     );
     return updated;
+  }
+
+  @Get('search')
+  @UseGuards(SupabaseAuthGuard)
+  @ApiOkResponse({ type: [UserSearchResultDto] })
+  @ApiQuery({ name: 'q', required: true, description: 'Display name to search for' })
+  search(@Req() request: FastifyRequest, @Query('q') query: string) {
+    return this.users.search(getAuthenticatedUser(request), query);
   }
 
   @Get(':id')

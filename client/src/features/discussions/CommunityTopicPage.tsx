@@ -17,6 +17,7 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { useUsersControllerCurrent } from '@/api/generated/users/users';
 import { ApiError } from '@/api/fetcher';
 import { Button } from '@/components/ui/Button';
+import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { Field } from '@/components/ui/Field';
 import { Textarea } from '@/components/ui/Textarea';
 import { QueryError } from '@/components/feedback/QueryError';
@@ -32,6 +33,7 @@ export function CommunityTopicPage(): React.JSX.Element {
   const [error, setError] = useState(false);
   const [posted, setPosted] = useState(false);
   const [editing, setEditing] = useState<{ id: string; body: string } | null>(null);
+  const { confirm, dialog } = useConfirm();
   const queryClient = useQueryClient();
   const query = useCommunityDiscussionsControllerDetails(id, topicId, { page });
   const membership = useParticipationControllerCommunityStatus(id, {
@@ -52,7 +54,14 @@ export function CommunityTopicPage(): React.JSX.Element {
       queryKey: getCommunityDiscussionsControllerDetailsQueryKey(id, topicId).slice(0, 1),
     });
   const closeTopic = async () => {
-    if (!window.confirm(t('confirmCloseTopic'))) return;
+    if (
+      !(await confirm({
+        title: t('closeTopic'),
+        description: t('confirmCloseTopic'),
+        confirmLabel: t('closeTopic'),
+      }))
+    )
+      return;
     try {
       await close.mutateAsync({ id, topicId });
       await refresh();
@@ -76,7 +85,15 @@ export function CommunityTopicPage(): React.JSX.Element {
     }
   };
   const removePost = async (postId: string) => {
-    if (!window.confirm(t('confirmRemoveComment'))) return;
+    if (
+      !(await confirm({
+        title: t('removeComment'),
+        description: t('confirmRemoveComment'),
+        confirmLabel: t('removeComment'),
+        destructive: true,
+      }))
+    )
+      return;
     try {
       await remove.mutateAsync({ id, topicId, postId });
       await refresh();
@@ -129,7 +146,7 @@ export function CommunityTopicPage(): React.JSX.Element {
   return (
     <article className="mx-auto grid max-w-(--container-reading) gap-6">
       <Link
-        className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-text-muted transition-colors hover:text-text"
+        className="inline-flex min-h-11 w-fit items-center gap-1.5 text-sm font-medium text-text-muted transition-colors hover:text-text"
         to={`/communities/${id}`}
       >
         <ArrowLeft aria-hidden="true" className="size-4 rtl:rotate-180" />
@@ -307,6 +324,8 @@ export function CommunityTopicPage(): React.JSX.Element {
             {t('postEventComment')}
           </Button>
         </form>
+      ) : query.data?.archived ? (
+        <p className="text-sm text-text-muted">{t('discussionClosed')}</p>
       ) : (
         <p className="text-sm text-text-muted">{t('communityPostingEligibility')}</p>
       )}
@@ -315,6 +334,7 @@ export function CommunityTopicPage(): React.JSX.Element {
           {t('discussionPostError')}
         </p>
       ) : null}
+      {dialog}
     </article>
   );
 }

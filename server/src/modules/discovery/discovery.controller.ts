@@ -73,32 +73,43 @@ export class DiscoveryController {
             .where(eq(communityCategories.categoryId, filters.category)),
         ),
       );
-    const rows = await db
-      .select({
-        id: communities.id,
-        slug: communities.slug,
-        name: communities.name,
-        description: communities.description,
-        admissionMode: communities.admissionMode,
-        capacity: communities.capacity,
-        hostName: sql<string>`COALESCE(${organizations.name}, ${communities.hostName})`,
-        ownerType: communities.ownerType,
-        ownerId: communities.ownerId,
-        organizationSlug: organizations.slug,
-        cityId: cities.id,
-        cityName: this.cityName(query.lang),
-      })
-      .from(communities)
-      .innerJoin(cities, eq(communities.cityId, cities.id))
-      .leftJoin(
-        organizations,
-        sql`${organizations.id}::text = ${communities.ownerId} and ${communities.ownerType} = 'organization'`,
-      )
-      .where(and(eq(communities.archived, false), ...filters.conditions))
-      .orderBy(desc(communities.createdAt))
-      .limit(pageSize)
-      .offset((page - 1) * pageSize);
-    return { items: await this.addCommunityCategories(rows), page, pageSize };
+    const where = and(eq(communities.archived, false), ...filters.conditions);
+    const [rows, countRows] = await Promise.all([
+      db
+        .select({
+          id: communities.id,
+          slug: communities.slug,
+          name: communities.name,
+          description: communities.description,
+          admissionMode: communities.admissionMode,
+          capacity: communities.capacity,
+          hostName: sql<string>`COALESCE(${organizations.name}, ${communities.hostName})`,
+          ownerType: communities.ownerType,
+          ownerId: communities.ownerId,
+          organizationSlug: organizations.slug,
+          cityId: cities.id,
+          cityName: this.cityName(query.lang),
+        })
+        .from(communities)
+        .innerJoin(cities, eq(communities.cityId, cities.id))
+        .leftJoin(
+          organizations,
+          sql`${organizations.id}::text = ${communities.ownerId} and ${communities.ownerType} = 'organization'`,
+        )
+        .where(where)
+        .orderBy(desc(communities.createdAt))
+        .limit(pageSize)
+        .offset((page - 1) * pageSize),
+      db.select({ total: sql<number>`count(*)::int` }).from(communities).where(where),
+    ]);
+    const total = Number(countRows[0]?.total ?? 0);
+    return {
+      items: await this.addCommunityCategories(rows),
+      page,
+      pageSize,
+      total,
+      hasMore: page * pageSize < total,
+    };
   }
 
   @Get('events')
@@ -121,38 +132,49 @@ export class DiscoveryController {
       );
     if (query.from) filters.conditions.push(gte(events.startsAt, this.date(query.from)));
     if (query.to) filters.conditions.push(lt(events.startsAt, this.date(query.to, true)));
-    const rows = await db
-      .select({
-        id: events.id,
-        slug: events.slug,
-        title: events.title,
-        description: events.description,
-        visibility: events.visibility,
-        hostName: sql<string>`COALESCE(${organizations.name}, ${events.hostName})`,
-        hostType: events.hostType,
-        hostId: events.hostId,
-        organizationSlug: organizations.slug,
-        online: events.online,
-        locationName: events.locationName,
-        startsAt: events.startsAt,
-        endsAt: events.endsAt,
-        cancelled: events.cancelled,
-        capacity: events.capacity,
-        admissionMode: events.admissionMode,
-        cityId: cities.id,
-        cityName: this.cityName(query.lang),
-      })
-      .from(events)
-      .leftJoin(cities, eq(cities.id, events.cityId))
-      .leftJoin(
-        organizations,
-        sql`${organizations.id}::text = ${events.hostId} and ${events.hostType} = 'organization'`,
-      )
-      .where(and(eq(events.visibility, 'public'), ...filters.conditions))
-      .orderBy(asc(events.startsAt))
-      .limit(pageSize)
-      .offset((page - 1) * pageSize);
-    return { items: await this.addEventCategories(rows), page, pageSize };
+    const where = and(eq(events.visibility, 'public'), ...filters.conditions);
+    const [rows, countRows] = await Promise.all([
+      db
+        .select({
+          id: events.id,
+          slug: events.slug,
+          title: events.title,
+          description: events.description,
+          visibility: events.visibility,
+          hostName: sql<string>`COALESCE(${organizations.name}, ${events.hostName})`,
+          hostType: events.hostType,
+          hostId: events.hostId,
+          organizationSlug: organizations.slug,
+          online: events.online,
+          locationName: events.locationName,
+          startsAt: events.startsAt,
+          endsAt: events.endsAt,
+          cancelled: events.cancelled,
+          capacity: events.capacity,
+          admissionMode: events.admissionMode,
+          cityId: cities.id,
+          cityName: this.cityName(query.lang),
+        })
+        .from(events)
+        .leftJoin(cities, eq(cities.id, events.cityId))
+        .leftJoin(
+          organizations,
+          sql`${organizations.id}::text = ${events.hostId} and ${events.hostType} = 'organization'`,
+        )
+        .where(where)
+        .orderBy(asc(events.startsAt))
+        .limit(pageSize)
+        .offset((page - 1) * pageSize),
+      db.select({ total: sql<number>`count(*)::int` }).from(events).where(where),
+    ]);
+    const total = Number(countRows[0]?.total ?? 0);
+    return {
+      items: await this.addEventCategories(rows),
+      page,
+      pageSize,
+      total,
+      hasMore: page * pageSize < total,
+    };
   }
 
   @Get('communities/:id')

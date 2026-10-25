@@ -18,7 +18,7 @@ Wasl is a bilingual (Arabic/English) community and event discovery and participa
 | 7. Notifications, moderation, privacy and compliance |        132–149 | In progress | [phase-7.md](phase-7.md); Task 132 complete |
 | 8. Hardening and launch                              |        150–164 | Not started | Requirements are in `IMPLEMENTATION_GUIDE.md` |
 
-**Next work:** Continue Phase 7 at Task 133 (in-app notification creation). Task 132's notification and delivery schema is complete; see [phase-7.md](phase-7.md). Execution is sequential by the owner's instruction; do not delegate unless the owner asks to resume multi-agent work.
+**Next work:** Review the Phase 7 implementation (Tasks 133–146) and address the Phase 7 legal/privacy blockers (Tasks 147–149). See [phase-7.md](phase-7.md) for implementation and verification details. Execution is sequential by the owner's instruction; do not delegate unless the owner asks to resume multi-agent work.
 
 ## Completed work
 
@@ -43,6 +43,7 @@ Wasl is a bilingual (Arabic/English) community and event discovery and participa
 - **Phase 6, Tasks 113-131:** added native PostgreSQL discussions (`discussion_threads`, `discussion_posts`) with one Event thread per Event, Community topics, one-level replies, author edit/removal, manager moderation, explicit close, and server-enforced eligibility. Added Stream-backed Community and Event chat with stable Wasl-to-Stream identity mapping, server-only credentials, channel-scoped moderator roles, fail-closed token issuance behind `STREAM_PERMISSIONS_VERIFIED`, durable desired-versus-provider membership reconciliation with a 30-second retry worker, direct messages, blocking, and reporting. Migrations `0013`-`0016` enable RLS and revoke direct client grants and were applied to the configured development database. Verification: workspace tests passed with 163 tests (109 server across 19 files, 54 client across 19 files); `test:discussions:postgres`, `test:messaging:postgres`, and live `test:messaging:stream` passed; 3 Chromium E2E tests passed; typecheck, lint, build and `db:generate` passed. The entry chunk is 418.38 kB with no circular-chunk warnings; the lazy `MessagesPage` chunk is 1,755.63 kB because it carries the Stream SDK, and its size warning is accepted. Full details are in [phase-6.md](phase-6.md).
 
 - **Phase 7, Task 132:** created notifications and email-delivery persistence with recipient/event-key idempotency, read and retry state, private RLS and revoked direct client grants. Generated migration `0017_spotty_greymalkin.sql` was applied to the configured development database. Focused schema tests, rolled-back PostgreSQL integration check, server typecheck/lint, formatting and no-pending-schema-diff check passed. Full evidence is in [phase-7.md](phase-7.md).
+- **Phase 7 ongoing:** Tasks 133–146 have implementation (notification delivery and UI, reporting, contextual moderators, platform-admin MFA/report decisions and review console). Migrations `0018`–`0020` were applied to the configured development database; focused tests and integration checks are recorded in [phase-7.md](phase-7.md). Resend credentials and platform-admin IDs are not configured locally; no live email or signed-in admin browser check was possible. Tasks 147–149 remain blocked on approved launch policy and qualified legal review, not just code.
 
 The phase records are the detailed evidence. Their checks are historical results recorded at completion; they were not rerun while preparing this handoff.
 
@@ -51,7 +52,7 @@ The phase records are the detailed evidence. Their checks are historical results
 - `client/`: React 19 + Vite SPA, React Router, TanStack Query, bilingual UI and generated Orval API clients.
 - `server/`: NestJS on Fastify. Feature modules own endpoints, validation, authorization, business logic and persistence. Supabase Auth verifies identity; it does not replace Wasl’s resource-scoped authorization.
 - `shared/`: cross-package contracts and types.
-- `server/src/db/schema.ts`: Drizzle database schema. `server/drizzle/`: ordered SQL migrations. The current migration chain contains `0000` through `0017`.
+- `server/src/db/schema.ts`: Drizzle database schema. `server/drizzle/`: ordered SQL migrations. The migration chain contains `0000` through `0020`.
 - Typical read: browser route → generated API client → same-origin `/api` → Nest controller/service → PostgreSQL → response rendered by the client.
 - Typical authenticated action: browser obtains Supabase Auth session → sends access token to Nest → Nest verifies token and resolves/provisions the Wasl user → service checks resource-level permission and applies the action/transaction → database state is returned to the UI.
 - Profile photos upload to Supabase Storage from the browser using the public client configuration; the server validates ownership, file type/signature and size before persisting the object path. Privileged keys and database credentials remain server-side.
@@ -62,7 +63,7 @@ Never query PostgreSQL from client code or place authoritative authorization/bus
 
 The configured Supabase project is the **development database used by the local app**, per the owner’s clarification. The phase 2 record and some older setup notes incorrectly call it “production”; treat those labels as stale. No production frontend/API deployment or production hosting URL has been provided, and no deployment has been configured. Do not infer that the connected project is a production target.
 
-Migrations through `0017` were applied to the configured development project; `0013`–`0016` cover Phase 6 discussions and messaging, and `0017` covers Task 132 notification/delivery persistence. `0007_revoke_participation_client_access.sql` revokes direct client-role table access to participation data; the server retains access through its configured database role. Phase 3 reports the `profile-photos` bucket and its owner-scoped upload controls.
+Migrations through `0020` were applied to the configured development project; `0013`–`0016` cover Phase 6 discussions and messaging, `0017` covers notification/delivery persistence, and `0018`–`0020` cover the email queue, reports and moderator assignments. `0007_revoke_participation_client_access.sql` revokes direct client-role table access to participation data; the server retains access through its configured database role. Phase 3 reports the `profile-photos` bucket and its owner-scoped upload controls.
 
 For later schema work, follow the repository’s Drizzle workflow and verify the target before applying changes:
 
@@ -92,9 +93,9 @@ See [phase-3.md](phase-3.md) and [phase-4.md](phase-4.md) for exact scope and ca
 ## Open follow-ups and constraints
 
 - **Phase 5 is complete.** Tasks 96–112 are recorded in [phase-5.md](phase-5.md).
-- **Phase 6 is complete.** Tasks 113–131 are recorded in [phase-6.md](phase-6.md). Phase 7 Task 132 is complete; Task 133 is next.
+- **Phase 6 is complete.** Tasks 113–131 are recorded in [phase-6.md](phase-6.md). Phase 7 Tasks 133–146 have implementations; Tasks 147–149 remain open and release-blocking.
 - **Stream is configured and verified.** `STREAM_API_KEY`, `STREAM_API_SECRET`, and `STREAM_PERMISSIONS_VERIFIED=true` are set in the ignored server `.env`. Live verification on 2026-10-23 confirmed the `messaging` channel type denies non-members reads, joins, and channel creation, that members can read and send, that `channel_moderator` is channel-scoped, and that expired tokens are rejected. The `create-channel` grant was removed from the `user` role because only the server provisions channels. Re-run with `corepack pnpm test:messaging:stream`; it skips without credentials and deletes its temporary users and channel. The signed-in chat surface still has no visual review because it needs a real signed-in Supabase session.
-- **Platform verification access is environment-configured.** `PLATFORM_ADMIN_USER_IDS` is a server-only, comma-separated allowlist of Wasl user IDs. An empty value means no platform administrators, so verification decisions return `403`. This allowlist is the Phase 5 implementation; the Phase 7 admin console and stronger platform-admin security (for example MFA) remain Task 144 work.
+- **Platform verification access is environment-configured.** `PLATFORM_ADMIN_USER_IDS` is a server-only, comma-separated allowlist of Wasl user IDs. An empty value means no platform administrators, so verification decisions return `403`. The Task 144 guard also requires a validated bearer token with `aal2` for platform operations. Admin allowlist and Resend credentials are not configured locally; live operations are unverified.
 - **Supabase Auth hardening:** Phase 3 reports leaked-password protection is disabled. Enable it in the Supabase project’s Auth password-security settings before production. It is a dashboard/Auth configuration item, not a SQL migration; do not claim it was fixed.
 - **Production remains future work:** no production deployment URLs, hosting configuration, or release validation are present. The implementation guide reserves CI/CD, staging and go-live for Phase 8.
 - **Phase 2 stale environment wording:** update that record when convenient so it no longer calls the owner-confirmed development project “production.”

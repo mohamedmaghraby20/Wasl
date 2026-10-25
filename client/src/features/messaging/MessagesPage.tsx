@@ -14,6 +14,7 @@ import './MessagesPage.css';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
+import { useUsersControllerSearch } from '@/api/generated/users/users';
 import {
   useMessagingControllerBlock,
   useMessagingControllerBlockedUsers,
@@ -25,13 +26,15 @@ import {
   messagingControllerConversations,
   getMessagingControllerConversationsQueryKey,
 } from '@/api/generated/messaging/messaging';
-import { MessageSquarePlus } from 'lucide-react';
+import { ArrowLeft, MessageSquarePlus } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Field } from '@/components/ui/Field';
-import { Input } from '@/components/ui/Input';
+import { SearchableSelect } from '@/components/ui/SearchableSelect';
+import { TextPromptDialog } from '@/components/ui/TextPromptDialog';
 import { QueryError } from '@/components/feedback/QueryError';
 import { ApiError } from '@/api/fetcher';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { cn } from '@/lib/cn';
 import { useSearchParams } from 'react-router';
 
 export function MessagesPage(): React.JSX.Element {
@@ -60,6 +63,9 @@ export function MessagesPage(): React.JSX.Element {
   const [channels, setChannels] = useState<StreamChannel[]>([]);
   const [selected, setSelected] = useState<StreamChannel | null>(null);
   const [recipientId, setRecipientId] = useState('');
+  const [recipientLabel, setRecipientLabel] = useState('');
+  const [recipientQuery, setRecipientQuery] = useState('');
+  const [debouncedRecipientQuery, setDebouncedRecipientQuery] = useState('');
   const [status, setStatus] = useState<'connecting' | 'connected' | 'offline' | 'error'>(
     'connecting',
   );
@@ -67,11 +73,34 @@ export function MessagesPage(): React.JSX.Element {
   const [success, setSuccess] = useState(false);
   const [syncPending, setSyncPending] = useState(false);
   const [channelRetry, setChannelRetry] = useState(0);
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportReason, setReportReason] = useState('');
+  const [reportError, setReportError] = useState(false);
+  const people = useUsersControllerSearch(
+    { q: debouncedRecipientQuery },
+    {
+      query: {
+        enabled: Boolean(user) && debouncedRecipientQuery.trim().length >= 2,
+        retry: false,
+      },
+    },
+  );
 
   useEffect(() => {
     const target = searchParams.get('to');
-    if (target) setRecipientId(target);
-  }, [searchParams]);
+    if (target) {
+      setRecipientId(target);
+      setRecipientLabel(t('directConversation'));
+    }
+  }, [searchParams, t]);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(
+      () => setDebouncedRecipientQuery(recipientQuery.trim()),
+      250,
+    );
+    return () => window.clearTimeout(timeout);
+  }, [recipientQuery]);
 
   useEffect(() => {
     if (!user) return;
@@ -209,10 +238,15 @@ export function MessagesPage(): React.JSX.Element {
 
   const startDm = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!recipientId) return;
     setError(false);
+    setSuccess(false);
     try {
-      const channel = await createDm.mutateAsync({ data: { recipientUserId: recipientId.trim() } });
+      const channel = await createDm.mutateAsync({ data: { recipientUserId: recipientId } });
       setRecipientId('');
+      setRecipientLabel('');
+      setRecipientQuery('');
+      setDebouncedRecipientQuery('');
       await queryClient.invalidateQueries();
       const ready = await client?.queryChannels(
         {
@@ -237,6 +271,7 @@ export function MessagesPage(): React.JSX.Element {
   const runBlock = async () => {
     if (!otherUserId) return;
     setError(false);
+    setSuccess(false);
     try {
       const result = await block.mutateAsync({ data: { userId: otherUserId } });
       setSyncPending(Boolean(result.syncPending));
@@ -249,6 +284,7 @@ export function MessagesPage(): React.JSX.Element {
   const runUnblock = async (targetId = otherUserId) => {
     if (!targetId) return;
     setError(false);
+    setSuccess(false);
     try {
       const result = await unblock.mutateAsync({ userId: targetId });
       setSyncPending(Boolean(result.syncPending));
@@ -257,16 +293,22 @@ export function MessagesPage(): React.JSX.Element {
       setError(true);
     }
   };
-  const runReport = async () => {
+  const runReport = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
+    event.preventDefault();
     if (!selectedRecord) return;
-    const reason = window.prompt(t('messageReportReason'))?.trim();
+    const reason = reportReason.trim();
     if (!reason) return;
     setError(false);
+    setReportError(false);
+    setSuccess(false);
     try {
       await report.mutateAsync({ id: selectedRecord.id, data: { reason } });
       setSuccess(true);
+      setReportOpen(false);
+      setReportReason('');
     } catch {
       setError(true);
+      setReportError(true);
     }
   };
   const retry = () => {
@@ -338,15 +380,34 @@ export function MessagesPage(): React.JSX.Element {
         className="grid gap-3 rounded-(--shape-radius-card) border border-border bg-card p-4 shadow-xs sm:flex sm:items-end"
         onSubmit={(event) => void startDm(event)}
       >
-        <Field className="flex-1" id="dm-recipient" label={t('recipientUserId')}>
-          <Input
+        <Field className="flex-1" id="dm-recipient" label={t('findPerson')}>
+          <SearchableSelect
+            emptyMessage={
+              recipientQuery.trim().length < 2 ? t('searchPeopleHint') : t('noPeopleFound')
+            }
             id="dm-recipient"
-            onChange={(event) => setRecipientId(event.target.value)}
-            placeholder={t('recipientUserId')}
+            loading={people.isFetching && debouncedRecipientQuery.length >= 2}
+            onSearch={setRecipientQuery}
+            onValueChange={(value) => {
+              const person = people.data?.find((item) => item.id === value);
+              setRecipientId(value);
+              setRecipientLabel(person?.displayName ?? '');
+              setRecipientQuery('');
+              setDebouncedRecipientQuery('');
+            }}
+            options={(debouncedRecipientQuery.length >= 2 ? (people.data ?? []) : []).map(
+              (person) => ({
+                value: person.id,
+                label: person.displayName,
+              }),
+            )}
+            placeholder={t('findPerson')}
+            searchPlaceholder={t('searchPeople')}
+            selectedLabel={recipientLabel}
             value={recipientId}
           />
         </Field>
-        <Button disabled={!recipientId.trim() || createDm.isPending}>
+        <Button disabled={!recipientId || createDm.isPending}>
           <MessageSquarePlus aria-hidden="true" />
           {t('startDirectMessage')}
         </Button>
@@ -397,10 +458,13 @@ export function MessagesPage(): React.JSX.Element {
         style={{ height: 'min(72vh, 760px)' }}
       >
         <Chat client={client} theme="str-chat__theme-light" i18nInstance={streamI18n}>
-          <div className="grid h-full grid-cols-[minmax(9rem,14rem)_1fr]">
+          <div className="grid h-full grid-cols-1 md:grid-cols-[minmax(9rem,14rem)_1fr]">
             <nav
               aria-label={t('conversations')}
-              className="overflow-y-auto border-e border-border p-2"
+              className={cn(
+                'overflow-y-auto border-e border-border p-2',
+                selected ? 'hidden md:block' : 'block',
+              )}
             >
               {channels.length === 0 ? (
                 <p className="p-3 text-sm">{t('noConversations')}</p>
@@ -418,7 +482,7 @@ export function MessagesPage(): React.JSX.Element {
                   return (
                     <button
                       aria-current={channel.cid === selected?.cid ? 'page' : undefined}
-                      className={`mb-1 w-full rounded-(--shape-radius-control) px-3 py-2.5 text-start text-sm transition-colors ${channel.cid === selected?.cid ? 'bg-primary-soft font-semibold text-primary-soft-text' : 'text-text-muted hover:bg-surface-soft hover:text-text'}`}
+                      className={`mb-1 min-h-11 w-full rounded-(--shape-radius-control) px-3 py-2.5 text-start text-sm transition-colors ${channel.cid === selected?.cid ? 'bg-primary-soft font-semibold text-primary-soft-text' : 'text-text-muted hover:bg-surface-soft hover:text-text'}`}
                       key={channel.cid}
                       onClick={() => setSelected(channel)}
                     >
@@ -428,44 +492,89 @@ export function MessagesPage(): React.JSX.Element {
                 })
               )}
             </nav>
-            {selected ? (
-              <div className="flex min-h-0 flex-col">
-                {selectedRecord?.kind === 'dm' && (
-                  <div className="flex justify-end gap-2 border-b border-border p-2">
-                    <Button onClick={() => void runReport()} size="sm" variant="ghost">
-                      {t('reportUser')}
+            <div
+              className={cn(
+                'min-h-0 flex-col',
+                selected ? 'flex' : 'hidden md:flex',
+              )}
+            >
+              {selected ? (
+                <>
+                  <div className="flex flex-wrap items-center gap-2 border-b border-border p-2">
+                    <Button
+                      className="md:hidden"
+                      onClick={() => setSelected(null)}
+                      size="sm"
+                      variant="ghost"
+                    >
+                      <ArrowLeft aria-hidden="true" className="rtl:rotate-180" />
+                      {t('backToConversations')}
                     </Button>
-                    {isBlocked ? (
-                      <Button onClick={() => void runUnblock()} size="sm" variant="ghost">
-                        {t('unblockUser')}
-                      </Button>
-                    ) : (
-                      <Button onClick={() => void runBlock()} size="sm" variant="ghost">
-                        {t('blockUser')}
-                      </Button>
-                    )}
+                    {selectedRecord?.kind === 'dm' ? (
+                      <div className="ms-auto flex gap-2">
+                        <Button
+                          onClick={() => {
+                            setReportError(false);
+                            setSuccess(false);
+                            setReportOpen(true);
+                          }}
+                          size="sm"
+                          variant="ghost"
+                        >
+                          {t('reportUser')}
+                        </Button>
+                        {isBlocked ? (
+                          <Button onClick={() => void runUnblock()} size="sm" variant="ghost">
+                            {t('unblockUser')}
+                          </Button>
+                        ) : (
+                          <Button onClick={() => void runBlock()} size="sm" variant="ghost">
+                            {t('blockUser')}
+                          </Button>
+                        )}
+                      </div>
+                    ) : null}
                   </div>
-                )}
-                {isBlocked ? (
-                  <p className="m-auto p-5 text-center">{t('conversationBlocked')}</p>
-                ) : (
-                  <Channel channel={selected}>
-                    <Window>
-                      <MessageList />
-                      <MessageComposer />
-                      <Thread />
-                    </Window>
-                  </Channel>
-                )}
-              </div>
-            ) : (
-              <p className="m-auto p-5 text-center text-sm text-text-muted">
-                {t('selectConversation')}
-              </p>
-            )}
+                  {isBlocked ? (
+                    <p className="m-auto p-5 text-center">{t('conversationBlocked')}</p>
+                  ) : (
+                    <Channel channel={selected}>
+                      <Window>
+                        <MessageList />
+                        <MessageComposer />
+                        <Thread />
+                      </Window>
+                    </Channel>
+                  )}
+                </>
+              ) : (
+                <p className="m-auto p-5 text-center text-sm text-text-muted">
+                  {t('selectConversation')}
+                </p>
+              )}
+            </div>
           </div>
         </Chat>
       </div>
+      <TextPromptDialog
+        description={t('messageReportReason')}
+        error={reportError ? t('messagingActionError') : undefined}
+        label={t('reportReasonLabel')}
+        onOpenChange={(open) => {
+          setReportOpen(open);
+          if (!open) {
+            setReportReason('');
+            setReportError(false);
+          }
+        }}
+        onSubmit={(event) => void runReport(event)}
+        onValueChange={setReportReason}
+        open={reportOpen}
+        pending={report.isPending}
+        submitLabel={t('reportUser')}
+        title={t('reportUser')}
+        value={reportReason}
+      />
     </section>
   );
 }

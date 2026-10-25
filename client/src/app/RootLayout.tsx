@@ -1,4 +1,5 @@
 import {
+  Bell,
   CalendarCheck,
   Globe2,
   LogOut,
@@ -12,7 +13,7 @@ import {
 import { useHead } from '@unhead/react';
 import { Link, NavLink, Outlet, ScrollRestoration, useLocation } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { AppFooter } from '@/components/layout/AppFooter';
@@ -38,6 +39,7 @@ const primaryLinks = [
 const accountLinks = [
   { key: 'create', to: '/create', icon: Plus },
   { key: 'myActivity', to: '/activity', icon: CalendarCheck },
+  { key: 'notifications', to: '/notifications', icon: Bell },
   { key: 'messages', to: '/messages', icon: MessageSquare },
   { key: 'profileTitle', to: '/profile', icon: UserRound },
 ] as const;
@@ -46,7 +48,7 @@ function Brand(): React.JSX.Element {
   const { t } = useTranslation();
   return (
     <Link
-      className="inline-flex shrink-0 items-center gap-2.5 rounded-md"
+      className="inline-flex min-h-11 shrink-0 items-center gap-2.5 rounded-md"
       to="/"
       aria-label={t('brand')}
     >
@@ -60,7 +62,7 @@ function Brand(): React.JSX.Element {
 
 const navItemClass = (isActive: boolean): string =>
   cn(
-    'relative flex h-9 items-center rounded-full px-3.5 text-sm font-medium transition-colors duration-(--motion-duration-fast)',
+    'relative flex h-11 items-center rounded-(--shape-radius-control) px-3.5 text-sm font-medium transition-colors duration-(--motion-duration-fast)',
     isActive
       ? 'bg-primary-soft text-primary-soft-text'
       : 'text-text-muted hover:bg-surface-soft hover:text-text',
@@ -71,7 +73,18 @@ export function RootLayout(): React.JSX.Element {
   const { pathname } = useLocation();
   const { user, signOut } = useAuth();
   const [navigationOpen, setNavigationOpen] = useState(false);
+  const mainRef = useRef<HTMLElement>(null);
+  const previousPathname = useRef(pathname);
   useEffect(() => setNavigationOpen(false), [pathname]);
+  useEffect(() => {
+    if (previousPathname.current === pathname) return;
+    previousPathname.current = pathname;
+    // Let a closing navigation sheet restore its trigger before moving focus.
+    const timeout = window.setTimeout(() => {
+      mainRef.current?.focus({ preventScroll: true });
+    }, 0);
+    return () => window.clearTimeout(timeout);
+  }, [pathname]);
   const isArabic = activeI18n.language.startsWith('ar');
   const displayName =
     (user?.user_metadata?.display_name as string | undefined)?.trim() ||
@@ -119,7 +132,7 @@ export function RootLayout(): React.JSX.Element {
               aria-label={languageLabel}
               className="hidden md:inline-flex"
               onClick={() => void changeLanguage()}
-              size="icon-sm"
+              size="icon"
               title={languageLabel}
               variant="ghost"
             >
@@ -127,7 +140,7 @@ export function RootLayout(): React.JSX.Element {
             </Button>
             {user ? (
               <>
-                <Button asChild className="hidden sm:inline-flex" size="sm" variant="secondary">
+                <Button asChild className="hidden sm:inline-flex" variant="secondary">
                   <Link to="/create">
                     <Plus aria-hidden="true" />
                     {t('create')}
@@ -137,7 +150,7 @@ export function RootLayout(): React.JSX.Element {
                   <DropdownMenuTrigger asChild>
                     <button
                       aria-label={t('accountMenu')}
-                      className="grid size-9 place-items-center rounded-full bg-primary-soft text-sm font-bold text-primary-soft-text transition-shadow hover:ring-2 hover:ring-primary/40"
+                      className="grid size-11 place-items-center rounded-full bg-primary-soft text-sm font-bold text-primary-soft-text transition-shadow hover:ring-2 hover:ring-primary/40"
                       type="button"
                     >
                       {initial}
@@ -168,7 +181,7 @@ export function RootLayout(): React.JSX.Element {
                 </DropdownMenu>
               </>
             ) : (
-              <Button asChild size="sm">
+              <Button asChild>
                 <Link
                   to={{
                     pathname: '/sign-in',
@@ -184,7 +197,7 @@ export function RootLayout(): React.JSX.Element {
                 <Button
                   aria-label={t(navigationOpen ? 'closeNavigation' : 'openNavigation')}
                   className="md:hidden"
-                  size="icon-sm"
+                  size="icon"
                   variant="ghost"
                 >
                   {navigationOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
@@ -204,7 +217,7 @@ export function RootLayout(): React.JSX.Element {
                       <NavLink
                         className={({ isActive }) =>
                           cn(
-                            'flex h-11 items-center rounded-lg px-3 text-[0.95rem] font-medium transition-colors',
+                            'flex h-11 items-center rounded-(--shape-radius-control) px-3 text-[0.95rem] font-medium transition-colors',
                             isActive
                               ? 'bg-primary-soft text-primary-soft-text'
                               : 'text-text hover:bg-surface-soft',
@@ -227,7 +240,7 @@ export function RootLayout(): React.JSX.Element {
                           <NavLink
                             className={({ isActive }) =>
                               cn(
-                                'flex h-11 items-center gap-3 rounded-lg px-3 text-[0.95rem] font-medium transition-colors [&_svg]:size-4 [&_svg]:text-text-subtle',
+                                'flex h-11 min-w-0 items-center gap-3 rounded-(--shape-radius-control) px-3 text-[0.95rem] font-medium transition-colors [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:text-text-subtle',
                                 isActive
                                   ? 'bg-surface-soft text-text'
                                   : 'text-text-muted hover:bg-surface-soft hover:text-text',
@@ -236,12 +249,12 @@ export function RootLayout(): React.JSX.Element {
                             to={item.to}
                           >
                             <item.icon aria-hidden="true" />
-                            {t(item.key)}
+                            <span className="min-w-0 truncate">{t(item.key)}</span>
                           </NavLink>
                         </SheetClose>
                       ))}
                       <button
-                        className="flex h-11 items-center gap-3 rounded-lg px-3 text-start text-[0.95rem] font-medium text-danger transition-colors hover:bg-danger-soft [&_svg]:size-4"
+                        className="flex h-11 min-w-0 items-center gap-3 rounded-(--shape-radius-control) px-3 text-start text-[0.95rem] font-medium text-danger transition-colors hover:bg-danger-soft [&_svg]:size-4 [&_svg]:shrink-0"
                         onClick={() => {
                           setNavigationOpen(false);
                           void signOut().catch(() => toast.error(t('genericError')));
@@ -249,13 +262,13 @@ export function RootLayout(): React.JSX.Element {
                         type="button"
                       >
                         <LogOut aria-hidden="true" />
-                        {t('authSignOut')}
+                        <span className="min-w-0 truncate">{t('authSignOut')}</span>
                       </button>
                     </>
                   ) : (
                     <SheetClose asChild>
                       <NavLink
-                        className="flex h-11 items-center rounded-lg bg-primary px-3 text-[0.95rem] font-semibold text-primary-foreground"
+                        className="flex h-11 items-center rounded-(--shape-radius-control) bg-primary px-3 text-[0.95rem] font-semibold text-primary-foreground"
                         to={{
                           pathname: '/sign-in',
                           search: `?returnTo=${encodeURIComponent(`${pathname}${window.location.search}${window.location.hash}`)}`,
@@ -269,12 +282,12 @@ export function RootLayout(): React.JSX.Element {
                 <div className="mt-auto grid gap-1 pt-4">
                   <button
                     aria-label={languageLabel}
-                    className="flex h-11 items-center gap-3 rounded-lg px-3 text-[0.95rem] font-medium text-text-muted transition-colors hover:bg-surface-soft hover:text-text [&_svg]:size-4"
+                    className="flex h-11 min-w-0 items-center gap-3 rounded-(--shape-radius-control) px-3 text-[0.95rem] font-medium text-text-muted transition-colors hover:bg-surface-soft hover:text-text [&_svg]:size-4 [&_svg]:shrink-0"
                     onClick={() => void changeLanguage()}
                     type="button"
                   >
                     <Globe2 aria-hidden="true" />
-                    {languageLabel}
+                    <span className="min-w-0 truncate">{languageLabel}</span>
                   </button>
                 </div>
               </SheetContent>
@@ -283,8 +296,10 @@ export function RootLayout(): React.JSX.Element {
         </div>
       </header>
       <main
-        className="mx-auto w-full max-w-(--container-max) flex-1 px-4 py-8 sm:px-6 sm:py-12"
+        className="mx-auto w-full max-w-(--container-max) flex-1 px-4 py-8 outline-none sm:px-6 sm:py-12"
         id="main-content"
+        ref={mainRef}
+        tabIndex={-1}
       >
         <Outlet />
       </main>

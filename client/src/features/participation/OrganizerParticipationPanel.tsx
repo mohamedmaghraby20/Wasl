@@ -10,7 +10,13 @@ import {
   useParticipationControllerEventParticipants,
 } from '@/api/generated/participation/participation';
 import { Button } from '@/components/ui/Button';
+import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { QueryError } from '@/components/feedback/QueryError';
+import {
+  useModeratorAssignmentsControllerAssign,
+  useModeratorAssignmentsControllerList,
+  useModeratorAssignmentsControllerRemove,
+} from '@/api/generated/moderation/moderation';
 
 export function OrganizerParticipationPanel({
   kind,
@@ -37,13 +43,27 @@ export function OrganizerParticipationPanel({
   });
   const communityDecision = useParticipationControllerCommunityDecision();
   const eventDecision = useParticipationControllerEventDecision();
+  const moderationKind = kind === 'communities' ? 'community' : 'event';
+  const moderators = useModeratorAssignmentsControllerList(moderationKind, resourceId);
+  const assignModerator = useModeratorAssignmentsControllerAssign();
+  const removeModerator = useModeratorAssignmentsControllerRemove();
+  const { confirm, dialog } = useConfirm();
   const participants = kind === 'communities' ? communityParticipants : eventParticipants;
   const counts = kind === 'communities' ? communityCounts : eventCounts;
   const isPending = participants.isPending || counts.isPending;
   const isError = participants.isError || counts.isError;
 
   const decide = async (participantId: string, action: string): Promise<void> => {
-    if (action === 'remove' && !window.confirm(t('confirmRemoveParticipant'))) return;
+    if (
+      action === 'remove' &&
+      !(await confirm({
+        title: t('removeParticipant'),
+        description: t('confirmRemoveParticipant'),
+        confirmLabel: t('removeParticipant'),
+        destructive: true,
+      }))
+    )
+      return;
     try {
       if (kind === 'communities') {
         const result = await communityDecision.mutateAsync({
@@ -62,6 +82,15 @@ export function OrganizerParticipationPanel({
     }
   };
   const busy = communityDecision.isPending || eventDecision.isPending;
+  const setModerator = async (userId: string, enabled: boolean): Promise<void> => {
+    try {
+      if (enabled) await assignModerator.mutateAsync({ kind: moderationKind, id: resourceId, data: { userId } });
+      else await removeModerator.mutateAsync({ kind: moderationKind, id: resourceId, userId });
+      await queryClient.invalidateQueries();
+    } catch {
+      toast.error(t('moderatorActionError'));
+    }
+  };
 
   return (
     <section
@@ -108,7 +137,12 @@ export function OrganizerParticipationPanel({
                       {t(`participationStatus_${participant.status}`)}
                     </p>
                   </div>
-                  <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-2">
+                    {moderators.isSuccess && (kind === 'communities' ? participant.status === 'ACTIVE' : participant.status === 'ACCEPTED') ? (
+                      <Button disabled={assignModerator.isPending || removeModerator.isPending} onClick={() => void setModerator(participant.userId, !moderators.data.some((entry) => entry.userId === participant.userId))} variant="outline">
+                        {moderators.data.some((entry) => entry.userId === participant.userId) ? t('removeModerator') : t('assignModerator')}
+                      </Button>
+                    ) : null}
                     {participant.status === 'PENDING' && (
                       <>
                         <Button
@@ -192,6 +226,7 @@ export function OrganizerParticipationPanel({
           )}
         </>
       )}
+      {dialog}
     </section>
   );
 }

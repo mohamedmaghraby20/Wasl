@@ -11,6 +11,7 @@ function selectQuery(rows: unknown[]) {
     innerJoin: () => query,
     leftJoin: () => query,
     where: () => query,
+    orderBy: () => query,
     limit: async () => rows,
   };
   return query;
@@ -50,6 +51,47 @@ describe('UsersService', () => {
     });
     expect(result).not.toHaveProperty('email');
     expect(result).not.toHaveProperty('status');
+  });
+
+  it('searches active profiles without exposing private fields', async () => {
+    const row = {
+      id: 'a020e6d0-2a9b-4105-b2c8-2811cad2b600',
+      displayName: 'Public Member',
+      avatarPath: 'auth-id/00000000-0000-4000-8000-000000000000.png',
+      email: 'private@example.com',
+    };
+    const db = { select: vi.fn(() => selectQuery([row])) };
+    const service = new UsersService(
+      db as unknown as Database,
+      undefined,
+      'https://wasl.supabase.co',
+    );
+
+    const result = await service.search({ id: 'local-id', authUserId: 'auth-id' }, 'member');
+
+    expect(result).toEqual([
+      {
+        id: row.id,
+        displayName: row.displayName,
+        avatarUrl:
+          'https://wasl.supabase.co/storage/v1/object/public/profile-photos/auth-id/00000000-0000-4000-8000-000000000000.png',
+      },
+    ]);
+    expect(result[0]).not.toHaveProperty('email');
+  });
+
+  it('does not query for a one-character search', async () => {
+    const select = vi.fn();
+    const service = new UsersService(
+      { select } as unknown as Database,
+      undefined,
+      'https://wasl.supabase.co',
+    );
+
+    await expect(
+      service.search({ id: 'local-id', authUserId: 'auth-id' }, 'a'),
+    ).resolves.toEqual([]);
+    expect(select).not.toHaveBeenCalled();
   });
 
   it('rejects a profile photo path owned by another Supabase account', async () => {

@@ -23,6 +23,12 @@ export class CurrentUserDto {
   @ApiProperty({ type: [String] }) interests!: string[];
 }
 
+export class UserSearchResultDto {
+  @ApiProperty({ format: 'uuid' }) id!: string;
+  @ApiProperty() displayName!: string;
+  @ApiPropertyOptional({ type: String, nullable: true }) avatarUrl!: string | null;
+}
+
 export class PublicUserProfileDto {
   @ApiProperty({ format: 'uuid' }) id!: string;
   @ApiProperty() displayName!: string;

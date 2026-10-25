@@ -127,6 +127,27 @@
       "when": 1792947787680,
       "tag": "0017_spotty_greymalkin",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1792952935768,
+      "tag": "0018_notification-email-queue",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1792953467729,
+      "tag": "0019_skinny_xavin",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1792953867474,
+      "tag": "0020_loving_mantis",
+      "breakpoints": true
     }
   ]
 }

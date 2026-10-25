@@ -23,6 +23,7 @@ const environmentSchema = z
     SUPABASE_SERVICE_ROLE_KEY: optionalText,
     PLATFORM_ADMIN_USER_IDS: optionalText,
     RESEND_API_KEY: optionalText,
+    RESEND_FROM_EMAIL: optionalText,
     STREAM_API_KEY: optionalText,
     STREAM_API_SECRET: optionalText,
     STREAM_PERMISSIONS_VERIFIED: z.enum(['true', 'false']).default('false'),
@@ -45,6 +46,13 @@ const environmentSchema = z
       }
     }
     if (environment.NODE_ENV === 'production') {
+      if (!environment.RESEND_API_KEY || !environment.RESEND_FROM_EMAIL) {
+        context.addIssue({
+          code: 'custom',
+          path: ['RESEND_API_KEY'],
+          message: 'Transactional email credentials are required in production.',
+        });
+      }
       if (!environment.DATABASE_URL) {
         context.addIssue({
           code: 'custom',

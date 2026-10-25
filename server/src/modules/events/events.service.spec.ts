@@ -165,6 +165,13 @@ describe('EventsService', () => {
 
   it('lets an organization manager cancel an organization-hosted event', async () => {
     const set = vi.fn(() => ({ where: async () => [] }));
+    const tx = {
+      select: vi
+        .fn()
+        .mockImplementationOnce(() => selectQuery([{ cancelled: false }]))
+        .mockImplementationOnce(() => selectQuery([])),
+      update: vi.fn(() => ({ set })),
+    };
     const db = {
       select: vi.fn(() =>
         selectQuery([
@@ -179,6 +186,7 @@ describe('EventsService', () => {
         ]),
       ),
       update: vi.fn(() => ({ set })),
+      transaction: async (work: (transaction: typeof tx) => Promise<unknown>) => work(tx),
     };
     const organizations = {
       assertCanManageOrganization: vi

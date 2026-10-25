@@ -4,6 +4,8 @@ export * from './discussions/discussions';
 export * from './events/events';
 export * from './health/health';
 export * from './messaging/messaging';
+export * from './moderation/moderation';
+export * from './notifications/notifications';
 export * from './organizations/organizations';
 export * from './participation/participation';
 export * from './users/users';

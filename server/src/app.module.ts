@@ -14,6 +14,8 @@ import { ParticipationModule } from './modules/participation/participation.modul
 import { OrganizationsModule } from './modules/organizations/organizations.module';
 import { DiscussionsModule } from './modules/discussions/discussions.module';
 import { MessagingModule } from './modules/messaging/messaging.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
+import { ModerationModule } from './modules/moderation/moderation.module';
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import { MessagingModule } from './modules/messaging/messaging.module';
     OrganizationsModule,
     DiscussionsModule,
     MessagingModule,
+    NotificationsModule,
+    ModerationModule,
     DiscoveryModule,
     HealthModule,
   ],

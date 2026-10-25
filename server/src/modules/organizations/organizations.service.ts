@@ -6,6 +6,7 @@ import {
   Inject,
   Injectable,
   NotFoundException,
+  Optional,
   ServiceUnavailableException,
 } from '@nestjs/common';
 import type { SupabaseClient } from '@supabase/supabase-js';
@@ -23,6 +24,7 @@ import {
   users,
 } from '../../db/schema';
 import type { AuthenticatedUser } from '../auth/authenticated-user';
+import { NotificationsService } from '../notifications/notifications.service';
 import type {
   CreateOrganizationAdminInvitationDto,
   CreateOrganizationDto,
@@ -43,6 +45,7 @@ export class OrganizationsService {
     @Inject(DATABASE) private readonly db: Database | undefined,
     @Inject(ORGANIZATION_STORAGE_CLIENT) private readonly storage: SupabaseClient | undefined,
     @Inject(ORGANIZATION_SUPABASE_URL) private readonly supabaseUrl: string | undefined,
+    @Optional() private readonly notifications?: NotificationsService,
   ) {}
 
   async create(user: AuthenticatedUser, input: CreateOrganizationDto) {
@@ -243,6 +246,13 @@ export class OrganizationsService {
         tokenHash,
         expiresAt,
       });
+      await this.notifications?.create(tx, {
+        recipientUserId: target.id,
+        eventKey: `organization-invitation:${invitationId}`,
+        type: 'organization_admin_invited',
+        contextType: 'organization',
+        contextId: organization.id,
+      }, true);
     });
 
     // The raw token is returned only in this response; it is never persisted or logged.
@@ -552,7 +562,7 @@ export class OrganizationsService {
       }
 
       const [organization] = await tx
-        .select({ id: organizations.id })
+        .select({ id: organizations.id, ownerUserId: organizations.ownerUserId })
         .from(organizations)
         .where(eq(organizations.id, request.organizationId))
         .for('update')
@@ -576,6 +586,13 @@ export class OrganizationsService {
         .update(organizations)
         .set({ verificationStatus, updatedAt: now })
         .where(eq(organizations.id, organization.id));
+      await this.notifications?.create(tx, {
+        recipientUserId: organization.ownerUserId,
+        eventKey: `organization-verification:${request.id}`,
+        type: `organization_verification_${verificationStatus.toLowerCase()}`,
+        contextType: 'organization',
+        contextId: organization.id,
+      }, true);
 
       return {
         id: request.id,

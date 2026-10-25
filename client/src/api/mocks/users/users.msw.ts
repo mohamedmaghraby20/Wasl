@@ -18,13 +18,16 @@ import type {
 
 import type {
   CurrentUserDto,
-  PublicUserProfileDto
+  PublicUserProfileDto,
+  UserSearchResultDto
 } from '../../generated/wasl-client.schemas';
 
 
 export const getUsersControllerCurrentResponseMock = (overrideResponse: Partial<Extract<CurrentUserDto, object>> = {}): CurrentUserDto => ({id: faker.string.uuid(), email: faker.string.alpha({length: {min: 10, max: 20}}), emailVerifiedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), displayName: faker.string.alpha({length: {min: 10, max: 20}}), avatarUrl: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), bio: faker.string.alpha({length: {min: 10, max: 20}}), cityId: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), cityName: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), interests: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), ...overrideResponse})
 
 export const getUsersControllerUpdateResponseMock = (overrideResponse: Partial<Extract<CurrentUserDto, object>> = {}): CurrentUserDto => ({id: faker.string.uuid(), email: faker.string.alpha({length: {min: 10, max: 20}}), emailVerifiedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), displayName: faker.string.alpha({length: {min: 10, max: 20}}), avatarUrl: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), bio: faker.string.alpha({length: {min: 10, max: 20}}), cityId: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), cityName: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), interests: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), ...overrideResponse})
+
+export const getUsersControllerSearchResponseMock = (): UserSearchResultDto[] => (Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), displayName: faker.string.alpha({length: {min: 10, max: 20}}), avatarUrl: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null])})))
 
 export const getUsersControllerPublicProfileResponseMock = (overrideResponse: Partial<Extract<PublicUserProfileDto, object>> = {}): PublicUserProfileDto => ({id: faker.string.uuid(), displayName: faker.string.alpha({length: {min: 10, max: 20}}), avatarUrl: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), bio: faker.string.alpha({length: {min: 10, max: 20}}), cityId: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), cityName: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), interests: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), ...overrideResponse})
 
@@ -53,6 +56,18 @@ export const getUsersControllerUpdateMockHandler = (overrideResponse?: CurrentUs
   }, options)
 }
 
+export const getUsersControllerSearchMockHandler = (overrideResponse?: UserSearchResultDto[] | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<UserSearchResultDto[]> | UserSearchResultDto[]), options?: RequestHandlerOptions) => {
+  return http.get('*/api/v1/users/search', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getUsersControllerSearchResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
 export const getUsersControllerPublicProfileMockHandler = (overrideResponse?: PublicUserProfileDto | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<PublicUserProfileDto> | PublicUserProfileDto), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/users/:id', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
@@ -67,5 +82,6 @@ export const getUsersControllerPublicProfileMockHandler = (overrideResponse?: Pu
 export const getUsersMock = () => [
   getUsersControllerCurrentMockHandler(),
   getUsersControllerUpdateMockHandler(),
+  getUsersControllerSearchMockHandler(),
   getUsersControllerPublicProfileMockHandler()
 ]

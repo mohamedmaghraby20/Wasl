@@ -21,6 +21,7 @@ import type { AuthenticatedUser } from '../auth/authenticated-user';
 import { CommunitiesService } from '../communities/communities.service';
 import { EventsService } from '../events/events.service';
 import { MessagingService } from '../messaging/messaging.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import {
   assertCommunityTransition,
   assertEventTransition,
@@ -36,6 +37,7 @@ export class ParticipationService {
     private readonly communitiesService: CommunitiesService,
     private readonly eventsService: EventsService,
     @Optional() private readonly messaging?: MessagingService,
+    @Optional() private readonly notifications?: NotificationsService,
   ) {}
 
   async joinCommunity(user: AuthenticatedUser, communityId: string) {
@@ -103,12 +105,25 @@ export class ParticipationService {
               .returning({ id: communityMemberships.id })
           )[0];
       if (!membership) throw new BadRequestException('Membership could not be saved.');
-      await tx.insert(communityMembershipTransitions).values({
-        membershipId: membership.id,
-        fromStatus: existing?.status ?? null,
-        toStatus: status,
-        actorUserId: user.id,
-      });
+      const [transition] = await tx
+        .insert(communityMembershipTransitions)
+        .values({
+          membershipId: membership.id,
+          fromStatus: existing?.status ?? null,
+          toStatus: status,
+          actorUserId: user.id,
+        })
+        .returning({ id: communityMembershipTransitions.id });
+      if (transition)
+        await this.notifyParticipation(
+          tx,
+          'community',
+          communityId,
+          user.id,
+          transition.id,
+          status,
+          existing?.status ?? null,
+        );
       return { status };
     });
     const messagingSyncPending = await this.messaging?.reconcileResourceAccess(
@@ -228,12 +243,25 @@ export class ParticipationService {
               .returning({ id: eventRegistrations.id })
           )[0];
       if (!registration) throw new BadRequestException('Registration could not be saved.');
-      await tx.insert(eventRegistrationTransitions).values({
-        registrationId: registration.id,
-        fromStatus: existing?.status ?? null,
-        toStatus: status,
-        actorUserId: user.id,
-      });
+      const [transition] = await tx
+        .insert(eventRegistrationTransitions)
+        .values({
+          registrationId: registration.id,
+          fromStatus: existing?.status ?? null,
+          toStatus: status,
+          actorUserId: user.id,
+        })
+        .returning({ id: eventRegistrationTransitions.id });
+      if (transition)
+        await this.notifyParticipation(
+          tx,
+          'event',
+          eventId,
+          user.id,
+          transition.id,
+          status,
+          existing?.status ?? null,
+        );
       return { status };
     });
     const messagingSyncPending = await this.messaging?.reconcileResourceAccess('event', eventId);
@@ -432,7 +460,11 @@ export class ParticipationService {
         .limit(1);
       if (!community) throw new NotFoundException('Community not found.');
       const [membership] = await tx
-        .select({ id: communityMemberships.id, status: communityMemberships.status })
+        .select({
+          id: communityMemberships.id,
+          status: communityMemberships.status,
+          userId: communityMemberships.userId,
+        })
         .from(communityMemberships)
         .where(
           and(
@@ -470,7 +502,15 @@ export class ParticipationService {
         if (action === 'promote' && status !== 'ACTIVE')
           throw new BadRequestException('No community capacity is currently available.');
       }
-      await this.updateMembershipState(tx, membership.id, membership.status, status, user.id);
+      await this.updateMembershipState(
+        tx,
+        membership.id,
+        membership.status,
+        status,
+        user.id,
+        communityId,
+        membership.userId,
+      );
       if (
         (action === 'remove' || (action === 'reject' && membership.status === 'WAITLISTED')) &&
         community.admissionMode !== 'approval'
@@ -508,7 +548,11 @@ export class ParticipationService {
         .limit(1);
       if (!event) throw new NotFoundException('Event not found.');
       const [registration] = await tx
-        .select({ id: eventRegistrations.id, status: eventRegistrations.status })
+        .select({
+          id: eventRegistrations.id,
+          status: eventRegistrations.status,
+          userId: eventRegistrations.userId,
+        })
         .from(eventRegistrations)
         .where(
           and(eq(eventRegistrations.id, registrationId), eq(eventRegistrations.eventId, eventId)),
@@ -556,7 +600,15 @@ export class ParticipationService {
         if (action === 'promote' && status !== 'ACCEPTED')
           throw new BadRequestException('No event capacity is currently available.');
       }
-      await this.updateRegistrationState(tx, registration.id, registration.status, status, user.id);
+      await this.updateRegistrationState(
+        tx,
+        registration.id,
+        registration.status,
+        status,
+        user.id,
+        eventId,
+        registration.userId,
+      );
       if (
         (action === 'remove' || (action === 'reject' && registration.status === 'WAITLISTED')) &&
         event.admissionMode !== 'approval' &&
@@ -613,15 +665,28 @@ export class ParticipationService {
     from: CommunityStatus,
     to: CommunityStatus,
     actorUserId: string | null,
+    communityId: string,
+    recipientUserId: string,
   ) {
     assertCommunityTransition(from, to);
     await tx
       .update(communityMemberships)
       .set({ status: to, updatedAt: new Date() })
       .where(eq(communityMemberships.id, id));
-    await tx
+    const [transition] = await tx
       .insert(communityMembershipTransitions)
-      .values({ membershipId: id, fromStatus: from, toStatus: to, actorUserId });
+      .values({ membershipId: id, fromStatus: from, toStatus: to, actorUserId })
+      .returning({ id: communityMembershipTransitions.id });
+    if (transition)
+      await this.notifyParticipation(
+        tx,
+        'community',
+        communityId,
+        recipientUserId,
+        transition.id,
+        to,
+        from,
+      );
   }
 
   private async updateRegistrationState(
@@ -630,15 +695,28 @@ export class ParticipationService {
     from: EventStatus,
     to: EventStatus,
     actorUserId: string | null,
+    eventId: string,
+    recipientUserId: string,
   ) {
     assertEventTransition(from, to);
     await tx
       .update(eventRegistrations)
       .set({ status: to, updatedAt: new Date() })
       .where(eq(eventRegistrations.id, id));
-    await tx
+    const [transition] = await tx
       .insert(eventRegistrationTransitions)
-      .values({ registrationId: id, fromStatus: from, toStatus: to, actorUserId });
+      .values({ registrationId: id, fromStatus: from, toStatus: to, actorUserId })
+      .returning({ id: eventRegistrationTransitions.id });
+    if (transition)
+      await this.notifyParticipation(
+        tx,
+        'event',
+        eventId,
+        recipientUserId,
+        transition.id,
+        to,
+        from,
+      );
   }
 
   private async promoteCommunityWaitlist(
@@ -648,7 +726,11 @@ export class ParticipationService {
   ) {
     while (await this.communityHasCapacity(tx, communityId, capacity)) {
       const [next] = await tx
-        .select({ id: communityMemberships.id, status: communityMemberships.status })
+        .select({
+          id: communityMemberships.id,
+          status: communityMemberships.status,
+          userId: communityMemberships.userId,
+        })
         .from(communityMemberships)
         .where(
           and(
@@ -660,14 +742,26 @@ export class ParticipationService {
         .for('update')
         .limit(1);
       if (!next) return;
-      await this.updateMembershipState(tx, next.id, next.status, 'ACTIVE', null);
+      await this.updateMembershipState(
+        tx,
+        next.id,
+        next.status,
+        'ACTIVE',
+        null,
+        communityId,
+        next.userId,
+      );
     }
   }
 
   private async promoteEventWaitlist(tx: Transaction, eventId: string, capacity: number | null) {
     while (await this.eventHasCapacity(tx, eventId, capacity)) {
       const [next] = await tx
-        .select({ id: eventRegistrations.id, status: eventRegistrations.status })
+        .select({
+          id: eventRegistrations.id,
+          status: eventRegistrations.status,
+          userId: eventRegistrations.userId,
+        })
         .from(eventRegistrations)
         .where(
           and(eq(eventRegistrations.eventId, eventId), eq(eventRegistrations.status, 'WAITLISTED')),
@@ -676,8 +770,47 @@ export class ParticipationService {
         .for('update')
         .limit(1);
       if (!next) return;
-      await this.updateRegistrationState(tx, next.id, next.status, 'ACCEPTED', null);
+      await this.updateRegistrationState(
+        tx,
+        next.id,
+        next.status,
+        'ACCEPTED',
+        null,
+        eventId,
+        next.userId,
+      );
     }
+  }
+
+  private async notifyParticipation(
+    tx: Transaction,
+    contextType: 'community' | 'event',
+    contextId: string,
+    recipientUserId: string,
+    transitionId: string,
+    to: CommunityStatus | EventStatus,
+    from: CommunityStatus | EventStatus | null,
+  ) {
+    if (
+      !this.notifications ||
+      !['ACTIVE', 'ACCEPTED', 'REJECTED', 'REMOVED', 'REMOVED_BY_ORGANIZER'].includes(to)
+    )
+      return;
+    const outcome =
+      from === 'WAITLISTED' && (to === 'ACTIVE' || to === 'ACCEPTED')
+        ? 'waitlist_promoted'
+        : to.toLowerCase();
+    await this.notifications.create(
+      tx,
+      {
+        recipientUserId,
+        eventKey: `${contextType}-transition:${transitionId}`,
+        type: `${contextType}_${outcome}`,
+        contextType,
+        contextId,
+      },
+      true,
+    );
   }
 
   private database(): Database {

@@ -78,6 +78,22 @@ export const router = createBrowserRouter([
         },
       },
       {
+        path: 'notifications',
+        lazy: async () => {
+          const { NotificationsPage } = await import('@/features/notifications/NotificationsPage');
+          return { Component: NotificationsPage };
+        },
+      },
+      {
+        path: 'admin',
+        lazy: async () => {
+          const { PlatformModerationPage } = await import(
+            '@/features/moderation/PlatformModerationPage'
+          );
+          return { Component: PlatformModerationPage };
+        },
+      },
+      {
         path: 'profile/edit',
         lazy: async () => {
           const { ProfileEditPage } = await import('@/features/profile/ProfileEditPage');

@@ -4,6 +4,7 @@ import {
   Inject,
   Injectable,
   NotFoundException,
+  Optional,
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { and, asc, count, eq, or } from 'drizzle-orm';
@@ -21,6 +22,7 @@ import {
 import type { AuthenticatedUser } from '../auth/authenticated-user';
 import { EventsService } from '../events/events.service';
 import { CommunitiesService } from '../communities/communities.service';
+import { ModerationService } from '../moderation/moderation.service';
 import type {
   CreateCommunityTopicDto,
   CreateDiscussionPostDto,
@@ -33,6 +35,7 @@ export class DiscussionsService {
     @Inject(DATABASE) private readonly db: Database | undefined,
     private readonly eventsService: EventsService,
     private readonly communitiesService: CommunitiesService,
+    @Optional() private readonly moderation?: ModerationService,
   ) {}
 
   async communityTopics(communityId: string, pageInput?: string) {
@@ -195,7 +198,11 @@ export class DiscussionsService {
 
   async closeCommunityTopic(user: AuthenticatedUser, communityId: string, topicId: string) {
     const community = await this.publicCommunity(communityId);
-    await this.communitiesService.assertCanManage(user.id, community.id);
+    try {
+      await this.communitiesService.assertCanManage(user.id, community.id);
+    } catch (error) {
+      if (!(error instanceof ForbiddenException) || !(await this.moderation?.isModerator(user.id, 'community', community.id))) throw error;
+    }
     const [topic] = await this.database()
       .update(discussionThreads)
       .set({ archivedAt: new Date(), archivedByUserId: user.id })
@@ -214,7 +221,11 @@ export class DiscussionsService {
       .where(or(eq(events.id, eventId), eq(events.slug, eventId)))
       .limit(1);
     if (!event) throw new NotFoundException('Event not found.');
-    await this.eventsService.assertCanManageById(user, event.id);
+    try {
+      await this.eventsService.assertCanManageById(user, event.id);
+    } catch (error) {
+      if (!(error instanceof ForbiddenException) || !(await this.moderation?.isModerator(user.id, 'event', event.id))) throw error;
+    }
     await this.database().transaction(async (tx) => {
       await tx.select({ id: events.id }).from(events).where(eq(events.id, event.id)).for('update');
       const [existing] = await tx
@@ -273,6 +284,7 @@ export class DiscussionsService {
     } catch (error) {
       if (!(error instanceof ForbiddenException)) throw error;
     }
+    const moderator = !manager && Boolean(await this.moderation?.isModerator(user.id, kind, parent.id));
 
     return db.transaction(async (tx) => {
       const [resourceState] =
@@ -311,11 +323,13 @@ export class DiscussionsService {
         )
         .for('update');
       if (!post) throw new NotFoundException('Post not found.');
-      if (!manager && post.authorId !== user.id)
+      if (!manager && !moderator && post.authorId !== user.id)
         throw new ForbiddenException('You cannot manage this post.');
+      if (!manager && moderator && body !== null && post.authorId !== user.id)
+        throw new ForbiddenException('Moderators may remove but not edit others’ posts.');
       if (post.deletedAt) throw new BadRequestException('This post was already removed.');
 
-      if (!manager) {
+      if (!manager && !moderator) {
         if (resourceState?.closed || post.archivedAt)
           throw new ForbiddenException('This discussion is closed.');
         if (kind === 'event') {

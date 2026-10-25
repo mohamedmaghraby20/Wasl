@@ -42,6 +42,10 @@ const api = vi.hoisted(() => ({
     isError: false,
   },
   blocked: { data: [], isPending: false, isError: false },
+  people: {
+    data: [{ id: 'recipient-id', displayName: 'Recipient Person', avatarUrl: null }],
+    isFetching: false,
+  },
   createDm: {
     mutateAsync: vi.fn(() => Promise.resolve({ channelId: 'channel-1' })),
     isPending: false,
@@ -64,6 +68,9 @@ vi.mock('stream-chat-react', () => ({
   Window: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 vi.mock('@/features/auth/AuthProvider', () => ({ useAuth: () => ({ user: api.user }) }));
+vi.mock('@/api/generated/users/users', () => ({
+  useUsersControllerSearch: () => api.people,
+}));
 vi.mock('@/api/generated/messaging/messaging', () => ({
   useMessagingControllerSession: () => api.session,
   useMessagingControllerConversations: () => api.conversations,
@@ -107,10 +114,15 @@ describe('MessagesPage', () => {
     expect(stream.connectUser).toHaveBeenCalledWith({ id: 'wasl-user' }, expect.any(Function));
   });
 
-  it('starts a DM from a Wasl user ID and reports failures accessibly', async () => {
+  it('starts a DM from a searched person', async () => {
     renderPage();
     await screen.findByRole('heading', { name: 'Messages' });
-    await userEvent.type(screen.getByRole('textbox', { name: 'Wasl user ID' }), 'recipient-id');
+    await userEvent.click(screen.getByRole('combobox', { name: 'Find a person' }));
+    await userEvent.type(
+      screen.getByRole('searchbox', { name: /Search people/ }),
+      'Recipient',
+    );
+    await userEvent.click(await screen.findByRole('option', { name: 'Recipient Person' }));
     await userEvent.click(screen.getByRole('button', { name: 'Start direct message' }));
     await waitFor(() =>
       expect(api.createDm.mutateAsync).toHaveBeenCalledWith({

@@ -5,6 +5,7 @@ import {
   Inject,
   Injectable,
   NotFoundException,
+  Optional,
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { and, count, eq, inArray } from 'drizzle-orm';
@@ -20,6 +21,7 @@ import {
 import type { AuthenticatedUser } from '../auth/authenticated-user';
 import { CommunitiesService } from '../communities/communities.service';
 import { OrganizationsService } from '../organizations/organizations.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import type { CreateEventDto, UpdateEventDto } from './events.dto';
 
 @Injectable()
@@ -28,6 +30,7 @@ export class EventsService {
     @Inject(DATABASE) private readonly db: Database | undefined,
     private readonly communities: CommunitiesService,
     private readonly organizations: OrganizationsService,
+    @Optional() private readonly notifications?: NotificationsService,
   ) {}
 
   async create(user: AuthenticatedUser, input: CreateEventDto) {
@@ -154,7 +157,38 @@ export class EventsService {
     const existing = await this.find(id);
     await this.assertCanManage(user, existing);
     if (!existing.cancelled)
-      await this.database().update(events).set({ cancelled: true }).where(eq(events.id, id));
+      await this.database().transaction(async (tx) => {
+        const [locked] = await tx
+          .select({ cancelled: events.cancelled })
+          .from(events)
+          .where(eq(events.id, id))
+          .for('update')
+          .limit(1);
+        if (!locked || locked.cancelled) return;
+        await tx.update(events).set({ cancelled: true }).where(eq(events.id, id));
+        const recipients = await tx
+          .select({ userId: eventRegistrations.userId })
+          .from(eventRegistrations)
+          .where(
+            and(
+              eq(eventRegistrations.eventId, id),
+              inArray(eventRegistrations.status, ['ACCEPTED', 'PENDING', 'WAITLISTED']),
+            ),
+          );
+        for (const recipient of recipients) {
+          await this.notifications?.create(
+            tx,
+            {
+              recipientUserId: recipient.userId,
+              eventKey: `event-cancelled:${id}`,
+              type: 'event_cancelled',
+              contextType: 'event',
+              contextId: id,
+            },
+            true,
+          );
+        }
+      });
     return { id: existing.id, slug: existing.slug };
   }
 

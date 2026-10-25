@@ -6,7 +6,7 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { and, eq } from 'drizzle-orm';
+import { and, asc, eq, ilike, ne } from 'drizzle-orm';
 import { DATABASE, type Database } from '../../db/database.module';
 import { cities, profiles, users } from '../../db/schema';
 import type { AuthenticatedUser } from '../auth/authenticated-user';
@@ -74,6 +74,34 @@ export class UsersService {
       cityName: row.cityName,
       interests: row.interests,
     };
+  }
+
+  async search(user: AuthenticatedUser, query: string) {
+    const term = query.trim();
+    if (term.length < 2) return [];
+    const escaped = term.replace(/[\\%_]/g, '\\$&');
+    const rows = await this.database()
+      .select({
+        id: users.id,
+        displayName: profiles.displayName,
+        avatarPath: profiles.avatarPath,
+      })
+      .from(users)
+      .innerJoin(profiles, eq(profiles.id, users.id))
+      .where(
+        and(
+          eq(users.accountStatus, 'ACTIVE'),
+          ne(users.id, user.id),
+          ilike(profiles.displayName, `%${escaped}%`),
+        ),
+      )
+      .orderBy(asc(profiles.displayName))
+      .limit(8);
+    return rows.map((row) => ({
+      id: row.id,
+      displayName: row.displayName,
+      avatarUrl: this.publicAvatarUrl(row.avatarPath),
+    }));
   }
 
   async getCurrentAvatarPath(user: AuthenticatedUser): Promise<string | null> {
