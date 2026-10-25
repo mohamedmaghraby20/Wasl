@@ -53,6 +53,10 @@ async function main(): Promise<void> {
       rejected.headers.get('access-control-allow-origin'),
       'https://untrusted.example',
     );
+    const invalidPage = await fetch(`${url}/events?pageSize=101`);
+    assert.equal(invalidPage.status, 400, 'public listing must reject out-of-range pagination');
+    const invalidDate = await fetch(`${url}/events?from=2026-02-30`);
+    assert.equal(invalidDate.status, 400, 'public listing must reject invalid dates');
 
     const denied = await fetch(`${url}/reports`, { method: 'POST' });
     assert.equal(denied.status, 401, 'unauthenticated reports must not reach the handler');
@@ -67,7 +71,7 @@ async function main(): Promise<void> {
     }
     assert.equal(limited, true, 'repeated report requests must be throttled');
     console.log(
-      'Security headers, CORS, unauthenticated report denial and report throttling passed.',
+      'Security headers, CORS, public filter validation, unauthenticated report denial and report throttling passed.',
     );
   } finally {
     await stop(api);
