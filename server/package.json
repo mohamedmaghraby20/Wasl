@@ -17,10 +17,10 @@
   },
   "dependencies": {
     "@fastify/helmet": "13.0.2",
-    "@nestjs/common": "11.1.6",
+    "@nestjs/common": "11.2.4",
     "@nestjs/config": "4.0.2",
-    "@nestjs/core": "11.1.6",
-    "@nestjs/platform-fastify": "11.1.6",
+    "@nestjs/core": "11.2.4",
+    "@nestjs/platform-fastify": "11.2.4",
     "@nestjs/swagger": "11.2.0",
     "@nestjs/terminus": "11.0.0",
     "@nestjs/throttler": "6.4.0",
@@ -28,13 +28,13 @@
     "@wasl/shared": "workspace:*",
     "class-transformer": "0.5.1",
     "class-validator": "0.14.2",
-    "drizzle-orm": "0.44.7",
-    "fastify": "5.4.0",
+    "drizzle-orm": "0.45.4",
+    "fastify": "5.12.7",
     "pg": "8.16.3",
     "reflect-metadata": "0.2.2",
     "rxjs": "7.8.2",
     "stream-chat": "9.54.0",
-    "zod": "4.1.12"
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@nestjs/cli": "11.0.10",
