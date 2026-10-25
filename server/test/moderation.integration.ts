@@ -119,6 +119,29 @@ async function main(): Promise<void> {
         assert.equal(await service.isModerator(target, 'event', eventId), true);
         assert.equal((await service.permissions(target, 'event', eventId)).manager, false);
         assert.equal((await service.permissions(target, 'event', eventId)).moderator, true);
+        const unrelatedEventId = randomUUID();
+        await tx.execute(sql`insert into public.events
+        (id, slug, title, description, host_type, host_id, host_name, online, starts_at, admission_mode)
+        values (${unrelatedEventId}, ${unrelatedEventId}, 'Other event', '', 'user', ${reporter}, 'Organizer', true, '2099-01-01T00:00:00Z', 'instant')`);
+        await tx.insert(schema.eventRegistrations).values({
+          eventId: unrelatedEventId,
+          userId: target,
+          status: 'ACCEPTED',
+        });
+        assert.equal(
+          await service.isModerator(target, 'event', unrelatedEventId),
+          false,
+          'moderator permissions must not transfer between Events',
+        );
+        await tx
+          .update(schema.users)
+          .set({ accountStatus: 'SUSPENDED' })
+          .where(eq(schema.users.id, target));
+        assert.equal(await service.isModerator(target, 'event', eventId), false);
+        await tx
+          .update(schema.users)
+          .set({ accountStatus: 'ACTIVE' })
+          .where(eq(schema.users.id, target));
         await tx
           .update(schema.eventRegistrations)
           .set({ status: 'CANCELLED_BY_USER' })

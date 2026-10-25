@@ -71,6 +71,12 @@ const navItemClass = (isActive: boolean): string =>
 export function RootLayout(): React.JSX.Element {
   const { t, i18n: activeI18n } = useTranslation();
   const { pathname } = useLocation();
+  const isPrivateRoute =
+    /^\/(?:admin|activity|messages|notifications|profile|create|sign-in|sign-up)(?:\/|$)/.test(
+      pathname,
+    ) ||
+    pathname.startsWith('/organizations/invitations/') ||
+    /^\/(?:organizations|communities|events)\/[^/]+\/(?:edit|manage)\/?$/.test(pathname);
   const { user, signOut } = useAuth();
   const [navigationOpen, setNavigationOpen] = useState(false);
   const mainRef = useRef<HTMLElement>(null);
@@ -98,7 +104,10 @@ export function RootLayout(): React.JSX.Element {
   useHead({
     titleTemplate: '%s | Wasl',
     htmlAttrs: { lang: isArabic ? 'ar' : 'en', dir: isArabic ? 'rtl' : 'ltr' },
-    link: [{ rel: 'canonical', href: `${window.location.origin}${pathname}` }],
+    meta: isPrivateRoute ? [{ name: 'robots', content: 'noindex, nofollow' }] : [],
+    link: isPrivateRoute
+      ? []
+      : [{ rel: 'canonical', href: `${window.location.origin}${pathname}` }],
   });
   const languageLabel = t(isArabic ? 'switchToEnglish' : 'switchToArabic');
   return (

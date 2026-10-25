@@ -1,2 +1,13 @@
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /activity
+Disallow: /messages
+Disallow: /notifications
+Disallow: /profile
+Disallow: /create
+Disallow: /sign-in
+Disallow: /sign-up
+Disallow: /organizations/invitations/
+Disallow: /*/manage
+Disallow: /*/edit
