@@ -13,7 +13,7 @@ const buttonVariants = cva(
         secondary:
           'rounded-(--shape-radius-control) border border-primary/25 bg-primary-soft text-primary-soft-text hover:border-primary/45 hover:bg-primary-soft/70 active:bg-primary-soft/60',
         outline:
-          'rounded-(--shape-radius-control) border border-border bg-surface text-text hover:border-border-strong hover:bg-surface-soft active:bg-surface-soft/70',
+          'rounded-(--shape-radius-control) border border-border-control bg-surface text-text hover:border-border-control-hover hover:bg-surface-soft active:bg-surface-soft/70',
         ghost:
           'rounded-(--shape-radius-control) text-text-muted hover:bg-surface-soft hover:text-text',
         danger:
@@ -23,11 +23,11 @@ const buttonVariants = cva(
         link: 'rounded-(--shape-radius-sm) text-primary-soft-text underline decoration-primary/50 decoration-2 underline-offset-4 hover:decoration-primary',
       },
       size: {
-        sm: 'h-9 px-3 text-[0.8125rem]',
+        sm: 'h-11 px-3 text-[0.8125rem]',
         md: 'h-11 px-4 text-sm',
         lg: 'h-12 px-5 text-[0.9375rem]',
         icon: 'size-11 p-0',
-        'icon-sm': 'size-9 p-0',
+        'icon-sm': 'size-11 p-0',
       },
       block: { true: 'w-full', false: '' },
     },

@@ -23,7 +23,7 @@ export function ResourceCard({
   const [firstCategory, ...otherCategories] = item.categories;
 
   return (
-    <article className="group relative flex flex-col gap-4 rounded-(--shape-radius-card) border border-border bg-card p-5 shadow-xs transition-[box-shadow,translate,border-color] duration-(--motion-duration-base) ease-(--motion-ease-standard) hover:-translate-y-0.5 hover:border-border-strong hover:shadow-md has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-ring has-[a:focus-visible]:ring-offset-2 has-[a:focus-visible]:ring-offset-background sm:min-h-[13rem]">
+    <article className="group relative flex flex-col gap-4 rounded-(--shape-radius-card) border border-border bg-card p-5 shadow-xs transition-[box-shadow,translate,border-color] duration-(--motion-duration-base) ease-(--motion-ease-standard) hover:-translate-y-0.5 hover:border-border-strong hover:shadow-md has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-ring has-[a:focus-visible]:ring-offset-2 has-[a:focus-visible]:ring-offset-background">
       {(event && date) || firstCategory ? (
         <div className="flex items-start justify-between gap-3">
           {event && date ? (

@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createHead, UnheadProvider } from '@unhead/react/client';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { I18nextProvider } from 'react-i18next';
 import { MemoryRouter, Route, Routes } from 'react-router';
@@ -49,10 +49,6 @@ describe('MyActivityPage', () => {
     mocks.useAuth.mockReturnValue({ user: { id: 'user-1' }, loading: false });
     mocks.leave.mockResolvedValue({ status: 'LEFT' });
     mocks.cancel.mockResolvedValue({ status: 'CANCELLED_BY_USER' });
-    vi.stubGlobal(
-      'confirm',
-      vi.fn(() => true),
-    );
   });
 
   it('shows both empty states when the user has no participation', () => {
@@ -102,6 +98,8 @@ describe('MyActivityPage', () => {
     expect(screen.getByText('You are a community member')).toBeVisible();
     expect(screen.getByText('You are on the waitlist')).toBeVisible();
     await user.click(screen.getByRole('button', { name: 'Leave community' }));
+    const dialog = await screen.findByRole('alertdialog');
+    await user.click(within(dialog).getByRole('button', { name: 'Leave community' }));
     expect(mocks.leave).toHaveBeenCalledWith({ id: 'community-1' });
     expect(screen.getByRole('link', { name: 'Community meetup' })).toHaveAttribute(
       'href',

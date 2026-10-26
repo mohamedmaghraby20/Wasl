@@ -1,8 +1,10 @@
-import { ArrowRight, Eye } from 'lucide-react';
+import { ArrowRight, Eye, Search, X } from 'lucide-react';
+import { useState } from 'react';
 import { Form, Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useSeoMeta } from '@unhead/react';
 import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import { HomeSection } from './HomeSection';
 import {
   useDiscoveryControllerListCommunities,
@@ -11,6 +13,7 @@ import {
 
 export function HomePage(): React.JSX.Element {
   const { t, i18n } = useTranslation();
+  const [query, setQuery] = useState('');
   const lang = i18n.language.startsWith('ar') ? 'ar' : 'en';
   const communities = useDiscoveryControllerListCommunities({ pageSize: 3, lang });
   const events = useDiscoveryControllerListEvents({ pageSize: 3, lang });
@@ -34,13 +37,13 @@ export function HomePage(): React.JSX.Element {
         />
         <div className="relative grid items-center gap-8 p-6 sm:p-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14 lg:p-12">
           <div className="grid content-center gap-5">
-            <h1 className="max-w-[16ch] font-heading text-[length:var(--font-size-display)] font-extrabold leading-[1.06] tracking-tight">
+            <h1 className="max-w-[16ch] font-heading text-[length:var(--font-size-display)] font-extrabold rtl:max-w-[24ch]">
               {t('welcome')}
             </h1>
             <p className="max-w-(--container-reading) text-base leading-relaxed text-text-muted">
               {t('starter')}
             </p>
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="grid gap-2 sm:flex sm:flex-wrap sm:items-center sm:gap-3">
               <Button asChild>
                 <Link to="/communities">
                   {t('browseCommunities')}
@@ -67,13 +70,34 @@ export function HomePage(): React.JSX.Element {
             <label className="text-sm font-semibold text-text" htmlFor="home-search">
               {t('homeSearchLabel')}
             </label>
-            <input
-              className="h-11 min-w-0 rounded-(--shape-radius-control) border border-input bg-background px-3 text-sm text-text shadow-xs transition-[border-color] duration-(--motion-duration-fast) placeholder:text-text-subtle hover:border-border-strong"
-              id="home-search"
-              name="q"
-              placeholder={t('exploreByName')}
-              type="search"
-            />
+            <div className="relative">
+              <Search
+                aria-hidden="true"
+                className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-text-subtle"
+              />
+              <Input
+                autoComplete="off"
+                className={query ? 'ps-9 pe-12' : 'ps-9'}
+                enterKeyHint="search"
+                id="home-search"
+                name="q"
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder={t('exploreByName')}
+                type="search"
+                value={query}
+              />
+              {query ? (
+                <button
+                  aria-label={t('clearSearch')}
+                  className="absolute end-0 top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-full text-text-subtle transition-colors hover:bg-surface-soft hover:text-text"
+                  onClick={() => setQuery('')}
+                  title={t('clearSearch')}
+                  type="button"
+                >
+                  <X aria-hidden="true" className="size-4" />
+                </button>
+              ) : null}
+            </div>
             <Button block type="submit">
               {t('search')}
             </Button>

@@ -39,6 +39,8 @@
   --color-text-muted: var(--color-text-muted);
   --color-text-subtle: var(--color-text-subtle);
   --color-border-strong: var(--color-border-strong);
+  --color-border-control: var(--color-border-control);
+  --color-border-control-hover: var(--color-border-control-hover);
   --color-primary-hover: var(--color-primary-hover);
   --color-primary-active: var(--color-primary-active);
   --color-primary-soft: var(--color-primary-soft);

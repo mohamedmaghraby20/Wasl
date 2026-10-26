@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useHead } from '@unhead/react';
 import { ArrowLeft, Camera, CircleUserRound, X } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router';
@@ -18,18 +18,20 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Field } from '@/components/ui/Field';
 import { Input } from '@/components/ui/Input';
-import { Select } from '@/components/ui/Select';
+import { SearchableSelect } from '@/components/ui/SearchableSelect';
+import { TagInput } from '@/components/ui/TagInput';
 import { Textarea } from '@/components/ui/Textarea';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { languageCode } from '@/features/resources/resource-utils';
 import { profileImageExtension } from './profile-utils';
+import { focusFirstInvalid } from '@/lib/focus-first-invalid';
 import { supabase } from '@/lib/supabase';
 
 const profileSchema = z.object({
   displayName: z.string().trim().min(1).max(80),
   bio: z.string().max(500),
   cityId: z.string(),
-  interests: z.string(),
+  interests: z.array(z.string().trim().min(1).max(60)).max(20),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -47,13 +49,14 @@ export function ProfileEditPage(): React.JSX.Element {
   const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
   const [removePhoto, setRemovePhoto] = useState(false);
   const [formError, setFormError] = useState('');
+  const formRef = useRef<HTMLFormElement>(null);
   const previewUrl = useMemo(
     () => (selectedPhoto ? URL.createObjectURL(selectedPhoto) : null),
     [selectedPhoto],
   );
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
-    defaultValues: { displayName: '', bio: '', cityId: '', interests: '' },
+    defaultValues: { displayName: '', bio: '', cityId: '', interests: [] },
   });
 
   useHead({ title: t('editProfile') });
@@ -63,7 +66,7 @@ export function ProfileEditPage(): React.JSX.Element {
       displayName: profile.data.displayName,
       bio: profile.data.bio,
       cityId: profile.data.cityId ?? '',
-      interests: profile.data.interests.join(', '),
+      interests: profile.data.interests,
     });
   }, [form, profile.data]);
   useEffect(
@@ -110,10 +113,7 @@ export function ProfileEditPage(): React.JSX.Element {
           displayName: values.displayName,
           bio: values.bio,
           cityId: values.cityId || null,
-          interests: values.interests
-            .split(',')
-            .map((interest) => interest.trim())
-            .filter(Boolean),
+          interests: values.interests,
           ...(avatarPath !== undefined ? { avatarPath } : {}),
         },
         params: { lang },
@@ -141,7 +141,7 @@ export function ProfileEditPage(): React.JSX.Element {
   return (
     <section className="mx-auto grid max-w-(--container-reading) gap-6">
       <Link
-        className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-text-muted transition-colors hover:text-text"
+        className="inline-flex min-h-11 w-fit items-center gap-1.5 text-sm font-medium text-text-muted transition-colors hover:text-text"
         to="/profile"
       >
         <ArrowLeft aria-hidden="true" className="size-4 rtl:rotate-180" />
@@ -155,7 +155,13 @@ export function ProfileEditPage(): React.JSX.Element {
       <Card>
         <form
           className="grid gap-6 p-5 sm:p-7"
-          onSubmit={(event) => void form.handleSubmit((values) => void saveProfile(values))(event)}
+          onSubmit={(event) =>
+            void form.handleSubmit(
+              (values) => void saveProfile(values),
+              () => focusFirstInvalid(formRef.current),
+            )(event)
+          }
+          ref={formRef}
         >
           <section
             aria-labelledby="profile-photo-heading"
@@ -225,8 +231,9 @@ export function ProfileEditPage(): React.JSX.Element {
               id="profile-city"
               label={t('profileCity')}
             >
-              <Select
+              <SearchableSelect
                 disabled={cities.isPending || cities.isError}
+                emptyMessage={t('noCitiesFound')}
                 id="profile-city"
                 onValueChange={(value) =>
                   form.setValue('cityId', value === '__none__' ? '' : value, {
@@ -234,6 +241,7 @@ export function ProfileEditPage(): React.JSX.Element {
                   })
                 }
                 options={[{ value: '__none__', label: t('profileCityEmpty') }, ...cityOptions]}
+                searchPlaceholder={t('searchCities')}
                 value={form.watch('cityId') || '__none__'}
               />
             </Field>
@@ -255,7 +263,17 @@ export function ProfileEditPage(): React.JSX.Element {
           </Field>
 
           <Field hint={t('profileInterestsHint')} id="profile-interests" label={t('profileInterests')}>
-            <Input id="profile-interests" maxLength={1200} {...form.register('interests')} />
+            <TagInput
+              id="profile-interests"
+              onChange={(interests) =>
+                form.setValue('interests', interests, {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                })
+              }
+              placeholder={t('addInterest')}
+              value={form.watch('interests')}
+            />
           </Field>
 
           {formError ? (

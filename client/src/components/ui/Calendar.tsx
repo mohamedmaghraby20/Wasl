@@ -20,7 +20,7 @@ export function Calendar({
       : 'en';
   return (
     <DayPicker
-      className={cn('p-1', className)}
+      className={cn('p-0', className)}
       classNames={{
         months: 'relative flex flex-col gap-4 sm:flex-row',
         month: 'flex w-full flex-col gap-3',

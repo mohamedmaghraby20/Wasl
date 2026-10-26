@@ -6,7 +6,7 @@ import {
   useDiscoveryControllerListEvents,
 } from '@/api/generated/discovery/discovery';
 import { languageCode } from '@/features/resources/resource-utils';
-import type { DiscoveryKind } from './discovery-utils';
+import { DISCOVERY_PAGE_SIZE, type DiscoveryKind } from './discovery-utils';
 
 function resetPage(params: URLSearchParams): URLSearchParams {
   const next = new URLSearchParams(params);
@@ -26,7 +26,9 @@ export function useDiscoveryPageState(language: string) {
         : 'all';
   const requestedPage = Number(params.get('page') ?? 1);
   const page = Number.isInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
-  const hasFilters = ['q', 'city', 'category', 'from', 'to'].some((key) => params.has(key));
+  const filterKeys =
+    kind === 'communities' ? ['q', 'city', 'category'] : ['q', 'city', 'category', 'from', 'to'];
+  const hasFilters = filterKeys.some((key) => params.has(key));
   const lang = languageCode(language);
   const communityParams = {
     ...(params.get('q') ? { q: params.get('q')! } : {}),
@@ -34,7 +36,7 @@ export function useDiscoveryPageState(language: string) {
     ...(params.get('category') ? { category: params.get('category')! } : {}),
     lang,
     page: kind === 'all' ? 1 : page,
-    pageSize: kind === 'all' ? 6 : 13,
+    pageSize: kind === 'all' ? 6 : DISCOVERY_PAGE_SIZE,
   };
   const eventParams = {
     ...communityParams,
@@ -72,9 +74,17 @@ export function useDiscoveryPageState(language: string) {
   };
 
   const listingParams = resetPage(params);
+  if (kind === 'communities') {
+    listingParams.delete('from');
+    listingParams.delete('to');
+  }
   const listingQuery = listingParams.toString();
+  const communityPathParams = new URLSearchParams(listingParams);
+  communityPathParams.delete('from');
+  communityPathParams.delete('to');
+  const communityQuery = communityPathParams.toString();
   const allPath = `/discover${listingQuery ? `?${listingQuery}` : ''}`;
-  const communityPath = `/communities${listingQuery ? `?${listingQuery}` : ''}`;
+  const communityPath = `/communities${communityQuery ? `?${communityQuery}` : ''}`;
   const eventPath = `/events${listingQuery ? `?${listingQuery}` : ''}`;
 
   return {

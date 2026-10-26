@@ -64,9 +64,9 @@ export function HomeSection({
         <QueryError message={t('loadError', { resource })} onRetry={onRetry} />
       ) : !items?.length ? (
         <EmptyState
-          description={t('noResults', { resource })}
+          description={t('noHomeResults', { resource })}
           icon={SearchX}
-          title={t('noResultsTitle')}
+          title={t('noHomeResultsTitle')}
         />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

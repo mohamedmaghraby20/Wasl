@@ -59,7 +59,7 @@ export function DateTimePicker({
         value={datePart}
       />
       <Select
-        aria-label={t('time')}
+        aria-label={timePart ? `${t('time')}: ${timePart}` : t('time')}
         className="w-28"
         disabled={disabled || !datePart}
         onValueChange={(nextTime) => update(datePart, nextTime)}

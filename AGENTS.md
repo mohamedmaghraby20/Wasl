@@ -134,19 +134,15 @@ Keep these instructions useful and concise. When the user corrects an approach, 
 - Generated API code: generate from NestJS OpenAPI; never hand-edit generated clients.
 
 ### Conventions specific to this repo
-
-- Read `docs/IMPLEMENTATION_GUIDE.md`, `docs/context/`, and the relevant task before implementation. If no task-specific document exists, use the user's request and acceptance criteria. Work in global task order and preserve existing changes.
+- For every phase in this repo a git commit and branch with relevant commit message should be created.
 - Keep React in `client/`, NestJS domain logic in `server/`, and cross-boundary contracts in `shared/`.
 - NestJS owns authorization and business rules. Do not query PostgreSQL from client code or share repositories across server modules.
-- Use approved tokens in `client/src/styles/` and treat `docs/design/` as the design handoff when present. Keep Arabic/English and RTL/LTR behavior in scope.
 - When a task matches an installed skill under `.agents/skills/`, read its `SKILL.md` and follow its task-specific workflow.
 - Keep secrets out of source control. Client environment values must be safe to expose; privileged keys and database credentials stay on the server.
-- Add focused tests with feature work. Run relevant local lint, type checks, tests, and builds; report exact commands and results. Never claim verification that was not run.
+-When running tests run those tests just on this specific feature, don't load passed test only failed ones gets loaded
 
 ### Forbidden
 
-- Do not initialize Git or configure CI/CD before the final implementation phase.
-- Do not hand-edit generated API code.
 - Do not place database access or authoritative business authorization in client code.
 
 ---
@@ -155,17 +151,19 @@ Keep these instructions useful and concise. When the user corrects an approach, 
 
 **Accumulated corrections. This section is for the agent to maintain, not just the human.**
 
+- Preserve the existing city dropdown styling when adding search; use the shared Input tokens and hide the scrollbar while retaining scrolling.
+- Keep date pickers compact with fixed-height month grids and viewport-aware positioning; do not enlarge calendars or force popovers outside the visible viewport.
+- Keep input focus indicators inside the border frame; dropdowns open downward after scrolling their trigger into view and lock background scrolling while open.
+
 When the user corrects your approach, append a one-line rule here before ending the session. Write it concretely ("Always use X for Y" not "be careful with Y"), never abstractly. If an existing line already covers the correction, tighten it instead of adding a new one. Remove lines when the underlying issue goes away (model upgrades, refactors, process changes).
 
 - Review the whole `client/src` surface for client-wide React quality requests, even when earlier work focused on one feature phase.
 - Use PascalCase filenames for React component modules; keep tests and Storybook stories in their existing naming pattern.
 - Identify deployment origins and migration targets from environment files, deployment configuration, and connected provider metadata before asking the user; distinguish confirmed values from environment intent that remains unlabeled.
 - Complete each requested task or phase end to end, including required database schema changes, migrations, and verification, before starting the next phase.
+- When finishing a phase, implement all available scope before running focused phase tests; rerun only failed checks after fixes.
 - During a verification or fix pass, close only the stated checks; do not add features, refactors, or new polish opportunities until those checks pass.
 - Let Vite split lazily routed SDKs naturally; a `manualChunks` catch-all `vendor` hoists them into the eager bundle and cross-assigning their sub-dependencies produces circular-chunk warnings.
+- When asked what can proceed without an owner handoff, list concrete task IDs and distinguish executable preparation from tasks that can be completed.
 
 ---
-
-## 12. How this file was built
-
-Adapted from [FerroxLabs/agents-md](https://github.com/FerroxLabs/agents-md), licensed under MIT, with Wasl's existing repository instructions retained in Project context.

@@ -5,11 +5,28 @@ import type { CategoryPublicDto, CityPublicDto } from '@/api/generated/wasl-clie
 import { QueryError } from '@/components/feedback/QueryError';
 import { Button } from '@/components/ui/Button';
 import { DatePicker } from '@/components/ui/DatePicker';
+import { SearchableSelect } from '@/components/ui/SearchableSelect';
 import { Select } from '@/components/ui/Select';
 import { localizedName } from '@/features/resources/resource-utils';
 import type { DiscoveryKind } from './discovery-utils';
 
 const filterControlClass = 'shrink-0 sm:w-44';
+
+type ActiveFilter = {
+  key: string;
+  label: string;
+  value: string;
+  onRemove: () => void;
+};
+
+function formatFilterDate(value: string, language: string): string {
+  const date = new Date(`${value}T00:00:00Z`);
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat(language, {
+    dateStyle: 'medium',
+    timeZone: 'Europe/Istanbul',
+  }).format(date);
+}
 
 export function DiscoveryFilters({
   kind,
@@ -56,9 +73,58 @@ export function DiscoveryFilters({
   // The URL is the committed value; keep the form draft aligned after history navigation.
   useEffect(() => setSearchDraft(searchValue), [searchValue]);
 
+  const selectedCity = cities?.find((city) => city.id === cityValue);
+  const selectedCategory = categories?.find((category) => category.id === categoryValue);
+  const cityName = selectedCity ? localizedName(selectedCity, i18n.language) : cityValue;
+  const categoryName = selectedCategory
+    ? localizedName(selectedCategory, i18n.language)
+    : categoryValue;
+  const activeFilters: ActiveFilter[] = [];
+
+  if (searchValue.trim()) {
+    activeFilters.push({
+      key: 'q',
+      label: t('search'),
+      value: searchValue.trim(),
+      onRemove: () => onSearch(''),
+    });
+  }
+  if (cityValue) {
+    activeFilters.push({
+      key: 'city',
+      label: t('cityFilter'),
+      value: cityName,
+      onRemove: () => onFilterChange('city', ''),
+    });
+  }
+  if (categoryValue) {
+    activeFilters.push({
+      key: 'category',
+      label: t('categoryFilter'),
+      value: categoryName,
+      onRemove: () => onFilterChange('category', ''),
+    });
+  }
+  if (kind !== 'communities' && fromValue) {
+    activeFilters.push({
+      key: 'from',
+      label: t('fromDate'),
+      value: formatFilterDate(fromValue, i18n.language),
+      onRemove: () => onFilterChange('from', ''),
+    });
+  }
+  if (kind !== 'communities' && toValue) {
+    activeFilters.push({
+      key: 'to',
+      label: t('toDate'),
+      value: formatFilterDate(toValue, i18n.language),
+      onRemove: () => onFilterChange('to', ''),
+    });
+  }
+
   return (
     <form
-      aria-label={t('discoveryTitle')}
+      aria-label={t('filters')}
       className="grid gap-3 rounded-(--shape-radius-card) border border-border bg-card p-3 shadow-xs sm:p-4"
       onSubmit={(event) => {
         event.preventDefault();
@@ -74,7 +140,10 @@ export function DiscoveryFilters({
           />
           <input
             aria-label={t('search')}
-            className="h-11 w-full rounded-(--shape-radius-control) border border-input bg-background ps-9 pe-9 text-sm text-text shadow-xs transition-[border-color,box-shadow] duration-(--motion-duration-fast) placeholder:text-text-subtle hover:border-border-strong aria-invalid:border-danger"
+            autoComplete="off"
+            className="h-11 w-full rounded-(--shape-radius-control) border border-input bg-background ps-9 pe-12 text-sm text-text shadow-xs transition-[border-color,box-shadow] duration-(--motion-duration-fast) placeholder:text-text-subtle hover:border-border-control-hover aria-invalid:border-danger"
+            enterKeyHint="search"
+            name="q"
             onChange={(event) => setSearchDraft(event.target.value)}
             placeholder={t('searchHint')}
             type="search"
@@ -83,12 +152,11 @@ export function DiscoveryFilters({
           {searchDraft ? (
             <button
               aria-label={t('clearSearch')}
-              className="absolute end-2 top-1/2 grid size-7 -translate-y-1/2 place-items-center rounded-full text-text-subtle transition-colors hover:bg-surface-soft hover:text-text"
+              className="absolute end-0 top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-full text-text-subtle transition-colors hover:bg-surface-soft hover:text-text"
               onClick={() => {
                 setSearchDraft('');
                 onSearch('');
               }}
-              tabIndex={-1}
               title={t('clearSearch')}
               type="button"
             >
@@ -103,22 +171,25 @@ export function DiscoveryFilters({
       </div>
 
       <div className="grid grid-cols-2 items-center gap-2 sm:flex sm:flex-wrap">
-        <Select
+        <SearchableSelect
           aria-busy={citiesPending}
-          aria-label={t('allCities')}
+          aria-label={cityValue ? `${t('cityFilter')}: ${cityName}` : t('allCities')}
           className={filterControlClass}
           disabled={citiesPending || citiesError || !cities}
+          emptyMessage={t('noCitiesFound')}
+          id="discovery-city"
           onValueChange={(value) => onFilterChange('city', value)}
           options={(cities ?? []).map((city) => ({
             value: city.id,
             label: localizedName(city, i18n.language),
           }))}
           placeholder={citiesPending ? t('loadingCities') : t('allCities')}
+          searchPlaceholder={t('searchCities')}
           value={cityValue}
         />
         <Select
           aria-busy={categoriesPending}
-          aria-label={t('allCategories')}
+          aria-label={categoryValue ? `${t('categoryFilter')}: ${categoryName}` : t('allCategories')}
           className={filterControlClass}
           disabled={categoriesPending || categoriesError || !categories}
           onValueChange={(value) => onFilterChange('category', value)}
@@ -132,6 +203,7 @@ export function DiscoveryFilters({
         {kind !== 'communities' ? (
           <>
             <DatePicker
+              align="start"
               className="w-full shrink-0 sm:w-44"
               label={t('fromDate')}
               onChange={(value) => onFilterChange('from', value)}
@@ -139,6 +211,7 @@ export function DiscoveryFilters({
               value={fromValue}
             />
             <DatePicker
+              align="end"
               className="w-full shrink-0 sm:w-44"
               label={t('toDate')}
               min={fromValue}
@@ -148,9 +221,40 @@ export function DiscoveryFilters({
             />
           </>
         ) : null}
-        {showClear ? (
+      </div>
+
+      {showClear ? (
+        <div
+          aria-label={t('filters')}
+          className="flex flex-wrap items-center gap-2"
+          role="group"
+        >
+          {activeFilters.map((filter) => {
+            const removeLabel = t('removeFilter', {
+              name: `${filter.label}: ${filter.value}`,
+            });
+            return (
+              <span
+                className="inline-flex items-center gap-1 rounded-full border border-border-control bg-surface-soft py-1 ps-3 pe-1 text-xs text-text"
+                key={filter.key}
+              >
+                <span>
+                  <span className="font-semibold">{filter.label}:</span> {filter.value}
+                </span>
+                <button
+                  aria-label={removeLabel}
+                  className="grid size-9 place-items-center rounded-full text-text-muted transition-colors hover:bg-surface hover:text-text"
+                  onClick={filter.onRemove}
+                  title={removeLabel}
+                  type="button"
+                >
+                  <X aria-hidden="true" className="size-3.5" />
+                </button>
+              </span>
+            );
+          })}
           <Button
-            className="col-span-2 justify-self-start text-text-muted sm:col-span-1"
+            className="text-text-muted"
             onClick={onClear}
             size="sm"
             type="button"
@@ -159,8 +263,8 @@ export function DiscoveryFilters({
             <X aria-hidden="true" />
             {t('clearFilters')}
           </Button>
-        ) : null}
-      </div>
+        </div>
+      ) : null}
 
       {citiesError || categoriesError ? (
         <div className="grid gap-2 sm:grid-cols-2">

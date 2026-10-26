@@ -18,7 +18,7 @@
   --destructive: var(--color-danger);
   --destructive-foreground: var(--color-surface);
   --border: var(--color-border);
-  --input: var(--color-border);
+  --input: var(--color-border-control);
   --ring: var(--color-ring);
   --chart-1: var(--color-primary);
   --chart-2: var(--color-success);

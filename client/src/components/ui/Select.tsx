@@ -2,6 +2,7 @@ import * as SelectPrimitive from '@radix-ui/react-select';
 import { Check, ChevronDown } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { cn } from '@/lib/cn';
+import { useDownwardDropdown } from '@/lib/use-downward-dropdown';
 
 export type SelectOption = { value: string; label: ReactNode; disabled?: boolean };
 
@@ -38,12 +39,15 @@ export function Select({
   'aria-invalid': ariaInvalid,
   'aria-busy': ariaBusy,
 }: SelectProps): React.JSX.Element {
+  const { open, onOpenChange, triggerRef } = useDownwardDropdown(300);
   return (
     <SelectPrimitive.Root
       disabled={disabled}
       name={name}
       onValueChange={onValueChange}
       value={value}
+      open={open}
+      onOpenChange={onOpenChange}
     >
       <SelectPrimitive.Trigger
         aria-busy={ariaBusy}
@@ -51,11 +55,12 @@ export function Select({
         aria-invalid={ariaInvalid}
         aria-label={ariaLabel}
         className={cn(
-          'flex h-11 w-full min-w-0 items-center justify-between gap-2 rounded-(--shape-radius-control) border border-input bg-background px-3 text-start text-sm text-text shadow-xs transition-[border-color,background-color] duration-(--motion-duration-fast) hover:border-border-strong disabled:cursor-not-allowed disabled:opacity-(--opacity-disabled) aria-invalid:border-danger [&>span]:truncate',
+          'flex h-11 w-full min-w-0 items-center justify-between gap-2 rounded-(--shape-radius-control) border border-input bg-background px-3 text-start text-sm text-text shadow-xs transition-[border-color,background-color] duration-(--motion-duration-fast) hover:border-border-control-hover disabled:cursor-not-allowed disabled:opacity-(--opacity-disabled) aria-invalid:border-danger [&>span]:truncate',
           !value && 'text-text-subtle',
           className,
         )}
         id={id}
+        ref={triggerRef}
       >
         <SelectPrimitive.Value placeholder={placeholder} />
         <SelectPrimitive.Icon asChild>
@@ -66,12 +71,14 @@ export function Select({
         <SelectPrimitive.Content
           className="z-(--z-dropdown) max-h-(--radix-select-content-available-height) min-w-(--radix-select-trigger-width) overflow-hidden rounded-xl border border-border bg-popover text-popover-foreground shadow-lg data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95"
           position="popper"
+          side="bottom"
+          avoidCollisions={false}
           sideOffset={6}
         >
           <SelectPrimitive.Viewport className="max-h-72 overflow-y-auto p-1">
             {options.map((option) => (
               <SelectPrimitive.Item
-                className="relative flex h-9 w-full cursor-pointer select-none items-center rounded-md px-2.5 pe-8 text-sm outline-hidden data-[disabled]:pointer-events-none data-[disabled]:opacity-(--opacity-disabled) data-[highlighted]:bg-primary-soft data-[highlighted]:text-primary-soft-text data-[state=checked]:font-semibold"
+                className="relative flex min-h-11 w-full cursor-pointer select-none items-center rounded-md px-2.5 py-2 pe-8 text-sm outline-hidden data-[disabled]:pointer-events-none data-[disabled]:opacity-(--opacity-disabled) data-[highlighted]:bg-primary-soft data-[highlighted]:text-primary-soft-text data-[state=checked]:font-semibold"
                 disabled={option.disabled}
                 key={option.value}
                 value={option.value}

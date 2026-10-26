@@ -11,6 +11,7 @@ import { QueryError } from '@/components/feedback/QueryError';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { ReportAction } from '@/features/moderation/ReportAction';
 import { languageCode } from '@/features/resources/resource-utils';
 
 function safeExternalUrl(value: string | null | undefined): string | undefined {
@@ -120,6 +121,7 @@ export function OrganizationProfilePage(): React.JSX.Element {
             </Link>
           </Button>
         ) : null}
+        <ReportAction targetType="organization" targetId={organization.id} />
       </header>
 
       <div className="grid gap-5 rounded-(--shape-radius-card) border border-border bg-card p-6 shadow-xs">
@@ -137,7 +139,7 @@ export function OrganizationProfilePage(): React.JSX.Element {
               {websiteUrl ? (
                 <li>
                   <a
-                    className="inline-flex h-10 items-center gap-2 rounded-(--shape-radius-control) border border-border bg-background px-3.5 text-sm font-medium text-text transition-colors hover:border-border-strong hover:bg-surface-soft"
+                    className="inline-flex h-11 items-center gap-2 rounded-(--shape-radius-control) border border-border-control bg-background px-3.5 text-sm font-medium text-text transition-colors hover:border-border-control-hover hover:bg-surface-soft"
                     href={websiteUrl}
                     rel="noreferrer"
                     target="_blank"
@@ -151,7 +153,7 @@ export function OrganizationProfilePage(): React.JSX.Element {
               {socialUrl ? (
                 <li>
                   <a
-                    className="inline-flex h-10 items-center gap-2 rounded-(--shape-radius-control) border border-border bg-background px-3.5 text-sm font-medium text-text transition-colors hover:border-border-strong hover:bg-surface-soft"
+                    className="inline-flex h-11 items-center gap-2 rounded-(--shape-radius-control) border border-border-control bg-background px-3.5 text-sm font-medium text-text transition-colors hover:border-border-control-hover hover:bg-surface-soft"
                     href={socialUrl}
                     rel="noreferrer"
                     target="_blank"

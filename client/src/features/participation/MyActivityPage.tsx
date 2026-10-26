@@ -10,6 +10,7 @@ import {
 } from '@/api/generated/participation/participation';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { QueryError } from '@/components/feedback/QueryError';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -30,6 +31,7 @@ export function MyActivityPage(): React.JSX.Element {
   const activity = useParticipationControllerMyActivity({ query: { enabled: Boolean(user) } });
   const leave = useParticipationControllerLeaveCommunity();
   const cancel = useParticipationControllerCancelEventRegistration();
+  const { confirm, dialog } = useConfirm();
   usePageMetadata(t('myActivity'), t('myActivityDescription'), { noindex: true });
 
   if (!loading && !user) return <Navigate replace to="/sign-in?returnTo=%2Factivity" />;
@@ -46,7 +48,15 @@ export function MyActivityPage(): React.JSX.Element {
   }
 
   const leaveCommunity = async (id: string): Promise<void> => {
-    if (!window.confirm(t('confirmLeaveCommunity'))) return;
+    if (
+      !(await confirm({
+        title: t('leaveCommunity'),
+        description: t('confirmLeaveCommunity'),
+        confirmLabel: t('leaveCommunity'),
+        destructive: true,
+      }))
+    )
+      return;
     try {
       await leave.mutateAsync({ id });
       await queryClient.invalidateQueries();
@@ -55,7 +65,15 @@ export function MyActivityPage(): React.JSX.Element {
     }
   };
   const cancelRegistration = async (id: string): Promise<void> => {
-    if (!window.confirm(t('confirmCancelRegistration'))) return;
+    if (
+      !(await confirm({
+        title: t('cancelRegistration'),
+        description: t('confirmCancelRegistration'),
+        confirmLabel: t('cancelRegistration'),
+        destructive: true,
+      }))
+    )
+      return;
     try {
       await cancel.mutateAsync({ id });
       await queryClient.invalidateQueries();
@@ -168,6 +186,7 @@ export function MyActivityPage(): React.JSX.Element {
           />
         )}
       </section>
+      {dialog}
     </div>
   );
 }

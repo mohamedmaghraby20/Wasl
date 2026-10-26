@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useHead } from '@unhead/react';
 import { ArrowLeft } from 'lucide-react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router';
@@ -12,10 +12,11 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Field } from '@/components/ui/Field';
 import { Input } from '@/components/ui/Input';
-import { Select } from '@/components/ui/Select';
+import { SearchableSelect } from '@/components/ui/SearchableSelect';
 import { Textarea } from '@/components/ui/Textarea';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { languageCode } from '@/features/resources/resource-utils';
+import { focusFirstInvalid } from '@/lib/focus-first-invalid';
 
 const optionalUrl = z
   .string()
@@ -44,6 +45,7 @@ export function OrganizationCreatePage(): React.JSX.Element {
   const cities = useDiscoveryControllerCities();
   const create = useOrganizationsControllerCreate();
   const [formError, setFormError] = useState('');
+  const formRef = useRef<HTMLFormElement>(null);
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -95,7 +97,7 @@ export function OrganizationCreatePage(): React.JSX.Element {
   return (
     <section className="mx-auto grid max-w-(--container-reading) gap-6">
       <Link
-        className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-text-muted transition-colors hover:text-text"
+        className="inline-flex min-h-11 w-fit items-center gap-1.5 text-sm font-medium text-text-muted transition-colors hover:text-text"
         to="/create"
       >
         <ArrowLeft aria-hidden="true" className="size-4 rtl:rotate-180" />
@@ -111,7 +113,13 @@ export function OrganizationCreatePage(): React.JSX.Element {
       <Card>
         <form
           className="grid gap-6 p-5 sm:p-7"
-          onSubmit={(event) => void form.handleSubmit((values) => void save(values))(event)}
+          onSubmit={(event) =>
+            void form.handleSubmit(
+              (values) => void save(values),
+              () => focusFirstInvalid(formRef.current),
+            )(event)
+          }
+          ref={formRef}
         >
           {Object.keys(errors).length > 0 ? (
             <p
@@ -179,8 +187,10 @@ export function OrganizationCreatePage(): React.JSX.Element {
               id="organization-city"
               label={t('profileCity')}
             >
-              <Select
+              <SearchableSelect
+                aria-busy={cities.isPending}
                 disabled={cities.isPending || cities.isError}
+                emptyMessage={t('noCitiesFound')}
                 id="organization-city"
                 onValueChange={(value) =>
                   form.setValue('cityId', value === '__none__' ? '' : value, {
@@ -195,6 +205,8 @@ export function OrganizationCreatePage(): React.JSX.Element {
                       lang === 'ar' ? city.nameAr : lang === 'tr' ? city.nameTr : city.nameEn,
                   })),
                 ]}
+                placeholder={cities.isPending ? t('loadingCities') : t('organizationCityEmpty')}
+                searchPlaceholder={t('searchCities')}
                 value={form.watch('cityId') || '__none__'}
               />
             </Field>

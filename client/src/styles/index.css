@@ -50,8 +50,8 @@ a {
   text-decoration: none;
 }
 ::selection {
-  background: var(--color-primary-soft);
-  color: var(--color-primary-soft-text);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
 }
 
 /* One focus treatment for every interactive element. Components no longer need
@@ -60,9 +60,11 @@ a {
   outline: 2px solid var(--color-ring);
   outline-offset: 2px;
 }
-:where(input, select, textarea):focus-visible {
-  outline: 2px solid var(--color-ring);
-  outline-offset: 1px;
+:where(input:not([type='hidden']), select, textarea, button[role='combobox'], button[aria-haspopup='dialog']):focus-visible {
+  outline: 1px solid var(--color-ring);
+  outline-offset: -1px;
+  border-color: var(--color-ring);
+  transition: none;
 }
 /* Options inside open popovers show focus through their highlighted row.
    An extra ring there reads as a doubled border inside the panel. */

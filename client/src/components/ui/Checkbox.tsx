@@ -10,7 +10,7 @@ export function Checkbox({
   return (
     <CheckboxPrimitive.Root
       className={cn(
-        'peer grid size-[1.15rem] shrink-0 place-items-center rounded-[0.3rem] border border-border-strong bg-surface shadow-xs transition-[background-color,border-color,box-shadow] duration-(--motion-duration-fast) hover:border-primary disabled:cursor-not-allowed disabled:opacity-(--opacity-disabled) data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground data-[state=indeterminate]:border-primary data-[state=indeterminate]:bg-primary data-[state=indeterminate]:text-primary-foreground',
+        'peer grid size-[1.15rem] shrink-0 place-items-center rounded-[0.3rem] border border-border-control bg-surface shadow-xs transition-[background-color,border-color,box-shadow] duration-(--motion-duration-fast) hover:border-border-control-hover disabled:cursor-not-allowed disabled:opacity-(--opacity-disabled) data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground data-[state=indeterminate]:border-primary data-[state=indeterminate]:bg-primary data-[state=indeterminate]:text-primary-foreground',
         className,
       )}
       {...props}

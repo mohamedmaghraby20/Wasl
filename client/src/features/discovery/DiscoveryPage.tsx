@@ -24,6 +24,8 @@ export function DiscoveryPage(): React.JSX.Element {
     eventPath,
   } = useDiscoveryPageState(i18n.language);
   const title = kind === 'all' ? t('discover') : t(kind);
+  const communityTitle = kind === 'all' ? t('communities') : t('communityResults');
+  const eventTitle = kind === 'all' ? t('events') : t('eventResults');
 
   usePageMetadata(title, t('discoverIntro'));
 
@@ -90,13 +92,14 @@ export function DiscoveryPage(): React.JSX.Element {
       {kind !== 'events' && (
         <DiscoverySection
           kind="communities"
-          title={t('communities')}
+          title={communityTitle}
+          total={communities.data?.total}
           results={communities.data?.items}
           page={page}
           loading={communities.isPending}
           error={communities.isError}
           onRetry={() => void communities.refetch()}
-          pageSize={12}
+          hasMore={communities.data?.hasMore ?? false}
           showExploreAll={kind === 'all'}
           exploreHref={communityPath}
           onPageChange={changePage}
@@ -105,13 +108,14 @@ export function DiscoveryPage(): React.JSX.Element {
       {kind !== 'communities' && (
         <DiscoverySection
           kind="events"
-          title={t('events')}
+          title={eventTitle}
+          total={events.data?.total}
           results={events.data?.items}
           page={page}
           loading={events.isPending}
           error={events.isError}
           onRetry={() => void events.refetch()}
-          pageSize={12}
+          hasMore={events.data?.hasMore ?? false}
           showExploreAll={kind === 'all'}
           exploreHref={eventPath}
           onPageChange={changePage}

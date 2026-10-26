@@ -173,6 +173,15 @@
   --z-toast: 60;
 }
 
+/* Arabic headings need a taller line box and no negative tracking. Tajawal is
+   the body face for RTL, so headings should not fall back to Manrope. */
+:root[dir="rtl"] {
+  --font-family-heading: var(--font-family-arabic);
+  --line-height-heading: 1.35;
+  --letter-spacing-tight: 0;
+  --tracking-tight: 0;
+}
+
 /* Wasl Lime — provisional brand accent: #8CC63E. */
 :root[data-theme="wasl"][data-mode="light"] {
   color-scheme: light;
@@ -182,16 +191,18 @@
   --color-surface-raised: var(--color-white);
   --color-text: var(--color-gray-950);
   --color-text-muted: var(--color-gray-600);
-  --color-text-subtle: var(--color-gray-500);
+  --color-text-subtle: #687063;
   --color-border: var(--color-gray-200);
   --color-border-strong: var(--color-gray-300);
+  --color-border-control: #7F8678;
+  --color-border-control-hover: #5F665A;
   --color-primary: var(--color-lime-500);
   --color-primary-hover: var(--color-lime-600);
   --color-primary-active: var(--color-lime-700);
   --color-on-primary: var(--color-gray-950);
   --color-primary-soft: var(--color-lime-100);
   --color-primary-soft-text: var(--color-lime-900);
-  --color-ring: var(--color-lime-700);
+  --color-ring: #537D1B;
   --color-success: var(--color-green-700);
   --color-success-soft: var(--color-green-100);
   --color-warning: var(--color-amber-700);
@@ -220,6 +231,8 @@
   --color-text-subtle: var(--color-dark-300);
   --color-border: var(--color-dark-700);
   --color-border-strong: var(--color-dark-600);
+  --color-border-control: #68795C;
+  --color-border-control-hover: #7D916F;
   --color-primary: var(--color-lime-300);
   --color-primary-hover: var(--color-lime-200);
   --color-primary-active: var(--color-lime-400);
@@ -251,9 +264,11 @@
   --color-surface-raised: var(--color-white);
   --color-text: #17212E;
   --color-text-muted: #5D6B7D;
-  --color-text-subtle: #7C8A9B;
+  --color-text-subtle: #5F6D7E;
   --color-border: #DCE4EF;
   --color-border-strong: #C2D0E1;
+  --color-border-control: #6C8199;
+  --color-border-control-hover: #536579;
   --color-primary: #80B6F2;
   --color-primary-hover: #68A4E7;
   --color-primary-active: #4B8FD9;
@@ -288,6 +303,8 @@
   --color-text-subtle: #8EA2B9;
   --color-border: #34475D;
   --color-border-strong: #4A6079;
+  --color-border-control: #6E8AA6;
+  --color-border-control-hover: #86A2BE;
   --color-primary: #8FC1FA;
   --color-primary-hover: #ACD1FB;
   --color-primary-active: #73AEF0;
@@ -316,9 +333,11 @@
   --color-surface-raised: var(--color-white);
   --color-text: #241A2A;
   --color-text-muted: #6F6376;
-  --color-text-subtle: #908496;
+  --color-text-subtle: #6F6276;
   --color-border: #E5DAEB;
   --color-border-strong: #CFBDD9;
+  --color-border-control: #8A6E9C;
+  --color-border-control-hover: #735D80;
   --color-primary: #C3A0E8;
   --color-primary-hover: #B38ADB;
   --color-primary-active: #9D70CA;
@@ -353,6 +372,8 @@
   --color-text-subtle: #A18CAD;
   --color-border: #483652;
   --color-border-strong: #624B70;
+  --color-border-control: #8C729C;
+  --color-border-control-hover: #A58BB5;
   --color-primary: #D1B2F1;
   --color-primary-hover: #E1CCF8;
   --color-primary-active: #BD96E7;

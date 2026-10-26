@@ -1,10 +1,26 @@
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import { Check, ChevronRight } from 'lucide-react';
-import type { ComponentProps } from 'react';
+import { createContext, useContext, type ComponentProps, type RefObject } from 'react';
 import { cn } from '@/lib/cn';
+import { useDownwardDropdown } from '@/lib/use-downward-dropdown';
 
-export const DropdownMenu = DropdownMenuPrimitive.Root;
-export const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger;
+const TriggerContext = createContext<RefObject<HTMLButtonElement | null> | undefined>(undefined);
+
+export function DropdownMenu({ children, ...props }: ComponentProps<typeof DropdownMenuPrimitive.Root>): React.JSX.Element {
+  const { open, onOpenChange, triggerRef } = useDownwardDropdown(360);
+  return (
+    <TriggerContext.Provider value={triggerRef}>
+      <DropdownMenuPrimitive.Root {...props} open={open} onOpenChange={onOpenChange}>
+        {children}
+      </DropdownMenuPrimitive.Root>
+    </TriggerContext.Provider>
+  );
+}
+
+export function DropdownMenuTrigger(props: ComponentProps<typeof DropdownMenuPrimitive.Trigger>): React.JSX.Element {
+  const triggerRef = useContext(TriggerContext);
+  return <DropdownMenuPrimitive.Trigger {...props} ref={triggerRef} />;
+}
 export const DropdownMenuGroup = DropdownMenuPrimitive.Group;
 
 export function DropdownMenuContent({
@@ -16,6 +32,8 @@ export function DropdownMenuContent({
   return (
     <DropdownMenuPrimitive.Portal>
       <DropdownMenuPrimitive.Content
+        side="bottom"
+        avoidCollisions={false}
         align={align}
         className={cn(
           'z-(--z-dropdown) min-w-52 overflow-hidden rounded-xl border border-border bg-popover p-1 text-popover-foreground shadow-lg data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
@@ -36,7 +54,7 @@ export function DropdownMenuItem({
   return (
     <DropdownMenuPrimitive.Item
       className={cn(
-        'relative flex h-9 cursor-pointer select-none items-center gap-2.5 rounded-md px-2.5 text-sm text-text outline-hidden transition-colors duration-(--motion-duration-fast) data-[disabled]:pointer-events-none data-[disabled]:opacity-(--opacity-disabled) data-[highlighted]:bg-surface-soft [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:text-text-subtle',
+        'relative flex min-h-11 cursor-pointer select-none items-center gap-2.5 rounded-md px-2.5 py-2 text-sm text-text outline-hidden transition-colors duration-(--motion-duration-fast) data-[disabled]:pointer-events-none data-[disabled]:opacity-(--opacity-disabled) data-[highlighted]:bg-surface-soft [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:text-text-subtle',
         inset && 'ps-8',
         className,
       )}
@@ -55,7 +73,7 @@ export function DropdownMenuCheckboxItem({
     <DropdownMenuPrimitive.CheckboxItem
       checked={checked}
       className={cn(
-        'relative flex h-9 cursor-pointer select-none items-center rounded-md py-1.5 pe-2.5 ps-8 text-sm text-text outline-hidden data-[highlighted]:bg-surface-soft',
+        'relative flex min-h-11 cursor-pointer select-none items-center rounded-md py-2 pe-2.5 ps-8 text-sm text-text outline-hidden data-[highlighted]:bg-surface-soft',
         className,
       )}
       {...props}
@@ -102,7 +120,7 @@ export function DropdownMenuSubTrigger({
   return (
     <DropdownMenuPrimitive.SubTrigger
       className={cn(
-        'flex h-9 cursor-pointer select-none items-center gap-2.5 rounded-md px-2.5 text-sm text-text outline-hidden data-[state=open]:bg-surface-soft data-[highlighted]:bg-surface-soft',
+        'flex min-h-11 cursor-pointer select-none items-center gap-2.5 rounded-md px-2.5 py-2 text-sm text-text outline-hidden data-[state=open]:bg-surface-soft data-[highlighted]:bg-surface-soft',
         className,
       )}
       {...props}

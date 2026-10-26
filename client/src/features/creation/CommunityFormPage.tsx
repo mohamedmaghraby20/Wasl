@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useHead } from '@unhead/react';
 import { ArrowLeft } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-router';
@@ -22,11 +22,13 @@ import { Checkbox } from '@/components/ui/Checkbox';
 import { Field } from '@/components/ui/Field';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
+import { SearchableSelect } from '@/components/ui/SearchableSelect';
 import { Select } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { languageCode } from '@/features/resources/resource-utils';
 import { cn } from '@/lib/cn';
+import { focusFirstInvalid } from '@/lib/focus-first-invalid';
 
 const formSchema = z.object({
   name: z.string().trim().min(1).max(100),
@@ -61,6 +63,7 @@ export function CommunityFormPage(): React.JSX.Element {
   const create = useCommunitiesControllerCreate();
   const update = useCommunitiesControllerUpdate();
   const [formError, setFormError] = useState('');
+  const formRef = useRef<HTMLFormElement>(null);
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -132,7 +135,7 @@ export function CommunityFormPage(): React.JSX.Element {
   return (
     <section className="mx-auto grid max-w-(--container-reading) gap-6">
       <Link
-        className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-text-muted transition-colors hover:text-text"
+        className="inline-flex min-h-11 w-fit items-center gap-1.5 text-sm font-medium text-text-muted transition-colors hover:text-text"
         to={editing ? `/communities/${existing.data!.slug}` : '/create'}
       >
         <ArrowLeft aria-hidden="true" className="size-4 rtl:rotate-180" />
@@ -148,7 +151,13 @@ export function CommunityFormPage(): React.JSX.Element {
       <Card>
         <form
           className="grid gap-6 p-5 sm:p-7"
-          onSubmit={(event) => void form.handleSubmit((values) => void save(values))(event)}
+          onSubmit={(event) =>
+            void form.handleSubmit(
+              (values) => void save(values),
+              () => focusFirstInvalid(formRef.current),
+            )(event)
+          }
+          ref={formRef}
         >
           {Object.keys(errors).length > 0 ? (
             <p
@@ -162,10 +171,17 @@ export function CommunityFormPage(): React.JSX.Element {
           {!editing ? (
             <Field
               error={organizations.isError ? t('managedOrganizationsLoadError') : undefined}
+              hint={
+                organizations.isPending
+                  ? t('loading', { resource: t('organizations') })
+                  : undefined
+              }
               id="community-organization"
               label={t('resourceOrganizationHost')}
             >
               <Select
+                aria-busy={organizations.isPending}
+                disabled={organizations.isPending || organizations.isError}
                 id="community-organization"
                 onValueChange={(value) =>
                   form.setValue('organizationId', value === '__self__' ? '' : value, {
@@ -237,9 +253,12 @@ export function CommunityFormPage(): React.JSX.Element {
               label={t('profileCity')}
               required
             >
-              <Select
+              <SearchableSelect
+                aria-busy={cities.isPending}
                 aria-describedby={errors.cityId ? 'community-city-error' : undefined}
                 aria-invalid={Boolean(errors.cityId)}
+                disabled={cities.isPending || cities.isError}
+                emptyMessage={t('noCitiesFound')}
                 id="community-city"
                 onValueChange={(value) =>
                   form.setValue('cityId', value, { shouldDirty: true, shouldValidate: true })
@@ -248,11 +267,16 @@ export function CommunityFormPage(): React.JSX.Element {
                   value: city.id,
                   label: lang === 'ar' ? city.nameAr : lang === 'tr' ? city.nameTr : city.nameEn,
                 }))}
-                placeholder={t('profileCityEmpty')}
+                placeholder={cities.isPending ? t('loadingCities') : t('profileCityEmpty')}
+                searchPlaceholder={t('searchCities')}
                 value={form.watch('cityId')}
               />
             </Field>
-            <Field id="community-admission" label={t('admissionPolicy')}>
+            <Field
+              hint={t('admissionHint')}
+              id="community-admission"
+              label={t('admissionPolicy')}
+            >
               <Select
                 id="community-admission"
                 onValueChange={(value) =>
@@ -271,11 +295,19 @@ export function CommunityFormPage(): React.JSX.Element {
           </div>
 
           <fieldset
+            aria-busy={categories.isPending}
             aria-describedby={errors.categoryIds ? 'community-categories-error' : undefined}
+            aria-invalid={Boolean(errors.categoryIds)}
             className="grid gap-3"
+            tabIndex={-1}
           >
             <legend className="text-sm font-medium text-text">{t('chooseCategories')}</legend>
             <div className="flex flex-wrap gap-2">
+              {categories.isPending ? (
+                <p className="text-sm text-text-muted" role="status">
+                  {t('loadingCategories')}
+                </p>
+              ) : null}
               {categories.data?.map((category) => {
                 const checked = categoryIds.includes(category.id);
                 const categoryName =
@@ -286,7 +318,7 @@ export function CommunityFormPage(): React.JSX.Element {
                       'flex items-center gap-2 rounded-full border px-3 py-1.5 transition-colors',
                       checked
                         ? 'border-primary/40 bg-primary-soft'
-                        : 'border-border bg-surface-soft hover:border-border-strong',
+                        : 'border-border-control bg-surface-soft hover:border-border-control-hover',
                     )}
                     key={category.id}
                   >
