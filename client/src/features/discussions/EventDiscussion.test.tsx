@@ -3,9 +3,12 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { I18nextProvider } from 'react-i18next';
 import { MemoryRouter } from 'react-router';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { i18n } from '@/lib/i18n';
 import { EventDiscussion } from './EventDiscussion';
+
+const mocks = vi.hoisted(() => ({ auth: vi.fn() }));
+vi.mock('@/features/auth/AuthProvider', () => ({ useAuth: mocks.auth }));
 
 function renderDiscussion(canPost = false): void {
   render(
@@ -22,6 +25,10 @@ function renderDiscussion(canPost = false): void {
 }
 
 describe('EventDiscussion', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.auth.mockReturnValue({ user: null });
+  });
   afterEach(() => vi.unstubAllGlobals());
 
   it('shows public comments, a removed comment placeholder, and paginated replies', async () => {

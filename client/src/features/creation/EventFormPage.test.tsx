@@ -72,6 +72,9 @@ describe('EventFormPage organization host choice', () => {
     mocks.update.mockReturnValue({ mutateAsync: vi.fn(), isPending: false });
   });
 
+  // Radix Select mounts a portal and runs pointer-down/focus handling for each
+  // choice, so this interaction regularly takes 2-3 s under jsdom and can cross
+  // the 5 s default on a loaded machine.
   it('offers authorized organizations and keeps the selected host exclusive', async () => {
     const user = userEvent.setup();
     renderPage();
@@ -90,5 +93,5 @@ describe('EventFormPage organization host choice', () => {
     await user.click(await screen.findByRole('option', { name: 'My community' }));
     expect(communityHost).toHaveTextContent('My community');
     expect(organizationHost).toHaveTextContent('No organization');
-  });
+  }, 20_000);
 });

@@ -17,11 +17,14 @@ import type {
 } from 'msw';
 
 import type {
-  HealthResponseDto
+  HealthResponseDto,
+  ReadinessResponseDto
 } from '../../generated/wasl-client.schemas';
 
 
 export const getHealthControllerGetHealthResponseMock = (overrideResponse: Partial<Extract<HealthResponseDto, object>> = {}): HealthResponseDto => ({status: faker.helpers.arrayElement(['ok'] as const), timestamp: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+export const getHealthControllerGetReadinessResponseMock = (overrideResponse: Partial<Extract<ReadinessResponseDto, object>> = {}): ReadinessResponseDto => ({status: faker.helpers.arrayElement(['ok'] as const), timestamp: faker.date.past().toISOString().slice(0, 19) + 'Z', database: faker.helpers.arrayElement(['up'] as const), ...overrideResponse})
 
 
 export const getHealthControllerGetHealthMockHandler = (overrideResponse?: HealthResponseDto | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<HealthResponseDto> | HealthResponseDto), options?: RequestHandlerOptions) => {
@@ -35,6 +38,19 @@ export const getHealthControllerGetHealthMockHandler = (overrideResponse?: Healt
       })
   }, options)
 }
+
+export const getHealthControllerGetReadinessMockHandler = (overrideResponse?: ReadinessResponseDto | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ReadinessResponseDto> | ReadinessResponseDto), options?: RequestHandlerOptions) => {
+  return http.get('*/api/v1/health/ready', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getHealthControllerGetReadinessResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
 export const getHealthMock = () => [
-  getHealthControllerGetHealthMockHandler()
+  getHealthControllerGetHealthMockHandler(),
+  getHealthControllerGetReadinessMockHandler()
 ]

@@ -28,6 +28,13 @@ export const router = createBrowserRouter([
           return { Component: AuthPage };
         },
       },
+      {
+        path: 'password-reset',
+        lazy: async () => {
+          const { PasswordResetPage } = await import('@/features/auth/PasswordResetPage');
+          return { Component: PasswordResetPage };
+        },
+      },
       ...['discover', 'communities', 'events'].map((path) => ({
         path,
         lazy: async () => {

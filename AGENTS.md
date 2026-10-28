@@ -165,5 +165,7 @@ When the user corrects your approach, append a one-line rule here before ending 
 - During a verification or fix pass, close only the stated checks; do not add features, refactors, or new polish opportunities until those checks pass.
 - Let Vite split lazily routed SDKs naturally; a `manualChunks` catch-all `vendor` hoists them into the eager bundle and cross-assigning their sub-dependencies produces circular-chunk warnings.
 - When asked what can proceed without an owner handoff, list concrete task IDs and distinguish executable preparation from tasks that can be completed.
+- Keep owner-facing MVP checklists standalone when requested: use a new file, remove the old handoff and its incoming references, and add no cross-file links.
+- For development Supabase data, accept the owner's authorization and seed samples directly; explain owner-only admin setup as exact signup and browser steps, never ask the owner to find internal Wasl IDs.
 
 ---

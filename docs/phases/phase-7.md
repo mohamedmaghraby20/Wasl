@@ -9,11 +9,11 @@ Status: complete. Branch: `feature/phase7-notification-schema`.
 - Generated migration `server/drizzle/0017_spotty_greymalkin.sql` enables RLS and revokes direct `PUBLIC`, `anon` and `authenticated` grants for both tables. It was applied to the owner-confirmed development database, not production.
 - Focused checks passed: `corepack pnpm --filter @wasl/server exec vitest run --config vitest.config.ts src/db/notification-schema.spec.ts` (2 tests), `corepack pnpm --filter @wasl/server exec tsx test/notification-schema.integration.ts` (transaction-rolled-back duplicate recipient/event and delivery checks, retry state and database RLS/grants), `corepack pnpm --filter @wasl/server typecheck`, `corepack pnpm --filter @wasl/server lint`, and `corepack pnpm exec prettier --check server/src/db/schema.ts server/src/db/notification-schema.spec.ts server/test/notification-schema.integration.ts`. `corepack pnpm db:generate` reported no schema changes after generation and `corepack pnpm db:migrate` completed.
 
-Next: Task 133, create in-app notifications for required transitions using the persisted event key. Tasks 134–149 remain open.
+At the Task 132 checkpoint, Task 133 was next. Tasks 133–146 have since been implemented; Tasks 147–149 remain open pending approved privacy and legal decisions.
 
 ## Subsequent implementation (committed, not release-ready)
 
-Tasks 133–143 have working server/client implementations in this worktree: transaction-bound notification creation, owner-only listing/read, a notification page, a Resend adapter with provider idempotency key, a pgmq email queue/worker with retry status, participation/organization/cancellation notices, report submission, and scoped moderator assignment with contextual controls. Migrations 0018–0020 are in the worktree. The separate external Resend service and a production worker deployment have not been verified; a successful local mock send does not establish live delivery.
+Tasks 133–143 have working server/client implementations in this worktree: transaction-bound notification creation, owner-only listing/read, a notification page, a Resend adapter with provider idempotency key, a pgmq email queue/worker with retry status, participation/organization/cancellation notices, report submission, and scoped moderator assignment with contextual controls. Migrations 0018–0020 are in the worktree. Development queue delivery was later tested through the real Resend provider and the owner confirmed receipt; production email setup and delivery to general recipients remain unverified.
 
 Tasks 144–146 add AAL2 enforcement on all existing platform-admin endpoints, a transactional report-review API with recorded actor/decision and target-scoped suspension, restore, archive and cancellation actions, and a small MFA-enabled review screen at `/admin`. Admin cancellation produces the same participant notices as organizer cancellation. A user's pending Stream membership removal relies on the existing reconciliation worker; immediate provider-side revocation has not been verified for admin suspension.
 
@@ -41,4 +41,10 @@ Until these are approved and implemented, Phase 7 cannot be honestly marked comp
 
 ### Follow-up verification
 
-- `corepack pnpm --filter @wasl/server exec tsx test/notifications.integration.ts` passed with additional rolled-back checks that a suspended recipient is not emailed and an archived notification is not sent again. Live Resend delivery remains unverified.
+- `corepack pnpm --filter @wasl/server exec tsx test/notifications.integration.ts` passed with additional rolled-back checks that a suspended recipient is not emailed and an archived notification is not sent again. Live Resend delivery had not been tested at that checkpoint; the later owner-confirmed live test is recorded below.
+
+### Owner-confirmed development follow-up (2026-10-28)
+
+- The owner confirmed receipt of a Wasl notification email sent through the live development queue and Resend provider.
+- The owner confirmed the browser signup/sign-in, password reset, admin/MFA, sample Community/Event, and chat flows work. This is development owner testing, not staging or production acceptance.
+- Supabase accepted a password-reset email request using the configured development account. The new client reset page supports requesting a link and setting a password after the recovery session is established.

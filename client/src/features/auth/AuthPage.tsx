@@ -14,7 +14,12 @@ export function safeReturnPath(search: string): string {
   try {
     const target = new URL(candidate, window.location.origin);
     if (target.origin !== window.location.origin) return '/';
-    if (target.pathname === '/sign-in' || target.pathname === '/sign-up') return '/';
+    if (
+      target.pathname === '/sign-in' ||
+      target.pathname === '/sign-up' ||
+      target.pathname === '/password-reset'
+    )
+      return '/';
     return `${target.pathname}${target.search}${target.hash}`;
   } catch {
     return '/';
@@ -172,14 +177,21 @@ export function AuthPage(): React.JSX.Element {
                 value={password}
               />
             </Field>
-            <Button
-              block
-              disabled={!configured || busy || Boolean(notice)}
-              type="submit"
-            >
+            <Button block disabled={!configured || busy || Boolean(notice)} type="submit">
               {busy ? t('authWorking') : t(isSignUp ? 'authCreateAccount' : 'authSignIn')}
             </Button>
           </form>
+
+          {!isSignUp ? (
+            <p className="mt-4 text-center text-sm">
+              <Link
+                className="font-semibold text-primary-soft-text underline decoration-primary/40 decoration-2 underline-offset-4 transition-colors hover:decoration-primary"
+                to="/password-reset"
+              >
+                {t('authForgotPassword')}
+              </Link>
+            </p>
+          ) : null}
 
           <p className="mt-6 text-center text-sm text-text-muted">
             {t(isSignUp ? 'authHaveAccount' : 'authNeedAccount')}{' '}

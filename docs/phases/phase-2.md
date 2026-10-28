@@ -2,7 +2,7 @@
 
 ## Implemented
 
-- Added Turkish province reference data with Turkish, Arabic and English display fields. The reference seed has been run against the active Wasl Supabase production project; all 81 provinces and 3 categories are present.
+- Added Turkish province reference data with Turkish, Arabic and English display fields. At the time of this phase record, all 81 provinces and 3 categories were present in the connected Wasl Supabase project. The owner later clarified that this is the development project; it is not a confirmed production target.
 - Added public Community and Event tables, category joins, visibility and lifecycle fields, location/host constraints, indexes and row-level security migrations.
 - Added paginated public listing and direct-detail endpoints. Listings omit archived Communities and unlisted Events; direct Event details accept unlisted links. Search, city/category filters, locale selection and Türkiye-local Event date ranges are supported.
 - Added generated OpenAPI response/query contracts and Orval Fetch/TanStack Query clients. Fetch response types now match the JSON body returned by the shared mutator.
@@ -16,12 +16,12 @@
 
 ## Remaining work and inputs
 
-- Migrations `0000` through `0003` were applied to the active Supabase project named `Wasl` (`vuznrkujfmxrggonuvif`) and verified in the Drizzle migration ledger. The project is not labeled as development/test in repository configuration; confirm its intended environment before seeding or applying future changes.
+- Migrations `0000` through `0003` were applied to the connected Supabase project named `Wasl` and verified in the Drizzle migration ledger. The owner has since confirmed this is the development project. Do not use it as production.
 - The client supports same-origin `/api` requests. Vite development/preview proxy `/api` to Nest at `http://localhost:3000`; production hosting must proxy `/api` to the deployed Nest service. Alternatively, set `VITE_API_URL` to the API origin for a cross-origin deployment.
 - Sitemap generation and its robots.txt reference still need the actual public site origin. No sitemap was created with a guessed domain.
 - Organization and User preview endpoints depend on their owning schemas, which are introduced later in Phase 3 (Tasks 53 and 96).
-- The active Wasl production project currently has 81 cities, 3 categories, 0 communities and 0 events. No community/event fixtures were added.
-- Server tests inspect generated SQL predicates for visibility, search, city, category and date filters without connecting to a database. The migration schema and reference-data counts were verified on the active Wasl project; endpoint integration tests against populated community/event records remain pending.
+- At the original Phase 2 checkpoint, the database had 81 cities, 3 categories and no Community/Event fixtures. Later development work added clearly marked sample Communities and Events; those samples are not production content.
+- Server tests at this phase inspected generated SQL predicates without connecting to a database. Later integration and browser checks expanded coverage, but this historical phase record is not evidence that every populated-data discovery case passed.
 
 ## Verification
 

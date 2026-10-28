@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && node scripts/generate-sitemap.ts",
     "dev": "vite",
     "preview": "vite preview",
     "typecheck": "tsc -b --pretty false",
@@ -12,6 +12,7 @@
     "test": "vitest run --config vitest.config.ts",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "sitemap": "node scripts/generate-sitemap.ts",
     "storybook:build": "storybook build",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",

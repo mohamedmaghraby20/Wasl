@@ -20,7 +20,8 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  HealthResponseDto
+  HealthResponseDto,
+  ReadinessResponseDto
 } from '../wasl-client.schemas';
 
 import { waslFetch } from '../../fetcher';
@@ -128,6 +129,100 @@ export function useHealthControllerGetHealth<TData = Awaited<ReturnType<typeof h
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getHealthControllerGetHealthQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+export const getHealthControllerGetReadinessUrl = () => {
+
+
+
+
+  return `/api/v1/health/ready`
+}
+
+export const healthControllerGetReadiness = async ( options?: Parameters<typeof waslFetch>[1]): Promise<ReadinessResponseDto> => {
+
+  return waslFetch<ReadinessResponseDto>(getHealthControllerGetReadinessUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getHealthControllerGetReadinessQueryKey = () => {
+    return [
+    `/api/v1/health/ready`
+    ] as const;
+    }
+
+
+export const getHealthControllerGetReadinessQueryOptions = <TData = Awaited<ReturnType<typeof healthControllerGetReadiness>>, TError = void>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof healthControllerGetReadiness>>, TError, TData>>, request?: SecondParameter<typeof waslFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getHealthControllerGetReadinessQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof healthControllerGetReadiness>>> = ({ signal }) => healthControllerGetReadiness({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof healthControllerGetReadiness>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type HealthControllerGetReadinessQueryResult = NonNullable<Awaited<ReturnType<typeof healthControllerGetReadiness>>>
+export type HealthControllerGetReadinessQueryError = void
+
+
+export function useHealthControllerGetReadiness<TData = Awaited<ReturnType<typeof healthControllerGetReadiness>>, TError = void>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof healthControllerGetReadiness>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof healthControllerGetReadiness>>,
+          TError,
+          Awaited<ReturnType<typeof healthControllerGetReadiness>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof waslFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useHealthControllerGetReadiness<TData = Awaited<ReturnType<typeof healthControllerGetReadiness>>, TError = void>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof healthControllerGetReadiness>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof healthControllerGetReadiness>>,
+          TError,
+          Awaited<ReturnType<typeof healthControllerGetReadiness>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof waslFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useHealthControllerGetReadiness<TData = Awaited<ReturnType<typeof healthControllerGetReadiness>>, TError = void>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof healthControllerGetReadiness>>, TError, TData>>, request?: SecondParameter<typeof waslFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useHealthControllerGetReadiness<TData = Awaited<ReturnType<typeof healthControllerGetReadiness>>, TError = void>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof healthControllerGetReadiness>>, TError, TData>>, request?: SecondParameter<typeof waslFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getHealthControllerGetReadinessQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

@@ -14,6 +14,8 @@ interface AuthContextValue {
     password: string,
     returnTo: string,
   ) => Promise<boolean>;
+  requestPasswordReset: (email: string) => Promise<void>;
+  updatePassword: (password: string) => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -65,12 +67,27 @@ export function AuthProvider({ children }: PropsWithChildren): React.JSX.Element
     if (error) throw error;
   };
 
+  const requestPasswordReset = async (email: string): Promise<void> => {
+    if (!supabase) throw new Error('Supabase is not configured.');
+    const redirectTo = new URL('/password-reset', window.location.origin).toString();
+    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
+    if (error) throw error;
+  };
+
+  const updatePassword = async (password: string): Promise<void> => {
+    if (!supabase) throw new Error('Supabase is not configured.');
+    const { error } = await supabase.auth.updateUser({ password });
+    if (error) throw error;
+  };
+
   const value: AuthContextValue = {
     configured: Boolean(supabase),
     loading,
     user: session?.user ?? null,
     signIn,
     signUp,
+    requestPasswordReset,
+    updatePassword,
     signOut,
   };
 

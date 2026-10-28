@@ -10,4 +10,4 @@ The server is configured to connect to Supabase PostgreSQL through the pooled `D
 
 ## Seed data
 
-`corepack pnpm db:seed` idempotently upserts all 81 provinces and 3 discovery categories. This reference data was seeded in the active Wasl production project by owner instruction. It does not create users, communities, or events because those require the Phase 2 schemas and an explicit local owner identity. The Task 25 “sample public resources” criterion depends on Phase 2 Tasks 28–29; do not add resource fixtures before those schemas exist.
+`corepack pnpm db:seed` idempotently upserts all 81 provinces and 3 discovery categories. The connected Wasl Supabase project is the development project, as clarified by the owner; older references in this record that call it production are stale. This seed does not create users, Communities, or Events because those require later schemas and an explicit local owner identity.

@@ -32,7 +32,7 @@ corepack pnpm db:migrate
 corepack pnpm db:seed
 ```
 
-Review generated SQL in `server/drizzle/` before applying it to a shared database. Seed data is limited to reference cities and categories until Community and Event schemas exist.
+Review generated SQL in `server/drizzle/` before applying it to a shared database. The development seed creates reference cities and categories plus clearly labelled sample users, Communities, Events, memberships and registrations; it refuses to run when `NODE_ENV=production`. Never run it against production.
 
 ## Quality commands
 

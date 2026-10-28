@@ -1,0 +1,91 @@
+# Render Blueprint for Wasl.
+#
+# Two services: a NestJS API and the static React client. Staging is a copy of
+# this file's services with `-staging` names, a `staging` branch and its own
+# secrets, created as a separate Blueprint.
+#
+# Before the first sync:
+#   1. Connect this repository to Render.
+#   2. Fill every `sync: false` value in the dashboard. Nothing secret lives here.
+#   3. Point custom domains at both services and update the values that use the
+#      onrender.com URLs below.
+#
+# Production auto-deploy is off on purpose: deploy a tested commit manually.
+
+services:
+  - type: web
+    name: wasl-api
+    runtime: node
+    region: frankfurt
+    plan: 1c-2g
+    branch: main
+    autoDeployTrigger: 'off'
+    # The shared package must be built before the server: the API imports its types.
+    buildCommand: corepack enable && corepack pnpm install --frozen-lockfile && corepack pnpm --filter @wasl/shared build && corepack pnpm --filter @wasl/server build
+    startCommand: node server/dist/main.js
+    # Fails when PostgreSQL is unreachable, so Render stops routing traffic to it.
+    healthCheckPath: /api/v1/health/ready
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: CLIENT_ORIGIN
+        fromService:
+          name: wasl-web
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: DATABASE_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_PUBLISHABLE_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: RESEND_FROM_EMAIL
+        sync: false
+      - key: STREAM_API_KEY
+        sync: false
+      - key: STREAM_API_SECRET
+        sync: false
+      - key: STREAM_PERMISSIONS_VERIFIED
+        value: 'false'
+      - key: PLATFORM_ADMIN_USER_IDS
+        value: ''
+
+  - type: web
+    name: wasl-web
+    runtime: static
+    branch: main
+    autoDeployTrigger: 'off'
+    buildCommand: corepack enable && corepack pnpm install --frozen-lockfile && corepack pnpm --filter @wasl/shared build && corepack pnpm --filter @wasl/web build
+    staticPublishPath: client/dist
+    envVars:
+      # Vite inlines these at build time; changing one requires a new deploy.
+      - key: VITE_API_URL
+        fromService:
+          name: wasl-api
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: VITE_SUPABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_PUBLISHABLE_KEY
+        sync: false
+      # Absolute origin used for canonical sitemap URLs.
+      - key: PUBLIC_WEB_ORIGIN
+        fromService:
+          name: wasl-web
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
+      # The build reads public communities and events from the API when it is reachable.
+      - key: SITEMAP_API_URL
+        fromService:
+          name: wasl-api
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
+    routes:
+      # React Router owns client-side paths: serve index.html for deep links.
+      - type: rewrite
+        source: /*
+        destination: /index.html
