@@ -140,6 +140,13 @@ async function main(): Promise<void> {
         assert.equal(syncState?.provider, true);
         assert.ok(syncState?.error);
         removeFails = false;
+        await tx.execute(sql`
+          update public.messaging_member_sync
+          set last_checked_at = now() - interval '31 seconds'
+          where conversation_id = (
+            select id from public.messaging_conversations where community_id = ${communityId}
+          ) and user_id = ${activeId}
+        `);
         await service.reconcilePendingMemberships();
         const [synced] = await tx
           .select({

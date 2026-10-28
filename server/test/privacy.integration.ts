@@ -5,6 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { and, eq, sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import * as schema from '../src/db/schema';
 import type { Database } from '../src/db/database.module';
 import type { StreamChatAdapter } from '../src/modules/messaging/stream-chat.adapter';
@@ -27,10 +28,12 @@ async function main(): Promise<void> {
         const adult = randomUUID();
         const minor = randomUUID();
         const admin = randomUUID();
+        const raceUser = randomUUID();
         for (const [id, label] of [
           [adult, 'adult'],
           [minor, 'minor'],
           [admin, 'admin'],
+          [raceUser, 'race'],
         ] as const) {
           await tx.execute(
             sql`insert into identity.users (id, normalized_email) values (${id}, ${`privacy-${label}-${id}@example.test`})`,
@@ -40,12 +43,41 @@ async function main(): Promise<void> {
 
         const config = new ConfigService({ AGE_VERIFICATION_METHOD: 'TEST_CONFIRMATION' });
         const gate = new PrivacyGateService(database);
+        let streamCalls = 0;
+        let holdStream = false;
+        let streamStarted!: () => void;
+        let streamGate: Promise<void> = Promise.resolve();
         const stream = {
           deactivateUser: (): Promise<void> => {
+            streamCalls += 1;
+            if (holdStream) {
+              streamStarted();
+              return streamGate;
+            }
             throw new Error('Stream provider unavailable');
           },
         } as unknown as StreamChatAdapter;
-        const providerActions = new PrivacyProviderActionsService(database, undefined, stream);
+        let releaseStream!: () => void;
+        const listedOffsets: number[] = [];
+        const removedPaths: string[] = [];
+        const providerClient = {
+          auth: { admin: { deleteUser: async () => ({ error: null }) } },
+          storage: {
+            from: () => ({
+              list: async (_path: string, options: { limit?: number; offset?: number } = {}) => {
+                const all = Array.from({ length: 205 }, (_, index) => ({ name: `photo-${index}` }));
+                const offset = options.offset ?? 0;
+                listedOffsets.push(offset);
+                return { data: all.slice(offset, offset + (options.limit ?? 100)), error: null };
+              },
+              remove: async (paths: string[]) => {
+                removedPaths.push(...paths);
+                return { error: null };
+              },
+            }),
+          },
+        } as unknown as SupabaseClient;
+        const providerActions = new PrivacyProviderActionsService(database, providerClient, stream);
         const privacy = new PrivacyService(
           database,
           config,
@@ -202,6 +234,27 @@ async function main(): Promise<void> {
           'ACTIVE',
         );
 
+        const lockedDeletion = await privacy.createRequest(raceUser, { requestType: 'DELETION' });
+        await privacy.decideRequest(admin, lockedDeletion.id, { action: 'APPROVE' });
+        await assert.rejects(
+          privacy.cancelRequest(raceUser, lockedDeletion.id),
+          /This privacy request can no longer be cancelled/,
+        );
+        const [raceRequest] = await tx
+          .select({ status: schema.privacyRequests.status })
+          .from(schema.privacyRequests)
+          .where(eq(schema.privacyRequests.id, lockedDeletion.id));
+        const [raceAccount] = await tx
+          .select({ status: schema.users.accountStatus })
+          .from(schema.users)
+          .where(eq(schema.users.id, raceUser));
+        assert.equal(
+          raceRequest?.status === 'CANCELLED'
+            ? raceAccount?.status === 'ACTIVE'
+            : raceAccount?.status === 'DEACTIVATED',
+          true,
+        );
+
         // Fixtures for deletion side effects.
         const communityId = randomUUID();
         await tx.execute(sql`insert into public.communities
@@ -220,6 +273,20 @@ async function main(): Promise<void> {
         await tx.insert(schema.messagingUserMappings).values({
           userId: adult,
           providerUserId: `stream-${adult}`,
+        });
+        await tx.insert(schema.authIdentities).values({
+          userId: adult,
+          provider: 'email',
+          providerUserId: `auth-${adult}`,
+        });
+        await tx.insert(schema.messagingReports).values({
+          reporterUserId: minor,
+          reportedUserId: adult,
+          reason: 'Test report',
+        });
+        await tx.insert(schema.messagingUserBlocks).values({
+          blockerUserId: minor,
+          blockedUserId: adult,
         });
 
         const deletion = await privacy.createRequest(adult, {
@@ -241,6 +308,13 @@ async function main(): Promise<void> {
           approved.providerActions?.find((action) => action.provider === 'WASL')?.status,
           'SUCCEEDED',
         );
+        assert.equal(
+          approved.providerActions?.find((action) => action.provider === 'SUPABASE_STORAGE')
+            ?.status,
+          'SUCCEEDED',
+        );
+        assert.deepEqual(listedOffsets, [0, 100, 200]);
+        assert.equal(removedPaths.length, 205);
 
         const anonymized = (
           await tx
@@ -290,12 +364,37 @@ async function main(): Promise<void> {
         const retried = await privacy.retryProviderActions(admin, deletion.id);
         assert.equal(retried.status, 'PENDING_PROVIDER');
 
+        holdStream = true;
+        streamCalls = 0;
+        let started!: () => void;
+        const startedPromise = new Promise<void>((resolve) => {
+          started = resolve;
+        });
+        const streamPromise = new Promise<void>((_resolve, reject) => {
+          releaseStream = () => reject(new Error('Stream provider unavailable'));
+        });
+        streamGate = streamPromise;
+        streamStarted = started;
+        const firstRetry = providerActions.process(deletion.id, admin);
+        await startedPromise;
+        const secondRetry = providerActions.process(deletion.id, admin);
+        await secondRetry;
+        releaseStream();
+        await firstRetry;
+        assert.equal(streamCalls, 1);
+
         // Export contains only this user's Wasl-owned records.
         const exported = await privacy.exportData(minor);
         assert.equal(exported.account.id, minor);
         assert.equal(exported.profile?.displayName, 'Privacy minor');
         assert.equal(exported.ageEligibility?.status, 'UNDER_18');
         assert.ok(Array.isArray(exported.documentAcceptances));
+        assert.equal(exported.messaging.submittedReports.length, 1);
+        assert.equal(exported.messaging.blockedUsers.length, 1);
+        assert.ok(Array.isArray(exported.messaging.blockedByUsers));
+        assert.ok(Array.isArray(exported.organizations.invitationsReceived));
+        assert.ok(Array.isArray(exported.organizations.invitationsSent));
+        assert.ok(Array.isArray(exported.moderatorAssignments));
 
         // Retention stays blocked and disabled while periods are TBD-LEGAL.
         await tx.insert(schema.retentionPolicies).values({

@@ -22,8 +22,11 @@ import {
   legalAcceptances,
   legalDocuments,
   messagingConversations,
+  messagingReports,
+  messagingUserBlocks,
   moderationReports,
   notifications,
+  organizationAdminInvitations,
   organizationAdmins,
   organizations,
   privacyProviderActions,
@@ -32,6 +35,7 @@ import {
   privacyRequestStatus,
   profiles,
   retentionPolicies,
+  resourceModerators,
   users,
 } from '../../db/schema';
 import { PrivacyGateService } from '../auth/privacy-gate.service';
@@ -262,18 +266,18 @@ export class PrivacyService {
 
   async cancelRequest(userId: string, id: string) {
     const db = this.database();
-    const [request] = await db
-      .select()
-      .from(privacyRequests)
-      .where(and(eq(privacyRequests.id, id), eq(privacyRequests.userId, userId)))
-      .limit(1);
-    if (!request) throw new NotFoundException('Privacy request not found.');
-    if (!['RECEIVED', 'IN_REVIEW'].includes(request.status)) {
-      throw new BadRequestException('This privacy request can no longer be cancelled.');
-    }
-
     const now = new Date();
     await db.transaction(async (tx) => {
+      const [request] = await tx
+        .select()
+        .from(privacyRequests)
+        .where(and(eq(privacyRequests.id, id), eq(privacyRequests.userId, userId)))
+        .for('update')
+        .limit(1);
+      if (!request) throw new NotFoundException('Privacy request not found.');
+      if (!['RECEIVED', 'IN_REVIEW'].includes(request.status)) {
+        throw new BadRequestException('This privacy request can no longer be cancelled.');
+      }
       await tx
         .update(privacyRequests)
         .set({ status: 'CANCELLED', updatedAt: now })
@@ -310,6 +314,15 @@ export class PrivacyService {
       notificationRows,
       reportRows,
       conversationRows,
+      messagingReportRows,
+      blockedUsers,
+      blockedByUsers,
+      organizationRows,
+      organizationAdminRows,
+      invitationsReceived,
+      invitationsSent,
+      moderatorAssignments,
+      moderatorAssignmentsMade,
     ] = await Promise.all([
       db
         .select({
@@ -407,6 +420,88 @@ export class PrivacyService {
             eq(messagingConversations.dmUserHighId, userId),
           ),
         ),
+      db
+        .select({
+          reportedUserId: messagingReports.reportedUserId,
+          conversationId: messagingReports.conversationId,
+          reason: messagingReports.reason,
+          createdAt: messagingReports.createdAt,
+        })
+        .from(messagingReports)
+        .where(eq(messagingReports.reporterUserId, userId)),
+      db
+        .select({
+          blockedUserId: messagingUserBlocks.blockedUserId,
+          createdAt: messagingUserBlocks.createdAt,
+        })
+        .from(messagingUserBlocks)
+        .where(eq(messagingUserBlocks.blockerUserId, userId)),
+      db
+        .select({
+          blockerUserId: messagingUserBlocks.blockerUserId,
+          createdAt: messagingUserBlocks.createdAt,
+        })
+        .from(messagingUserBlocks)
+        .where(eq(messagingUserBlocks.blockedUserId, userId)),
+      db
+        .select({
+          organizationId: organizations.id,
+          name: organizations.name,
+          createdAt: organizations.createdAt,
+        })
+        .from(organizations)
+        .where(eq(organizations.ownerUserId, userId)),
+      db
+        .select({
+          organizationId: organizationAdmins.organizationId,
+          organizationName: organizations.name,
+          createdAt: organizationAdmins.createdAt,
+        })
+        .from(organizationAdmins)
+        .innerJoin(organizations, eq(organizations.id, organizationAdmins.organizationId))
+        .where(eq(organizationAdmins.userId, userId)),
+      db
+        .select({
+          id: organizationAdminInvitations.id,
+          organizationId: organizationAdminInvitations.organizationId,
+          invitedByUserId: organizationAdminInvitations.invitedByUserId,
+          status: organizationAdminInvitations.status,
+          createdAt: organizationAdminInvitations.createdAt,
+          expiresAt: organizationAdminInvitations.expiresAt,
+          respondedAt: organizationAdminInvitations.respondedAt,
+        })
+        .from(organizationAdminInvitations)
+        .where(eq(organizationAdminInvitations.targetUserId, userId)),
+      db
+        .select({
+          id: organizationAdminInvitations.id,
+          organizationId: organizationAdminInvitations.organizationId,
+          targetUserId: organizationAdminInvitations.targetUserId,
+          status: organizationAdminInvitations.status,
+          createdAt: organizationAdminInvitations.createdAt,
+          expiresAt: organizationAdminInvitations.expiresAt,
+          respondedAt: organizationAdminInvitations.respondedAt,
+        })
+        .from(organizationAdminInvitations)
+        .where(eq(organizationAdminInvitations.invitedByUserId, userId)),
+      db
+        .select({
+          communityId: resourceModerators.communityId,
+          eventId: resourceModerators.eventId,
+          assignedByUserId: resourceModerators.assignedByUserId,
+          createdAt: resourceModerators.createdAt,
+        })
+        .from(resourceModerators)
+        .where(eq(resourceModerators.userId, userId)),
+      db
+        .select({
+          communityId: resourceModerators.communityId,
+          eventId: resourceModerators.eventId,
+          userId: resourceModerators.userId,
+          createdAt: resourceModerators.createdAt,
+        })
+        .from(resourceModerators)
+        .where(eq(resourceModerators.assignedByUserId, userId)),
     ]);
 
     if (!accountRows[0]) throw new NotFoundException('User profile not found.');
@@ -424,8 +519,19 @@ export class PrivacyService {
       discussionThreads: threadRows,
       notifications: notificationRows,
       submittedReports: reportRows,
+      organizations: {
+        owned: organizationRows,
+        administered: organizationAdminRows,
+        invitationsReceived,
+        invitationsSent,
+      },
+      moderatorAssignments,
+      moderatorAssignmentsMade,
       messaging: {
         directConversations: conversationRows,
+        submittedReports: messagingReportRows,
+        blockedUsers,
+        blockedByUsers,
         note: AUTHORITATIVE_DATA_NOTE,
       },
     };
@@ -466,6 +572,7 @@ export class PrivacyService {
     const now = new Date();
     if (input.action === 'START_REVIEW') {
       await db.transaction(async (tx) => {
+        await this.lockOpenRequest(tx, id);
         await tx
           .update(privacyRequests)
           .set({ status: 'IN_REVIEW', updatedAt: now })
@@ -483,6 +590,7 @@ export class PrivacyService {
 
     if (input.action === 'REJECT') {
       await db.transaction(async (tx) => {
+        const current = await this.lockOpenRequest(tx, id);
         await tx
           .update(privacyRequests)
           .set({
@@ -500,15 +608,15 @@ export class PrivacyService {
           eventType: 'REJECTED',
           note: input.note?.trim() || null,
         });
-        if (request.requestType === 'DELETION') {
+        if (current.requestType === 'DELETION') {
           await tx
             .update(users)
             .set({ accountStatus: 'ACTIVE', updatedAt: now })
-            .where(and(eq(users.id, request.userId), eq(users.accountStatus, 'DELETION_PENDING')));
+            .where(and(eq(users.id, current.userId), eq(users.accountStatus, 'DELETION_PENDING')));
         }
         // In-app only: case updates stay behind the signed-in privacy page, not in email.
         await this.notifications.create(tx, {
-          recipientUserId: request.userId,
+          recipientUserId: current.userId,
           eventKey: `privacy-request-decided:${id}`,
           type: 'privacy_request_decided',
           contextType: 'privacy',
@@ -520,6 +628,7 @@ export class PrivacyService {
 
     if (request.requestType !== 'DELETION') {
       await db.transaction(async (tx) => {
+        const current = await this.lockOpenRequest(tx, id);
         await tx
           .update(privacyRequests)
           .set({
@@ -539,7 +648,7 @@ export class PrivacyService {
           note: input.note?.trim() || 'Response is available through the account data export.',
         });
         await this.notifications.create(tx, {
-          recipientUserId: request.userId,
+          recipientUserId: current.userId,
           eventKey: `privacy-request-decided:${id}`,
           type: 'privacy_request_decided',
           contextType: 'privacy',
@@ -638,6 +747,10 @@ export class PrivacyService {
     const userId = request.userId;
 
     await db.transaction(async (tx) => {
+      const current = await this.lockOpenRequest(tx, request.id);
+      if (current.requestType !== 'DELETION') {
+        throw new BadRequestException('This request is not a deletion request.');
+      }
       const [owned] = await tx
         .select({ id: organizations.id })
         .from(organizations)
@@ -793,6 +906,20 @@ export class PrivacyService {
     if (open) throw new ConflictException('A deletion request is already open for this account.');
   }
 
+  private async lockOpenRequest(tx: PrivacyTransaction, id: string) {
+    const [request] = await tx
+      .select()
+      .from(privacyRequests)
+      .where(eq(privacyRequests.id, id))
+      .for('update')
+      .limit(1);
+    if (!request) throw new NotFoundException('Privacy request not found.');
+    if (!['RECEIVED', 'IN_REVIEW'].includes(request.status)) {
+      throw new BadRequestException('This privacy request has already been closed or processed.');
+    }
+    return request;
+  }
+
   private async requestView(id: string, userId: string) {
     const db = this.database();
     const [request] = await db
@@ -857,3 +984,5 @@ export class PrivacyService {
     return this.db;
   }
 }
+
+type PrivacyTransaction = Parameters<Parameters<Database['transaction']>[0]>[0];

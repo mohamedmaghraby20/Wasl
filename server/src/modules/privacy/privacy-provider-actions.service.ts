@@ -1,6 +1,6 @@
 import { Inject, Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, eq, inArray, lt, or } from 'drizzle-orm';
 import { DATABASE, type Database } from '../../db/database.module';
 import {
   authIdentities,
@@ -15,6 +15,7 @@ export const SUPABASE_ADMIN_CLIENT = Symbol('SUPABASE_ADMIN_CLIENT');
 
 const PHOTO_BUCKET = 'profile-photos';
 const RETRYABLE_STATUSES = ['PENDING', 'FAILED', 'IN_PROGRESS'] as const;
+const STALE_ACTION_MS = 10 * 60 * 1000;
 
 type ProviderAction = typeof privacyProviderActions.$inferSelect;
 
@@ -103,7 +104,7 @@ export class PrivacyProviderActionsService {
   private async run(action: ProviderAction): Promise<void> {
     const db = this.database();
     const now = new Date();
-    await db
+    const [claimed] = await db
       .update(privacyProviderActions)
       .set({
         status: 'IN_PROGRESS',
@@ -111,7 +112,20 @@ export class PrivacyProviderActionsService {
         lastAttemptAt: now,
         lastError: null,
       })
-      .where(eq(privacyProviderActions.id, action.id));
+      .where(
+        and(
+          eq(privacyProviderActions.id, action.id),
+          or(
+            inArray(privacyProviderActions.status, ['PENDING', 'FAILED']),
+            and(
+              eq(privacyProviderActions.status, 'IN_PROGRESS'),
+              lt(privacyProviderActions.lastAttemptAt, new Date(now.getTime() - STALE_ACTION_MS)),
+            ),
+          ),
+        ),
+      )
+      .returning({ id: privacyProviderActions.id });
+    if (!claimed) return;
 
     try {
       const outcome = await this.execute(action);
@@ -154,12 +168,20 @@ export class PrivacyProviderActionsService {
         const authUserId = await this.authUserId(request.userId);
         if (!authUserId) return 'skipped';
         const client = this.adminClient();
-        const { data, error } = await client.storage.from(PHOTO_BUCKET).list(authUserId);
-        if (error) throw new Error(error.message);
-        if (!data?.length) return 'skipped';
-        const paths = data.map((object) => `${authUserId}/${object.name}`);
-        const removal = await client.storage.from(PHOTO_BUCKET).remove(paths);
-        if (removal.error) throw new Error(removal.error.message);
+        const storage = client.storage.from(PHOTO_BUCKET);
+        const paths: string[] = [];
+        const pageSize = 100;
+        for (let offset = 0; ; offset += pageSize) {
+          const { data, error } = await storage.list(authUserId, { limit: pageSize, offset });
+          if (error) throw new Error(error.message);
+          paths.push(...(data ?? []).map((object) => `${authUserId}/${object.name}`));
+          if (!data || data.length < pageSize) break;
+        }
+        if (!paths.length) return 'skipped';
+        for (let index = 0; index < paths.length; index += 1000) {
+          const removal = await storage.remove(paths.slice(index, index + 1000));
+          if (removal.error) throw new Error(removal.error.message);
+        }
         return 'done';
       }
       case 'STREAM:DEACTIVATE_USER': {

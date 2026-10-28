@@ -8,7 +8,7 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { and, eq, inArray, or } from 'drizzle-orm';
+import { and, eq, inArray, or, sql } from 'drizzle-orm';
 import { randomUUID } from 'node:crypto';
 import { DATABASE, type Database } from '../../db/database.module';
 import {
@@ -363,12 +363,27 @@ export class MessagingService {
 
   async reconcilePendingMemberships(): Promise<void> {
     if (this.config.get<string>('STREAM_PERMISSIONS_VERIFIED') !== 'true') return;
-    const usersWithMessagingChannels = await this.database()
-      .selectDistinct({ userId: messagingMemberSync.userId })
-      .from(messagingMemberSync);
-    for (const row of usersWithMessagingChannels) {
+    const claims = await this.database().execute(sql`
+      with due as (
+        select conversation_id, user_id
+        from public.messaging_member_sync
+        where last_checked_at <= now() - interval '30 seconds'
+        order by last_checked_at
+        limit 100
+        for update skip locked
+      )
+      update public.messaging_member_sync as sync
+      set last_checked_at = now()
+      from due
+      where sync.conversation_id = due.conversation_id and sync.user_id = due.user_id
+      returning sync.conversation_id, sync.user_id
+    `);
+    for (const row of claims.rows as { conversation_id: string; user_id: string }[]) {
       try {
-        await this.reconcileMemberships({ id: row.userId, authUserId: 'messaging-reconcile' });
+        await this.reconcileMemberships(
+          { id: row.user_id, authUserId: 'messaging-reconcile' },
+          row.conversation_id,
+        );
       } catch {
         // syncMember persists the provider error and the next scheduled pass retries it.
         this.logger.warn('A pending Stream membership sync remains in the retry queue.');
@@ -376,7 +391,7 @@ export class MessagingService {
     }
   }
 
-  private async reconcileMemberships(user: AuthenticatedUser) {
+  private async reconcileMemberships(user: AuthenticatedUser, conversationId?: string) {
     const pending = await this.database()
       .select({
         conversationId: messagingMemberSync.conversationId,
@@ -392,7 +407,14 @@ export class MessagingService {
         messagingConversations,
         eq(messagingConversations.id, messagingMemberSync.conversationId),
       )
-      .where(eq(messagingMemberSync.userId, user.id));
+      .where(
+        conversationId
+          ? and(
+              eq(messagingMemberSync.userId, user.id),
+              eq(messagingMemberSync.conversationId, conversationId),
+            )
+          : eq(messagingMemberSync.userId, user.id),
+      );
     for (const item of pending) {
       let authorized = item.desiredMember;
       let moderator = false;
