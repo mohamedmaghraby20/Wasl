@@ -59,7 +59,7 @@ No change needed: the existing app is used and channel permissions are already v
 
 ## 6. Deploy
 
-1. Push the repository to GitHub (there is no remote yet).
+1. The repository is already on GitHub (`mohamedmaghraby20/Wasl`, `main`). Redeploy from the commit you tested.
 2. On Render: **New → Blueprint**, pick the repository, and let it read `render.yaml`. It creates `wasl-api` (Node) and `wasl-web` (static).
 3. Fill the values marked `sync: false` in the dashboard from your env files.
 4. Deploy. The API health check is `/api/v1/health/ready`; it fails when the database is unreachable, which is what you want.

@@ -10,7 +10,7 @@ Production means the real public service. Keep it separate from the connected de
 - `server/.env.production` does not set `CLIENT_ORIGIN`; production validation falls back to the local address and rejects startup.
 - The built client currently includes the development Supabase address. No production website/API address is configured.
 - The client has no production API address. A hosted static site needs a configured API address or an explicit host rule that sends `/api` requests to the Nest service.
-- There is no Render configuration, no GitHub Actions workflow, and no Git remote in this checkout.
+- Render configuration, a GitHub Actions workflow and the GitHub remote now exist, but none has executed: no pipeline run and no deploy has happened yet.
 - Resend has no verified domain. A test sender worked for development email only.
 - The development project was reported to have leaked-password protection disabled.
 - Privacy, age, consent, retention, deletion, support, budget, and performance decisions still need owner/reviewer approval.
