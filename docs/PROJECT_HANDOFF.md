@@ -26,14 +26,14 @@ The project is a learning build that will also run as a first MVP, so it uses on
 | 4. Participation                      | Join/leave, register/cancel, status transitions with history, My Activity, organizer accept/reject, attendance marking, capacity limits, waitlists and FIFO promotion under concurrent requests.                                                                                                                              |
 | 5. Organizations                      | Organizations with exactly one owner plus admins, public organization profile, organization-owned communities and organization-hosted events, single-use hashed admin invitations, ownership transfer, verification requests, platform-admin review.                                                                          |
 | 6. Discussions and chat               | PostgreSQL discussions (one thread per event, community topics, one-level replies, author edits, manager moderation, explicit close); Stream-backed community and event chat with server-issued tokens, channel-scoped moderators and a membership reconciliation worker; direct messages, blocking and reporting.            |
-| 7. Notifications, moderation, privacy | Notification records and an email queue with idempotency and retry, Resend delivery, user reports with a moderator queue, platform-admin MFA and review console. Privacy: 18+ age eligibility, versioned legal acceptance records, a user `/privacy` page (export, requests, history), deletion requests with provider actions and a retry queue, an admin privacy queue, and retention-policy slots. |
+| 7. Notifications, moderation, privacy | Notification records and an email queue with idempotency and retry, Resend delivery, user reports with a moderator queue, platform-admin MFA and review console. Privacy: 18+ age eligibility, versioned legal acceptance records, a user `/privacy` page (export, requests, history), in-app requester notices when a request is decided, deletion requests with provider actions and a retry queue, an admin privacy queue, and retention-policy slots. |
 | 8. Release checks                     | Security headers and abuse limits, production dependency audit, email-recovery check, draft-restore rehearsal, guest browser journeys, a CI workflow, a Render blueprint and a database-readiness health check.                                                                                                               |
 
 Everything that was planned to be **built** is built. What remains is shipping, plus the small gaps listed below.
 
 ## Providers and data
 
-- **Supabase** — one project (`vuznrkujfmxrggonuvif`), used for development and, from now on, for the MVP. 22 migrations applied (`0000`–`0021`). 31 public tables, all with Row Level Security enabled. `pgmq` and the `notification_emails` queue exist. The `profile-photos` bucket is public with a 5 MB limit and JPEG/PNG/WebP only.
+- **Supabase** — one project (`vuznrkujfmxrggonuvif`), used for development and, from now on, for the MVP. 23 migrations applied (`0000`–`0022`). 31 public tables, all with Row Level Security enabled. `pgmq` and the `notification_emails` queue exist. The `profile-photos` bucket is public with a 5 MB limit and JPEG/PNG/WebP only.
 - **Sample data** — the database is seeded with labelled sample users, communities, events, memberships and registrations. This data ships with the MVP. The seed refuses to run when `NODE_ENV=production`.
 - **Stream** — one app for community chat, event chat and DMs. Permissions are verified (`STREAM_PERMISSIONS_VERIFIED=true`).
 - **Resend** — no verified sending domain yet. Development email goes out from `onboarding@resend.dev`.
@@ -59,8 +59,8 @@ Everything that was planned to be **built** is built. What remains is shipping, 
 
 - `pnpm typecheck` — passes.
 - `pnpm lint` — passes with `--max-warnings=0`.
-- `pnpm test` — **126 server tests / 21 files** and **86 client tests / 26 files** pass.
-- `pnpm test:privacy:postgres` — passes against the project database: age/acceptance gate, under-18 refusal, organization-ownership block on deletion, cancellation, anonymization, provider failure and retry, export, retention blocker and admin age review.
+- `pnpm test` — **126 server tests / 21 files** and **87 client tests / 26 files** pass.
+- `pnpm test:privacy:postgres` — passes against the project database: age/acceptance gate, under-18 refusal, organization-ownership block on deletion, cancellation, anonymization, provider failure and retry, export, retention blocker, admin age review, and the in-app notice created on a decision (with no email queued).
 - `pnpm build` — passes: OpenAPI and Orval clients regenerate, server and client build, and the client build writes `sitemap.xml` (27 URLs on the seeded data) and a `robots.txt` with a `Sitemap:` line.
 - `GET /api/v1/health/ready` — returns `200` with `database: "up"` against the project, and `503` when the database is unreachable.
 - CI and the Render blueprint exist as files but have never run: there is still no Git remote.

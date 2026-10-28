@@ -472,6 +472,7 @@ export const NotificationDtoContextType = {
   community: 'community',
   event: 'event',
   organization: 'organization',
+  privacy: 'privacy',
 } as const;
 
 export interface NotificationDto {

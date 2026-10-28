@@ -72,6 +72,25 @@ describe('NotificationsPage', () => {
     expect(screen.getByText('No notifications yet')).toBeVisible();
   });
 
+  it('links a privacy decision to the privacy page', () => {
+    mocks.list.mockReturnValue({
+      isPending: false,
+      isError: false,
+      data: [
+        {
+          id: 'privacy-notice',
+          type: 'privacy_request_decided',
+          readAt: '2026-10-02T12:00:00Z',
+          createdAt: '2026-10-01T12:00:00Z',
+          href: '/privacy',
+        },
+      ],
+    });
+    renderPage();
+    expect(screen.getByText('There is a response to your privacy request')).toBeVisible();
+    expect(screen.getByRole('link', { name: 'View details' })).toHaveAttribute('href', '/privacy');
+  });
+
   it('links to the resolved resource and marks unread items', async () => {
     mocks.list.mockReturnValue({
       isPending: false,

@@ -375,7 +375,7 @@ export const notifications = pgTable(
     check('notifications_type_length', sql`char_length(${table.type}) between 1 and 80`),
     check(
       'notifications_context_type_check',
-      sql`${table.contextType} in ('community', 'event', 'organization')`,
+      sql`${table.contextType} in ('community', 'event', 'organization', 'privacy')`,
     ),
     check(
       'notifications_context_id_length',

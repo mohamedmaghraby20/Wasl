@@ -1,0 +1,2 @@
+ALTER TABLE "notifications" DROP CONSTRAINT "notifications_context_type_check";--> statement-breakpoint
+ALTER TABLE "notifications" ADD CONSTRAINT "notifications_context_type_check" CHECK ("notifications"."context_type" in ('community', 'event', 'organization', 'privacy'));

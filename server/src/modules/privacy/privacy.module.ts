@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { createClient } from '@supabase/supabase-js';
 import { AuthModule } from '../auth/auth.module';
 import { MessagingModule } from '../messaging/messaging.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 import { PrivacyAdminController, PrivacyController } from './privacy.controller';
 import {
   PrivacyProviderActionsService,
@@ -11,7 +12,7 @@ import {
 import { PrivacyService } from './privacy.service';
 
 @Module({
-  imports: [AuthModule, MessagingModule],
+  imports: [AuthModule, MessagingModule, NotificationsModule],
   controllers: [PrivacyController, PrivacyAdminController],
   providers: [
     PrivacyService,

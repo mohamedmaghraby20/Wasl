@@ -2,13 +2,14 @@ import 'dotenv/config';
 import * as assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import { ConfigService } from '@nestjs/config';
-import { eq, sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import * as schema from '../src/db/schema';
 import type { Database } from '../src/db/database.module';
 import type { StreamChatAdapter } from '../src/modules/messaging/stream-chat.adapter';
 import { PrivacyGateService } from '../src/modules/auth/privacy-gate.service';
+import { NotificationsService } from '../src/modules/notifications/notifications.service';
 import { PrivacyProviderActionsService } from '../src/modules/privacy/privacy-provider-actions.service';
 import { PrivacyService } from '../src/modules/privacy/privacy.service';
 
@@ -45,7 +46,13 @@ async function main(): Promise<void> {
           },
         } as unknown as StreamChatAdapter;
         const providerActions = new PrivacyProviderActionsService(database, undefined, stream);
-        const privacy = new PrivacyService(database, config, gate, providerActions);
+        const privacy = new PrivacyService(
+          database,
+          config,
+          gate,
+          providerActions,
+          new NotificationsService(database),
+        );
 
         // Gate: absent evidence means UNVERIFIED, and a published document must be accepted.
         const initial = await privacy.status(adult);
@@ -104,6 +111,54 @@ async function main(): Promise<void> {
         assert.equal(completedAccess.status, 'COMPLETED');
         assert.equal(completedAccess.decidedByUserId, admin);
         assert.ok(completedAccess.completedAt);
+
+        // A decision must reach the requester in-app only; no email is queued for a case update.
+        const decisionNotice = (
+          await tx
+            .select()
+            .from(schema.notifications)
+            .where(
+              and(
+                eq(schema.notifications.recipientUserId, adult),
+                eq(schema.notifications.type, 'privacy_request_decided'),
+              ),
+            )
+        )[0];
+        assert.equal(decisionNotice?.contextType, 'privacy');
+        assert.equal(decisionNotice?.contextId, access.id);
+        const decisionEmail = (
+          await tx
+            .select()
+            .from(schema.notificationEmailDeliveries)
+            .where(
+              eq(
+                schema.notificationEmailDeliveries.notificationId,
+                decisionNotice?.id ?? 'missing',
+              ),
+            )
+        )[0];
+        assert.equal(decisionEmail, undefined);
+
+        const correction = await privacy.createRequest(adult, {
+          requestType: 'CORRECTION',
+          note: 'My display name is misspelled.',
+        });
+        await privacy.decideRequest(admin, correction.id, {
+          action: 'REJECT',
+          note: 'Please identify the field to correct.',
+        });
+        const rejectionNotice = (
+          await tx
+            .select()
+            .from(schema.notifications)
+            .where(
+              and(
+                eq(schema.notifications.recipientUserId, adult),
+                eq(schema.notifications.contextId, correction.id),
+              ),
+            )
+        )[0];
+        assert.ok(rejectionNotice, 'a rejection should notify the requester');
 
         // A user who still owns an organization cannot start deletion.
         const organizationId = randomUUID();

@@ -15,7 +15,7 @@ export type NotificationEvent = {
   recipientUserId: string;
   eventKey: string;
   type: string;
-  contextType: 'community' | 'event' | 'organization';
+  contextType: 'community' | 'event' | 'organization' | 'privacy';
   contextId: string;
 };
 
@@ -75,13 +75,16 @@ export class NotificationsService {
       .limit(50);
     return rows.map(({ communitySlug, eventSlug, organizationSlug, ...notification }) => ({
       ...notification,
-      href: communitySlug
-        ? `/communities/${communitySlug}`
-        : eventSlug
-          ? `/events/${eventSlug}`
-          : organizationSlug
-            ? `/organizations/${organizationSlug}`
-            : null,
+      href:
+        notification.contextType === 'privacy'
+          ? '/privacy'
+          : communitySlug
+            ? `/communities/${communitySlug}`
+            : eventSlug
+              ? `/events/${eventSlug}`
+              : organizationSlug
+                ? `/organizations/${organizationSlug}`
+                : null,
     }));
   }
 

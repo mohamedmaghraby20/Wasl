@@ -35,6 +35,7 @@ import {
   users,
 } from '../../db/schema';
 import { PrivacyGateService } from '../auth/privacy-gate.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import type {
   AcceptDocumentDto,
   CreatePrivacyRequestDto,
@@ -57,6 +58,7 @@ export class PrivacyService {
     private readonly config: ConfigService,
     private readonly gate: PrivacyGateService,
     private readonly providerActions: PrivacyProviderActionsService,
+    private readonly notifications: NotificationsService,
   ) {}
 
   async status(userId: string) {
@@ -504,6 +506,14 @@ export class PrivacyService {
             .set({ accountStatus: 'ACTIVE', updatedAt: now })
             .where(and(eq(users.id, request.userId), eq(users.accountStatus, 'DELETION_PENDING')));
         }
+        // In-app only: case updates stay behind the signed-in privacy page, not in email.
+        await this.notifications.create(tx, {
+          recipientUserId: request.userId,
+          eventKey: `privacy-request-decided:${id}`,
+          type: 'privacy_request_decided',
+          contextType: 'privacy',
+          contextId: id,
+        });
       });
       return this.adminRequestView(id);
     }
@@ -527,6 +537,13 @@ export class PrivacyService {
           actorRole: 'ADMIN',
           eventType: 'COMPLETED',
           note: input.note?.trim() || 'Response is available through the account data export.',
+        });
+        await this.notifications.create(tx, {
+          recipientUserId: request.userId,
+          eventKey: `privacy-request-decided:${id}`,
+          type: 'privacy_request_decided',
+          contextType: 'privacy',
+          contextId: id,
         });
       });
       return this.adminRequestView(id);

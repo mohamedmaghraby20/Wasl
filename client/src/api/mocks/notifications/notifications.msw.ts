@@ -22,7 +22,7 @@ import type {
 } from '../../generated/wasl-client.schemas';
 
 
-export const getNotificationsControllerListResponseMock = (): NotificationDto[] => (Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), type: faker.string.alpha({length: {min: 10, max: 20}}), contextType: faker.helpers.arrayElement(['community','event','organization'] as const), contextId: faker.string.alpha({length: {min: 10, max: 20}}), href: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), readAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})))
+export const getNotificationsControllerListResponseMock = (): NotificationDto[] => (Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), type: faker.string.alpha({length: {min: 10, max: 20}}), contextType: faker.helpers.arrayElement(['community','event','organization','privacy'] as const), contextId: faker.string.alpha({length: {min: 10, max: 20}}), href: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), readAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})))
 
 export const getNotificationsControllerMarkReadResponseMock = (overrideResponse: Partial<Extract<ReadNotificationDto, object>> = {}): ReadNotificationDto => ({id: faker.string.uuid(), readAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 

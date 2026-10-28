@@ -184,6 +184,7 @@ void i18n.use(initReactI18next).init({
         noticeType_organization_verification_verified: 'Your Organization was verified',
         noticeType_organization_verification_rejected:
           'Your Organization verification was declined',
+        noticeType_privacy_request_decided: 'There is a response to your privacy request',
         loadingMessages: 'Connecting to messages…',
         messagesUnavailable: 'Messages are unavailable. Try again after reconnecting.',
         messagesSetupPending:
@@ -778,6 +779,7 @@ void i18n.use(initReactI18next).init({
         noticeType_organization_admin_invited: 'دُعيت لإدارة مؤسسة',
         noticeType_organization_verification_verified: 'تم توثيق مؤسستك',
         noticeType_organization_verification_rejected: 'تم رفض توثيق مؤسستك',
+        noticeType_privacy_request_decided: 'يوجد رد على طلب الخصوصية الخاص بك',
         loadingMessages: 'جارٍ الاتصال بالرسائل…',
         messagesUnavailable: 'الرسائل غير متاحة. حاول مجددًا بعد استعادة الاتصال.',
         messagesSetupPending: 'لم يتم تفعيل الرسائل بعد. يجب إعداد الخادم وصلاحيات Stream أولًا.',

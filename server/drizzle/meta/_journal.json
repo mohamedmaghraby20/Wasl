@@ -155,6 +155,13 @@
       "when": 1793191984666,
       "tag": "0021_opposite_jimmy_woo",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1793194253786,
+      "tag": "0022_magenta_jack_murdock",
+      "breakpoints": true
     }
   ]
 }

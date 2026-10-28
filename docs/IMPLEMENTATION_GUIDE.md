@@ -2226,8 +2226,8 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 
 **Acceptance criteria:**
 - [ ] Underage/consent behavior matches approved launch policy.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 146.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -2238,12 +2238,12 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 
 **Applicable requirements:** Sections 3–4: Notifications, moderation, privacy and security in this document.
 
-**Status (2026-10-28):** Implemented in code, not legally complete. Signed-in users submit `ACCESS`, `EXPORT`, `DELETION` and `CORRECTION` requests from `/privacy`; each request carries a 30-day due date and an audit trail. Export returns machine-readable JSON. Deletion anonymizes Wasl-owned data and queues per-provider cleanup that must reach `SUCCEEDED` or `SKIPPED` (with retry) before the request completes. Retention periods are configuration only: erasure stays disabled and `TBD_LEGAL` rows carry no duration. Open: retention durations, provider deletion terms and the data-controller identity remain owner/counsel decisions.
+**Status (2026-10-28):** Implemented in code, not legally complete. Signed-in users submit `ACCESS`, `EXPORT`, `DELETION` and `CORRECTION` requests from `/privacy`; each request carries a 30-day due date and an audit trail. Export returns machine-readable JSON. Deletion anonymizes Wasl-owned data and queues per-provider cleanup that must reach `SUCCEEDED` or `SKIPPED` (with retry) before the request completes. A rejection, or a completed access/export/correction request, creates an in-app notification that links to `/privacy`; the decision note stays in the request history. No email is sent for a case update, and a completed deletion has no reachable channel because the account is deactivated in the same step. Retention periods are configuration only: erasure stays disabled and `TBD_LEGAL` rows carry no duration. Open: retention durations, provider deletion terms and the data-controller identity remain owner/counsel decisions.
 
 **Acceptance criteria:**
 - [ ] Restricted records and provider cleanup follow configured policy.
-- [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
-- [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
+- [x] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
+- [x] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 147.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
@@ -2257,7 +2257,7 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Status (2026-10-28):** Not complete, and it cannot be closed by code or tests. Launch-blocking decisions are tracked in `docs/launch-decisions.md`: approved legal texts and their publication, the age-verification method, retention periods, data-controller identity and KVKK/5651 obligations. Code-side evidence that exists today: the privacy integration suite (`test:privacy:postgres`), server and client unit tests, typecheck and lint.
 
 **Acceptance criteria:**
-- [ ] Unresolved launch-blocking legal decisions explicitly tracked.
+- [x] Unresolved launch-blocking legal decisions explicitly tracked.
 - [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
 - [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 

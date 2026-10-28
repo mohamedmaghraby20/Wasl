@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 export class NotificationDto {
   @ApiProperty({ format: 'uuid' }) id!: string;
   @ApiProperty() type!: string;
-  @ApiProperty({ enum: ['community', 'event', 'organization'] }) contextType!: string;
+  @ApiProperty({ enum: ['community', 'event', 'organization', 'privacy'] }) contextType!: string;
   @ApiProperty() contextId!: string;
   @ApiProperty({ type: String, nullable: true }) href!: string | null;
   @ApiProperty({ type: String, nullable: true, format: 'date-time' }) readAt!: Date | null;
