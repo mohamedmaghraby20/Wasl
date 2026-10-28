@@ -12,6 +12,7 @@ import {
 import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import type { FastifyRequest } from 'fastify';
 import { getAuthenticatedUser } from '../auth/authenticated-user';
+import { PrivacyGateExempt } from '../auth/privacy-gate.decorator';
 import { SupabaseAuthGuard } from '../auth/supabase-auth.guard';
 import { UsersService } from './users.service';
 import {
@@ -28,6 +29,7 @@ export class UsersController {
 
   @Get('me')
   @UseGuards(SupabaseAuthGuard)
+  @PrivacyGateExempt()
   @ApiOkResponse({ type: CurrentUserDto })
   @ApiQuery({ name: 'lang', required: false, enum: ['en', 'ar', 'tr'] })
   current(@Req() request: FastifyRequest, @Query('lang') language?: string) {

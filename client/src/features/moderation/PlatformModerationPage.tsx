@@ -13,11 +13,19 @@ import {
   useOrganizationsControllerDecideVerification,
   useOrganizationsControllerListPendingVerificationRequests,
 } from '@/api/generated/organizations/organizations';
+import {
+  getPrivacyAdminControllerListQueryKey,
+  usePrivacyAdminControllerDecide,
+  usePrivacyAdminControllerList,
+  usePrivacyAdminControllerRetry,
+} from '@/api/generated/privacy/privacy';
+import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Field } from '@/components/ui/Field';
 import { Input } from '@/components/ui/Input';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { usePageMetadata } from '@/features/discovery/usePageMetadata';
+import { formatTurkeyDateTime } from '@/features/resources/resource-utils';
 import { supabase } from '@/lib/supabase';
 
 function SecondFactor({ onSuccess }: { onSuccess: () => void }): React.JSX.Element {
@@ -128,7 +136,7 @@ function SecondFactor({ onSuccess }: { onSuccess: () => void }): React.JSX.Eleme
 }
 
 export function PlatformModerationPage(): React.JSX.Element {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user, loading } = useAuth();
   const queryClient = useQueryClient();
   const [aal, setAal] = useState<'aal1' | 'aal2' | null>(null);
@@ -140,8 +148,13 @@ export function PlatformModerationPage(): React.JSX.Element {
   const requests = useOrganizationsControllerListPendingVerificationRequests({
     query: { enabled: Boolean(user && aal === 'aal2') },
   });
+  const privacyRequests = usePrivacyAdminControllerList(undefined, {
+    query: { enabled: Boolean(user && aal === 'aal2') },
+  });
   const decide = useModerationControllerDecide();
   const verify = useOrganizationsControllerDecideVerification();
+  const decidePrivacy = usePrivacyAdminControllerDecide();
+  const retryPrivacy = usePrivacyAdminControllerRetry();
   usePageMetadata(t('adminTitle'), t('adminDescription'), { noindex: true });
 
   useEffect(() => {
@@ -200,6 +213,35 @@ export function PlatformModerationPage(): React.JSX.Element {
       setBusyId('');
     }
   };
+  const reviewPrivacy = async (id: string, action: 'START_REVIEW' | 'APPROVE' | 'REJECT') => {
+    const note = action === 'START_REVIEW' ? '' : window.prompt(t('adminDecisionNote'));
+    if (note === null) return;
+    setBusyId(id);
+    setError('');
+    try {
+      await decidePrivacy.mutateAsync({ id, data: { action, note: note.slice(0, 2000) } });
+      await queryClient.invalidateQueries({ queryKey: getPrivacyAdminControllerListQueryKey() });
+    } catch {
+      setError(t('adminActionError'));
+    } finally {
+      setBusyId('');
+    }
+  };
+  const retryPrivacyActions = async (id: string) => {
+    setBusyId(id);
+    setError('');
+    try {
+      await retryPrivacy.mutateAsync({ id });
+      await queryClient.invalidateQueries({ queryKey: getPrivacyAdminControllerListQueryKey() });
+    } catch {
+      setError(t('adminActionError'));
+    } finally {
+      setBusyId('');
+    }
+  };
+  const openPrivacy = (privacyRequests.data ?? []).filter(
+    (request) => !['COMPLETED', 'CANCELLED', 'REJECTED'].includes(request.status),
+  );
   return (
     <div className="mx-auto grid max-w-(--container-reading) gap-8">
       <header>
@@ -331,6 +373,87 @@ export function PlatformModerationPage(): React.JSX.Element {
           ))
         ) : (
           <p className="text-text-muted">{t('adminEmptyVerification')}</p>
+        )}
+      </section>
+      <section className="grid gap-4">
+        <h2 className="text-xl font-semibold">{t('adminPrivacy')}</h2>
+        {privacyRequests.isPending ? (
+          <p role="status">{t('authWorking')}</p>
+        ) : privacyRequests.isError ? (
+          <Button onClick={() => void privacyRequests.refetch()}>{t('reloadPage')}</Button>
+        ) : openPrivacy.length ? (
+          openPrivacy.map((request) => (
+            <article
+              className="grid gap-3 rounded-(--shape-radius-card) border border-border bg-card p-4"
+              key={request.id}
+            >
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="font-semibold">{t(`privacyRequestType_${request.requestType}`)}</p>
+                <Badge variant={request.status === 'PENDING_PROVIDER' ? 'warning' : 'info'}>
+                  {t(`privacyRequestStatus_${request.status}`)}
+                </Badge>
+              </div>
+              <p className="text-sm text-text-muted">
+                {request.requesterEmail}
+                {' · '}
+                {t('privacyRequestDue', {
+                  date: formatTurkeyDateTime(request.dueAt, i18n.language),
+                })}
+              </p>
+              {request.requestNote ? (
+                <p className="whitespace-pre-wrap wrap-break-word text-sm">{request.requestNote}</p>
+              ) : null}
+              {request.providerActions?.length ? (
+                <ul className="grid gap-1 text-xs text-text-subtle">
+                  {request.providerActions.map((action) => (
+                    <li key={action.id}>
+                      {action.provider} · {action.action} · {action.status}
+                      {action.lastError ? ` · ${action.lastError}` : ''}
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+              <div className="flex flex-wrap gap-2">
+                {request.status === 'RECEIVED' ? (
+                  <Button
+                    disabled={Boolean(busyId)}
+                    onClick={() => void reviewPrivacy(request.id, 'START_REVIEW')}
+                    size="sm"
+                    variant="secondary"
+                  >
+                    {t('adminStartReview')}
+                  </Button>
+                ) : null}
+                <Button
+                  disabled={Boolean(busyId)}
+                  onClick={() => void reviewPrivacy(request.id, 'APPROVE')}
+                  size="sm"
+                >
+                  {t('adminApproveRequest')}
+                </Button>
+                <Button
+                  disabled={Boolean(busyId)}
+                  onClick={() => void reviewPrivacy(request.id, 'REJECT')}
+                  size="sm"
+                  variant="secondary"
+                >
+                  {t('adminRejectRequest')}
+                </Button>
+                {request.status === 'PENDING_PROVIDER' ? (
+                  <Button
+                    disabled={Boolean(busyId)}
+                    onClick={() => void retryPrivacyActions(request.id)}
+                    size="sm"
+                    variant="ghost"
+                  >
+                    {t('adminRetryProviders')}
+                  </Button>
+                ) : null}
+              </div>
+            </article>
+          ))
+        ) : (
+          <p className="text-text-muted">{t('adminEmptyPrivacy')}</p>
         )}
       </section>
     </div>

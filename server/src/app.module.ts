@@ -16,6 +16,7 @@ import { DiscussionsModule } from './modules/discussions/discussions.module';
 import { MessagingModule } from './modules/messaging/messaging.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { ModerationModule } from './modules/moderation/moderation.module';
+import { PrivacyModule } from './modules/privacy/privacy.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { ModerationModule } from './modules/moderation/moderation.module';
     MessagingModule,
     NotificationsModule,
     ModerationModule,
+    PrivacyModule,
     DiscoveryModule,
     HealthModule,
   ],

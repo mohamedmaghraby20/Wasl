@@ -8,4 +8,5 @@ export * from './moderation/moderation';
 export * from './notifications/notifications';
 export * from './organizations/organizations';
 export * from './participation/participation';
+export * from './privacy/privacy';
 export * from './users/users';

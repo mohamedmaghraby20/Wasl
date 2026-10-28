@@ -151,9 +151,12 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 | 5 | 96–112 | Organization creation, admins, authority, transfer and verification |
 | 6 | 113–131 | Persistent discussions and Stream-based group/DM chat |
 | 7 | 132–149 | Notifications, moderation, privacy and compliance controls |
-| 8 | 150–164 | E2E hardening, security, performance, staging, CI/CD, go-live |
+| 8 | 150–164 | Pre-production checks, staging, and release automation |
+| 9 | 165–171 | Production setup, first release, and ongoing operation |
 
 ## Phases and tasks
+
+> **Task checkboxes are not a status source.** They are planning markers: some completed tasks are still unchecked, and some checked tasks were only finished later. For current state read `docs/project_handoff.md`.
 
 ## Phase 1: Foundation and local tooling
 
@@ -2219,6 +2222,8 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 
 **Applicable requirements:** Sections 3–4: Notifications, moderation, privacy and security in this document.
 
+**Status (2026-10-28):** Implemented in code, not legally complete. The server enforces the 18+ gate and required acceptance in `SupabaseAuthGuard` through `PrivacyGateService`; new identities start `UNVERIFIED` and must self-declare 18+ and accept every `PUBLISHED` document version, recorded as versioned acceptance rows. Under-18 accounts are refused rather than given a reduced account. Open: the age-verification method and approved privacy-notice, terms and age-policy text are owner/counsel decisions listed in `docs/launch-decisions.md`, so every document slot is seeded `DRAFT` with no content and no draft notice is published.
+
 **Acceptance criteria:**
 - [ ] Underage/consent behavior matches approved launch policy.
 - [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
@@ -2232,6 +2237,8 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Description:** Handle access/export/deletion requests and retention rules through server workflow
 
 **Applicable requirements:** Sections 3–4: Notifications, moderation, privacy and security in this document.
+
+**Status (2026-10-28):** Implemented in code, not legally complete. Signed-in users submit `ACCESS`, `EXPORT`, `DELETION` and `CORRECTION` requests from `/privacy`; each request carries a 30-day due date and an audit trail. Export returns machine-readable JSON. Deletion anonymizes Wasl-owned data and queues per-provider cleanup that must reach `SUCCEEDED` or `SKIPPED` (with retry) before the request completes. Retention periods are configuration only: erasure stays disabled and `TBD_LEGAL` rows carry no duration. Open: retention durations, provider deletion terms and the data-controller identity remain owner/counsel decisions.
 
 **Acceptance criteria:**
 - [ ] Restricted records and provider cleanup follow configured policy.
@@ -2247,6 +2254,8 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 
 **Applicable requirements:** Sections 3–4: Notifications, moderation, privacy and security in this document.
 
+**Status (2026-10-28):** Not complete, and it cannot be closed by code or tests. Launch-blocking decisions are tracked in `docs/launch-decisions.md`: approved legal texts and their publication, the age-verification method, retention periods, data-controller identity and KVKK/5651 obligations. Code-side evidence that exists today: the privacy integration suite (`test:privacy:postgres`), server and client unit tests, typecheck and lint.
+
 **Acceptance criteria:**
 - [ ] Unresolved launch-blocking legal decisions explicitly tracked.
 - [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
@@ -2255,7 +2264,7 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 **Dependencies:** Task 148.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
 
-## Phase 8: Final integration, hardening, deployment and CI/CD
+## Phase 8: Pre-production checks, staging and release automation
 
 ### Task 150: Complete functional E2E journeys
 
@@ -2385,12 +2394,12 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 
 ### Task 159: Prepare Render environments
 
-**Description:** Configure Render static client and NestJS service, staging and production env vars
+**Description:** Configure isolated Render staging services and document the production settings still needed. Do not point a production build at development services.
 
 **Applicable requirements:** Sections 4–5: release quality gates in this document.
 
 **Acceptance criteria:**
-- [ ] Staging app connects to correctly isolated services.
+- [ ] Staging app connects only to its isolated services; production settings are documented without using development credentials.
 - [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
 - [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
@@ -2441,12 +2450,12 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 
 ### Task 163: Configure CD at project end
 
-**Description:** Connect approved Git/Render deployment triggers and protected secrets
+**Description:** Connect approved Git/Render deployment triggers to staging and protect deployment secrets. Production deployment remains a separate, owner-approved step.
 
 **Applicable requirements:** Sections 4–5: release quality gates in this document.
 
 **Acceptance criteria:**
-- [ ] Successful verified main integration deploys intended environment.
+- [ ] A verified change can deploy to staging; production is not auto-deployed.
 - [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
 - [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
@@ -2455,20 +2464,108 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 
 ### Task 164: Verify post-deploy health
 
-**Description:** Run end-to-end production smoke checks with non-destructive fixtures
+**Description:** Run end-to-end staging health checks with non-destructive fixtures
 
 **Applicable requirements:** Sections 4–5: release quality gates in this document.
 
 **Acceptance criteria:**
-- [ ] Services healthy, key flows correct, rollback path documented.
+- [ ] Staging services are healthy, key flows work, and the rollback path is documented.
 - [ ] Task-specific success, failure, authorization, and empty-state cases are verified where applicable.
 - [ ] Changed code passes relevant local type checks, linting, and tests; completion records exact commands and results.
 
 **Dependencies:** Task 163.
 **Parallelization:** May run concurrently only with dependency-ready tasks that do not share mutable contracts, migration files, or code ownership; otherwise sequential.
 
+## Phase 9: Production setup, first release and operation
+
+Phase 9 starts only after Phase 8 passes and the owner approves the launch decisions. Keep production separate from the existing development Supabase project. Never copy development credentials or fake sample records into production.
+
+### Task 165: Approve production decisions
+
+**Description:** Confirm the domain, hosting account and spending limit, launch region, support owner, legal/privacy rules, performance targets, and recovery targets.
+
+**Acceptance criteria:**
+- [ ] A qualified reviewer has approved the required privacy, age, consent, retention, and deletion rules.
+- [ ] The owner has recorded the production domain, service budget, support contact, expected traffic, acceptable response time, and recovery targets.
+- [ ] No unresolved decision is silently treated as approved.
+
+**Dependencies:** Tasks 149 and 161.
+**Parallelization:** Owner decisions can be prepared alongside code review; production setup waits for the decisions.
+
+### Task 166: Create separate production services
+
+**Description:** Set up production Supabase, Render client/API services, and the required email and chat provider configuration without reusing development data.
+
+**Acceptance criteria:**
+- [ ] Production Supabase is separate from development and its region and backup plan are recorded.
+- [ ] Render has separate production client and API services with the correct account and spending controls.
+- [ ] Email and chat use production-approved provider settings; no test sender or sample credentials remain.
+
+**Dependencies:** Task 165.
+**Parallelization:** No production service is created before the owner confirms account, region, and spending.
+
+### Task 167: Secure production settings
+
+**Description:** Set production-only secrets, website/API origins, Supabase Auth redirects, Storage rules, email sender, admin access, and health checks.
+
+**Acceptance criteria:**
+- [ ] The client points only to production services and exposes no private keys.
+- [ ] The server starts with production validation and connects only to production Supabase.
+- [ ] CORS, Auth redirects, Storage permissions, admin MFA, email sender, and provider access are checked.
+- [ ] Development seed data cannot run in production.
+
+**Dependencies:** Task 166.
+**Parallelization:** Review settings with one owner; do not copy secret values into Git or chat.
+
+### Task 168: Prepare production data safely
+
+**Description:** Review and apply database changes and approved public reference data to the confirmed production project.
+
+**Acceptance criteria:**
+- [ ] A verified backup exists before the first migration.
+- [ ] Reviewed migrations apply in order and RLS/private access checks pass.
+- [ ] Only approved reference or launch content is loaded; development fake people, Communities, and Events are excluded.
+
+**Dependencies:** Task 167.
+**Parallelization:** Database changes run one at a time with the production target confirmed twice.
+
+### Task 169: Release to production
+
+**Description:** Promote the tested build through an owner-approved, reversible production release.
+
+**Acceptance criteria:**
+- [ ] The exact build was tested in staging and its source revision is recorded.
+- [ ] The owner approves the release window and rollback plan before deployment.
+- [ ] Non-destructive production checks pass for public pages, sign-in, one authorized action, email, and chat.
+
+**Dependencies:** Task 168.
+**Parallelization:** No parallel production release or unapproved automatic deploy.
+
+### Task 170: Accept or stop the launch
+
+**Description:** Review live checks, legal sign-off, support readiness, security and rollback evidence, then record the owner's launch decision.
+
+**Acceptance criteria:**
+- [ ] All launch gates have named evidence and an accountable owner.
+- [ ] The owner records a clear launch approval or a no-go decision with remaining actions.
+
+**Dependencies:** Task 169.
+**Parallelization:** Owner sign-off is not delegated.
+
+### Task 171: Operate and review production
+
+**Description:** Monitor service health, email/chat delivery, support reports, backups, security updates, and incident response after launch.
+
+**Acceptance criteria:**
+- [ ] A named person reviews alerts and user reports and can pause or roll back a release.
+- [ ] Backup and recovery checks continue on the approved schedule.
+- [ ] Incidents and follow-up fixes are recorded without exposing user secrets or data.
+
+**Dependencies:** Task 170.
+**Parallelization:** Operational ownership remains assigned after launch.
+
 ## 7. Explicitly out of scope
 
 Do not implement payments, paid events/tickets, QR check-in, Guides, AI ranking/personalization, premium subscriptions, private Communities, advanced analytics, enterprise logs, arbitrary organization roles, deep forum nesting, push notifications, a custom Socket.IO chat backend, microservices, Kafka or Kubernetes. Store no provider-specific chat IDs as core User/Community/Event primary keys. Treat `docs/design/` as the only visual design file requirement; the owner adds it.
 
-**Total numbered tasks: 164.**
+**Total numbered tasks: 171.**

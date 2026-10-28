@@ -828,3 +828,309 @@ export const profiles = identity
     ],
   )
   .enableRLS();
+
+export const ageEligibilityStatus = identity.enum('age_eligibility_status', [
+  'UNVERIFIED',
+  '18_PLUS',
+  'UNDER_18',
+]);
+
+/**
+ * Minimal age-eligibility outcome. Only the result, the configured method name and the decision
+ * metadata are stored: never a birth date, national ID or identity-document scan.
+ */
+export const ageEligibilities = identity
+  .table(
+    'age_eligibilities',
+    {
+      userId: uuid('user_id')
+        .primaryKey()
+        .references(() => users.id, { onDelete: 'restrict' }),
+      status: ageEligibilityStatus('status').notNull(),
+      method: text('method').notNull(),
+      decidedAt: timestamp('decided_at', { withTimezone: true }).notNull().defaultNow(),
+      reviewedByUserId: uuid('reviewed_by_user_id').references(() => users.id, {
+        onDelete: 'restrict',
+      }),
+      note: text('note'),
+    },
+    (table) => [
+      check(
+        'age_eligibilities_method_length',
+        sql`char_length(${table.method}) between 1 and 80`,
+      ),
+      check(
+        'age_eligibilities_note_length',
+        sql`${table.note} is null or char_length(${table.note}) <= 1000`,
+      ),
+      index('age_eligibilities_status_idx').on(table.status),
+      index('age_eligibilities_reviewer_idx').on(table.reviewedByUserId),
+    ],
+  )
+  .enableRLS();
+
+export const legalDocumentStatus = pgEnum('legal_document_status', [
+  'DRAFT',
+  'APPROVED',
+  'PUBLISHED',
+  'SUPERSEDED',
+]);
+
+/**
+ * Versioned legal-document slot. Counsel-owned text is stored here once approved; an empty
+ * draft slot must never be served as an approved notice.
+ */
+export const legalDocuments = pgTable(
+  'legal_documents',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    type: text('type').notNull(),
+    version: text('version').notNull(),
+    locale: text('locale').notNull(),
+    status: legalDocumentStatus('status').notNull().default('DRAFT'),
+    content: text('content'),
+    contentHash: text('content_hash'),
+    approvedBy: text('approved_by'),
+    approvedAt: timestamp('approved_at', { withTimezone: true }),
+    publishedAt: timestamp('published_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex('legal_documents_type_version_locale_unique').on(
+      table.type,
+      table.version,
+      table.locale,
+    ),
+    index('legal_documents_type_status_idx').on(table.type, table.status, table.publishedAt),
+    check(
+      'legal_documents_type_check',
+      sql`${table.type} in ('TERMS_OF_USE', 'PRIVACY_NOTICE', 'AGE_ELIGIBILITY_POLICY', 'COOKIE_NOTICE', 'TAKEDOWN_PROCEDURE', 'PROCESSOR_TRANSFER_REGISTER', 'RETENTION_SCHEDULE')`,
+    ),
+    check('legal_documents_version_length', sql`char_length(${table.version}) between 1 and 40`),
+    check('legal_documents_locale_check', sql`${table.locale} in ('ar', 'en', 'tr')`),
+    check(
+      'legal_documents_content_hash_format',
+      sql`${table.contentHash} is null or ${table.contentHash} ~ '^[a-f0-9]{64}$'`,
+    ),
+    check(
+      'legal_documents_approval_check',
+      sql`(${table.status} in ('DRAFT', 'SUPERSEDED') and ${table.approvedBy} is null and ${table.approvedAt} is null and ${table.publishedAt} is null) or (${table.status} = 'APPROVED' and ${table.approvedBy} is not null and ${table.approvedAt} is not null and ${table.publishedAt} is null) or (${table.status} = 'PUBLISHED' and ${table.approvedBy} is not null and ${table.approvedAt} is not null and ${table.publishedAt} is not null and ${table.content} is not null)`,
+    ),
+  ],
+).enableRLS();
+
+/**
+ * Minimal acceptance evidence: document type, version, user and time. An acknowledgment is not
+ * a lawful basis and is never treated as marketing consent.
+ */
+export const legalAcceptances = pgTable(
+  'legal_acceptances',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'restrict' }),
+    documentType: text('document_type').notNull(),
+    version: text('version').notNull(),
+    documentId: uuid('document_id').references(() => legalDocuments.id, {
+      onDelete: 'restrict',
+    }),
+    acceptedAt: timestamp('accepted_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex('legal_acceptances_user_type_version_unique').on(
+      table.userId,
+      table.documentType,
+      table.version,
+    ),
+    index('legal_acceptances_document_idx').on(table.documentId),
+    check(
+      'legal_acceptances_document_type_check',
+      sql`${table.documentType} in ('TERMS_OF_USE', 'PRIVACY_NOTICE', 'AGE_ELIGIBILITY_POLICY', 'COOKIE_NOTICE')`,
+    ),
+    check('legal_acceptances_version_length', sql`char_length(${table.version}) between 1 and 40`),
+  ],
+).enableRLS();
+
+export const privacyRequestType = pgEnum('privacy_request_type', [
+  'ACCESS',
+  'CORRECTION',
+  'EXPORT',
+  'DELETION',
+]);
+
+export const privacyRequestStatus = pgEnum('privacy_request_status', [
+  'RECEIVED',
+  'IN_REVIEW',
+  'PENDING_PROVIDER',
+  'COMPLETED',
+  'REJECTED',
+  'CANCELLED',
+]);
+
+export const privacyRequests = pgTable(
+  'privacy_requests',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'restrict' }),
+    requestType: privacyRequestType('request_type').notNull(),
+    status: privacyRequestStatus('status').notNull().default('RECEIVED'),
+    requestNote: text('request_note'),
+    dueAt: timestamp('due_at', { withTimezone: true }).notNull(),
+    identityVerifiedAt: timestamp('identity_verified_at', { withTimezone: true }),
+    decidedByUserId: uuid('decided_by_user_id').references(() => users.id, {
+      onDelete: 'restrict',
+    }),
+    decisionNote: text('decision_note'),
+    decidedAt: timestamp('decided_at', { withTimezone: true }),
+    completedAt: timestamp('completed_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex('privacy_requests_open_deletion_unique')
+      .on(table.userId)
+      .where(sql`${table.requestType} = 'DELETION' and ${table.status} in ('RECEIVED', 'IN_REVIEW', 'PENDING_PROVIDER')`),
+    index('privacy_requests_user_created_idx').on(table.userId, table.createdAt),
+    index('privacy_requests_status_due_idx').on(table.status, table.dueAt),
+    index('privacy_requests_decider_idx').on(table.decidedByUserId),
+    check(
+      'privacy_requests_request_note_length',
+      sql`${table.requestNote} is null or char_length(${table.requestNote}) <= 2000`,
+    ),
+    check(
+      'privacy_requests_decision_note_length',
+      sql`${table.decisionNote} is null or char_length(${table.decisionNote}) <= 2000`,
+    ),
+    check(
+      'privacy_requests_decision_check',
+      sql`(${table.status} in ('COMPLETED', 'REJECTED') and ${table.decidedByUserId} is not null and ${table.decidedAt} is not null) or (${table.status} not in ('COMPLETED', 'REJECTED') and ${table.decidedByUserId} is null and ${table.decidedAt} is null)`,
+    ),
+    check(
+      'privacy_requests_completion_check',
+      sql`(${table.status} = 'COMPLETED' and ${table.completedAt} is not null) or (${table.status} <> 'COMPLETED' and ${table.completedAt} is null)`,
+    ),
+  ],
+).enableRLS();
+
+export const privacyRequestEvents = pgTable(
+  'privacy_request_events',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    requestId: uuid('request_id')
+      .notNull()
+      .references(() => privacyRequests.id, { onDelete: 'restrict' }),
+    actorUserId: uuid('actor_user_id').references(() => users.id, { onDelete: 'restrict' }),
+    actorRole: text('actor_role').notNull(),
+    eventType: text('event_type').notNull(),
+    note: text('note'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index('privacy_request_events_request_created_idx').on(table.requestId, table.createdAt),
+    index('privacy_request_events_actor_idx').on(table.actorUserId),
+    check(
+      'privacy_request_events_actor_role_check',
+      sql`${table.actorRole} in ('USER', 'ADMIN', 'SYSTEM')`,
+    ),
+    check(
+      'privacy_request_events_event_type_length',
+      sql`char_length(${table.eventType}) between 1 and 80`,
+    ),
+    check(
+      'privacy_request_events_note_length',
+      sql`${table.note} is null or char_length(${table.note}) <= 2000`,
+    ),
+  ],
+).enableRLS();
+
+export const privacyProviderActionStatus = pgEnum('privacy_provider_action_status', [
+  'PENDING',
+  'IN_PROGRESS',
+  'SUCCEEDED',
+  'FAILED',
+  'SKIPPED',
+]);
+
+export const privacyProviderActions = pgTable(
+  'privacy_provider_actions',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    requestId: uuid('request_id')
+      .notNull()
+      .references(() => privacyRequests.id, { onDelete: 'restrict' }),
+    provider: text('provider').notNull(),
+    action: text('action').notNull(),
+    status: privacyProviderActionStatus('status').notNull().default('PENDING'),
+    attemptCount: integer('attempt_count').notNull().default(0),
+    lastAttemptAt: timestamp('last_attempt_at', { withTimezone: true }),
+    completedAt: timestamp('completed_at', { withTimezone: true }),
+    lastError: text('last_error'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex('privacy_provider_actions_request_unique').on(
+      table.requestId,
+      table.provider,
+      table.action,
+    ),
+    index('privacy_provider_actions_status_idx').on(table.status),
+    check(
+      'privacy_provider_actions_provider_check',
+      sql`${table.provider} in ('WASL', 'SUPABASE_AUTH', 'SUPABASE_STORAGE', 'STREAM', 'RESEND')`,
+    ),
+    check(
+      'privacy_provider_actions_action_length',
+      sql`char_length(${table.action}) between 1 and 80`,
+    ),
+    check('privacy_provider_actions_attempts_check', sql`${table.attemptCount} >= 0`),
+    check(
+      'privacy_provider_actions_completion_check',
+      sql`(${table.status} = 'SUCCEEDED' and ${table.completedAt} is not null) or (${table.status} <> 'SUCCEEDED' and ${table.completedAt} is null)`,
+    ),
+    check(
+      'privacy_provider_actions_error_length',
+      sql`${table.lastError} is null or char_length(${table.lastError}) <= 2000`,
+    ),
+  ],
+).enableRLS();
+
+export const retentionPolicyStatus = pgEnum('retention_policy_status', ['TBD_LEGAL', 'APPROVED']);
+
+/**
+ * Category-level retention slot. `TBD_LEGAL` rows deliberately carry no duration; the erasure job
+ * refuses to act until counsel approves a period and the exception handling.
+ */
+export const retentionPolicies = pgTable(
+  'retention_policies',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    dataGroup: text('data_group').notNull().unique(),
+    triggerEvent: text('trigger_event').notNull(),
+    durationDays: integer('duration_days'),
+    handling: text('handling').notNull(),
+    owner: text('owner').notNull(),
+    status: retentionPolicyStatus('status').notNull().default('TBD_LEGAL'),
+    approvedBy: text('approved_by'),
+    approvedAt: timestamp('approved_at', { withTimezone: true }),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    check(
+      'retention_policies_trigger_event_length',
+      sql`char_length(${table.triggerEvent}) between 1 and 200`,
+    ),
+    check(
+      'retention_policies_handling_length',
+      sql`char_length(${table.handling}) between 1 and 500`,
+    ),
+    check('retention_policies_owner_length', sql`char_length(${table.owner}) between 1 and 120`),
+    check(
+      'retention_policies_duration_check',
+      sql`(${table.status} = 'TBD_LEGAL' and ${table.durationDays} is null and ${table.approvedBy} is null and ${table.approvedAt} is null) or (${table.status} = 'APPROVED' and ${table.durationDays} is not null and ${table.durationDays} > 0 and ${table.approvedBy} is not null and ${table.approvedAt} is not null)`,
+    ),
+  ],
+).enableRLS();

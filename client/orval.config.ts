@@ -17,6 +17,7 @@ export default defineConfig({
       override: {
         mutator: { path: './src/api/fetcher.ts', name: 'waslFetch' },
         fetch: { includeHttpResponseReturnType: false },
+        mock: { exactOptional: true },
       },
     },
   },

@@ -923,6 +923,315 @@ export interface ModeratorUserDto {
   userId: string;
 }
 
+export type LegalDocumentDtoType = typeof LegalDocumentDtoType[keyof typeof LegalDocumentDtoType];
+
+
+export const LegalDocumentDtoType = {
+  TERMS_OF_USE: 'TERMS_OF_USE',
+  PRIVACY_NOTICE: 'PRIVACY_NOTICE',
+  AGE_ELIGIBILITY_POLICY: 'AGE_ELIGIBILITY_POLICY',
+  COOKIE_NOTICE: 'COOKIE_NOTICE',
+} as const;
+
+export type LegalDocumentDtoLocale = typeof LegalDocumentDtoLocale[keyof typeof LegalDocumentDtoLocale];
+
+
+export const LegalDocumentDtoLocale = {
+  ar: 'ar',
+  en: 'en',
+  tr: 'tr',
+} as const;
+
+export interface LegalDocumentDto {
+  id: string;
+  type: LegalDocumentDtoType;
+  version: string;
+  locale: LegalDocumentDtoLocale;
+  content: string;
+  contentHash: string;
+  publishedAt: string;
+}
+
+export interface AcceptedDocumentDto {
+  documentType: string;
+  version: string;
+  acceptedAt: string;
+}
+
+export type PrivacyRequestEventDtoActorRole = typeof PrivacyRequestEventDtoActorRole[keyof typeof PrivacyRequestEventDtoActorRole];
+
+
+export const PrivacyRequestEventDtoActorRole = {
+  USER: 'USER',
+  ADMIN: 'ADMIN',
+  SYSTEM: 'SYSTEM',
+} as const;
+
+export interface PrivacyRequestEventDto {
+  id: string;
+  actorRole: PrivacyRequestEventDtoActorRole;
+  eventType: string;
+  /** @nullable */
+  note?: string | null;
+  createdAt: string;
+}
+
+export type PrivacyProviderActionDtoProvider = typeof PrivacyProviderActionDtoProvider[keyof typeof PrivacyProviderActionDtoProvider];
+
+
+export const PrivacyProviderActionDtoProvider = {
+  WASL: 'WASL',
+  SUPABASE_AUTH: 'SUPABASE_AUTH',
+  SUPABASE_STORAGE: 'SUPABASE_STORAGE',
+  STREAM: 'STREAM',
+  RESEND: 'RESEND',
+} as const;
+
+export type PrivacyProviderActionDtoStatus = typeof PrivacyProviderActionDtoStatus[keyof typeof PrivacyProviderActionDtoStatus];
+
+
+export const PrivacyProviderActionDtoStatus = {
+  PENDING: 'PENDING',
+  IN_PROGRESS: 'IN_PROGRESS',
+  SUCCEEDED: 'SUCCEEDED',
+  FAILED: 'FAILED',
+  SKIPPED: 'SKIPPED',
+} as const;
+
+export interface PrivacyProviderActionDto {
+  id: string;
+  provider: PrivacyProviderActionDtoProvider;
+  action: string;
+  status: PrivacyProviderActionDtoStatus;
+  attemptCount: number;
+  /** @nullable */
+  lastAttemptAt?: string | null;
+  /** @nullable */
+  completedAt?: string | null;
+  /** @nullable */
+  lastError?: string | null;
+}
+
+export type PrivacyRequestDtoRequestType = typeof PrivacyRequestDtoRequestType[keyof typeof PrivacyRequestDtoRequestType];
+
+
+export const PrivacyRequestDtoRequestType = {
+  ACCESS: 'ACCESS',
+  CORRECTION: 'CORRECTION',
+  EXPORT: 'EXPORT',
+  DELETION: 'DELETION',
+} as const;
+
+export type PrivacyRequestDtoStatus = typeof PrivacyRequestDtoStatus[keyof typeof PrivacyRequestDtoStatus];
+
+
+export const PrivacyRequestDtoStatus = {
+  RECEIVED: 'RECEIVED',
+  IN_REVIEW: 'IN_REVIEW',
+  PENDING_PROVIDER: 'PENDING_PROVIDER',
+  COMPLETED: 'COMPLETED',
+  REJECTED: 'REJECTED',
+  CANCELLED: 'CANCELLED',
+} as const;
+
+export interface PrivacyRequestDto {
+  id: string;
+  requestType: PrivacyRequestDtoRequestType;
+  status: PrivacyRequestDtoStatus;
+  /** @nullable */
+  requestNote?: string | null;
+  dueAt: string;
+  /** @nullable */
+  identityVerifiedAt?: string | null;
+  /** @nullable */
+  decisionNote?: string | null;
+  /** @nullable */
+  decidedAt?: string | null;
+  /** @nullable */
+  completedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  events?: PrivacyRequestEventDto[];
+  providerActions?: PrivacyProviderActionDto[];
+}
+
+export type PrivacyStatusDtoAgeEligibility = typeof PrivacyStatusDtoAgeEligibility[keyof typeof PrivacyStatusDtoAgeEligibility];
+
+
+export const PrivacyStatusDtoAgeEligibility = {
+  UNVERIFIED: 'UNVERIFIED',
+  '18_PLUS': '18_PLUS',
+  UNDER_18: 'UNDER_18',
+} as const;
+
+export interface PrivacyStatusDto {
+  ageEligibility: PrivacyStatusDtoAgeEligibility;
+  /** @nullable */
+  ageVerificationMethod?: string | null;
+  requiresOnboarding: boolean;
+  documents: LegalDocumentDto[];
+  acceptedDocuments: AcceptedDocumentDto[];
+  openRequests: PrivacyRequestDto[];
+}
+
+export interface DeclareAgeEligibilityDto {
+  /** Affirmative confirmation that the account holder is 18 or older. A false answer records an under-18 determination. */
+  isAdult: boolean;
+}
+
+export type AcceptDocumentDtoDocumentType = typeof AcceptDocumentDtoDocumentType[keyof typeof AcceptDocumentDtoDocumentType];
+
+
+export const AcceptDocumentDtoDocumentType = {
+  TERMS_OF_USE: 'TERMS_OF_USE',
+  PRIVACY_NOTICE: 'PRIVACY_NOTICE',
+} as const;
+
+export interface AcceptDocumentDto {
+  documentType: AcceptDocumentDtoDocumentType;
+  /**
+     * @minLength 1
+     * @maxLength 40
+     */
+  version: string;
+}
+
+export type CreatePrivacyRequestDtoRequestType = typeof CreatePrivacyRequestDtoRequestType[keyof typeof CreatePrivacyRequestDtoRequestType];
+
+
+export const CreatePrivacyRequestDtoRequestType = {
+  ACCESS: 'ACCESS',
+  CORRECTION: 'CORRECTION',
+  EXPORT: 'EXPORT',
+  DELETION: 'DELETION',
+} as const;
+
+export interface CreatePrivacyRequestDto {
+  requestType: CreatePrivacyRequestDtoRequestType;
+  /** @maxLength 2000 */
+  note?: string;
+}
+
+export type AdminPrivacyRequestDtoRequestType = typeof AdminPrivacyRequestDtoRequestType[keyof typeof AdminPrivacyRequestDtoRequestType];
+
+
+export const AdminPrivacyRequestDtoRequestType = {
+  ACCESS: 'ACCESS',
+  CORRECTION: 'CORRECTION',
+  EXPORT: 'EXPORT',
+  DELETION: 'DELETION',
+} as const;
+
+export type AdminPrivacyRequestDtoStatus = typeof AdminPrivacyRequestDtoStatus[keyof typeof AdminPrivacyRequestDtoStatus];
+
+
+export const AdminPrivacyRequestDtoStatus = {
+  RECEIVED: 'RECEIVED',
+  IN_REVIEW: 'IN_REVIEW',
+  PENDING_PROVIDER: 'PENDING_PROVIDER',
+  COMPLETED: 'COMPLETED',
+  REJECTED: 'REJECTED',
+  CANCELLED: 'CANCELLED',
+} as const;
+
+export interface AdminPrivacyRequestDto {
+  id: string;
+  requestType: AdminPrivacyRequestDtoRequestType;
+  status: AdminPrivacyRequestDtoStatus;
+  /** @nullable */
+  requestNote?: string | null;
+  dueAt: string;
+  /** @nullable */
+  identityVerifiedAt?: string | null;
+  /** @nullable */
+  decisionNote?: string | null;
+  /** @nullable */
+  decidedAt?: string | null;
+  /** @nullable */
+  completedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  events?: PrivacyRequestEventDto[];
+  providerActions?: PrivacyProviderActionDto[];
+  requesterEmail: string;
+}
+
+export type DecidePrivacyRequestDtoAction = typeof DecidePrivacyRequestDtoAction[keyof typeof DecidePrivacyRequestDtoAction];
+
+
+export const DecidePrivacyRequestDtoAction = {
+  START_REVIEW: 'START_REVIEW',
+  APPROVE: 'APPROVE',
+  REJECT: 'REJECT',
+} as const;
+
+export interface DecidePrivacyRequestDto {
+  action: DecidePrivacyRequestDtoAction;
+  /** @maxLength 2000 */
+  note?: string;
+}
+
+export type ReviewAgeEligibilityDtoStatus = typeof ReviewAgeEligibilityDtoStatus[keyof typeof ReviewAgeEligibilityDtoStatus];
+
+
+export const ReviewAgeEligibilityDtoStatus = {
+  UNVERIFIED: 'UNVERIFIED',
+  '18_PLUS': '18_PLUS',
+  UNDER_18: 'UNDER_18',
+} as const;
+
+export interface ReviewAgeEligibilityDto {
+  status: ReviewAgeEligibilityDtoStatus;
+  /** @maxLength 1000 */
+  note?: string;
+}
+
+export type AdminAgeEligibilityDtoStatus = typeof AdminAgeEligibilityDtoStatus[keyof typeof AdminAgeEligibilityDtoStatus];
+
+
+export const AdminAgeEligibilityDtoStatus = {
+  UNVERIFIED: 'UNVERIFIED',
+  '18_PLUS': '18_PLUS',
+  UNDER_18: 'UNDER_18',
+} as const;
+
+export interface AdminAgeEligibilityDto {
+  userId: string;
+  status: AdminAgeEligibilityDtoStatus;
+  method: string;
+  decidedAt: string;
+  /** @nullable */
+  note?: string | null;
+}
+
+export type RetentionPolicyDtoStatus = typeof RetentionPolicyDtoStatus[keyof typeof RetentionPolicyDtoStatus];
+
+
+export const RetentionPolicyDtoStatus = {
+  TBD_LEGAL: 'TBD_LEGAL',
+  APPROVED: 'APPROVED',
+} as const;
+
+export interface RetentionPolicyDto {
+  dataGroup: string;
+  triggerEvent: string;
+  /** @nullable */
+  durationDays?: number | null;
+  handling: string;
+  owner: string;
+  status: RetentionPolicyDtoStatus;
+  /** @nullable */
+  approvedBy?: string | null;
+  /** @nullable */
+  approvedAt?: string | null;
+}
+
+export interface RetentionPreviewDto {
+  policies: RetentionPolicyDto[];
+  erasureEnabled: boolean;
+  blockedDataGroups: string[];
+}
+
 export interface CityPublicDto {
   id: string;
   nameEn: string;
@@ -1009,6 +1318,26 @@ export const HealthResponseDtoStatus = {
 export interface HealthResponseDto {
   status: HealthResponseDtoStatus;
   timestamp: string;
+}
+
+export type ReadinessResponseDtoStatus = typeof ReadinessResponseDtoStatus[keyof typeof ReadinessResponseDtoStatus];
+
+
+export const ReadinessResponseDtoStatus = {
+  ok: 'ok',
+} as const;
+
+export type ReadinessResponseDtoDatabase = typeof ReadinessResponseDtoDatabase[keyof typeof ReadinessResponseDtoDatabase];
+
+
+export const ReadinessResponseDtoDatabase = {
+  up: 'up',
+} as const;
+
+export interface ReadinessResponseDto {
+  status: ReadinessResponseDtoStatus;
+  timestamp: string;
+  database: ReadinessResponseDtoDatabase;
 }
 
 export type UsersControllerCurrentParams = {
@@ -1159,4 +1488,22 @@ page?: number;
 export type CommunityDiscussionsControllerDetailsParams = {
 page?: number;
 };
+
+export type PrivacyControllerExportData200 = { [key: string]: unknown };
+
+export type PrivacyAdminControllerListParams = {
+status?: PrivacyAdminControllerListStatus;
+};
+
+export type PrivacyAdminControllerListStatus = typeof PrivacyAdminControllerListStatus[keyof typeof PrivacyAdminControllerListStatus];
+
+
+export const PrivacyAdminControllerListStatus = {
+  RECEIVED: 'RECEIVED',
+  IN_REVIEW: 'IN_REVIEW',
+  PENDING_PROVIDER: 'PENDING_PROVIDER',
+  COMPLETED: 'COMPLETED',
+  REJECTED: 'REJECTED',
+  CANCELLED: 'CANCELLED',
+} as const;
 

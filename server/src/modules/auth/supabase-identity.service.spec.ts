@@ -38,7 +38,7 @@ describe('SupabaseIdentityService', () => {
       emailVerifiedAt: new Date('2026-10-21T12:00:00Z'),
       displayName: 'Member Name',
     });
-    expect(result).toEqual({ id: expect.any(String), authUserId });
+    expect(result).toEqual({ id: expect.any(String), authUserId, accountStatus: 'ACTIVE' });
     expect(result.id).not.toBe(authUserId);
     expect(inserted).toEqual([
       expect.objectContaining({ id: result.id, normalizedEmail: 'member@example.com' }),
@@ -69,5 +69,33 @@ describe('SupabaseIdentityService', () => {
       }),
     ).rejects.toBeInstanceOf(ForbiddenException);
     expect(tx.insert).not.toHaveBeenCalled();
+  });
+
+  it('resolves a deletion-pending account so the holder can review or cancel the request', async () => {
+    const tx = {
+      execute: vi.fn(),
+      select: vi
+        .fn()
+        .mockImplementationOnce(() => query([{ userId: 'local-id' }]))
+        .mockImplementationOnce(() => query([{ status: 'DELETION_PENDING' }])),
+      insert: vi.fn(() => ({
+        values: vi.fn(() => ({ onConflictDoNothing: vi.fn().mockResolvedValue([]) })),
+      })),
+      update: vi.fn(() => ({ set: () => ({ where: vi.fn() }) })),
+    };
+    const db = { transaction: (work: (transaction: typeof tx) => Promise<unknown>) => work(tx) };
+    const service = new SupabaseIdentityService(db as unknown as Database);
+
+    const result = await service.resolve({
+      authUserId: 'auth-id',
+      email: 'member@example.com',
+      emailVerifiedAt: null,
+      displayName: 'Member',
+    });
+    expect(result).toEqual({
+      id: 'local-id',
+      authUserId: 'auth-id',
+      accountStatus: 'DELETION_PENDING',
+    });
   });
 });

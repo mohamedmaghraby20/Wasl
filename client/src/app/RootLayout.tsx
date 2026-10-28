@@ -6,6 +6,7 @@ import {
   Menu,
   MessageSquare,
   Plus,
+  ShieldCheck,
   UserRound,
   Waypoints,
   X,
@@ -15,6 +16,7 @@ import { Link, NavLink, Outlet, ScrollRestoration, useLocation } from 'react-rou
 import { useTranslation } from 'react-i18next';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
+import { usePrivacyControllerStatus } from '@/api/generated/privacy/privacy';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { AppFooter } from '@/components/layout/AppFooter';
 import { Button } from '@/components/ui/Button';
@@ -42,6 +44,7 @@ const accountLinks = [
   { key: 'notifications', to: '/notifications', icon: Bell },
   { key: 'messages', to: '/messages', icon: MessageSquare },
   { key: 'profileTitle', to: '/profile', icon: UserRound },
+  { key: 'privacyTitle', to: '/privacy', icon: ShieldCheck },
 ] as const;
 
 function Brand(): React.JSX.Element {
@@ -72,12 +75,13 @@ export function RootLayout(): React.JSX.Element {
   const { t, i18n: activeI18n } = useTranslation();
   const { pathname } = useLocation();
   const isPrivateRoute =
-    /^\/(?:admin|activity|messages|notifications|profile|create|sign-in|sign-up)(?:\/|$)/.test(
+    /^\/(?:admin|activity|messages|notifications|privacy|profile|create|sign-in|sign-up|password-reset)(?:\/|$)/.test(
       pathname,
     ) ||
     pathname.startsWith('/organizations/invitations/') ||
     /^\/(?:organizations|communities|events)\/[^/]+\/(?:edit|manage)\/?$/.test(pathname);
   const { user, signOut } = useAuth();
+  const privacy = usePrivacyControllerStatus({ query: { enabled: Boolean(user) } });
   const [navigationOpen, setNavigationOpen] = useState(false);
   const mainRef = useRef<HTMLElement>(null);
   const previousPathname = useRef(pathname);
@@ -110,6 +114,9 @@ export function RootLayout(): React.JSX.Element {
       : [{ rel: 'canonical', href: `${window.location.origin}${pathname}` }],
   });
   const languageLabel = t(isArabic ? 'switchToEnglish' : 'switchToArabic');
+  const showPrivacyBanner =
+    Boolean(user) && pathname !== '/privacy' && privacy.data?.requiresOnboarding === true;
+  const recordedUnder18 = privacy.data?.ageEligibility === 'UNDER_18';
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       <a
@@ -310,6 +317,16 @@ export function RootLayout(): React.JSX.Element {
         ref={mainRef}
         tabIndex={-1}
       >
+        {showPrivacyBanner ? (
+          <div className="mx-auto mb-6 flex max-w-(--container-reading) flex-wrap items-center justify-between gap-3 rounded-(--shape-radius-card) border border-warning/40 bg-warning-soft px-4 py-3">
+            <p className="text-sm font-medium text-warning">
+              {t(recordedUnder18 ? 'privacyUnder18Banner' : 'privacyOnboardingBanner')}
+            </p>
+            <Button asChild size="sm" variant="secondary">
+              <Link to="/privacy">{t('privacyOnboardingAction')}</Link>
+            </Button>
+          </div>
+        ) : null}
         <Outlet />
       </main>
       <AppFooter />

@@ -53,6 +53,10 @@ export class StreamChatAdapter {
     await this.configured().channel('messaging', channelId).removeMembers([providerUserId]);
   }
 
+  async deactivateUser(providerUserId: string): Promise<void> {
+    await this.configured().deactivateUser(providerUserId);
+  }
+
   token(providerUserId: string): { token: string; expiresAt: string } {
     const expiresAt = Math.floor(Date.now() / 1000) + 15 * 60;
     return {

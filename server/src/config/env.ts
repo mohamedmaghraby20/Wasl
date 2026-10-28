@@ -22,6 +22,7 @@ const environmentSchema = z
     SUPABASE_SECRET_KEY: optionalText,
     SUPABASE_SERVICE_ROLE_KEY: optionalText,
     PLATFORM_ADMIN_USER_IDS: optionalText,
+    AGE_VERIFICATION_METHOD: optionalText,
     RESEND_API_KEY: optionalText,
     RESEND_FROM_EMAIL: optionalText,
     STREAM_API_KEY: optionalText,

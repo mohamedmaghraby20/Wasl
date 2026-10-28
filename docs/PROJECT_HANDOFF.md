@@ -1,129 +1,104 @@
-# Wasl project progress and agent handoff
+# Wasl — Project Handoff
 
-**Snapshot date:** 2026-10-23  
-**Purpose:** Give the next coding agent a reliable starting point and a progress ledger to update. This snapshot was checked against the implementation guide, phase records, package scripts, migrations, and current repository layout. Update it as tasks are completed; the implementation guide remains the source of requirements.
+**Snapshot:** 2026-10-28 · branch `feature/phase7-privacy-compliance` (base `305cc4f`) plus the uncommitted work listed at the end.
+**What this is:** the build history and current state of the project, written so another agent can continue without reading anything else.
 
-## Current status
+## What Wasl is
 
-Wasl is a bilingual (Arabic/English) community and event discovery and participation app for people in Türkiye. The product flow is **discover → evaluate → sign in when acting → join/register → receive an admission outcome → participate → manage and communicate**. The client is a React SPA; the NestJS API owns authorization and business rules; PostgreSQL is managed through Supabase and accessed by the server.
+A bilingual Arabic/English (RTL-aware) web app for finding, joining and running communities and events in Türkiye. Visitors can browse everything public without an account. Joining, registering, creating, chatting, reporting and managing all require a signed-in user. The flow is: **discover → evaluate → sign in to act → join/register → receive an admission outcome → participate → manage and communicate.**
 
-| Phase                                                | Guide task IDs | Status      | Progress record                               |
-| ---------------------------------------------------- | -------------: | ----------- | --------------------------------------------- |
-| 1. Foundation and local tooling                      |           1–25 | Complete    | [phase-1.md](phase-1.md)                      |
-| 2. Public discovery                                  |          26–49 | Complete    | [phase-2.md](phase-2.md)                      |
-| 3. Accounts, profiles, first content creation        |          50–72 | Complete    | [phase-3.md](phase-3.md)                      |
-| 4. Participation, approvals, capacity                |          73–95 | Complete    | [phase-4.md](phase-4.md)                      |
-| 5. Organizations, ownership and staff                |         96–112 | Complete    | [phase-5.md](phase-5.md)                      |
-| 6. Discussions and chat                              |        113–131 | Complete    | [phase-6.md](phase-6.md)                      |
-| 7. Notifications, moderation, privacy and compliance |        132–149 | In progress | [phase-7.md](phase-7.md); Task 132 complete |
-| 8. Hardening and launch                              |        150–164 | Not started | Requirements are in `IMPLEMENTATION_GUIDE.md` |
+The project is a learning build that will also run as a first MVP, so it uses one Supabase project for both development and the live app.
 
-**Next work:** Review the Phase 7 implementation (Tasks 133–146) and address the Phase 7 legal/privacy blockers (Tasks 147–149). See [phase-7.md](phase-7.md) for implementation and verification details. Execution is sequential by the owner's instruction; do not delegate unless the owner asks to resume multi-agent work.
+## Stack and layout
 
-## Completed work
+- `client/` — React 19, Vite, React Router, TanStack Query, Tailwind, i18next (EN/AR), Orval-generated API client, Vitest, Playwright (guest journeys), Storybook.
+- `server/` — NestJS 11 on Fastify, Drizzle ORM, PostgreSQL (Supabase), Supabase Auth, Stream for realtime chat, Resend for transactional email.
+- `shared/` — cross-package types and contracts.
+- pnpm 10 workspaces on Node 24. `server/drizzle/` holds ordered SQL migrations; `server/openapi.json` and the generated client are build artifacts.
 
-- **Phase 1:** pnpm workspace, React/Vite client, NestJS/Fastify server, shared package, development tooling, local environment templates and reference-data seed. Phase 1 record documents the setup and intended secret boundaries.
-- **Phase 2:** public Community/Event discovery, filters and details, URL-backed search state, localization/RTL, metadata and generated API clients. The record includes the original checks and known limits of discovery verification.
-- **Phase 3:** Supabase Auth token verification and stable Wasl identity mapping; private account/public profile separation; profile editing and owner-scoped photo upload; Community/Event create, edit, archive/cancel and organizer controls. A live integration script exercised Auth, API, Storage and cleanup against the configured Supabase project.
-- **Phase 4:** membership and registration state transitions/history; join/leave/register/cancel and My Activity; organizer decisions and attendance; capacity checks, waitlisting and FIFO promotion under concurrent requests. PostgreSQL concurrency verification used a temporary schema and cleaned it up.
-- **Phase 5, Task 96:** added the Organization table with exactly one required owner and the scoped Organization Admin association. The generated `0008_outstanding_joystick.sql` migration enables RLS and revokes direct `PUBLIC`/`anon`/`authenticated` table privileges. It was applied to the configured development database. Focused schema tests, server typecheck and server lint passed.
-- **Phase 5, Task 97:** added the public `GET /organizations/:slug` endpoint and Organization public projection. It returns approved identity, location, social, verification, Community, and public Event data while excluding owner, staff, invitations, and non-public resources. Migration `0009_flimsy_the_call.sql` was applied to the configured development database. OpenAPI/Orval output was regenerated; focused schema/service tests, server typecheck, lint, and formatting passed.
-- **Phase 5, Task 98:** added the public `/organizations/:slug` client route with public identity, verification, location, safe external links, linked Communities/Events, and loading, retry, not-found, and empty states. English/Arabic strings and focused page tests were added. Client typecheck, lint, and production build passed. Live browser verification awaits a persisted Organization from Task 99.
-- **Phase 5, Task 99:** added authenticated `POST /organizations`; its creator is stored as the sole initial Owner, without an Admin association. Profile fields, City, and HTTP(S) links are validated and slugs are generated safely. The Organizations module imports AuthModule so the protected route works in the generated OpenAPI document. Focused API tests, server typecheck, lint, formatting, and OpenAPI/Orval generation passed.
-- **Phase 5, Task 100:** added an Organization choice to the Create surface and the guarded `/create/organization` form. It uses the generated creation client, validates Organization details, displays mutation failures, and redirects successful creation to the public Organization profile. English/Arabic strings and focused redirect, validation, success, and failure tests were added. Client typecheck, lint, and production build passed.
-- **Phase 5, Task 101:** added protected `PATCH /organizations/:id` with Owner/Admin authorization and a safe profile/logo update projection. Logo paths reuse server validation of the signed-in user's uploaded image in the existing `profile-photos` bucket. Twelve focused tests, server typecheck/lint/formatting, and OpenAPI/Orval generation passed.
-- **Phase 5, Task 102:** added the signed-in `/organizations/:slug/edit` route and form, using the generated authorized PATCH contract. The page preloads public values, supports safe URL validation and optional logo upload/removal, updates query data, and shows API 403 errors without guessing the caller's role. Three focused tests, client typecheck/lint, and formatting passed.
-- **Phase 5, Task 103:** added optional `organizationId` to Community/Event creation contracts. The server checks Owner/Admin authority, stores the Organization as owner/host, and writes `created_by_user_id` for the acting Wasl user. Public resource responses provide the current Organization name and slug so details link to its profile. Migration `0010_unusual_strong_guy.sql` was applied to the development database; OpenAPI/Orval was regenerated. Nine focused server tests passed; server/client typechecks and linters plus the full workspace build passed. `db:generate` reported no outstanding schema changes.
-- **Phase 5, Task 104:** added authenticated `GET /organizations/mine`, returning only organizations where the caller is Owner/Admin. Community/Event creation forms use the generated hook and show only those returned organizations; Event selection clears the competing Community host selection. Two focused client tests and 23 focused server tests passed, along with server/client typecheck, lint, full build, and no-pending-migration check. No additional schema migration was needed.
-- **Phase 5, Task 105:** added `organization_admin_invitations` with existing-user target and inviter IDs, unique 64-character SHA-256 token hash, expiry, PENDING/ACCEPTED/REVOKED state, response timestamp, checks, foreign keys, and indexed lookup paths. RLS is enabled and direct `PUBLIC`/`anon`/`authenticated` privileges are revoked. Migration `0011_typical_hellcat.sql` was applied to the active Wasl development project. Three schema tests, server typecheck/lint, and no-pending-migration check passed. A read-only database query confirmed RLS, denied direct client SELECT, and the unique hash index.
-- **Phase 5, Task 106:** added Owner-only invitation creation/list/revocation and authenticated target acceptance APIs. Invitations resolve an active Wasl account by normalized email, expire after seven days, return a 256-bit token once, and persist only its SHA-256 hash. Acceptance locks the Organization and invitation, checks target, expiry, unused state and current inviter ownership, then creates the Admin association and consumes the invitation in one transaction. OpenAPI and Orval client/MSW output were regenerated. Workspace tests (94), typecheck, lint and production build passed. Local API smoke returned health `200`, acceptance without authentication `401`, and pending-list without authentication `401`. No schema migration was needed; Task 105's invitation table is used. The production build retains the existing large main-chunk warning (605.31 kB minified).
-- **Phase 5, Task 107:** added Owner/Admin manager listing and Owner-only admin removal (`GET /organizations/:id/admins`, `DELETE /organizations/:id/admins/:userId`), with the owner protected from removal and non-managers denied. The invitation acceptance response now includes the organization slug. Added `/organizations/:slug/manage` (role-aware roster, Owner-only invite/pending-invitation/revoke/remove controls, acceptance-link copy, and owner-only messaging for admins) and `/organizations/invitations/accept` (single-use token acceptance through the signed-in personal account). The public profile shows a management link only to that organization's Owner/Admin, and the edit page is reachable from management. English and Arabic strings were added. Focused verification: 28 organization server tests and 18 organization client tests passed; workspace tests passed with 108 tests (67 server, 41 client); workspace typecheck, lint and production build passed; `db:generate` reported no schema changes, so no migration was needed. The production build retains the existing large main-chunk warning (611.89 kB minified).
-- **Phase 5, Tasks 108–112:** added transactional ownership transfer (`POST /organizations/:id/ownership-transfer`) with an active-Admin target, owner-only authorization, previous-owner-to-Admin behavior, and a single-owner invariant; verification request APIs (`GET`/`POST /organizations/:id/verification-requests`) and platform-admin queue/decision APIs (`GET /organizations/verification-requests`, `PATCH /organizations/verification-requests/:requestId`) behind the new `PlatformAdminGuard`; the management-page transfer and verification UI with EN/AR strings; and inherited authority for Organization-owned Communities, Organization-hosted Events, and Events hosted by Organization-owned Communities. Added `organization_verification_requests` with RLS, zero direct client grants, a partial unique pending-request index, and migration `0012_known_scarlet_witch.sql`, which was applied to the configured development database. Platform decisions require the server-only `PLATFORM_ADMIN_USER_IDS` allowlist of Wasl user IDs; an empty value grants no platform access. Verification: workspace tests passed with 128 tests (84 server across 14 files, 44 client across 15 files); `test:organizations:postgres` passed concurrent ownership-transfer, pending-request and decision checks in an isolated temporary schema; typecheck, lint and production build passed; `db:generate` reported no schema changes. The production build retains the main-chunk warning (615.83 kB minified). Full details are in [phase-5.md](phase-5.md).
+## Build history — all planned phases are closed
 
-- **Phase 6, Tasks 113-131:** added native PostgreSQL discussions (`discussion_threads`, `discussion_posts`) with one Event thread per Event, Community topics, one-level replies, author edit/removal, manager moderation, explicit close, and server-enforced eligibility. Added Stream-backed Community and Event chat with stable Wasl-to-Stream identity mapping, server-only credentials, channel-scoped moderator roles, fail-closed token issuance behind `STREAM_PERMISSIONS_VERIFIED`, durable desired-versus-provider membership reconciliation with a 30-second retry worker, direct messages, blocking, and reporting. Migrations `0013`-`0016` enable RLS and revoke direct client grants and were applied to the configured development database. Verification: workspace tests passed with 163 tests (109 server across 19 files, 54 client across 19 files); `test:discussions:postgres`, `test:messaging:postgres`, and live `test:messaging:stream` passed; 3 Chromium E2E tests passed; typecheck, lint, build and `db:generate` passed. The entry chunk is 418.38 kB with no circular-chunk warnings; the lazy `MessagesPage` chunk is 1,755.63 kB because it carries the Stream SDK, and its size warning is accepted. Full details are in [phase-6.md](phase-6.md).
+| Phase                                 | What shipped                                                                                                                                                                                                                                                                                                                  |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1. Foundation                         | pnpm workspace, client/server/shared packages, ESLint, Prettier, typecheck, Vitest, Drizzle setup, env templates, reference seed, health endpoint.                                                                                                                                                                            |
+| 2. Public discovery                   | Home page, unified discovery with text/city/category filters and pagination, community and event detail pages, URL-backed filter state, EN/AR localization with RTL, SEO metadata, `robots.txt`, and a build-time sitemap.                                                                                                    |
+| 3. Accounts and creation              | Supabase Auth with a stable Wasl identity mapping, private account data vs. public profile, profile editing, owner-scoped photo upload to Supabase Storage, community and event create/edit/archive/cancel, password recovery.                                                                                                |
+| 4. Participation                      | Join/leave, register/cancel, status transitions with history, My Activity, organizer accept/reject, attendance marking, capacity limits, waitlists and FIFO promotion under concurrent requests.                                                                                                                              |
+| 5. Organizations                      | Organizations with exactly one owner plus admins, public organization profile, organization-owned communities and organization-hosted events, single-use hashed admin invitations, ownership transfer, verification requests, platform-admin review.                                                                          |
+| 6. Discussions and chat               | PostgreSQL discussions (one thread per event, community topics, one-level replies, author edits, manager moderation, explicit close); Stream-backed community and event chat with server-issued tokens, channel-scoped moderators and a membership reconciliation worker; direct messages, blocking and reporting.            |
+| 7. Notifications, moderation, privacy | Notification records and an email queue with idempotency and retry, Resend delivery, user reports with a moderator queue, platform-admin MFA and review console. Privacy: 18+ age eligibility, versioned legal acceptance records, a user `/privacy` page (export, requests, history), deletion requests with provider actions and a retry queue, an admin privacy queue, and retention-policy slots. |
+| 8. Release checks                     | Security headers and abuse limits, production dependency audit, email-recovery check, draft-restore rehearsal, guest browser journeys, a CI workflow, a Render blueprint and a database-readiness health check.                                                                                                               |
 
-- **Phase 7, Task 132:** created notifications and email-delivery persistence with recipient/event-key idempotency, read and retry state, private RLS and revoked direct client grants. Generated migration `0017_spotty_greymalkin.sql` was applied to the configured development database. Focused schema tests, rolled-back PostgreSQL integration check, server typecheck/lint, formatting and no-pending-schema-diff check passed. Full evidence is in [phase-7.md](phase-7.md).
-- **Phase 7 ongoing:** Tasks 133–146 have implementation (notification delivery and UI, reporting, contextual moderators, platform-admin MFA/report decisions and review console). Migrations `0018`–`0020` were applied to the configured development database; focused tests and integration checks are recorded in [phase-7.md](phase-7.md). Resend credentials and platform-admin IDs are not configured locally; no live email or signed-in admin browser check was possible. Tasks 147–149 remain blocked on approved launch policy and qualified legal review, not just code.
+Everything that was planned to be **built** is built. What remains is shipping, plus the small gaps listed below.
 
-The phase records are the detailed evidence. Their checks are historical results recorded at completion; they were not rerun while preparing this handoff.
+## Providers and data
 
-## Architecture and user/data flow
+- **Supabase** — one project (`vuznrkujfmxrggonuvif`), used for development and, from now on, for the MVP. 22 migrations applied (`0000`–`0021`). 31 public tables, all with Row Level Security enabled. `pgmq` and the `notification_emails` queue exist. The `profile-photos` bucket is public with a 5 MB limit and JPEG/PNG/WebP only.
+- **Sample data** — the database is seeded with labelled sample users, communities, events, memberships and registrations. This data ships with the MVP. The seed refuses to run when `NODE_ENV=production`.
+- **Stream** — one app for community chat, event chat and DMs. Permissions are verified (`STREAM_PERMISSIONS_VERIFIED=true`).
+- **Resend** — no verified sending domain yet. Development email goes out from `onboarding@resend.dev`.
 
-- `client/`: React 19 + Vite SPA, React Router, TanStack Query, bilingual UI and generated Orval API clients.
-- `server/`: NestJS on Fastify. Feature modules own endpoints, validation, authorization, business logic and persistence. Supabase Auth verifies identity; it does not replace Wasl’s resource-scoped authorization.
-- `shared/`: cross-package contracts and types.
-- `server/src/db/schema.ts`: Drizzle database schema. `server/drizzle/`: ordered SQL migrations. The migration chain contains `0000` through `0020`.
-- Typical read: browser route → generated API client → same-origin `/api` → Nest controller/service → PostgreSQL → response rendered by the client.
-- Typical authenticated action: browser obtains Supabase Auth session → sends access token to Nest → Nest verifies token and resolves/provisions the Wasl user → service checks resource-level permission and applies the action/transaction → database state is returned to the UI.
-- Profile photos upload to Supabase Storage from the browser using the public client configuration; the server validates ownership, file type/signature and size before persisting the object path. Privileged keys and database credentials remain server-side.
+## How it works
 
-Never query PostgreSQL from client code or place authoritative authorization/business rules in the client. Generate API clients from Nest OpenAPI; do not edit generated files by hand.
+- **Reads:** browser route → generated API client → `/api/v1/...` → Nest controller → service → PostgreSQL → rendered by React.
+- **Writes:** the client sends the Supabase access token; Nest verifies it, resolves or provisions the Wasl user, checks resource-scoped permission, then runs the action or transaction.
+- **Uploads:** the browser uploads to Supabase Storage with the public client config; the server validates ownership, type, signature and size before storing the object path.
+- **Chat:** the browser gets a Stream token from the API; channel membership is granted only to admitted users, and removals are reconciled by a worker.
+- **Authorization:** lives only on the server. Roles are resource-scoped (platform admin, organization owner/admin, community manager, event organizer, participant) and never trusted from the client.
+- **API contract:** generated from the Nest OpenAPI document, so server DTO changes require `pnpm api:generate`.
 
-## Supabase and local development
+## Where the code is
 
-The configured Supabase project is the **development database used by the local app**, per the owner’s clarification. The phase 2 record and some older setup notes incorrectly call it “production”; treat those labels as stale. No production frontend/API deployment or production hosting URL has been provided, and no deployment has been configured. Do not infer that the connected project is a production target.
+- **Server modules** (`server/src/modules/`): `auth`, `users`, `communities`, `events`, `discovery`, `participation`, `organizations`, `discussions`, `messaging`, `notifications`, `moderation`, `privacy`. Shared HTTP concerns (health, filters, interceptors) live in `server/src/common/`.
+- **Client features** (`client/src/features/`): `home`, `discovery`, `resources`, `auth`, `profile`, `creation`, `participation`, `organizations`, `discussions`, `messaging`, `notifications`, `moderation`, `privacy`, `not-found`. Routing is in `client/src/app/router.tsx`.
+- **Public routes:** `/`, `/discover`, `/communities`, `/events`, `/communities/:slug`, `/events/:slug`, `/organizations/:slug`, `/users/:id`, `/communities/:id/topics/:topicId`.
+- **Signed-in routes:** `/profile`, `/profile/edit`, `/activity`, `/messages`, `/notifications`, `/privacy`, `/create/*`, `/*/edit`, `/*/manage`, `/organizations/invitations/accept`, `/admin`.
+- **Database:** `server/src/db/schema.ts` and `server/drizzle/*.sql`; applied migrations are immutable history.
 
-Migrations through `0020` were applied to the configured development project; `0013`–`0016` cover Phase 6 discussions and messaging, `0017` covers notification/delivery persistence, and `0018`–`0020` cover the email queue, reports and moderator assignments. `0007_revoke_participation_client_access.sql` revokes direct client-role table access to participation data; the server retains access through its configured database role. Phase 3 reports the `profile-photos` bucket and its owner-scoped upload controls.
+## Verified state (2026-10-28, current worktree)
 
-For later schema work, follow the repository’s Drizzle workflow and verify the target before applying changes:
+- `pnpm typecheck` — passes.
+- `pnpm lint` — passes with `--max-warnings=0`.
+- `pnpm test` — **126 server tests / 21 files** and **86 client tests / 26 files** pass.
+- `pnpm test:privacy:postgres` — passes against the project database: age/acceptance gate, under-18 refusal, organization-ownership block on deletion, cancellation, anonymization, provider failure and retry, export, retention blocker and admin age review.
+- `pnpm build` — passes: OpenAPI and Orval clients regenerate, server and client build, and the client build writes `sitemap.xml` (27 URLs on the seeded data) and a `robots.txt` with a `Sitemap:` line.
+- `GET /api/v1/health/ready` — returns `200` with `database: "up"` against the project, and `503` when the database is unreachable.
+- CI and the Render blueprint exist as files but have never run: there is still no Git remote.
 
-1. Inspect `server/src/db/schema.ts`, existing migrations, environment selection, callers, and the relevant task acceptance criteria.
-2. Change the Drizzle schema; generate the migration with `corepack pnpm db:generate` and review the SQL, RLS/grants, indexes and rollback implications.
-3. Apply with `corepack pnpm db:migrate` only to the configured development database. Check the migration result and any data/security invariants affected by the change.
-4. Regenerate API artifacts with `corepack pnpm api:generate` if the Nest OpenAPI contract changed. Never hand-edit generated clients.
+## Known gaps
 
-Local secrets belong in ignored `.env` files (server credentials only on the server). Use `.env.example` as the safe template. Never copy secret values into this handoff, client variables, commits, or agent prompts. The project owner has authorized the next agent to perform required development-database and migration work as part of each task; that does not identify a production target.
+- Legal and policy inputs for the privacy work are still owner/counsel decisions (`docs/launch-decisions.md`): no approved or published notice, terms or age policy, no chosen age-verification method, no approved retention periods, no named data controller, and no verified sending domain or sender identity for legal notices. Because the UI only lists `PUBLISHED` documents, `/privacy` shows no document to accept yet; the 18+ self-declaration gate is still enforced.
+- Retention erasure is hard-disabled (`erasureEnabled: false`, `TBD_LEGAL` rows with no duration), so no irreversible deletion job can run until periods are approved.
+- End-to-end tests cover guest journeys only; there are no automated signed-in journeys through the real API.
+- `pnpm format:check` fails on 74 files (39 under `.opencode/`/`.agents/`, 35 in project source), so CI does not run it.
+- Legal texts (privacy notice, terms, age policy) are drafts with placeholders; no published version exists.
+- Public organization and user profiles are not in the sitemap because there is no public listing endpoint for them.
+- One branch per phase, no staging environment; release checks ran locally.
 
-## Historical verification recorded for Phases 3–4
+## Worktree state
 
-The phase records report these checks passed at the time of completion:
+The privacy phase is committed on `feature/phase7-privacy-compliance` (base `305cc4f`). Documentation is mid-rewrite: this file, the implementation guide and `docs/launch-decisions.md` are updated with the phase, while the removed phase notes, `docs/GETTING_STARTED.md` and `docs/production-handoff.md` are still uncommitted. Other uncommitted work: the password-reset page and tests, CI and Render files, the sitemap generator, the readiness endpoint, and test fixes. `git status` is the source of truth for what is still in flight.
 
-- `corepack pnpm typecheck`
-- `corepack pnpm lint`
-- `corepack pnpm test` — 55 tests (34 server, 21 client)
-- `corepack pnpm build` — includes OpenAPI and Orval generation
-- `corepack pnpm db:generate` — no outstanding schema diff at that checkpoint
-- `corepack pnpm db:migrate` — no pending migrations at that checkpoint
-- `corepack pnpm test:phase3:integration` — real Auth/API/Storage/profile/resource flow with cleanup
-- `corepack pnpm test:participation:postgres` — capacity/concurrency/FIFO checks with temporary schema cleanup
-- `corepack pnpm --filter @wasl/web test:e2e` — two Chromium navigation/mobile Arabic RTL checks
+## Local commands
 
-See [phase-3.md](phase-3.md) and [phase-4.md](phase-4.md) for exact scope and caveats. The E2E checks are not an authenticated end-to-end participation journey; Phase 4 reports unavailable `/api` proxy requests during that browser run because Nest was not started. The client build previously reported a main-bundle size warning (599.33 kB minified); the current Vite configuration splits vendor, router, query, i18n, icon and Supabase chunks, and the latest build is warning-free. These were reported as follow-ups, not blockers to the completed phase criteria.
-
-## Open follow-ups and constraints
-
-- **Phase 5 is complete.** Tasks 96–112 are recorded in [phase-5.md](phase-5.md).
-- **Phase 6 is complete.** Tasks 113–131 are recorded in [phase-6.md](phase-6.md). Phase 7 Tasks 133–146 have implementations; Tasks 147–149 remain open and release-blocking.
-- **Stream is configured and verified.** `STREAM_API_KEY`, `STREAM_API_SECRET`, and `STREAM_PERMISSIONS_VERIFIED=true` are set in the ignored server `.env`. Live verification on 2026-10-23 confirmed the `messaging` channel type denies non-members reads, joins, and channel creation, that members can read and send, that `channel_moderator` is channel-scoped, and that expired tokens are rejected. The `create-channel` grant was removed from the `user` role because only the server provisions channels. Re-run with `corepack pnpm test:messaging:stream`; it skips without credentials and deletes its temporary users and channel. The signed-in chat surface still has no visual review because it needs a real signed-in Supabase session.
-- **Platform verification access is environment-configured.** `PLATFORM_ADMIN_USER_IDS` is a server-only, comma-separated allowlist of Wasl user IDs. An empty value means no platform administrators, so verification decisions return `403`. The Task 144 guard also requires a validated bearer token with `aal2` for platform operations. Admin allowlist and Resend credentials are not configured locally; live operations are unverified.
-- **Supabase Auth hardening:** Phase 3 reports leaked-password protection is disabled. Enable it in the Supabase project’s Auth password-security settings before production. It is a dashboard/Auth configuration item, not a SQL migration; do not claim it was fixed.
-- **Production remains future work:** no production deployment URLs, hosting configuration, or release validation are present. The implementation guide reserves CI/CD, staging and go-live for Phase 8.
-- **Phase 2 stale environment wording:** update that record when convenient so it no longer calls the owner-confirmed development project “production.”
-- `docs/MULTI_AGENT_WORKFLOW.md` retains coordination guidance for possible future delegation, but its active mode and task ledger are reconciled to the owner's current single-agent, sequential instruction.
-- **Git history exists for Phases 1-6.** The repository has sequential commits for Phase 1 through Phase 6, and `git status --short` reflects only later uncommitted work. Because the worktree was entirely untracked before those commits, the phase boundaries are retrospective file groupings rather than replayed snapshots; shared files carry their final content in the phase where they were introduced. Do not rewrite this history to "correct" it without owner approval.
-
-## Guidance for the next agent and parallel work
-
-Read `AGENTS.md`, `docs/IMPLEMENTATION_GUIDE.md`, relevant `docs/context/` materials, and the complete Phase 7 task descriptions before editing. Follow global task order and dependencies. Preserve current work; keep changes focused and include focused tests and exact verification evidence as required by the repository instructions.
-
-Parallel agents can help only after the lead confirms dependencies, stable API/schema contracts and separate file ownership. Assign one owner for each shared contract, migration batch, generated API output and root configuration change. Do not let multiple agents concurrently edit migrations or generated files. Client work may proceed against an agreed API contract, but integration must verify the real API/database flow. The lead agent integrates results, checks migrations and generated output, runs verification, updates this handoff and the phase/workflow records, and does not mark a task complete merely because code exists.
-
-Useful root commands (`package.json`):
-
-```powershell
+```sh
 corepack pnpm install
 corepack pnpm dev
 corepack pnpm typecheck
 corepack pnpm lint
 corepack pnpm test
-corepack pnpm build
+corepack pnpm build          # api:generate + all builds + sitemap
+corepack pnpm api:generate
 corepack pnpm db:generate
 corepack pnpm db:migrate
-corepack pnpm api:generate
+corepack pnpm db:seed
 corepack pnpm test:e2e
+corepack pnpm test:privacy:postgres
+corepack pnpm test:participation:postgres
 corepack pnpm test:organizations:postgres
 corepack pnpm test:discussions:postgres
 corepack pnpm test:messaging:postgres
+corepack pnpm test:messaging:stream
 ```
 
-Run the checks relevant to each task and report actual results. Do not describe the historical checks above as newly run.
+Schema changes follow: edit `schema.ts` → `db:generate` → review the SQL (including RLS and grants) → `db:migrate` → `api:generate` if the API changed.

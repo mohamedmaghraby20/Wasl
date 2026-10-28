@@ -71,6 +71,13 @@ export const router = createBrowserRouter([
         },
       },
       {
+        path: 'privacy',
+        lazy: async () => {
+          const { PrivacyDataPage } = await import('@/features/privacy/PrivacyDataPage');
+          return { Component: PrivacyDataPage };
+        },
+      },
+      {
         path: 'messages',
         lazy: async () => {
           const { MessagesPage } = await import('@/features/messaging/MessagesPage');

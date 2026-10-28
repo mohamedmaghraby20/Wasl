@@ -13,7 +13,7 @@ export class SupabaseIdentityService {
 
   async resolve(authUser: VerifiedSupabaseUser): Promise<AuthenticatedUser> {
     const db = this.database();
-    const userId = await db.transaction(async (tx) => {
+    const resolved = await db.transaction(async (tx) => {
       const provider = 'email';
       await tx.execute(
         sql`select pg_advisory_xact_lock(hashtext(${provider}), hashtext(${authUser.authUserId}))`,
@@ -59,7 +59,7 @@ export class SupabaseIdentityService {
         .from(users)
         .where(eq(users.id, resolvedId))
         .limit(1);
-      if (!account || account.status !== 'ACTIVE') {
+      if (!account || !['ACTIVE', 'DELETION_PENDING'].includes(account.status)) {
         throw new ForbiddenException('This Wasl account is not active.');
       }
 
@@ -67,10 +67,9 @@ export class SupabaseIdentityService {
         .insert(profiles)
         .values({ id: resolvedId, displayName: authUser.displayName })
         .onConflictDoNothing({ target: profiles.id });
-      return resolvedId;
+      return { id: resolvedId, accountStatus: account.status };
     });
-
-    return { id: userId, authUserId: authUser.authUserId };
+    return { ...resolved, authUserId: authUser.authUserId };
   }
 
   private database(): Database {

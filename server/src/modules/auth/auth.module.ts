@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createClient } from '@supabase/supabase-js';
 import { PlatformAdminGuard } from './platform-admin.guard';
+import { PrivacyGateService } from './privacy-gate.service';
 import { SupabaseAuthGuard } from './supabase-auth.guard';
 import { SUPABASE_AUTH_CLIENT, SupabaseAuthService } from './supabase-auth.service';
 import { SupabaseIdentityService } from './supabase-identity.service';
@@ -27,9 +28,16 @@ import { SupabaseIdentityService } from './supabase-identity.service';
         new SupabaseAuthService(client),
     },
     SupabaseIdentityService,
+    PrivacyGateService,
     SupabaseAuthGuard,
     PlatformAdminGuard,
   ],
-  exports: [SupabaseAuthGuard, SupabaseAuthService, SupabaseIdentityService, PlatformAdminGuard],
+  exports: [
+    SupabaseAuthGuard,
+    SupabaseAuthService,
+    SupabaseIdentityService,
+    PrivacyGateService,
+    PlatformAdminGuard,
+  ],
 })
 export class AuthModule {}

@@ -17,6 +17,7 @@
     "test": "corepack pnpm -r test",
     "test:phase3:integration": "corepack pnpm --filter @wasl/server build && corepack pnpm --filter @wasl/server exec tsx test/phase3.integration.ts",
     "test:participation:postgres": "corepack pnpm --filter @wasl/server exec tsx test/participation-postgres.integration.ts",
+    "test:privacy:postgres": "corepack pnpm --filter @wasl/server exec tsx test/privacy.integration.ts",
     "test:organizations:postgres": "corepack pnpm --filter @wasl/server exec tsx test/organizations-postgres.integration.ts",
     "test:discussions:postgres": "corepack pnpm --filter @wasl/server exec tsx test/discussions-postgres.integration.ts && corepack pnpm --filter @wasl/server exec tsx test/discussions-posting.integration.ts",
     "test:messaging:postgres": "corepack pnpm --filter @wasl/server exec tsx test/messaging-postgres.integration.ts",
