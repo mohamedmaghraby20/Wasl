@@ -1,6 +1,6 @@
 # Wasl — Project Handoff
 
-**Snapshot:** 2026-10-28 · branch `feature/phase7-privacy-compliance` (base `305cc4f`) plus the uncommitted work listed at the end.
+**Snapshot:** 2026-10-28 · `main` at `c2c7bbd`, pushed to `origin` (`mohamedmaghraby20/Wasl`). See “Repository state” at the end.
 **What this is:** the build history and current state of the project, written so another agent can continue without reading anything else.
 
 ## What Wasl is
@@ -55,7 +55,7 @@ Everything that was planned to be **built** is built. What remains is shipping, 
 - **Signed-in routes:** `/profile`, `/profile/edit`, `/activity`, `/messages`, `/notifications`, `/privacy`, `/create/*`, `/*/edit`, `/*/manage`, `/organizations/invitations/accept`, `/admin`.
 - **Database:** `server/src/db/schema.ts` and `server/drizzle/*.sql`; applied migrations are immutable history.
 
-## Verified state (2026-10-28, current worktree)
+## Verified state (2026-10-28, `main`)
 
 - `pnpm typecheck` — passes.
 - `pnpm lint` — passes with `--max-warnings=0`.
@@ -63,7 +63,7 @@ Everything that was planned to be **built** is built. What remains is shipping, 
 - `pnpm test:privacy:postgres` — passes against the project database: age/acceptance gate, under-18 refusal, organization-ownership block on deletion, cancellation, anonymization, provider failure and retry, export, retention blocker, admin age review, and the in-app notice created on a decision (with no email queued).
 - `pnpm build` — passes: OpenAPI and Orval clients regenerate, server and client build, and the client build writes `sitemap.xml` (27 URLs on the seeded data) and a `robots.txt` with a `Sitemap:` line.
 - `GET /api/v1/health/ready` — returns `200` with `database: "up"` against the project, and `503` when the database is unreachable.
-- CI and the Render blueprint exist as files but have never run: there is still no Git remote.
+- CI and the Render blueprint are committed but have not run yet: the repository is now on GitHub at `mohamedmaghraby20/Wasl` (`main`), so CI starts on the next push or pull request.
 
 ## Known gaps
 
@@ -75,9 +75,9 @@ Everything that was planned to be **built** is built. What remains is shipping, 
 - Public organization and user profiles are not in the sitemap because there is no public listing endpoint for them.
 - One branch per phase, no staging environment; release checks ran locally.
 
-## Worktree state
+## Repository state
 
-The privacy phase is committed on `feature/phase7-privacy-compliance` (base `305cc4f`). Documentation is mid-rewrite: this file, the implementation guide and `docs/launch-decisions.md` are updated with the phase, while the removed phase notes, `docs/GETTING_STARTED.md` and `docs/production-handoff.md` are still uncommitted. Other uncommitted work: the password-reset page and tests, CI and Render files, the sitemap generator, the readiness endpoint, and test fixes. `git status` is the source of truth for what is still in flight.
+Everything is merged into `main` and pushed to `origin` (`mohamedmaghraby20/Wasl`); `git status` is clean. The phase branches (`feature/phase7-notification-schema`, `feature/phase8-local-hardening`) and `master` are already contained in `main`. CI and the Render blueprint are committed but have never executed, so the first pipeline run and the first deploy are still ahead.
 
 ## Local commands
 

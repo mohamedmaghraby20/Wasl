@@ -156,7 +156,7 @@ Keep code close to its owning feature. Each NestJS module owns business logic an
 
 ## Phases and tasks
 
-> **Task checkboxes are not a status source.** They are planning markers: some completed tasks are still unchecked, and some checked tasks were only finished later. For current state read `docs/project_handoff.md`.
+> **Task checkboxes are not a status source.** They are planning markers: some completed tasks are still unchecked, and some checked tasks were only finished later. For current state read `docs/PROJECT_HANDOFF.md`.
 
 ## Phase 1: Foundation and local tooling
 

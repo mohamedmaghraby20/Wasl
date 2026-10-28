@@ -173,7 +173,7 @@ Step-by-step instructions, including domain, Supabase, Resend and Stream setup, 
 | [`docs/context/01-PRODUCT.md`](docs/context/01-PRODUCT.md)           | Product scope and participation invariants                 |
 | [`docs/context/02-ARCHITECTURE.md`](docs/context/02-ARCHITECTURE.md) | Module boundaries and ownership rules                      |
 | [`docs/context/03-TECH-STACK.md`](docs/context/03-TECH-STACK.md)     | Approved technology baseline                               |
-| [`docs/project_handoff.md`](docs/project_handoff.md)                 | Build history, verified state and known gaps               |
+| [`docs/PROJECT_HANDOFF.md`](docs/PROJECT_HANDOFF.md)                 | Build history, verified state and known gaps               |
 | [`docs/production-handoff.md`](docs/production-handoff.md)           | Launch runbook and smoke tests                             |
 | [`docs/launch-decisions.md`](docs/launch-decisions.md)               | Legal, privacy and age decision register                   |
 | [`docs/design/README.md`](docs/design/README.md)                     | Design token contract and theme notes                      |
