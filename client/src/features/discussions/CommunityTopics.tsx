@@ -12,6 +12,8 @@ import { Field } from '@/components/ui/Field';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { QueryError } from '@/components/feedback/QueryError';
+import { LoadingState } from '@/components/feedback/LoadingState';
+import { EmptyState } from '@/components/ui/EmptyState';
 
 export function CommunityTopics({
   communityId,
@@ -52,15 +54,11 @@ export function CommunityTopics({
         {t('communityTopics')}
       </h2>
       {query.isPending ? (
-        <p className="text-sm text-text-muted" role="status">
-          {t('loadingTopics')}
-        </p>
+        <LoadingState message={t('loadingTopics')} />
       ) : query.isError ? (
         <QueryError message={t('topicsLoadError')} onRetry={() => void query.refetch()} />
       ) : query.data.items.length === 0 && page === 1 ? (
-        <p className="rounded-(--shape-radius-card) border border-dashed border-border p-5 text-sm text-text-muted">
-          {t('noCommunityTopics')}
-        </p>
+        <EmptyState title={t('noCommunityTopics')} />
       ) : (
         <>
           <ul className="divide-y divide-border overflow-hidden rounded-(--shape-radius-card) border border-border bg-card shadow-xs">

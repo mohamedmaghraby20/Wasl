@@ -17,6 +17,8 @@ import { Field } from '@/components/ui/Field';
 import { Textarea } from '@/components/ui/Textarea';
 import { QueryError } from '@/components/feedback/QueryError';
 import { ReportAction } from '@/features/moderation/ReportAction';
+import { LoadingState } from '@/components/feedback/LoadingState';
+import { EmptyState } from '@/components/ui/EmptyState';
 
 export function EventDiscussion({
   eventId,
@@ -151,15 +153,11 @@ export function EventDiscussion({
         </p>
       ) : null}
       {query.isPending ? (
-        <p className="text-sm text-text-muted" role="status">
-          {t('loadingDiscussion')}
-        </p>
+        <LoadingState message={t('loadingDiscussion')} />
       ) : query.isError ? (
         <QueryError message={t('discussionLoadError')} onRetry={() => void query.refetch()} />
       ) : query.data.items.length === 0 && page === 1 ? (
-        <p className="rounded-(--shape-radius-card) border border-dashed border-border p-5 text-sm text-text-muted">
-          {t('noDiscussionPosts')}
-        </p>
+        <EmptyState title={t('noDiscussionPosts')} />
       ) : (
         <>
           <ol className="grid gap-4">

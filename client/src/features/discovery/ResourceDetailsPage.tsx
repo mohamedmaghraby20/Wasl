@@ -1,13 +1,8 @@
 import { useState } from 'react';
 import {
   ArrowLeft,
-  CalendarDays,
-  MapPin,
   MessageSquare,
   Share2,
-  Ticket,
-  UsersRound,
-  Video,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
@@ -42,15 +37,13 @@ import {
 } from '@/api/generated/discovery/discovery';
 import { ApiError } from '@/api/fetcher';
 import { getMessagingControllerConversationsQueryKey } from '@/api/generated/messaging/messaging';
-import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { QueryError } from '@/components/feedback/QueryError';
+import { EmptyState } from '@/components/ui/EmptyState';
 import {
-  formatTurkeyDateTime,
   languageCode,
-  localizedName,
   localizedResourceTitle,
   type ResourceKind,
 } from '@/features/resources/resource-utils';
@@ -65,6 +58,7 @@ import {
   useMessagingControllerCommunity,
   useMessagingControllerEvent,
 } from '@/api/generated/messaging/messaging';
+import { ResourceOverview } from './ResourceOverview';
 
 export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX.Element {
   const { t, i18n } = useTranslation();
@@ -187,25 +181,16 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
       );
     }
     return (
-      <div
-        className="mx-auto grid max-w-(--container-reading) justify-items-center gap-3 rounded-(--shape-radius-card) border border-border bg-card px-6 py-12 text-center"
+      <EmptyState
+        className="mx-auto w-full max-w-(--container-reading) bg-card"
+        title={t('notFoundResource', { resource: resourceName })}
         role="alert"
-      >
-        <p className="text-base font-semibold">
-          {t('notFoundResource', { resource: resourceName })}
-        </p>
-        <Button asChild size="sm" variant="outline">
-          <Link to={`/${kind}`}>{t('backTo', { resource: t(kind) })}</Link>
-        </Button>
-      </div>
+        action={<Button asChild size="sm" variant="outline"><Link to={`/${kind}`}>{t('backTo', { resource: t(kind) })}</Link></Button>}
+      />
     );
   }
   if (!item) {
-    return (
-      <p className="rounded-(--shape-radius-card) border border-border bg-card p-5" role="alert">
-        {t('notFoundResource', { resource: resourceName })}
-      </p>
-    );
+    return <EmptyState className="bg-card" role="alert" title={t('notFoundResource', { resource: resourceName })} />;
   }
 
   const eventItem = 'startsAt' in item ? item : undefined;
@@ -392,101 +377,7 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
         <ReportAction targetType={kind === 'events' ? 'event' : 'community'} targetId={item.id} />
       </div>
 
-      <header className="grid gap-5 rounded-(--shape-radius-card) border border-border bg-card p-6 shadow-sm sm:p-8">
-        <div className="grid gap-3">
-          {item.categories.length > 0 ? (
-            <ul aria-label={t('categoriesLabel')} className="flex flex-wrap gap-1.5">
-              {item.categories.map((category) => (
-                <li key={category.id}>
-                  <Badge variant="primary">{localizedName(category, i18n.language)}</Badge>
-                </li>
-              ))}
-            </ul>
-          ) : null}
-          <h1 className="text-3xl font-extrabold sm:text-4xl">{localizedResourceTitle(item)}</h1>
-          <p className="text-sm text-text-muted">
-            <span>{t('hostedByLabel')} </span>
-            {hostPath ? (
-              <Link
-                className="font-semibold text-primary-soft-text underline decoration-primary/40 decoration-2 underline-offset-4 transition-colors hover:decoration-primary"
-                to={hostPath}
-              >
-                {item.hostName}
-              </Link>
-            ) : (
-              <span className="font-medium text-text">{item.hostName}</span>
-            )}
-          </p>
-        </div>
-        <p className="whitespace-pre-wrap text-sm leading-relaxed text-text-muted">
-          {item.description}
-        </p>
-        {eventItem ? (
-          <div className="flex items-start gap-3 rounded-xl bg-primary-soft px-4 py-3 text-primary-soft-text">
-            <CalendarDays aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
-            <div className="grid gap-0.5 text-sm">
-              <p className="font-semibold">
-                {formatTurkeyDateTime(eventItem.startsAt, i18n.language, 'full')}
-              </p>
-              {eventItem.endsAt ? (
-                <p className="text-xs opacity-80">
-                  {t('endsAt', {
-                    date: formatTurkeyDateTime(eventItem.endsAt, i18n.language, 'full'),
-                  })}
-                </p>
-              ) : null}
-            </div>
-          </div>
-        ) : null}
-        {eventItem?.cancelled ? (
-          <p
-            className="rounded-lg bg-danger-soft px-3 py-2 text-sm font-medium text-danger"
-            role="status"
-          >
-            {t('cancelledMessage')}
-          </p>
-        ) : null}
-      </header>
-
-      <section className="grid gap-3 sm:grid-cols-3">
-        <div className="grid content-start gap-1 rounded-(--shape-radius-card) border border-border bg-card p-4">
-          <p className="inline-flex items-center gap-1.5 text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-text-subtle">
-            {eventItem?.online ? (
-              <Video aria-hidden="true" className="size-3.5 shrink-0" />
-            ) : (
-              <MapPin aria-hidden="true" className="size-3.5 shrink-0" />
-            )}
-            {eventItem ? t('detailLocation') : t('detailCity')}
-          </p>
-          <p className="text-sm font-medium text-text">
-            {eventItem?.online
-              ? t('online')
-              : eventItem?.locationName
-                ? `${eventItem.locationName}, ${item.cityName ?? ''}`.replace(/, $/, '')
-                : item.cityName}
-          </p>
-        </div>
-        {!eventItem?.cancelled ? (
-          <div className="grid content-start gap-1 rounded-(--shape-radius-card) border border-border bg-card p-4">
-            <p className="inline-flex items-center gap-1.5 text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-text-subtle">
-              <Ticket aria-hidden="true" className="size-3.5 shrink-0" />
-              {t('detailAdmission')}
-            </p>
-            <p className="text-sm font-medium text-text">{t(admissionLabel)}</p>
-          </div>
-        ) : null}
-        {item.capacity !== undefined && item.capacity !== null ? (
-          <div className="grid content-start gap-1 rounded-(--shape-radius-card) border border-border bg-card p-4">
-            <p className="inline-flex items-center gap-1.5 text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-text-subtle">
-              <UsersRound aria-hidden="true" className="size-3.5 shrink-0" />
-              {t('capacityLabel')}
-            </p>
-            <p className="text-sm font-medium text-text">
-              {t('capacityValue', { capacity: item.capacity })}
-            </p>
-          </div>
-        ) : null}
-      </section>
+      <ResourceOverview item={item} hostPath={hostPath} admissionLabel={admissionLabel} />
       {isManager ? (
         <section className="grid gap-4 rounded-(--shape-radius-card) border border-border bg-card p-5">
           <div className="flex flex-wrap gap-3">

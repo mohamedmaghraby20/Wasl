@@ -96,6 +96,7 @@ export function DatePicker({
         </button>
       </PopoverTrigger>
       <PopoverContent
+        aria-label={label}
         align={popoverAlign}
         alignOffset={compact ? alignOffset : 0}
         avoidCollisions={false}
