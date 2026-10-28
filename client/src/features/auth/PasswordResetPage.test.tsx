@@ -11,6 +11,7 @@ const mocks = vi.hoisted(() => ({
   useAuth: vi.fn(),
   requestPasswordReset: vi.fn(),
   updatePassword: vi.fn(),
+  signIn: vi.fn(),
 }));
 
 vi.mock('./AuthProvider', () => ({ useAuth: mocks.useAuth }));
@@ -36,11 +37,14 @@ describe('PasswordResetPage', () => {
       configured: true,
       loading: false,
       user: null,
+      passwordRecovery: false,
+      signIn: mocks.signIn,
       requestPasswordReset: mocks.requestPasswordReset,
       updatePassword: mocks.updatePassword,
     });
     mocks.requestPasswordReset.mockResolvedValue(undefined);
     mocks.updatePassword.mockResolvedValue(undefined);
+    mocks.signIn.mockResolvedValue(undefined);
     await act(async () => i18n.changeLanguage('en'));
   });
 
@@ -59,6 +63,8 @@ describe('PasswordResetPage', () => {
       configured: true,
       loading: false,
       user: { id: 'user-1' },
+      passwordRecovery: true,
+      signIn: mocks.signIn,
       requestPasswordReset: mocks.requestPasswordReset,
       updatePassword: mocks.updatePassword,
     });
@@ -69,5 +75,25 @@ describe('PasswordResetPage', () => {
 
     await waitFor(() => expect(mocks.updatePassword).toHaveBeenCalledWith('new-secure-password'));
     expect(await screen.findByRole('status')).toHaveTextContent('Your password has been updated');
+  });
+
+  it('requires the current password before changing a password in a regular session', async () => {
+    mocks.useAuth.mockReturnValue({
+      configured: true,
+      loading: false,
+      user: { id: 'user-1', email: 'test@example.com' },
+      passwordRecovery: false,
+      signIn: mocks.signIn,
+      requestPasswordReset: mocks.requestPasswordReset,
+      updatePassword: mocks.updatePassword,
+    });
+    const user = userEvent.setup();
+    renderPage();
+    await user.type(screen.getByLabelText('Current password'), 'old-password');
+    await user.type(screen.getByLabelText('New password'), 'new-secure-password');
+    await user.click(screen.getByRole('button', { name: 'Save new password' }));
+
+    await waitFor(() => expect(mocks.signIn).toHaveBeenCalledWith('test@example.com', 'old-password'));
+    expect(mocks.updatePassword).toHaveBeenCalledWith('new-secure-password');
   });
 });

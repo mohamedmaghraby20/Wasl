@@ -55,6 +55,7 @@ export function SearchableSelect({
   const [search, setSearch] = useState('');
   const [activeIndex, setActiveIndex] = useState(-1);
   const searchRef = useRef<HTMLInputElement>(null);
+  const activeOptionRef = useRef<HTMLDivElement>(null);
   const wasOpen = useRef(false);
   const selected = options.find((option) => option.value === value);
   const filtered = useMemo(() => {
@@ -84,6 +85,10 @@ export function SearchableSelect({
     );
   }, [filtered.length, open]);
 
+  useEffect(() => {
+    activeOptionRef.current?.scrollIntoView({ block: 'nearest' });
+  }, [activeIndex]);
+
   const choose = (option: SearchableSelectOption | undefined): void => {
     if (!option || option.disabled) return;
     onValueChange(option.value);
@@ -111,22 +116,20 @@ export function SearchableSelect({
       {name ? <input name={name} type="hidden" value={value} /> : null}
       <PopoverTrigger asChild>
         <button
-          aria-autocomplete="list"
           aria-busy={ariaBusy}
           aria-controls={`${id}-listbox`}
           aria-describedby={ariaDescribedBy}
           aria-expanded={open}
           aria-haspopup="listbox"
-          aria-invalid={ariaInvalid}
           aria-label={ariaLabel}
           className={cn(
             'flex h-11 w-full min-w-0 items-center justify-between gap-2 rounded-(--shape-radius-control) border border-input bg-background px-3 text-start text-sm text-text shadow-xs transition-[border-color,background-color] duration-(--motion-duration-fast) hover:border-border-control-hover disabled:cursor-not-allowed disabled:opacity-(--opacity-disabled) aria-invalid:border-danger',
             !selected && !selectedLabel && 'text-text-subtle',
+            ariaInvalid && 'border-danger',
             className,
           )}
           disabled={disabled}
           id={id}
-          role="combobox"
           ref={triggerRef}
           type="button"
         >
@@ -135,6 +138,7 @@ export function SearchableSelect({
         </button>
       </PopoverTrigger>
       <PopoverContent
+        aria-label={searchPlaceholder ?? t('searchOptions')}
         align="start"
         side="bottom"
         avoidCollisions={false}
@@ -147,6 +151,8 @@ export function SearchableSelect({
         <div className="relative m-1 mb-2">
           <Search aria-hidden="true" className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-text-subtle" />
           <Input
+            role="combobox"
+            aria-busy={ariaBusy || loading}
             aria-activedescendant={
               activeIndex >= 0 ? `${id}-option-${activeIndex}` : undefined
             }
@@ -185,25 +191,32 @@ export function SearchableSelect({
           ) : (
             filtered.map((option, index) => (
               <li key={option.value} role="presentation">
-                <button
+                <div
                   aria-selected={option.value === value}
+                  aria-disabled={option.disabled || undefined}
                   className={cn(
                     'flex min-h-11 w-full cursor-pointer select-none items-center gap-2 rounded-md px-2.5 py-2 text-start text-sm text-text transition-colors hover:bg-primary-soft hover:text-primary-soft-text',
                     option.value === value && 'font-semibold',
                     index === activeIndex && 'bg-primary-soft text-primary-soft-text',
                   )}
-                  disabled={option.disabled}
                   id={`${id}-option-${index}`}
                   onClick={() => choose(option)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      choose(option);
+                    }
+                  }}
                   onMouseEnter={() => setActiveIndex(index)}
+                  ref={index === activeIndex ? activeOptionRef : undefined}
                   role="option"
-                  type="button"
+                  tabIndex={-1}
                 >
                   <span className="min-w-0 flex-1 truncate">{option.label}</span>
                   {option.value === value ? (
                     <Check aria-hidden="true" className="size-4 shrink-0" />
                   ) : null}
-                </button>
+                </div>
               </li>
             ))
           )}

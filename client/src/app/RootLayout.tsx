@@ -12,7 +12,7 @@ import {
   X,
 } from 'lucide-react';
 import { useHead } from '@unhead/react';
-import { Link, NavLink, Outlet, ScrollRestoration, useLocation } from 'react-router';
+import { Link, NavLink, Navigate, Outlet, ScrollRestoration, useLocation } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
@@ -30,6 +30,7 @@ import {
 } from '@/components/ui/DropdownMenu';
 import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/Sheet';
 import { cn } from '@/lib/cn';
+import { requiresAuthentication } from './auth-routes';
 
 const primaryLinks = [
   { key: 'home', to: '/', end: true },
@@ -80,7 +81,8 @@ export function RootLayout(): React.JSX.Element {
     ) ||
     pathname.startsWith('/organizations/invitations/') ||
     /^\/(?:organizations|communities|events)\/[^/]+\/(?:edit|manage)\/?$/.test(pathname);
-  const { user, signOut } = useAuth();
+  const { user, loading, signOut } = useAuth();
+  const routeRequiresAuth = requiresAuthentication(pathname);
   const privacy = usePrivacyControllerStatus({ query: { enabled: Boolean(user) } });
   const [navigationOpen, setNavigationOpen] = useState(false);
   const mainRef = useRef<HTMLElement>(null);
@@ -109,14 +111,15 @@ export function RootLayout(): React.JSX.Element {
     titleTemplate: '%s | Wasl',
     htmlAttrs: { lang: isArabic ? 'ar' : 'en', dir: isArabic ? 'rtl' : 'ltr' },
     meta: isPrivateRoute ? [{ name: 'robots', content: 'noindex, nofollow' }] : [],
-    link: isPrivateRoute
-      ? []
-      : [{ rel: 'canonical', href: `${window.location.origin}${pathname}` }],
   });
   const languageLabel = t(isArabic ? 'switchToEnglish' : 'switchToArabic');
   const showPrivacyBanner =
     Boolean(user) && pathname !== '/privacy' && privacy.data?.requiresOnboarding === true;
   const recordedUnder18 = privacy.data?.ageEligibility === 'UNDER_18';
+  if (routeRequiresAuth && !loading && !user) {
+    const returnTo = `${pathname}${window.location.search}${window.location.hash}`;
+    return <Navigate replace to={`/sign-in?returnTo=${encodeURIComponent(returnTo)}`} />;
+  }
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       <a

@@ -1,4 +1,5 @@
 import { useHead, useSeoMeta } from '@unhead/react';
+import { useLocation } from 'react-router';
 
 export function usePageMetadata(
   title: string,
@@ -9,6 +10,7 @@ export function usePageMetadata(
     structuredData?: Record<string, unknown>;
   },
 ): void {
+  const { pathname } = useLocation();
   useSeoMeta({
     title,
     description,
@@ -18,9 +20,9 @@ export function usePageMetadata(
     robots: options?.noindex ? 'noindex, nofollow' : 'index, follow',
   });
   useHead({
-    link: options?.canonicalPath
-      ? [{ rel: 'canonical', href: `${window.location.origin}${options.canonicalPath}` }]
-      : [],
+    link: options?.noindex
+      ? []
+      : [{ rel: 'canonical', href: `${window.location.origin}${options?.canonicalPath ?? pathname}` }],
     script: options?.structuredData
       ? [
           {

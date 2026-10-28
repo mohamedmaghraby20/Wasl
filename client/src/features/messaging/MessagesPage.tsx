@@ -25,6 +25,7 @@ import {
   messagingControllerSession,
   messagingControllerConversations,
   getMessagingControllerConversationsQueryKey,
+  getMessagingControllerBlockedUsersQueryKey,
 } from '@/api/generated/messaging/messaging';
 import { ArrowLeft, MessageSquarePlus } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -120,7 +121,7 @@ export function MessagesPage(): React.JSX.Element {
     return () => {
       cancelled = true;
     };
-  }, [user?.id, sessionRetry]);
+  }, [user, sessionRetry]);
 
   useEffect(() => {
     const auth = session;
@@ -194,7 +195,7 @@ export function MessagesPage(): React.JSX.Element {
     return () => {
       cancelled = true;
     };
-  }, [client, conversations.data, channelRetry]);
+  }, [client, conversations.data, channelRetry, session?.userId]);
 
   const currentCid = selected?.cid;
   const streamI18n = useMemo(() => {
@@ -247,7 +248,7 @@ export function MessagesPage(): React.JSX.Element {
       setRecipientLabel('');
       setRecipientQuery('');
       setDebouncedRecipientQuery('');
-      await queryClient.invalidateQueries();
+      await queryClient.invalidateQueries({ queryKey: getMessagingControllerConversationsQueryKey() });
       const ready = await client?.queryChannels(
         {
           $and: [
@@ -275,7 +276,10 @@ export function MessagesPage(): React.JSX.Element {
     try {
       const result = await block.mutateAsync({ data: { userId: otherUserId } });
       setSyncPending(Boolean(result.syncPending));
-      await queryClient.invalidateQueries();
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: getMessagingControllerConversationsQueryKey() }),
+        queryClient.invalidateQueries({ queryKey: getMessagingControllerBlockedUsersQueryKey() }),
+      ]);
       setSelected(null);
     } catch {
       setError(true);
@@ -288,7 +292,7 @@ export function MessagesPage(): React.JSX.Element {
     try {
       const result = await unblock.mutateAsync({ userId: targetId });
       setSyncPending(Boolean(result.syncPending));
-      await queryClient.invalidateQueries();
+      await queryClient.invalidateQueries({ queryKey: getMessagingControllerBlockedUsersQueryKey() });
     } catch {
       setError(true);
     }

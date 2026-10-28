@@ -241,7 +241,7 @@ describe('DiscoveryPage', () => {
     await waitFor(() => expect(screen.getByLabelText('Current URL')).toHaveTextContent('?q=music'));
 
     await user.tab();
-    expect(screen.getByRole('combobox', { name: 'All cities' })).toHaveFocus();
+    expect(screen.getByRole('button', { name: 'All cities' })).toHaveFocus();
   });
 
   it('uses the route parameter when loading a public detail page', async () => {
@@ -275,25 +275,25 @@ describe('DiscoveryPage', () => {
     mockDiscoveryApi();
     renderPage();
 
-    await user.click(screen.getByRole('combobox', { name: 'All cities' }));
+    await user.click(screen.getByRole('button', { name: 'All cities' }));
     await user.click(await screen.findByRole('option', { name: 'Ankara' }));
 
     await waitFor(() =>
       expect(screen.getByLabelText('Current URL')).toHaveTextContent('/discover?city=ankara'),
     );
-    expect(screen.getByRole('combobox', { name: 'City: Ankara' })).toHaveTextContent('Ankara');
+    expect(screen.getByRole('button', { name: 'City: Ankara' })).toHaveTextContent('Ankara');
 
     await user.click(screen.getByRole('button', { name: 'Back' }));
     await waitFor(() =>
       expect(screen.getByLabelText('Current URL')).toHaveTextContent('/discover'),
     );
-    expect(screen.getByRole('combobox', { name: 'All cities' })).toHaveTextContent('All cities');
+    expect(screen.getByRole('button', { name: 'All cities' })).toHaveTextContent('All cities');
 
     await user.click(screen.getByRole('button', { name: 'Forward' }));
     await waitFor(() =>
       expect(screen.getByLabelText('Current URL')).toHaveTextContent('/discover?city=ankara'),
     );
-    expect(screen.getByRole('combobox', { name: 'City: Ankara' })).toHaveTextContent('Ankara');
+    expect(screen.getByRole('button', { name: 'City: Ankara' })).toHaveTextContent('Ankara');
   });
 
   it('requests twelve items per page and follows the server hasMore flag', async () => {
@@ -356,7 +356,7 @@ describe('DiscoveryPage', () => {
     await waitFor(() =>
       expect(screen.getByLabelText('Current URL')).toHaveTextContent('/discover'),
     );
-    expect(screen.getByRole('combobox', { name: 'All cities' })).toHaveTextContent('All cities');
+    expect(screen.getByRole('button', { name: 'All cities' })).toHaveTextContent('All cities');
   });
 
   it('moves focus to the main content after a route change', async () => {

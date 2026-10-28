@@ -133,7 +133,7 @@ export function EventFormPage(): React.JSX.Element {
   if (loading || (editing && existing.isPending))
     return (
       <p className="text-sm text-text-muted" role="status">
-        {t('authWorking')}
+        {t('loading', { resource: t('events') })}
       </p>
     );
   if (editing && existing.isError)

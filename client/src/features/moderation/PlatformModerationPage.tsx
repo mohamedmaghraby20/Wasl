@@ -23,6 +23,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Field } from '@/components/ui/Field';
 import { Input } from '@/components/ui/Input';
+import { TextPromptDialog } from '@/components/ui/TextPromptDialog';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { usePageMetadata } from '@/features/discovery/usePageMetadata';
 import { formatTurkeyDateTime } from '@/features/resources/resource-utils';
@@ -99,6 +100,8 @@ function SecondFactor({ onSuccess }: { onSuccess: () => void }): React.JSX.Eleme
           <img
             alt={t('adminMfaQr')}
             className="size-48"
+            width={192}
+            height={192}
             src={`data:image/svg+xml,${encodeURIComponent(qr)}`}
           />
           <p className="break-all text-sm">
@@ -142,6 +145,12 @@ export function PlatformModerationPage(): React.JSX.Element {
   const [aal, setAal] = useState<'aal1' | 'aal2' | null>(null);
   const [error, setError] = useState('');
   const [busyId, setBusyId] = useState('');
+  const [decisionPrompt, setDecisionPrompt] = useState<
+    | { kind: 'report'; id: string; action: 'SUSPEND_USER' | 'RESTORE_USER' | 'ARCHIVE_COMMUNITY' | 'CANCEL_EVENT' }
+    | { kind: 'privacy'; id: string; action: 'APPROVE' | 'REJECT' }
+    | null
+  >(null);
+  const [decisionNote, setDecisionNote] = useState('');
   const reports = useModerationControllerList({
     query: { enabled: Boolean(user && aal === 'aal2') },
   });
@@ -185,9 +194,14 @@ export function PlatformModerationPage(): React.JSX.Element {
   const review = async (
     id: string,
     action: 'DISMISSED' | 'SUSPEND_USER' | 'RESTORE_USER' | 'ARCHIVE_COMMUNITY' | 'CANCEL_EVENT',
+    suppliedNote?: string,
   ) => {
-    const note = action === 'DISMISSED' ? '' : window.prompt(t('adminDecisionNote'));
-    if (note === null) return;
+    if (action !== 'DISMISSED' && suppliedNote === undefined) {
+      setDecisionPrompt({ kind: 'report', id, action });
+      setDecisionNote('');
+      return;
+    }
+    const note = suppliedNote ?? '';
     setBusyId(id);
     setError('');
     try {
@@ -213,9 +227,17 @@ export function PlatformModerationPage(): React.JSX.Element {
       setBusyId('');
     }
   };
-  const reviewPrivacy = async (id: string, action: 'START_REVIEW' | 'APPROVE' | 'REJECT') => {
-    const note = action === 'START_REVIEW' ? '' : window.prompt(t('adminDecisionNote'));
-    if (note === null) return;
+  const reviewPrivacy = async (
+    id: string,
+    action: 'START_REVIEW' | 'APPROVE' | 'REJECT',
+    suppliedNote?: string,
+  ) => {
+    if (action !== 'START_REVIEW' && suppliedNote === undefined) {
+      setDecisionPrompt({ kind: 'privacy', id, action });
+      setDecisionNote('');
+      return;
+    }
+    const note = suppliedNote ?? '';
     setBusyId(id);
     setError('');
     try {
@@ -253,6 +275,25 @@ export function PlatformModerationPage(): React.JSX.Element {
           {error}
         </p>
       )}
+      <TextPromptDialog
+        description={t('adminDecisionNote')}
+        label={t('adminDecisionNote')}
+        onOpenChange={(open) => { if (!open) setDecisionPrompt(null); }}
+        onSubmit={(event) => {
+          event.preventDefault();
+          const prompt = decisionPrompt;
+          if (!prompt) return;
+          if (prompt.kind === 'report') void review(prompt.id, prompt.action, decisionNote);
+          else void reviewPrivacy(prompt.id, prompt.action, decisionNote);
+          setDecisionPrompt(null);
+        }}
+        onValueChange={setDecisionNote}
+        open={decisionPrompt !== null}
+        pending={Boolean(busyId)}
+        submitLabel={t('confirmAction')}
+        title={t('adminDecisionNote')}
+        value={decisionNote}
+      />
       <section className="grid gap-4">
         <h2 className="text-xl font-semibold">{t('adminReports')}</h2>
         {reports.isPending ? (

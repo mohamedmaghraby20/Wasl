@@ -6,7 +6,6 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-router';
-import { z } from 'zod';
 import {
   getOrganizationsControllerPublicProfileQueryKey,
   useOrganizationsControllerPublicProfile,
@@ -26,24 +25,8 @@ import { profileImageExtension } from '@/features/profile/profile-utils';
 import { languageCode } from '@/features/resources/resource-utils';
 import { focusFirstInvalid } from '@/lib/focus-first-invalid';
 import { supabase } from '@/lib/supabase';
-
-const optionalUrl = z
-  .string()
-  .trim()
-  .max(2048)
-  .refine((value) => !value || /^https?:\/\//i.test(value), 'url');
-
-const formSchema = z.object({
-  name: z.string().trim().min(1).max(160),
-  description: z.string().trim().min(1).max(5000),
-  type: z.string().trim().min(1).max(80),
-  cityId: z.string(),
-  locationName: z.string().trim().max(160),
-  websiteUrl: optionalUrl,
-  socialUrl: optionalUrl,
-});
-
-type FormValues = z.infer<typeof formSchema>;
+import { organizationFormSchema } from './organization-form';
+import type { OrganizationFormValues as FormValues } from './organization-form';
 
 export function OrganizationEditPage(): React.JSX.Element {
   const { t, i18n } = useTranslation();
@@ -69,7 +52,7 @@ export function OrganizationEditPage(): React.JSX.Element {
     [selectedLogo],
   );
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(organizationFormSchema),
     defaultValues: {
       name: '',
       description: '',

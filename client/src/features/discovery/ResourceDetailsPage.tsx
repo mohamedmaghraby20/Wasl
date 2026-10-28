@@ -16,11 +16,15 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useUsersControllerCurrent } from '@/api/generated/users/users';
 import {
   useCommunitiesControllerArchive,
+  getCommunitiesControllerMineQueryKey,
   useCommunitiesControllerMine,
 } from '@/api/generated/communities/communities';
 import { useEventsControllerCancel } from '@/api/generated/events/events';
 import { useOrganizationsControllerMine } from '@/api/generated/organizations/organizations';
 import {
+  getParticipationControllerCommunityStatusQueryKey,
+  getParticipationControllerEventStatusQueryKey,
+  getParticipationControllerMyActivityQueryKey,
   useParticipationControllerCancelEventRegistration,
   useParticipationControllerCommunityStatus,
   useParticipationControllerEventStatus,
@@ -31,8 +35,13 @@ import {
 import {
   useDiscoveryControllerCommunity,
   useDiscoveryControllerEvent,
+  getDiscoveryControllerCommunityQueryKey,
+  getDiscoveryControllerEventQueryKey,
+  getDiscoveryControllerListCommunitiesQueryKey,
+  getDiscoveryControllerListEventsQueryKey,
 } from '@/api/generated/discovery/discovery';
 import { ApiError } from '@/api/fetcher';
+import { getMessagingControllerConversationsQueryKey } from '@/api/generated/messaging/messaging';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { useConfirm } from '@/components/ui/ConfirmDialog';
@@ -241,7 +250,11 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
       return;
     try {
       await archiveCommunity.mutateAsync({ id: item.id });
-      await queryClient.invalidateQueries();
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: getDiscoveryControllerCommunityQueryKey(item.id).slice(0, 1) }),
+        queryClient.invalidateQueries({ queryKey: getDiscoveryControllerListCommunitiesQueryKey().slice(0, 1) }),
+        queryClient.invalidateQueries({ queryKey: getCommunitiesControllerMineQueryKey().slice(0, 1) }),
+      ]);
       toast.success(t('communityArchived'));
       void navigate('/communities');
     } catch {
@@ -260,7 +273,10 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
       return;
     try {
       await cancelEvent.mutateAsync({ id: item.id });
-      await queryClient.invalidateQueries();
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: getDiscoveryControllerEventQueryKey(item.id).slice(0, 1) }),
+        queryClient.invalidateQueries({ queryKey: getDiscoveryControllerListEventsQueryKey().slice(0, 1) }),
+      ]);
       toast.success(t('eventCancelled'));
     } catch {
       toast.error(t('resourceSaveError'));
@@ -320,7 +336,12 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
           (await registerForEvent.mutateAsync({ id: item.id })).messagingSyncPending,
         );
       }
-      await queryClient.invalidateQueries();
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: kind === 'communities'
+          ? getParticipationControllerCommunityStatusQueryKey(item.id)
+          : getParticipationControllerEventStatusQueryKey(item.id) }),
+        queryClient.invalidateQueries({ queryKey: getParticipationControllerMyActivityQueryKey() }),
+      ]);
       if (messagingSyncPending) toast.warning(t('messagingSyncPending'));
     } catch {
       toast.error(t('participationActionError'));
@@ -341,7 +362,7 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
     try {
       if (eventItem) await openEventChat.mutateAsync({ id: eventItem.id });
       else await openCommunityChat.mutateAsync({ id: communityItem!.id });
-      await queryClient.invalidateQueries();
+      await queryClient.invalidateQueries({ queryKey: getMessagingControllerConversationsQueryKey() });
       void navigate('/messages');
     } catch {
       setChatError(true);

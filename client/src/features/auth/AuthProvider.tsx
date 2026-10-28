@@ -1,11 +1,13 @@
 import type { Session, User } from '@supabase/supabase-js';
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import type { PropsWithChildren } from 'react';
 import { supabase } from '@/lib/supabase';
 
 interface AuthContextValue {
   configured: boolean;
   loading: boolean;
+  passwordRecovery: boolean;
   user: User | null;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (
@@ -22,17 +24,27 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: PropsWithChildren): React.JSX.Element {
+  const queryClient = useQueryClient();
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(Boolean(supabase));
+  const [passwordRecovery, setPasswordRecovery] = useState(false);
+  const activeUserId = useRef<string | null>(null);
 
   useEffect(() => {
     if (!supabase) return;
-    const { data } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+    const { data } = supabase.auth.onAuthStateChange((event, nextSession) => {
+      if (event === 'SIGNED_OUT') queryClient.clear();
+      const nextUserId = nextSession?.user.id ?? null;
+      if (activeUserId.current && nextUserId && activeUserId.current !== nextUserId) {
+        queryClient.clear();
+      }
+      activeUserId.current = nextUserId;
+      setPasswordRecovery(event === 'PASSWORD_RECOVERY');
       setSession(nextSession);
       setLoading(false);
     });
     return () => data.subscription.unsubscribe();
-  }, []);
+  }, [queryClient]);
 
   const signIn = async (email: string, password: string): Promise<void> => {
     if (!supabase) throw new Error('Supabase is not configured.');
@@ -65,6 +77,7 @@ export function AuthProvider({ children }: PropsWithChildren): React.JSX.Element
     if (!supabase) return;
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
+    queryClient.clear();
   };
 
   const requestPasswordReset = async (email: string): Promise<void> => {
@@ -83,6 +96,7 @@ export function AuthProvider({ children }: PropsWithChildren): React.JSX.Element
   const value: AuthContextValue = {
     configured: Boolean(supabase),
     loading,
+    passwordRecovery,
     user: session?.user ?? null,
     signIn,
     signUp,

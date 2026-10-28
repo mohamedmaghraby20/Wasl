@@ -114,4 +114,20 @@ describe('NotificationsPage', () => {
     await userEvent.setup().click(screen.getByRole('button', { name: 'Mark as read' }));
     expect(mocks.markRead).toHaveBeenCalledWith({ id: 'notice' });
   });
+
+  it('does not render an untrusted cross-origin notification link', () => {
+    mocks.list.mockReturnValue({
+      isPending: false,
+      isError: false,
+      data: [{
+        id: 'external-notice',
+        type: 'event_accepted',
+        readAt: '2026-10-01T12:00:00Z',
+        createdAt: '2026-10-01T12:00:00Z',
+        href: 'https://example.org/phishing',
+      }],
+    });
+    renderPage();
+    expect(screen.queryByRole('link', { name: 'View details' })).not.toBeInTheDocument();
+  });
 });

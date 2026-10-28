@@ -61,6 +61,19 @@ services:
     autoDeployTrigger: 'off'
     buildCommand: corepack enable && corepack pnpm install --frozen-lockfile && corepack pnpm --filter @wasl/shared build && corepack pnpm --filter @wasl/web build
     staticPublishPath: client/dist
+    headers:
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: Strict-Transport-Security
+        value: max-age=63072000; includeSubDomains; preload
     envVars:
       # Vite inlines these at build time; changing one requires a new deploy.
       - key: VITE_API_URL

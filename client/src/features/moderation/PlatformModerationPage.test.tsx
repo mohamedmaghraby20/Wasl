@@ -112,11 +112,12 @@ describe('PlatformModerationPage', () => {
         },
       ],
     });
-    vi.spyOn(window, 'prompt').mockReturnValue('Handled by support');
     renderPage();
 
     expect(await screen.findByText('member@example.com', { exact: false })).toBeVisible();
     await user.click(screen.getByRole('button', { name: 'Approve request' }));
+    await user.type(screen.getByRole('textbox', { name: 'Reason for this action (visible to administrators):' }), 'Handled by support');
+    await user.click(screen.getByRole('button', { name: 'Confirm' }));
     await waitFor(() =>
       expect(mocks.privacyDecide).toHaveBeenCalledWith({
         id: 'request-1',

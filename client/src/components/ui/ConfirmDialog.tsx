@@ -84,8 +84,11 @@ export function useConfirm(): {
 } {
   const [options, setOptions] = useState<ConfirmOptions | null>(null);
   const resolver = useRef<((value: boolean) => void) | null>(null);
+  const pendingRef = useRef(false);
 
   const settle = useCallback((value: boolean) => {
+    if (pendingRef.current) return;
+    pendingRef.current = true;
     const resolve = resolver.current;
     resolver.current = null;
     setOptions(null);
@@ -97,6 +100,7 @@ export function useConfirm(): {
       new Promise<boolean>((resolve) => {
         resolver.current?.(false);
         resolver.current = resolve;
+        pendingRef.current = false;
         setOptions(next);
       }),
     [],
@@ -105,7 +109,7 @@ export function useConfirm(): {
   return {
     confirm,
     dialog: (
-      <ConfirmDialog
+        <ConfirmDialog
         description={options?.description ?? ''}
         destructive={options?.destructive}
         onConfirm={() => settle(true)}

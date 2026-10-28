@@ -5,7 +5,6 @@ import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router';
-import { z } from 'zod';
 import { useOrganizationsControllerCreate } from '@/api/generated/organizations/organizations';
 import { useDiscoveryControllerCities } from '@/api/generated/discovery/discovery';
 import { Button } from '@/components/ui/Button';
@@ -17,24 +16,8 @@ import { Textarea } from '@/components/ui/Textarea';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { languageCode } from '@/features/resources/resource-utils';
 import { focusFirstInvalid } from '@/lib/focus-first-invalid';
-
-const optionalUrl = z
-  .string()
-  .trim()
-  .max(2048)
-  .refine((value) => !value || /^https?:\/\//i.test(value), 'url');
-
-const formSchema = z.object({
-  name: z.string().trim().min(1).max(160),
-  description: z.string().trim().min(1).max(5000),
-  type: z.string().trim().min(1).max(80),
-  cityId: z.string(),
-  locationName: z.string().trim().max(160),
-  websiteUrl: optionalUrl,
-  socialUrl: optionalUrl,
-});
-
-type FormValues = z.infer<typeof formSchema>;
+import { organizationFormSchema } from './organization-form';
+import type { OrganizationFormValues as FormValues } from './organization-form';
 
 export function OrganizationCreatePage(): React.JSX.Element {
   const { t, i18n } = useTranslation();
@@ -47,7 +30,7 @@ export function OrganizationCreatePage(): React.JSX.Element {
   const [formError, setFormError] = useState('');
   const formRef = useRef<HTMLFormElement>(null);
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(organizationFormSchema),
     defaultValues: {
       name: '',
       description: '',

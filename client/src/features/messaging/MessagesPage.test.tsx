@@ -117,9 +117,9 @@ describe('MessagesPage', () => {
   it('starts a DM from a searched person', async () => {
     renderPage();
     await screen.findByRole('heading', { name: 'Messages' });
-    await userEvent.click(screen.getByRole('combobox', { name: 'Find a person' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Find a person' }));
     await userEvent.type(
-      screen.getByRole('searchbox', { name: /Search people/ }),
+      screen.getByRole('combobox', { name: /Search people/ }),
       'Recipient',
     );
     await userEvent.click(await screen.findByRole('option', { name: 'Recipient Person' }));

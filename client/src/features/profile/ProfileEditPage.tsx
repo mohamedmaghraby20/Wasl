@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useHead } from '@unhead/react';
 import { ArrowLeft, Camera, CircleUserRound, X } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router';
@@ -50,10 +50,7 @@ export function ProfileEditPage(): React.JSX.Element {
   const [removePhoto, setRemovePhoto] = useState(false);
   const [formError, setFormError] = useState('');
   const formRef = useRef<HTMLFormElement>(null);
-  const previewUrl = useMemo(
-    () => (selectedPhoto ? URL.createObjectURL(selectedPhoto) : null),
-    [selectedPhoto],
-  );
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: { displayName: '', bio: '', cityId: '', interests: [] },
@@ -69,12 +66,15 @@ export function ProfileEditPage(): React.JSX.Element {
       interests: profile.data.interests,
     });
   }, [form, profile.data]);
-  useEffect(
-    () => () => {
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
-    },
-    [previewUrl],
-  );
+  useEffect(() => {
+    if (!selectedPhoto) {
+      setPreviewUrl(null);
+      return;
+    }
+    const url = URL.createObjectURL(selectedPhoto);
+    setPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [selectedPhoto]);
 
   if (!loading && !user) {
     const returnTo = `${location.pathname}${location.search}${location.hash}`;

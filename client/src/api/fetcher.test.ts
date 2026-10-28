@@ -37,4 +37,30 @@ describe('waslFetch', () => {
     const [, options] = fetchMock.mock.calls[0] as [string, RequestInit];
     expect(new Headers(options.headers).get('Authorization')).toBe('Bearer session-token');
   });
+
+  it('preserves structured API error details', async () => {
+    authMocks.getCurrentAccessToken.mockResolvedValue(undefined);
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: false,
+      status: 409,
+      json: () => Promise.resolve({ message: 'Already exists' }),
+    }));
+    await expect(waslFetch('/api/v1/profile')).rejects.toMatchObject({
+      name: 'ApiError', status: 409, message: 'Already exists', body: { message: 'Already exists' },
+    });
+  });
+
+  it('aborts requests after the request timeout', async () => {
+    authMocks.getCurrentAccessToken.mockResolvedValue(undefined);
+    vi.useFakeTimers();
+    const fetchMock = vi.fn((_url: string, options: RequestInit) => new Promise((_resolve, reject) => {
+      options.signal?.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')));
+    }));
+    vi.stubGlobal('fetch', fetchMock);
+    const request = waslFetch('/api/v1/profile');
+    const rejection = expect(request).rejects.toMatchObject({ name: 'AbortError' });
+    await vi.advanceTimersByTimeAsync(30_000);
+    await rejection;
+    vi.useRealTimers();
+  });
 });

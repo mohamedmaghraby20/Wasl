@@ -20,6 +20,17 @@ export function NotificationsPage(): React.JSX.Element {
   const queryClient = useQueryClient();
   const notifications = useNotificationsControllerList({ query: { enabled: Boolean(user) } });
   const markRead = useNotificationsControllerMarkRead();
+  const safeHref = (href: string | null | undefined): string | undefined => {
+    if (!href) return undefined;
+    try {
+      const url = new URL(href, window.location.origin);
+      return url.origin === window.location.origin && url.pathname.startsWith('/')
+        ? `${url.pathname}${url.search}${url.hash}`
+        : undefined;
+    } catch {
+      return undefined;
+    }
+  };
   usePageMetadata(t('notifications'), t('notificationsDescription'), { noindex: true });
 
   if (!loading && !user) return <Navigate replace to="/sign-in?returnTo=%2Fnotifications" />;
@@ -70,10 +81,10 @@ export function NotificationsPage(): React.JSX.Element {
                     timeStyle: 'short',
                   }).format(new Date(item.createdAt))}
                 </time>
-                {item.href ? (
+                {safeHref(item.href) ? (
                   <Link
                     className="w-fit text-sm font-medium text-primary hover:underline"
-                    to={item.href}
+                    to={safeHref(item.href)!}
                   >
                     {t('viewNotificationContext')}
                   </Link>

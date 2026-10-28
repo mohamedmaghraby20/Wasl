@@ -452,7 +452,12 @@ export function OrganizationManagePage(): React.JSX.Element {
             id="organization-transfer-heading"
             title={t('organizationTransferOwnership')}
           >
-            {admins.length ? (
+            {managers.isError ? (
+              <QueryError
+                message={t('organizationManagersLoadError')}
+                onRetry={() => void managers.refetch()}
+              />
+            ) : admins.length ? (
               <form
                 className="grid gap-3 sm:flex sm:items-end"
                 onSubmit={(event) => void transfer(event)}

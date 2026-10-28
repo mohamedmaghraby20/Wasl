@@ -44,7 +44,6 @@ export function TextPromptDialog({
         <form className="mt-5 grid gap-4" onSubmit={onSubmit}>
           <Field error={error} id={id} label={label}>
             <Textarea
-              autoFocus
               id={id}
               maxLength={500}
               onChange={(event) => onValueChange(event.target.value)}

@@ -65,6 +65,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'profile',
+        handle: { requiresAuth: true },
         lazy: async () => {
           const { ProfilePage } = await import('@/features/profile/ProfilePage');
           return { Component: ProfilePage };
@@ -72,6 +73,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'activity',
+        handle: { requiresAuth: true },
         lazy: async () => {
           const { MyActivityPage } = await import('@/features/participation/MyActivityPage');
           return { Component: MyActivityPage };
@@ -79,6 +81,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'privacy',
+        handle: { requiresAuth: true },
         lazy: async () => {
           const { PrivacyDataPage } = await import('@/features/privacy/PrivacyDataPage');
           return { Component: PrivacyDataPage };
@@ -86,6 +89,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'messages',
+        handle: { requiresAuth: true },
         lazy: async () => {
           const { MessagesPage } = await import('@/features/messaging/MessagesPage');
           return { Component: MessagesPage };
@@ -93,6 +97,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'notifications',
+        handle: { requiresAuth: true },
         lazy: async () => {
           const { NotificationsPage } = await import('@/features/notifications/NotificationsPage');
           return { Component: NotificationsPage };
@@ -100,6 +105,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'admin',
+        handle: { requiresAuth: true },
         lazy: async () => {
           const { PlatformModerationPage } = await import(
             '@/features/moderation/PlatformModerationPage'
@@ -109,6 +115,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'profile/edit',
+        handle: { requiresAuth: true },
         lazy: async () => {
           const { ProfileEditPage } = await import('@/features/profile/ProfileEditPage');
           return { Component: ProfileEditPage };
@@ -125,6 +132,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'organizations/invitations/accept',
+        handle: { requiresAuth: true },
         lazy: async () => {
           const { OrganizationInvitationAcceptPage } = await import(
             '@/features/organizations/OrganizationInvitationAcceptPage'
@@ -143,6 +151,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'organizations/:slug/manage',
+        handle: { requiresAuth: true },
         lazy: async () => {
           const { OrganizationManagePage } = await import(
             '@/features/organizations/OrganizationManagePage'
@@ -152,6 +161,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'organizations/:slug/edit',
+        handle: { requiresAuth: true },
         lazy: async () => {
           const { OrganizationEditPage } = await import(
             '@/features/organizations/OrganizationEditPage'
@@ -161,6 +171,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'create',
+        handle: { requiresAuth: true },
         lazy: async () => {
           const { CreationStartPage } = await import('@/features/creation/CreationStartPage');
           return { Component: CreationStartPage };
@@ -168,6 +179,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'create/community',
+        handle: { requiresAuth: true },
         lazy: async () => {
           const { CommunityFormPage } = await import('@/features/creation/CommunityFormPage');
           return { Component: CommunityFormPage };
@@ -175,6 +187,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'create/event',
+        handle: { requiresAuth: true },
         lazy: async () => {
           const { EventFormPage } = await import('@/features/creation/EventFormPage');
           return { Component: EventFormPage };
@@ -182,6 +195,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'create/organization',
+        handle: { requiresAuth: true },
         lazy: async () => {
           const { OrganizationCreatePage } = await import(
             '@/features/organizations/OrganizationCreatePage'
@@ -191,6 +205,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'communities/:id/edit',
+        handle: { requiresAuth: true },
         lazy: async () => {
           const { CommunityFormPage } = await import('@/features/creation/CommunityFormPage');
           return { Component: CommunityFormPage };
@@ -198,6 +213,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'events/:id/edit',
+        handle: { requiresAuth: true },
         lazy: async () => {
           const { EventFormPage } = await import('@/features/creation/EventFormPage');
           return { Component: EventFormPage };

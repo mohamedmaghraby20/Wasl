@@ -77,11 +77,11 @@ export function DatePicker({
       <PopoverTrigger asChild>
         <button
           aria-describedby={ariaDescribedBy}
-          aria-invalid={ariaInvalid}
           aria-label={selected ? `${label}: ${formatter.format(selected)}` : label}
           className={cn(
             'flex h-11 w-full min-w-0 items-center gap-2 rounded-(--shape-radius-control) border border-input bg-background px-3 text-start text-sm shadow-xs transition-[border-color,box-shadow] duration-(--motion-duration-fast) hover:border-border-control-hover disabled:cursor-not-allowed disabled:opacity-(--opacity-disabled) aria-invalid:border-danger',
             !selected && 'text-text-subtle',
+            ariaInvalid && 'border-danger',
             className,
           )}
           disabled={disabled}

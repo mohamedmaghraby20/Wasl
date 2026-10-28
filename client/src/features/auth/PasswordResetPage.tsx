@@ -9,13 +9,15 @@ import { useAuth } from './AuthProvider';
 
 export function PasswordResetPage(): React.JSX.Element {
   const { t } = useTranslation();
-  const { configured, loading, user, requestPasswordReset, updatePassword } = useAuth();
+  const { configured, loading, user, passwordRecovery, signIn, requestPasswordReset, updatePassword } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [currentPassword, setCurrentPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [complete, setComplete] = useState(false);
   const updating = !loading && Boolean(user);
+  const requiresReauth = updating && !passwordRecovery;
 
   useHead({ title: t(updating ? 'authChoosePassword' : 'authResetPassword') });
 
@@ -24,7 +26,10 @@ export function PasswordResetPage(): React.JSX.Element {
     setBusy(true);
     setError('');
     try {
-      if (updating) await updatePassword(password);
+      if (updating) {
+        if (requiresReauth) await signIn(user!.email ?? '', currentPassword);
+        await updatePassword(password);
+      }
       else await requestPasswordReset(email.trim());
       setComplete(true);
     } catch {
@@ -64,17 +69,14 @@ export function PasswordResetPage(): React.JSX.Element {
         </p>
       ) : (
         <form className="mt-7 grid gap-5" onSubmit={(event) => void submit(event)}>
+          {requiresReauth ? (
+            <Field id="current-password" label={t('authCurrentPassword')}>
+              <Input autoComplete="current-password" id="current-password" onChange={(event) => setCurrentPassword(event.currentTarget.value)} required type="password" value={currentPassword} />
+            </Field>
+          ) : null}
           {updating ? (
             <Field id="reset-password" label={t('authNewPassword')}>
-              <Input
-                autoComplete="new-password"
-                id="reset-password"
-                minLength={8}
-                onChange={(event) => setPassword(event.currentTarget.value)}
-                required
-                type="password"
-                value={password}
-              />
+                <Input autoComplete="new-password" id="reset-password" minLength={8} onChange={(event) => setPassword(event.currentTarget.value)} required type="password" value={password} />
             </Field>
           ) : (
             <Field id="reset-email" label={t('authEmail')}>

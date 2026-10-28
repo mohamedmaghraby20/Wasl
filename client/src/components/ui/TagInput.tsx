@@ -88,12 +88,6 @@ export function TagInput({
         onBlur={commit}
         onChange={(event) => setDraft(event.target.value)}
         onKeyDown={onKeyDown}
-        onPaste={(event) => {
-          const pasted = event.clipboardData.getData('text');
-          if (!pasted.includes(',')) return;
-          event.preventDefault();
-          add(pasted);
-        }}
         placeholder={value.length >= max ? undefined : placeholder}
         value={draft}
       />
