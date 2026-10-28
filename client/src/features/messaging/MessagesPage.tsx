@@ -1,16 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
-import { StreamChat, type Channel as StreamChannel } from 'stream-chat';
-import {
-  Chat,
-  Channel,
-  MessageComposer,
-  MessageList,
-  Streami18n,
-  Thread,
-  Window,
-} from 'stream-chat-react';
-import 'stream-chat-react/dist/css/index.css';
-import './MessagesPage.css';
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
+import type { StreamChat, Channel as StreamChannel } from 'stream-chat';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
@@ -27,16 +16,18 @@ import {
   getMessagingControllerConversationsQueryKey,
   getMessagingControllerBlockedUsersQueryKey,
 } from '@/api/generated/messaging/messaging';
-import { ArrowLeft, MessageSquarePlus } from 'lucide-react';
+import { MessageSquarePlus } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Field } from '@/components/ui/Field';
 import { SearchableSelect } from '@/components/ui/SearchableSelect';
 import { TextPromptDialog } from '@/components/ui/TextPromptDialog';
 import { QueryError } from '@/components/feedback/QueryError';
+import { LoadingState } from '@/components/feedback/LoadingState';
 import { ApiError } from '@/api/fetcher';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { cn } from '@/lib/cn';
 import { useSearchParams } from 'react-router';
+
+const MessagesConversation = lazy(() => import('./MessagesConversation'));
 
 export function MessagesPage(): React.JSX.Element {
   const { t, i18n } = useTranslation();
@@ -127,7 +118,7 @@ export function MessagesPage(): React.JSX.Element {
     const auth = session;
     if (!auth || !user) return;
     let cancelled = false;
-    const stream = StreamChat.getInstance(auth.apiKey);
+    let stream: StreamChat;
     const onConnectionChanged = (event: { online?: boolean }) =>
       setStatus(event.online === false ? 'offline' : 'connected');
     let initialToken = true;
@@ -138,8 +129,10 @@ export function MessagesPage(): React.JSX.Element {
       }
       return (await messagingControllerSession()).token;
     };
-    void stream
-      .connectUser({ id: auth.userId }, tokenProvider)
+    void import('stream-chat').then(({ StreamChat }) => {
+      if (cancelled) return;
+      stream = StreamChat.getInstance(auth.apiKey);
+      return stream.connectUser({ id: auth.userId }, tokenProvider)
       .then(async () => {
         const latestConversations = await messagingControllerConversations();
         if (cancelled) {
@@ -157,10 +150,13 @@ export function MessagesPage(): React.JSX.Element {
       .catch(() => {
         if (!cancelled) setStatus('error');
       });
+    });
     return () => {
       cancelled = true;
-      stream.off('connection.changed', onConnectionChanged);
-      if (stream.userID) void stream.disconnectUser();
+      if (stream) {
+        stream.off('connection.changed', onConnectionChanged);
+        if (stream.userID) void stream.disconnectUser();
+      }
     };
   }, [session, user, queryClient]);
 
@@ -198,33 +194,6 @@ export function MessagesPage(): React.JSX.Element {
   }, [client, conversations.data, channelRetry, session?.userId]);
 
   const currentCid = selected?.cid;
-  const streamI18n = useMemo(() => {
-    const arabic = i18n.language.startsWith('ar');
-    return new Streami18n({
-      language: arabic ? 'ar' : 'en',
-      ...(arabic
-        ? {
-            translationsForLanguage: {
-              Actions: 'الإجراءات',
-              Attach: 'إرفاق',
-              Cancel: 'إلغاء',
-              Delete: 'حذف',
-              Edit: 'تعديل',
-              Edited: 'تم التعديل',
-              Reply: 'رد',
-              Send: 'إرسال',
-              Thread: 'سلسلة الردود',
-              Threads: 'سلاسل الردود',
-              'Send a message': 'أرسل رسالة',
-              'Send a message to start the conversation': 'أرسل رسالة لبدء المحادثة',
-              'No messages found': 'لم يتم العثور على رسائل',
-              'aria/Message input': 'مربع كتابة الرسالة',
-              'aria/There are no messages in this chat.': 'لا توجد رسائل في هذه المحادثة.',
-            },
-          }
-        : {}),
-    });
-  }, [i18n.language]);
   const selectedRecord = useMemo(
     () =>
       conversations.data?.find(
@@ -342,7 +311,7 @@ export function MessagesPage(): React.JSX.Element {
       </p>
     );
   if (sessionLoading || conversations.isPending || blockedUsers.isPending)
-    return <p role="status">{t('loadingMessages')}</p>;
+    return <LoadingState message={t('loadingMessages')} />;
   if (
     sessionError ||
     !session ||
@@ -360,7 +329,7 @@ export function MessagesPage(): React.JSX.Element {
         onRetry={retry}
       />
     );
-  if (status === 'connecting' || !client) return <p role="status">{t('loadingMessages')}</p>;
+  if (status === 'connecting' || !client) return <LoadingState message={t('loadingMessages')} />;
 
   return (
     <section
@@ -456,110 +425,24 @@ export function MessagesPage(): React.JSX.Element {
           {t('messageReported')}
         </p>
       ) : null}
-      <div
-        dir={i18n.dir()}
-        className="wasl-messaging overflow-hidden rounded-(--shape-radius-dialog) border border-border bg-card"
-        style={{ height: 'min(72vh, 760px)' }}
-      >
-        <Chat client={client} theme="str-chat__theme-light" i18nInstance={streamI18n}>
-          <div className="grid h-full grid-cols-1 md:grid-cols-[minmax(9rem,14rem)_1fr]">
-            <nav
-              aria-label={t('conversations')}
-              className={cn(
-                'overflow-y-auto border-e border-border p-2',
-                selected ? 'hidden md:block' : 'block',
-              )}
-            >
-              {channels.length === 0 ? (
-                <p className="p-3 text-sm">{t('noConversations')}</p>
-              ) : (
-                channels.map((channel) => {
-                  const record = conversations.data?.find(
-                    (item) => `messaging:${item.channelId}` === channel.cid,
-                  );
-                  const label =
-                    record?.kind === 'community'
-                      ? t('communityConversation')
-                      : record?.kind === 'event'
-                        ? t('eventConversation')
-                        : t('directConversation');
-                  return (
-                    <button
-                      aria-current={channel.cid === selected?.cid ? 'page' : undefined}
-                      className={`mb-1 min-h-11 w-full rounded-(--shape-radius-control) px-3 py-2.5 text-start text-sm transition-colors ${channel.cid === selected?.cid ? 'bg-primary-soft font-semibold text-primary-soft-text' : 'text-text-muted hover:bg-surface-soft hover:text-text'}`}
-                      key={channel.cid}
-                      onClick={() => setSelected(channel)}
-                    >
-                      {record?.title ?? label}
-                    </button>
-                  );
-                })
-              )}
-            </nav>
-            <div
-              className={cn(
-                'min-h-0 flex-col',
-                selected ? 'flex' : 'hidden md:flex',
-              )}
-            >
-              {selected ? (
-                <>
-                  <div className="flex flex-wrap items-center gap-2 border-b border-border p-2">
-                    <Button
-                      className="md:hidden"
-                      onClick={() => setSelected(null)}
-                      size="sm"
-                      variant="ghost"
-                    >
-                      <ArrowLeft aria-hidden="true" className="rtl:rotate-180" />
-                      {t('backToConversations')}
-                    </Button>
-                    {selectedRecord?.kind === 'dm' ? (
-                      <div className="ms-auto flex gap-2">
-                        <Button
-                          onClick={() => {
-                            setReportError(false);
-                            setSuccess(false);
-                            setReportOpen(true);
-                          }}
-                          size="sm"
-                          variant="ghost"
-                        >
-                          {t('reportUser')}
-                        </Button>
-                        {isBlocked ? (
-                          <Button onClick={() => void runUnblock()} size="sm" variant="ghost">
-                            {t('unblockUser')}
-                          </Button>
-                        ) : (
-                          <Button onClick={() => void runBlock()} size="sm" variant="ghost">
-                            {t('blockUser')}
-                          </Button>
-                        )}
-                      </div>
-                    ) : null}
-                  </div>
-                  {isBlocked ? (
-                    <p className="m-auto p-5 text-center">{t('conversationBlocked')}</p>
-                  ) : (
-                    <Channel channel={selected}>
-                      <Window>
-                        <MessageList />
-                        <MessageComposer />
-                        <Thread />
-                      </Window>
-                    </Channel>
-                  )}
-                </>
-              ) : (
-                <p className="m-auto p-5 text-center text-sm text-text-muted">
-                  {t('selectConversation')}
-                </p>
-              )}
-            </div>
-          </div>
-        </Chat>
-      </div>
+      <Suspense fallback={<LoadingState message={t('loadingMessages')} />}>
+        <MessagesConversation
+          client={client}
+          channels={channels}
+          conversations={conversations.data ?? []}
+          selected={selected}
+          selectedRecord={selectedRecord}
+          isBlocked={isBlocked}
+          language={i18n.language}
+          direction={i18n.dir()}
+          t={t}
+          onSelect={setSelected}
+          onBack={() => setSelected(null)}
+          onReport={() => { setReportError(false); setSuccess(false); setReportOpen(true); }}
+          onBlock={() => void runBlock()}
+          onUnblock={() => void runUnblock()}
+        />
+      </Suspense>
       <TextPromptDialog
         description={t('messageReportReason')}
         error={reportError ? t('messagingActionError') : undefined}
