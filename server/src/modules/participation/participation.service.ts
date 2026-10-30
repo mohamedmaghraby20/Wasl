@@ -499,7 +499,7 @@ export class ParticipationService {
           ),
         )
         .orderBy(communityMemberships.requestedAt)
-        .limit(6),
+        .limit(12),
       this.communityHost(communityId),
     ]);
     return {
@@ -576,6 +576,133 @@ export class ParticipationService {
       admissionMode: event.admissionMode,
       ...countStatuses(counts),
     };
+  }
+
+  async eventAttendees(user: AuthenticatedUser, eventId: string) {
+    await this.assertCanViewEventAttendees(user, eventId);
+    const rows = await this.database()
+      .select({
+        userId: profiles.id,
+        displayName: profiles.displayName,
+        avatarPath: profiles.avatarPath,
+      })
+      .from(eventRegistrations)
+      .innerJoin(profiles, eq(profiles.id, eventRegistrations.userId))
+      .where(
+        and(
+          eq(eventRegistrations.eventId, eventId),
+          inArray(eventRegistrations.status, ['ACCEPTED', 'ATTENDED', 'NO_SHOW']),
+        ),
+      )
+      .orderBy(eventRegistrations.requestedAt);
+    const host = await this.eventHost(eventId);
+    const attendees = rows
+      .filter((person) => person.userId !== host?.userId)
+      .map(({ avatarPath, ...person }) => ({
+        ...person,
+        isHost: false,
+        avatarUrl: this.publicAvatarUrl(avatarPath),
+      }));
+    return host
+      ? [
+          {
+            userId: host.userId,
+            displayName: host.displayName,
+            avatarUrl: this.publicAvatarUrl(host.avatarPath),
+            isHost: true,
+          },
+          ...attendees,
+        ]
+      : attendees;
+  }
+
+  async eventAttendeePreview(user: AuthenticatedUser, eventId: string) {
+    await this.assertCanViewEventAttendees(user, eventId);
+    const db = this.database();
+    const [totals, attendees, host] = await Promise.all([
+      db
+        .select({ total: count() })
+        .from(eventRegistrations)
+        .where(
+          and(
+            eq(eventRegistrations.eventId, eventId),
+            inArray(eventRegistrations.status, ['ACCEPTED', 'ATTENDED', 'NO_SHOW']),
+          ),
+        ),
+      db
+        .select({
+          userId: profiles.id,
+          displayName: profiles.displayName,
+          avatarPath: profiles.avatarPath,
+        })
+        .from(eventRegistrations)
+        .innerJoin(profiles, eq(profiles.id, eventRegistrations.userId))
+        .where(
+          and(
+            eq(eventRegistrations.eventId, eventId),
+            inArray(eventRegistrations.status, ['ACCEPTED', 'ATTENDED', 'NO_SHOW']),
+          ),
+        )
+        .orderBy(eventRegistrations.requestedAt)
+        .limit(6),
+      this.eventHost(eventId),
+    ]);
+    return {
+      host: host
+        ? {
+            userId: host.userId,
+            displayName: host.displayName,
+            avatarUrl: this.publicAvatarUrl(host.avatarPath),
+            isHost: true,
+          }
+        : null,
+      total: Number(totals[0]?.total ?? 0) + (host && !host.isMember ? 1 : 0),
+      members: attendees.map(({ avatarPath, ...person }) => ({
+        ...person,
+        isHost: person.userId === host?.userId,
+        avatarUrl: this.publicAvatarUrl(avatarPath),
+      })),
+    };
+  }
+
+  private async eventHost(eventId: string) {
+    const [host] = await this.database()
+      .select({
+        userId: profiles.id,
+        displayName: profiles.displayName,
+        avatarPath: profiles.avatarPath,
+        isMember: sql<boolean>`exists (select 1 from ${eventRegistrations} where ${eventRegistrations.eventId} = ${eventId} and ${eventRegistrations.userId} = ${profiles.id} and ${eventRegistrations.status} in ('ACCEPTED', 'ATTENDED', 'NO_SHOW'))`,
+      })
+      .from(events)
+      .innerJoin(
+        profiles,
+        sql`${profiles.id}::text = case when ${events.hostType} = 'user' then ${events.hostId} else ${events.createdByUserId}::text end`,
+      )
+      .where(eq(events.id, eventId))
+      .limit(1);
+    return host;
+  }
+
+  private async assertCanViewEventAttendees(user: AuthenticatedUser, eventId: string) {
+    try {
+      await this.eventsService.assertCanManageById(user, eventId);
+      return;
+    } catch (error) {
+      if (!(error instanceof ForbiddenException)) throw error;
+    }
+    const [registration] = await this.database()
+      .select({ id: eventRegistrations.id })
+      .from(eventRegistrations)
+      .where(
+        and(
+          eq(eventRegistrations.eventId, eventId),
+          eq(eventRegistrations.userId, user.id),
+          inArray(eventRegistrations.status, ['ACCEPTED', 'ATTENDED', 'NO_SHOW']),
+        ),
+      )
+      .limit(1);
+    if (!registration)
+      throw new ForbiddenException('Register for this event to view its attendees.');
   }
 
   async decideCommunity(

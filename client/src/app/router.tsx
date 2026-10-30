@@ -67,6 +67,14 @@ export const router = createBrowserRouter([
         },
       },
       {
+        path: 'events/:id/attendees',
+        handle: { requiresAuth: true },
+        lazy: async () => {
+          const { CommunityMembersPage } = await import('@/features/participation/CommunityMembersPage');
+          return { Component: () => <CommunityMembersPage kind="events" /> };
+        },
+      },
+      {
         path: 'events/:id',
         lazy: async () => {
           const { ResourceDetailsPage } = await import('@/features/discovery/ResourceDetailsPage');

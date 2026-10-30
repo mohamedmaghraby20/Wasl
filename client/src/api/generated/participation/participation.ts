@@ -1147,6 +1147,194 @@ export function useParticipationControllerEventParticipants<TData = Awaited<Retu
 
 
 
+export const getParticipationControllerEventAttendeesUrl = (id: string,) => {
+
+
+
+
+  return `/api/v1/events/${id}/attendees`
+}
+
+export const participationControllerEventAttendees = async (id: string, options?: Parameters<typeof waslFetch>[1]): Promise<CommunityMemberDto[]> => {
+
+  return waslFetch<CommunityMemberDto[]>(getParticipationControllerEventAttendeesUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getParticipationControllerEventAttendeesQueryKey = (id: string,) => {
+    return [
+    `/api/v1/events/${id}/attendees`
+    ] as const;
+    }
+
+
+export const getParticipationControllerEventAttendeesQueryOptions = <TData = Awaited<ReturnType<typeof participationControllerEventAttendees>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof participationControllerEventAttendees>>, TError, TData>>, request?: SecondParameter<typeof waslFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getParticipationControllerEventAttendeesQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof participationControllerEventAttendees>>> = ({ signal }) => participationControllerEventAttendees(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof participationControllerEventAttendees>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ParticipationControllerEventAttendeesQueryResult = NonNullable<Awaited<ReturnType<typeof participationControllerEventAttendees>>>
+export type ParticipationControllerEventAttendeesQueryError = unknown
+
+
+export function useParticipationControllerEventAttendees<TData = Awaited<ReturnType<typeof participationControllerEventAttendees>>, TError = unknown>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof participationControllerEventAttendees>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof participationControllerEventAttendees>>,
+          TError,
+          Awaited<ReturnType<typeof participationControllerEventAttendees>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof waslFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useParticipationControllerEventAttendees<TData = Awaited<ReturnType<typeof participationControllerEventAttendees>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof participationControllerEventAttendees>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof participationControllerEventAttendees>>,
+          TError,
+          Awaited<ReturnType<typeof participationControllerEventAttendees>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof waslFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useParticipationControllerEventAttendees<TData = Awaited<ReturnType<typeof participationControllerEventAttendees>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof participationControllerEventAttendees>>, TError, TData>>, request?: SecondParameter<typeof waslFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useParticipationControllerEventAttendees<TData = Awaited<ReturnType<typeof participationControllerEventAttendees>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof participationControllerEventAttendees>>, TError, TData>>, request?: SecondParameter<typeof waslFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getParticipationControllerEventAttendeesQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+export const getParticipationControllerEventAttendeePreviewUrl = (id: string,) => {
+
+
+
+
+  return `/api/v1/events/${id}/attendee-preview`
+}
+
+export const participationControllerEventAttendeePreview = async (id: string, options?: Parameters<typeof waslFetch>[1]): Promise<CommunityMemberPreviewDto> => {
+
+  return waslFetch<CommunityMemberPreviewDto>(getParticipationControllerEventAttendeePreviewUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getParticipationControllerEventAttendeePreviewQueryKey = (id: string,) => {
+    return [
+    `/api/v1/events/${id}/attendee-preview`
+    ] as const;
+    }
+
+
+export const getParticipationControllerEventAttendeePreviewQueryOptions = <TData = Awaited<ReturnType<typeof participationControllerEventAttendeePreview>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof participationControllerEventAttendeePreview>>, TError, TData>>, request?: SecondParameter<typeof waslFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getParticipationControllerEventAttendeePreviewQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof participationControllerEventAttendeePreview>>> = ({ signal }) => participationControllerEventAttendeePreview(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof participationControllerEventAttendeePreview>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ParticipationControllerEventAttendeePreviewQueryResult = NonNullable<Awaited<ReturnType<typeof participationControllerEventAttendeePreview>>>
+export type ParticipationControllerEventAttendeePreviewQueryError = unknown
+
+
+export function useParticipationControllerEventAttendeePreview<TData = Awaited<ReturnType<typeof participationControllerEventAttendeePreview>>, TError = unknown>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof participationControllerEventAttendeePreview>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof participationControllerEventAttendeePreview>>,
+          TError,
+          Awaited<ReturnType<typeof participationControllerEventAttendeePreview>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof waslFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useParticipationControllerEventAttendeePreview<TData = Awaited<ReturnType<typeof participationControllerEventAttendeePreview>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof participationControllerEventAttendeePreview>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof participationControllerEventAttendeePreview>>,
+          TError,
+          Awaited<ReturnType<typeof participationControllerEventAttendeePreview>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof waslFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useParticipationControllerEventAttendeePreview<TData = Awaited<ReturnType<typeof participationControllerEventAttendeePreview>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof participationControllerEventAttendeePreview>>, TError, TData>>, request?: SecondParameter<typeof waslFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useParticipationControllerEventAttendeePreview<TData = Awaited<ReturnType<typeof participationControllerEventAttendeePreview>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof participationControllerEventAttendeePreview>>, TError, TData>>, request?: SecondParameter<typeof waslFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getParticipationControllerEventAttendeePreviewQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 export const getParticipationControllerEventCountsUrl = (id: string,) => {
 
 

@@ -63,6 +63,7 @@ import {
 } from '@/api/generated/messaging/messaging';
 import { ResourceOverview } from './ResourceOverview';
 import { CommunityMemberPreview } from '@/features/participation/CommunityMemberPreview';
+import { EventAttendeePreview } from '@/features/participation/EventAttendeePreview';
 
 export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX.Element {
   const { t, i18n } = useTranslation();
@@ -398,7 +399,10 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
       {communityItem &&
       currentUser.isSuccess &&
       (isManager || participationStatus === 'ACTIVE') ? (
-        <CommunityMemberPreview communityId={communityItem.id} />
+        <CommunityMemberPreview communityId={communityItem.id} viewerId={currentUser.data?.id} />
+      ) : null}
+      {eventItem && currentUser.isSuccess && (isManager || ['ACCEPTED', 'ATTENDED', 'NO_SHOW'].includes(participationStatus ?? '')) ? (
+        <EventAttendeePreview eventId={eventItem.id} />
       ) : null}
       {isManager && communityItem ? (
         <details

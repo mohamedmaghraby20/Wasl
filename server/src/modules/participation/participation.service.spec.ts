@@ -152,6 +152,44 @@ describe('ParticipationService', () => {
     expect(database.select).toHaveBeenCalledTimes(1);
   });
 
+  it('denies event attendee lists to users without an accepted registration', async () => {
+    const database = { select: vi.fn(() => query([])) };
+    const service = new ParticipationService(
+      database as unknown as Database,
+      {} as CommunitiesService,
+      {
+        assertCanManageById: vi.fn().mockRejectedValue(new ForbiddenException()),
+      } as unknown as EventsService,
+    );
+    await expect(service.eventAttendees(user, 'event')).rejects.toBeInstanceOf(ForbiddenException);
+    await expect(service.eventAttendeePreview(user, 'event')).rejects.toBeInstanceOf(
+      ForbiddenException,
+    );
+    expect(database.select).toHaveBeenCalledTimes(2);
+  });
+
+  it('returns accepted event attendees to an attendee without exposing registration details', async () => {
+    const database = {
+      select: vi
+        .fn()
+        .mockImplementationOnce(() => query([{ id: 'registration' }]))
+        .mockImplementationOnce(() =>
+          query([{ userId: 'attendee-id', displayName: 'Attendee', avatarPath: null }]),
+        )
+        .mockImplementationOnce(() => query([])),
+    };
+    const service = new ParticipationService(
+      database as unknown as Database,
+      {} as CommunitiesService,
+      {
+        assertCanManageById: vi.fn().mockRejectedValue(new ForbiddenException()),
+      } as unknown as EventsService,
+    );
+    await expect(service.eventAttendees(user, 'event')).resolves.toEqual([
+      { userId: 'attendee-id', displayName: 'Attendee', avatarUrl: null, isHost: false },
+    ]);
+  });
+
   it('includes the owner as the preview host even without a membership row', async () => {
     const database = {
       select: vi

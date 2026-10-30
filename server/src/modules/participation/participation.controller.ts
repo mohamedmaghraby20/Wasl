@@ -57,19 +57,19 @@ export class ParticipationController {
 
   @Post('events/:id/register')
   @ApiOkResponse({ type: RegistrationStateDto })
-  registerForEvent(@Req() request: FastifyRequest, @Param('id', ParseUUIDPipe) id: string) {
+  registerForEvent(@Req() request: FastifyRequest, @Param('id') id: string) {
     return this.participation.registerForEvent(getAuthenticatedUser(request), id);
   }
 
   @Patch('events/:id/cancel-registration')
   @ApiOkResponse({ type: RegistrationStateDto })
-  cancelEventRegistration(@Req() request: FastifyRequest, @Param('id', ParseUUIDPipe) id: string) {
+  cancelEventRegistration(@Req() request: FastifyRequest, @Param('id') id: string) {
     return this.participation.cancelEventRegistration(getAuthenticatedUser(request), id);
   }
 
   @Get('events/:id/registration')
   @ApiOkResponse({ type: RegistrationStateDto })
-  eventStatus(@Req() request: FastifyRequest, @Param('id', ParseUUIDPipe) id: string) {
+  eventStatus(@Req() request: FastifyRequest, @Param('id') id: string) {
     return this.participation.myEventStatus(getAuthenticatedUser(request), id);
   }
 
@@ -117,13 +117,25 @@ export class ParticipationController {
 
   @Get('events/:id/participants')
   @ApiOkResponse({ type: ParticipantListItemDto, isArray: true })
-  eventParticipants(@Req() request: FastifyRequest, @Param('id', ParseUUIDPipe) id: string) {
+  eventParticipants(@Req() request: FastifyRequest, @Param('id') id: string) {
     return this.participation.eventParticipants(getAuthenticatedUser(request), id);
+  }
+
+  @Get('events/:id/attendees')
+  @ApiOkResponse({ type: CommunityMemberDto, isArray: true })
+  eventAttendees(@Req() request: FastifyRequest, @Param('id') id: string) {
+    return this.participation.eventAttendees(getAuthenticatedUser(request), id);
+  }
+
+  @Get('events/:id/attendee-preview')
+  @ApiOkResponse({ type: CommunityMemberPreviewDto })
+  eventAttendeePreview(@Req() request: FastifyRequest, @Param('id') id: string) {
+    return this.participation.eventAttendeePreview(getAuthenticatedUser(request), id);
   }
 
   @Get('events/:id/participation-counts')
   @ApiOkResponse({ type: ParticipationCountsDto })
-  eventCounts(@Req() request: FastifyRequest, @Param('id', ParseUUIDPipe) id: string) {
+  eventCounts(@Req() request: FastifyRequest, @Param('id') id: string) {
     return this.participation.eventCounts(getAuthenticatedUser(request), id);
   }
 
@@ -131,7 +143,7 @@ export class ParticipationController {
   @ApiOkResponse({ type: ParticipationDecisionDto })
   eventDecision(
     @Req() request: FastifyRequest,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @Param('participantId', ParseUUIDPipe) participantId: string,
     @Param('action') action: string,
   ) {

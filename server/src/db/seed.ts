@@ -453,15 +453,17 @@ async function run(): Promise<void> {
         .insert(eventRegistrations)
         .values(
           eventRows.flatMap((event, index) => {
-            const status = index % 2 === 0 ? ('ACCEPTED' as const) : ('PENDING' as const);
-            return [index, (index + 1) % sampleAttendees.length].map((attendeeIndex) => ({
+            return Array.from({ length: index % 2 === 0 ? 4 : 6 }, (_, offset) => ({
               eventId: event.id,
-              userId: sampleAttendees[attendeeIndex]!.id,
-              status,
+              userId: sampleAttendees[(index + offset) % sampleAttendees.length]!.id,
+              status: offset < 4 ? ('ACCEPTED' as const) : ('PENDING' as const),
             }));
           }),
         )
-        .onConflictDoNothing();
+        .onConflictDoUpdate({
+          target: [eventRegistrations.eventId, eventRegistrations.userId],
+          set: { status: sql`excluded.status` },
+        });
       await tx
         .insert(eventCategories)
         .values(

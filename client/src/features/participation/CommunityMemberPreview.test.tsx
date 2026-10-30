@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { I18nextProvider } from 'react-i18next';
 import { MemoryRouter } from 'react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -42,8 +42,12 @@ describe('CommunityMemberPreview', () => {
     );
 
     expect(screen.getByRole('link', { name: /Samira/ })).toHaveAttribute('href', '/users/user-1');
-    expect(within(screen.getAllByRole('listitem')[0]!).getByText('Host')).toBeVisible();
-    expect(screen.getByText('+3 more')).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Organizers' })).toBeVisible();
+    expect(screen.getByRole('link', { name: 'Message' })).toHaveAttribute(
+      'href',
+      '/messages?to=host-1',
+    );
+    expect(screen.queryByText('+3 more')).not.toBeInTheDocument();
     expect(screen.getByAltText('')).toHaveAttribute('src', 'https://example.test/photo.jpg');
     expect(screen.getByText('B')).toBeVisible();
     expect(screen.getByRole('link', { name: 'See all' })).toHaveAttribute(

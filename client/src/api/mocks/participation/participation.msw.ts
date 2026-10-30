@@ -54,6 +54,10 @@ export const getParticipationControllerCommunityDecisionResponseMock = (override
 
 export const getParticipationControllerEventParticipantsResponseMock = (): ParticipantListItemDto[] => (Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), userId: faker.string.uuid(), displayName: faker.string.alpha({length: {min: 10, max: 20}}), avatarUrl: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), status: faker.string.alpha({length: {min: 10, max: 20}}), requestedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})))
 
+export const getParticipationControllerEventAttendeesResponseMock = (): CommunityMemberDto[] => (Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({isHost: faker.datatype.boolean(), userId: faker.string.uuid(), displayName: faker.string.alpha({length: {min: 10, max: 20}}), avatarUrl: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null])})))
+
+export const getParticipationControllerEventAttendeePreviewResponseMock = (overrideResponse: Partial<Extract<CommunityMemberPreviewDto, object>> = {}): CommunityMemberPreviewDto => ({host: faker.helpers.arrayElement([{isHost: faker.datatype.boolean(), userId: faker.string.uuid(), displayName: faker.string.alpha({length: {min: 10, max: 20}}), avatarUrl: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null])},null,]), total: faker.number.float({fractionDigits: 2}), members: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({isHost: faker.datatype.boolean(), userId: faker.string.uuid(), displayName: faker.string.alpha({length: {min: 10, max: 20}}), avatarUrl: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null])})), ...overrideResponse})
+
 export const getParticipationControllerEventCountsResponseMock = (overrideResponse: Partial<Extract<ParticipationCountsDto, object>> = {}): ParticipationCountsDto => ({capacity: faker.string.alpha({length: {min: 10, max: 20}}), admissionMode: faker.string.alpha({length: {min: 10, max: 20}}), PENDING: faker.number.float({fractionDigits: 2}), WAITLISTED: faker.number.float({fractionDigits: 2}), ACTIVE: faker.number.float({fractionDigits: 2}), ACCEPTED: faker.number.float({fractionDigits: 2}), REJECTED: faker.number.float({fractionDigits: 2}), LEFT: faker.number.float({fractionDigits: 2}), REMOVED: faker.number.float({fractionDigits: 2}), CANCELLED_BY_USER: faker.number.float({fractionDigits: 2}), REMOVED_BY_ORGANIZER: faker.number.float({fractionDigits: 2}), ATTENDED: faker.number.float({fractionDigits: 2}), NO_SHOW: faker.number.float({fractionDigits: 2}), ...overrideResponse})
 
 export const getParticipationControllerEventDecisionResponseMock = (overrideResponse: Partial<Extract<ParticipationDecisionDto, object>> = {}): ParticipationDecisionDto => ({participantId: faker.string.uuid(), status: faker.string.alpha({length: {min: 10, max: 20}}), messagingSyncPending: faker.datatype.boolean(), ...overrideResponse})
@@ -215,6 +219,30 @@ export const getParticipationControllerEventParticipantsMockHandler = (overrideR
   }, options)
 }
 
+export const getParticipationControllerEventAttendeesMockHandler = (overrideResponse?: CommunityMemberDto[] | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<CommunityMemberDto[]> | CommunityMemberDto[]), options?: RequestHandlerOptions) => {
+  return http.get('*/api/v1/events/:id/attendees', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getParticipationControllerEventAttendeesResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getParticipationControllerEventAttendeePreviewMockHandler = (overrideResponse?: CommunityMemberPreviewDto | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<CommunityMemberPreviewDto> | CommunityMemberPreviewDto), options?: RequestHandlerOptions) => {
+  return http.get('*/api/v1/events/:id/attendee-preview', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getParticipationControllerEventAttendeePreviewResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
 export const getParticipationControllerEventCountsMockHandler = (overrideResponse?: ParticipationCountsDto | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ParticipationCountsDto> | ParticipationCountsDto), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/events/:id/participation-counts', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
@@ -252,6 +280,8 @@ export const getParticipationMock = () => [
   getParticipationControllerCommunityMemberPreviewMockHandler(),
   getParticipationControllerCommunityDecisionMockHandler(),
   getParticipationControllerEventParticipantsMockHandler(),
+  getParticipationControllerEventAttendeesMockHandler(),
+  getParticipationControllerEventAttendeePreviewMockHandler(),
   getParticipationControllerEventCountsMockHandler(),
   getParticipationControllerEventDecisionMockHandler()
 ]

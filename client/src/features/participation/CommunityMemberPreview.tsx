@@ -2,133 +2,104 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { useParticipationControllerCommunityMemberPreview } from '@/api/generated/participation/participation';
 import { QueryError } from '@/components/feedback/QueryError';
+import { Avatar } from './ParticipantAvatar';
 
 export function CommunityMemberPreview({
   communityId,
+  viewerId,
 }: {
   communityId: string;
+  viewerId?: string;
 }): React.JSX.Element {
   const { t } = useTranslation();
-  const members = useParticipationControllerCommunityMemberPreview(communityId);
-  const host = members.data?.host;
+  const query = useParticipationControllerCommunityMemberPreview(communityId);
+  if (query.isPending) return <p role="status">{t('loadingParticipation')}</p>;
+  if (query.isError)
+    return (
+      <QueryError message={t('loadCommunityMembersError')} onRetry={() => void query.refetch()} />
+    );
+  const { host, members, total } = query.data;
   const people = [
-    ...(host ? [{ ...host, isHost: true }] : []),
-    ...(members.data?.members
-      .filter((member) => member.userId !== host?.userId)
-      .map((member) => ({ ...member, isHost: false })) ?? []),
-  ];
-  const total = members.data?.total ?? 0;
-  const visiblePeople = people.slice(0, total > 4 ? 3 : 4);
-  const remaining = total - visiblePeople.length;
-
+    ...(host ? [host] : []),
+    ...members.filter((member) => member.userId !== host?.userId),
+  ].slice(0, 12);
   return (
-    <section aria-labelledby="community-members-heading" className="grid gap-8 py-2">
-      <div className="flex items-center justify-between gap-3">
-        <h2
-          className="flex items-center gap-3 font-heading text-2xl font-extrabold"
-          id="community-members-heading"
+    <div className="grid w-full max-w-lg gap-4">
+      {host ? (
+        <section
+          aria-labelledby="community-organizers-heading"
+          className="grid gap-4 rounded-(--shape-radius-2xl) border border-border bg-card p-6 shadow-xs sm:p-8"
         >
-          {t('attendees')}
-          {!members.isPending && !members.isError ? (
-            <span className="inline-flex min-w-8 items-center justify-center rounded-full border border-border px-2 py-1 text-xs font-medium">
-              {total}
-            </span>
-          ) : null}
-        </h2>
-        {members.data?.total ? (
-          <Link
-            className="text-sm font-semibold text-primary-soft-text hover:underline"
-            to={`/communities/${communityId}/members`}
-          >
-            {t('seeAll')}
-          </Link>
-        ) : null}
-      </div>
-      {members.isPending ? (
-        <p className="text-sm text-text-muted" role="status">
-          {t('loadingParticipation')}
-        </p>
-      ) : members.isError ? (
-        <QueryError
-          message={t('loadCommunityMembersError')}
-          onRetry={() => void members.refetch()}
-        />
-      ) : people.length ? (
-        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {visiblePeople.map((member) => (
-            <li key={member.userId}>
+          <h2 className="font-heading text-2xl font-extrabold" id="community-organizers-heading">
+            {t('organizers')}
+          </h2>
+          <div className="flex items-center gap-4">
+            <Link
+              aria-label={host.displayName}
+              className="[&>span]:size-12"
+              to={`/users/${host.userId}`}
+            >
+              <Avatar displayName={host.displayName} avatarUrl={host.avatarUrl} />
+            </Link>
+            <div className="min-w-0">
               <Link
-                className="flex min-h-56 h-full flex-col items-center rounded-(--shape-radius-2xl) border border-border bg-card px-3 py-5 text-center shadow-xs transition-colors hover:bg-surface-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                to={`/users/${member.userId}`}
+                className="block truncate text-lg font-semibold hover:underline"
+                to={`/users/${host.userId}`}
               >
-                <span className="relative mb-5 [&>span:first-child]:size-22">
-                  <Avatar displayName={member.displayName} avatarUrl={member.avatarUrl} />
-                  {member.isHost ? (
-                    <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 rounded-full border-2 border-card bg-primary-soft px-2.5 py-1 text-xs font-bold text-primary-soft-text">
-                      {t('attendeeHost')}
-                    </span>
-                  ) : null}
-                </span>
-                <span className="line-clamp-2 max-w-full break-words text-base font-semibold">
-                  {member.displayName}
-                </span>
-                <span className="mt-1 text-sm text-text-muted">
-                  {t(member.isHost ? 'attendeeOrganizer' : 'attendeeMember')}
-                </span>
+                {host.displayName}
               </Link>
-            </li>
-          ))}
-          {remaining > 0 ? (
-            <li>
-              <Link
-                className="flex min-h-56 h-full flex-col items-center rounded-(--shape-radius-2xl) border border-border bg-card px-3 py-5 text-center shadow-xs hover:bg-surface-soft"
-                to={`/communities/${communityId}/members`}
-              >
-                <span
-                  aria-hidden="true"
-                  className="mb-5 grid size-22 grid-cols-2 gap-1 [&_span]:size-full [&_span]:text-sm"
+              {host.userId !== viewerId ? (
+                <Link
+                  className="mt-1 block text-sm font-semibold text-primary-soft-text hover:underline"
+                  to={`/messages?to=${encodeURIComponent(host.userId)}`}
                 >
-                  {people.slice(3, 6).map((person) => (
-                    <Avatar
-                      key={person.userId}
-                      displayName={person.displayName}
-                      avatarUrl={person.avatarUrl}
-                    />
-                  ))}
-                  <span className="grid place-items-center rounded-full bg-primary-soft text-xs font-bold text-primary-soft-text">
-                    +{remaining}
-                  </span>
-                </span>
-                <span className="font-semibold">{t('attendeesMore', { count: remaining })}</span>
-                <span className="mt-1 text-sm text-text-muted">{t('attendees')}</span>
-              </Link>
-            </li>
+                  {t('messageOrganizer')}
+                </Link>
+              ) : null}
+            </div>
+          </div>
+        </section>
+      ) : null}
+      <section
+        aria-labelledby="community-members-heading"
+        className="grid gap-6 rounded-(--shape-radius-2xl) border border-border bg-card p-6 shadow-xs sm:p-8"
+      >
+        <div className="flex items-center justify-between gap-3">
+          <h2
+            className="flex items-baseline gap-3 font-heading text-2xl font-extrabold"
+            id="community-members-heading"
+          >
+            {t('communityMembers')}{' '}
+            <span className="text-sm font-medium text-text-muted">{total}</span>
+          </h2>
+          {total ? (
+            <Link
+              className="text-sm font-semibold text-primary-soft-text hover:underline"
+              to={`/communities/${communityId}/members`}
+            >
+              {t('seeAll')}
+            </Link>
           ) : null}
-        </ul>
-      ) : (
-        <p className="text-sm text-text-muted">{t('noParticipantsYet')}</p>
-      )}
-    </section>
-  );
-}
-
-export function Avatar({
-  displayName,
-  avatarUrl,
-}: {
-  displayName: string;
-  avatarUrl: string | null;
-}): React.JSX.Element {
-  return (
-    <span
-      aria-hidden="true"
-      className="grid size-16 place-items-center overflow-hidden rounded-full bg-primary-soft text-xl font-bold text-primary-soft-text"
-    >
-      {avatarUrl ? (
-        <img alt="" className="size-full object-cover" src={avatarUrl} />
-      ) : (
-        displayName.trim().slice(0, 1).toLocaleUpperCase()
-      )}
-    </span>
+        </div>
+        {people.length ? (
+          <ul className="grid grid-cols-4 gap-3 min-[420px]:grid-cols-6 sm:gap-4">
+            {people.map((member) => (
+              <li key={member.userId}>
+                <Link
+                  aria-label={member.displayName}
+                  className="block w-fit rounded-full [&>span]:size-11 sm:[&>span]:size-12"
+                  title={member.displayName}
+                  to={`/users/${member.userId}`}
+                >
+                  <Avatar displayName={member.displayName} avatarUrl={member.avatarUrl} />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-text-muted">{t('noParticipantsYet')}</p>
+        )}
+      </section>
+    </div>
   );
 }

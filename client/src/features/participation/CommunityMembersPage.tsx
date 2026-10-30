@@ -2,18 +2,28 @@ import { useState } from 'react';
 import { ArrowLeft, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router';
-import { useParticipationControllerCommunityMembers } from '@/api/generated/participation/participation';
-import { useDiscoveryControllerCommunity } from '@/api/generated/discovery/discovery';
+import {
+  useParticipationControllerCommunityMembers,
+  useParticipationControllerEventAttendees,
+} from '@/api/generated/participation/participation';
+import {
+  useDiscoveryControllerCommunity,
+  useDiscoveryControllerEvent,
+} from '@/api/generated/discovery/discovery';
 import { ApiError } from '@/api/fetcher';
 import { QueryError } from '@/components/feedback/QueryError';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Field } from '@/components/ui/Field';
 import { Input } from '@/components/ui/Input';
 import { languageCode, localizedResourceTitle } from '@/features/resources/resource-utils';
-import { Avatar } from './CommunityMemberPreview';
+import { Avatar } from './ParticipantAvatar';
 import { usePageMetadata } from '../discovery/usePageMetadata';
 
-export function CommunityMembersPage(): React.JSX.Element {
+export function CommunityMembersPage({
+  kind = 'communities',
+}: {
+  kind?: 'communities' | 'events';
+}): React.JSX.Element {
   const { t, i18n } = useTranslation();
   const { id = '' } = useParams();
   const [search, setSearch] = useState('');
@@ -21,13 +31,29 @@ export function CommunityMembersPage(): React.JSX.Element {
   const community = useDiscoveryControllerCommunity(
     id,
     { lang: language },
-    { query: { enabled: Boolean(id) } },
+    { query: { enabled: Boolean(id) && kind === 'communities' } },
   );
-  const members = useParticipationControllerCommunityMembers(id, {
-    query: { enabled: Boolean(id) },
+  const event = useDiscoveryControllerEvent(
+    id,
+    { lang: language },
+    {
+      query: { enabled: Boolean(id) && kind === 'events' },
+    },
+  );
+  const communityMembers = useParticipationControllerCommunityMembers(id, {
+    query: { enabled: Boolean(id) && kind === 'communities' },
   });
-  const communityTitle = community.data ? localizedResourceTitle(community.data) : t('community');
-  usePageMetadata(t('attendees'), communityTitle);
+  const eventAttendees = useParticipationControllerEventAttendees(id, {
+    query: { enabled: Boolean(id) && kind === 'events' },
+  });
+  const members = kind === 'events' ? eventAttendees : communityMembers;
+  const resource = kind === 'events' ? event : community;
+  const communityTitle = resource.data
+    ? localizedResourceTitle(resource.data)
+    : t(kind === 'events' ? 'event' : 'community');
+  const heading = kind === 'events' ? 'attendees' : 'communityMembers';
+  const backLabel = kind === 'events' ? 'eventDetails' : 'communityDetails';
+  usePageMetadata(t(heading), communityTitle, { noindex: true });
 
   if (members.isPending) {
     return (
@@ -41,13 +67,13 @@ export function CommunityMembersPage(): React.JSX.Element {
       return (
         <EmptyState
           className="mx-auto max-w-(--container-reading) bg-card"
-          title={t('membersOnly')}
+          title={t(kind === 'events' ? 'attendeesOnly' : 'membersOnly')}
           action={
             <Link
               className="text-sm font-semibold text-primary-soft-text hover:underline"
-              to={`/communities/${id}`}
+              to={`/${kind}/${id}`}
             >
-              {t('communityDetails')}
+              {t(backLabel)}
             </Link>
           }
         />
@@ -56,7 +82,7 @@ export function CommunityMembersPage(): React.JSX.Element {
     return (
       <div className="mx-auto w-full max-w-(--container-reading)">
         <QueryError
-          message={t('loadCommunityMembersError')}
+          message={t(kind === 'events' ? 'loadEventAttendeesError' : 'loadCommunityMembersError')}
           onRetry={() => void members.refetch()}
         />
       </div>
@@ -73,17 +99,21 @@ export function CommunityMembersPage(): React.JSX.Element {
     <section className="mx-auto grid max-w-(--container-reading) gap-6">
       <Link
         className="inline-flex min-h-11 w-fit items-center gap-2 text-sm font-medium text-text-muted hover:text-text"
-        to={`/communities/${id}`}
+        to={`/${kind}/${id}`}
       >
         <ArrowLeft aria-hidden="true" className="size-4 rtl:rotate-180" />
-        {t('communityDetails')}
+        {t(backLabel)}
       </Link>
       <header className="grid gap-2">
-        <h1 className="font-heading text-3xl font-extrabold">{t('attendees')}</h1>
+        <h1 className="font-heading text-3xl font-extrabold">{t(heading)}</h1>
         <p className="text-text-muted">{communityTitle}</p>
       </header>
       <div className="flex flex-wrap items-center gap-4">
-        <Field className="min-w-0 flex-1" id="member-search" label={t('searchMembers')}>
+        <Field
+          className="min-w-0 flex-1"
+          id="member-search"
+          label={t(kind === 'events' ? 'searchAttendees' : 'searchMembers')}
+        >
           <div className="relative">
             <Search
               aria-hidden="true"
@@ -98,7 +128,7 @@ export function CommunityMembersPage(): React.JSX.Element {
           </div>
         </Field>
         <span className="rounded-full bg-primary-soft px-4 py-2 text-sm font-semibold text-primary-soft-text">
-          {t('countActive')}: {members.data.length}
+          {t(heading)}: {members.data.length}
         </span>
       </div>
       {filteredMembers.length ? (
@@ -119,7 +149,13 @@ export function CommunityMembersPage(): React.JSX.Element {
                         : 'text-sm text-text-muted'
                     }
                   >
-                    {t(member.isHost ? 'attendeeHost' : 'attendeeMember')}
+                    {t(
+                      member.isHost
+                        ? kind === 'events'
+                          ? 'attendeeHost'
+                          : 'attendeeOrganizer'
+                        : 'attendeeMember',
+                    )}
                   </span>
                 </span>
               </Link>
@@ -128,7 +164,9 @@ export function CommunityMembersPage(): React.JSX.Element {
         </ul>
       ) : (
         <p className="rounded-(--shape-radius-card) border border-dashed border-border p-5 text-sm text-text-muted">
-          {search ? t('noMembersFound') : t('noParticipantsYet')}
+          {search
+            ? t('noMembersFound')
+            : t(kind === 'events' ? 'noEventAttendeesYet' : 'noParticipantsYet')}
         </p>
       )}
     </section>
