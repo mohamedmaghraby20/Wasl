@@ -18,6 +18,7 @@ import { Input } from '@/components/ui/Input';
 import { languageCode, localizedResourceTitle } from '@/features/resources/resource-utils';
 import { Avatar } from './ParticipantAvatar';
 import { usePageMetadata } from '../discovery/usePageMetadata';
+import { useModeratorAssignmentsControllerPermissions } from '@/api/generated/moderation/moderation';
 
 export function CommunityMembersPage({
   kind = 'communities',
@@ -48,6 +49,11 @@ export function CommunityMembersPage({
   });
   const members = kind === 'events' ? eventAttendees : communityMembers;
   const resource = kind === 'events' ? event : community;
+  const permissions = useModeratorAssignmentsControllerPermissions(
+    kind === 'events' ? 'event' : 'community',
+    resource.data?.id ?? '',
+    { query: { enabled: Boolean(resource.data) } },
+  );
   const communityTitle = resource.data
     ? localizedResourceTitle(resource.data)
     : t(kind === 'events' ? 'event' : 'community');
@@ -105,7 +111,17 @@ export function CommunityMembersPage({
         {t(backLabel)}
       </Link>
       <header className="grid gap-2">
-        <h1 className="font-heading text-3xl font-extrabold">{t(heading)}</h1>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h1 className="font-heading text-3xl font-extrabold">{t(heading)}</h1>
+          {permissions.data?.manager ? (
+            <Link
+              className="text-sm font-semibold text-primary-soft-text hover:underline"
+              to={`/${kind}/${resource.data!.id}/participants?status=${kind === 'events' ? 'ACCEPTED' : 'ACTIVE'}`}
+            >
+              {t(kind === 'events' ? 'manageAttendees' : 'manageActiveMembers')}
+            </Link>
+          ) : null}
+        </div>
         <p className="text-text-muted">{communityTitle}</p>
       </header>
       <div className="flex flex-wrap items-center gap-4">

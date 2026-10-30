@@ -7,7 +7,13 @@ import { Input } from '@/components/ui/Input';
 import { Field } from '@/components/ui/Field';
 import { Avatar } from './ParticipantAvatar';
 
-export function CommunityMembersTab({ communityId }: { communityId: string }): React.JSX.Element {
+export function CommunityMembersTab({
+  communityId,
+  canManage = false,
+}: {
+  communityId: string;
+  canManage?: boolean;
+}): React.JSX.Element {
   const { t, i18n } = useTranslation();
   const [search, setSearch] = useState('');
   const query = useParticipationControllerCommunityMembers(communityId);
@@ -23,9 +29,19 @@ export function CommunityMembersTab({ communityId }: { communityId: string }): R
   );
   return (
     <section aria-labelledby="community-directory-heading" className="grid gap-5">
-      <h2 className="font-heading text-2xl font-bold" id="community-directory-heading">
-        {t('communityMembers')}
-      </h2>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 className="font-heading text-2xl font-bold" id="community-directory-heading">
+          {t('communityMembers')}
+        </h2>
+        {canManage ? (
+          <Link
+            className="text-sm font-semibold text-primary-soft-text hover:underline"
+            to={`/communities/${communityId}/participants?status=ACTIVE`}
+          >
+            {t('manageActiveMembers')}
+          </Link>
+        ) : null}
+      </div>
       <Field id="community-member-search" label={t('searchMembers')}>
         <Input
           id="community-member-search"

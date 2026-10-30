@@ -39,6 +39,8 @@ function renderCommunity(viewer: 'owner' | 'member' | 'visitor'): void {
         data = { id: 'owner', displayName: 'Samira', avatarUrl: null };
       if (url.pathname.endsWith('/membership'))
         data = { status: viewer === 'member' ? 'ACTIVE' : null };
+      if (url.pathname.endsWith('/participation-counts'))
+        data = { PENDING: 0, WAITLISTED: 0, ACTIVE: 1, capacity: '30', admissionMode: 'open' };
       if (url.pathname.endsWith('/member-preview'))
         data = {
           host: { userId: 'owner', displayName: 'Samira', avatarUrl: null },
@@ -83,6 +85,8 @@ describe('Community detail viewer controls', () => {
       '/communities/community-1/edit',
     );
     expect(screen.getByRole('button', { name: 'Archive community' })).toBeVisible();
+    expect(screen.getByText('Hosted by you')).toBeVisible();
+    expect(screen.queryByRole('heading', { name: 'Membership requests' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Leave community' })).not.toBeInTheDocument();
   });
 

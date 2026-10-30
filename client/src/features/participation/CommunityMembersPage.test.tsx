@@ -7,7 +7,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { i18n } from '@/lib/i18n';
 import { CommunityMembersPage } from './CommunityMembersPage';
 
-const mocks = vi.hoisted(() => ({ members: vi.fn(), community: vi.fn(), attendees: vi.fn() }));
+const mocks = vi.hoisted(() => ({
+  members: vi.fn(),
+  community: vi.fn(),
+  attendees: vi.fn(),
+  permissions: vi.fn(),
+}));
 
 vi.mock('@/api/generated/participation/participation', () => ({
   useParticipationControllerCommunityMembers: mocks.members,
@@ -18,6 +23,9 @@ vi.mock('@/api/generated/discovery/discovery', () => ({
   useDiscoveryControllerEvent: () => ({ data: { title: 'Language Meetup' } }),
 }));
 vi.mock('../discovery/usePageMetadata', () => ({ usePageMetadata: vi.fn() }));
+vi.mock('@/api/generated/moderation/moderation', () => ({
+  useModeratorAssignmentsControllerPermissions: mocks.permissions,
+}));
 
 function renderPage(kind: 'communities' | 'events' = 'communities'): ReturnType<typeof render> {
   const suffix = kind === 'events' ? 'attendees' : 'members';
@@ -37,6 +45,7 @@ function renderPage(kind: 'communities' | 'events' = 'communities'): ReturnType<
 describe('CommunityMembersPage', () => {
   beforeEach(async () => {
     await i18n.changeLanguage('en');
+    mocks.permissions.mockReturnValue({ data: { manager: false } });
     mocks.community.mockReturnValue({ data: { id: 'community-1', name: 'Language Circle' } });
     mocks.attendees.mockReturnValue({
       data: [{ userId: 'host-1', displayName: 'Event Host', avatarUrl: null, isHost: true }],
@@ -77,6 +86,15 @@ describe('CommunityMembersPage', () => {
     expect(screen.getByRole('link', { name: /Event Host/ })).toHaveAttribute(
       'href',
       '/users/host-1',
+    );
+  });
+
+  it('keeps active-member management accessible to organizers', () => {
+    mocks.permissions.mockReturnValue({ data: { manager: true } });
+    renderPage();
+    expect(screen.getByRole('link', { name: 'Manage members' })).toHaveAttribute(
+      'href',
+      '/communities/community-1/participants?status=ACTIVE',
     );
   });
 });

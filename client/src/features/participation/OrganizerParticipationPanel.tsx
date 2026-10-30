@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next';
+import { useState } from 'react';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
-import { Link } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 import {
   useParticipationControllerCommunityCounts,
   useParticipationControllerCommunityDecision,
@@ -13,6 +14,10 @@ import {
 import { Button } from '@/components/ui/Button';
 import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { QueryError } from '@/components/feedback/QueryError';
+import { ApiError } from '@/api/fetcher';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { Field } from '@/components/ui/Field';
+import { Input } from '@/components/ui/Input';
 import {
   useModeratorAssignmentsControllerAssign,
   useModeratorAssignmentsControllerList,
@@ -23,36 +28,63 @@ export function OrganizerParticipationPanel({
   kind,
   resourceId,
   eventStarted = false,
+  mode = 'all',
 }: {
   kind: 'communities' | 'events';
   resourceId: string;
   eventStarted?: boolean;
-}): React.JSX.Element {
-  const { t } = useTranslation();
+  mode?: 'all' | 'requests' | 'directory';
+}): React.JSX.Element | null {
+  const { t, i18n } = useTranslation();
+  const [search, setSearch] = useState('');
+  const [params, setParams] = useSearchParams();
+  const activeStatus = kind === 'communities' ? 'ACTIVE' : 'ACCEPTED';
+  const selectedStatus = ['PENDING', 'WAITLISTED', activeStatus].includes(
+    params.get('status') ?? '',
+  )
+    ? params.get('status')!
+    : 'PENDING';
   const queryClient = useQueryClient();
-  const communityParticipants = useParticipationControllerCommunityParticipants(resourceId, {
-    query: { enabled: kind === 'communities' },
-  });
-  const eventParticipants = useParticipationControllerEventParticipants(resourceId, {
-    query: { enabled: kind === 'events' },
-  });
   const communityCounts = useParticipationControllerCommunityCounts(resourceId, {
     query: { enabled: kind === 'communities' },
   });
   const eventCounts = useParticipationControllerEventCounts(resourceId, {
     query: { enabled: kind === 'events' },
   });
+  const counts = kind === 'communities' ? communityCounts : eventCounts;
+  const needsParticipants =
+    mode !== 'requests' || Boolean(counts.data && counts.data.PENDING + counts.data.WAITLISTED > 0);
+  const communityParticipants = useParticipationControllerCommunityParticipants(resourceId, {
+    query: { enabled: kind === 'communities' && needsParticipants },
+  });
+  const eventParticipants = useParticipationControllerEventParticipants(resourceId, {
+    query: { enabled: kind === 'events' && needsParticipants },
+  });
   const communityDecision = useParticipationControllerCommunityDecision();
   const eventDecision = useParticipationControllerEventDecision();
   const moderationKind = kind === 'communities' ? 'community' : 'event';
-  const moderators = useModeratorAssignmentsControllerList(moderationKind, resourceId);
+  const moderators = useModeratorAssignmentsControllerList(moderationKind, resourceId, {
+    query: { enabled: mode === 'all' || (mode === 'directory' && selectedStatus === activeStatus) },
+  });
   const assignModerator = useModeratorAssignmentsControllerAssign();
   const removeModerator = useModeratorAssignmentsControllerRemove();
   const { confirm, dialog } = useConfirm();
   const participants = kind === 'communities' ? communityParticipants : eventParticipants;
-  const counts = kind === 'communities' ? communityCounts : eventCounts;
-  const isPending = participants.isPending || counts.isPending;
-  const isError = participants.isError || counts.isError;
+  const isPending = (needsParticipants && participants.isPending) || counts.isPending;
+  const isError = (needsParticipants && participants.isError) || counts.isError;
+  const filteredParticipants = (participants.data ?? []).filter((person) => {
+    if (mode === 'requests') return person.status === 'PENDING' || person.status === 'WAITLISTED';
+    if (mode === 'directory')
+      return (
+        person.status === selectedStatus &&
+        person.displayName
+          .toLocaleLowerCase(i18n.language)
+          .includes(search.trim().toLocaleLowerCase(i18n.language))
+      );
+    return true;
+  });
+  const visibleParticipants =
+    mode === 'requests' ? filteredParticipants.slice(0, 5) : filteredParticipants;
 
   const decide = async (participantId: string, action: string): Promise<void> => {
     if (
@@ -77,7 +109,22 @@ export function OrganizerParticipationPanel({
         const result = await eventDecision.mutateAsync({ id: resourceId, participantId, action });
         if (result.messagingSyncPending) toast.warning(t('messagingSyncPending'));
       }
-      await queryClient.invalidateQueries();
+      const prefix = `/api/v1/${kind}/${resourceId}`;
+      const affectedPaths = new Set([
+        `${prefix}/participants`,
+        `${prefix}/participation-counts`,
+        `${prefix}/${kind === 'communities' ? 'members' : 'attendees'}`,
+        `${prefix}/${kind === 'communities' ? 'member-preview' : 'attendee-preview'}`,
+      ]);
+      await queryClient.invalidateQueries({
+        predicate: (query) => {
+          const data = query.state.data;
+          return (
+            affectedPaths.has(String(query.queryKey[0])) ||
+            Boolean(data && typeof data === 'object' && 'id' in data && data.id === resourceId)
+          );
+        },
+      });
     } catch {
       toast.error(t('participationActionError'));
     }
@@ -92,21 +139,49 @@ export function OrganizerParticipationPanel({
           data: { userId },
         });
       else await removeModerator.mutateAsync({ kind: moderationKind, id: resourceId, userId });
-      await queryClient.invalidateQueries();
+      await moderators.refetch();
     } catch {
       toast.error(t('moderatorActionError'));
     }
   };
 
+  if (
+    mode === 'requests' &&
+    !counts.isError &&
+    (!counts.data || counts.data.PENDING + counts.data.WAITLISTED === 0)
+  )
+    return null;
+  const error = counts.error ?? participants.error;
+  if (isError && error instanceof ApiError && error.status === 403)
+    return <EmptyState title={t('organizersOnly')} className="bg-card" />;
+
   return (
-    <section className="grid gap-4 border-t border-border pt-5">
-      {kind === 'events' ? (
+    <section
+      className={
+        mode === 'requests'
+          ? 'grid gap-4 rounded-(--shape-radius-card) border border-border bg-card p-5'
+          : 'grid gap-4'
+      }
+    >
+      {mode === 'requests' ? (
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="font-heading text-xl font-bold">
+            {t(kind === 'communities' ? 'membershipRequests' : 'registrationRequests')}
+          </h2>
+          <Link
+            className="shrink-0 text-sm font-semibold text-primary-soft-text hover:underline"
+            to={`/${kind}/${resourceId}/participants?status=${counts.data?.PENDING ? 'PENDING' : 'WAITLISTED'}`}
+          >
+            {t('seeAll')}
+          </Link>
+        </div>
+      ) : mode === 'all' && kind === 'events' ? (
         <h2 id="organizer-participation-heading" className="font-heading text-xl font-bold">
           {t('manageRegistrations')}
         </h2>
       ) : null}
       {isPending ? (
-        <p role="status">{t('loadingParticipation')}</p>
+        <p role="status">{t('loadingParticipants')}</p>
       ) : isError ? (
         <QueryError
           message={t('loadOrganizerParticipationError')}
@@ -117,27 +192,71 @@ export function OrganizerParticipationPanel({
         />
       ) : (
         <>
-          <dl className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-            <Count label={t('countPending')} value={counts.data.PENDING} />
-            <Count label={t('countWaitlisted')} value={counts.data.WAITLISTED} />
-            <Count
-              label={kind === 'communities' ? t('countActive') : t('countAccepted')}
-              value={kind === 'communities' ? counts.data.ACTIVE : counts.data.ACCEPTED}
-            />
-            <Count
-              label={t('capacityLabel')}
-              value={counts.data.capacity === 'unlimited' ? t('unlimited') : counts.data.capacity}
-            />
-          </dl>
-          {participants.data.length ? (
-            <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-              {participants.data.map((participant) => (
+          {mode === 'all' ? (
+            <dl className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              <Count label={t('countPending')} value={counts.data.PENDING} />
+              <Count label={t('countWaitlisted')} value={counts.data.WAITLISTED} />
+              <Count
+                label={kind === 'communities' ? t('countActive') : t('countAccepted')}
+                value={kind === 'communities' ? counts.data.ACTIVE : counts.data.ACCEPTED}
+              />
+              <Count
+                label={t('capacityLabel')}
+                value={counts.data.capacity === 'unlimited' ? t('unlimited') : counts.data.capacity}
+              />
+            </dl>
+          ) : null}
+          {mode === 'directory' ? (
+            <>
+              <nav aria-label={t('participationFilters')} className="flex flex-wrap gap-2">
+                {['PENDING', 'WAITLISTED', activeStatus].map((status) => (
+                  <Button
+                    key={status}
+                    aria-current={selectedStatus === status ? 'page' : undefined}
+                    onClick={() => {
+                      const next = new URLSearchParams(params);
+                      next.set('status', status);
+                      setParams(next);
+                    }}
+                    size="sm"
+                    variant={selectedStatus === status ? 'secondary' : 'ghost'}
+                  >
+                    {t(
+                      status === 'PENDING'
+                        ? 'countPending'
+                        : status === 'WAITLISTED'
+                          ? 'countWaitlisted'
+                          : kind === 'communities'
+                            ? 'countActive'
+                            : 'countAccepted',
+                    )}{' '}
+                    <span>
+                      {counts.data[status as 'PENDING' | 'WAITLISTED' | 'ACTIVE' | 'ACCEPTED']}
+                    </span>
+                  </Button>
+                ))}
+              </nav>
+              <Field id="participant-review-search" label={t('searchParticipants')}>
+                <Input
+                  id="participant-review-search"
+                  value={search}
+                  onChange={(event) => setSearch(event.currentTarget.value)}
+                />
+              </Field>
+            </>
+          ) : null}
+          {visibleParticipants.length ? (
+            <ul className="grid gap-2">
+              {visibleParticipants.map((participant) => (
                 <li
                   key={participant.id}
-                  className="grid content-start gap-3 rounded-(--shape-radius-card) border border-border bg-card p-3"
+                  className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-(--shape-radius-card) border border-border bg-card px-3 py-2"
                 >
                   <div className="flex min-w-0 items-center gap-3">
-                    <span className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-full bg-primary-soft text-sm font-bold text-primary-soft-text">
+                    <span
+                      aria-hidden="true"
+                      className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-full bg-primary-soft text-sm font-bold text-primary-soft-text"
+                    >
                       {participant.avatarUrl ? (
                         <img
                           alt=""
@@ -150,13 +269,23 @@ export function OrganizerParticipationPanel({
                     </span>
                     <div className="min-w-0">
                       <Link
-                        className="block truncate font-semibold hover:underline"
+                        className="block truncate text-sm font-semibold hover:underline"
                         to={`/users/${participant.userId}`}
                       >
                         {participant.displayName}
                       </Link>
-                      <p className="text-xs text-muted-foreground">
-                        {t(`participationStatus_${participant.status}`)}
+                      <p className="text-xs text-text-muted">
+                        {t(
+                          participant.status === 'PENDING'
+                            ? 'requestPendingLabel'
+                            : participant.status === 'WAITLISTED'
+                              ? 'requestWaitlistedLabel'
+                              : participant.status === 'ACTIVE'
+                                ? 'attendeeMember'
+                                : participant.status === 'ACCEPTED'
+                                  ? 'countAccepted'
+                                  : `participationStatus_${participant.status}`,
+                        )}
                       </p>
                     </div>
                   </div>
@@ -258,7 +387,13 @@ export function OrganizerParticipationPanel({
             </ul>
           ) : (
             <p className="rounded-(--shape-radius-card) border border-dashed border-border p-5 text-sm text-muted-foreground">
-              {t('noParticipantsYet')}
+              {t(
+                mode === 'directory'
+                  ? search
+                    ? 'noMembersFound'
+                    : 'noRequestsInFilter'
+                  : 'noParticipantsYet',
+              )}
             </p>
           )}
         </>

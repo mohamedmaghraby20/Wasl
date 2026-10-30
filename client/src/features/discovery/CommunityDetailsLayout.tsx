@@ -22,6 +22,7 @@ import { CommunityMembersTab } from '@/features/participation/CommunityMembersTa
 import { CommunityTopics } from '@/features/discussions/CommunityTopics';
 import { localizedName } from '@/features/resources/resource-utils';
 import { CommunityEvents } from './CommunityEvents';
+import { ParticipationQueueLinks } from '@/features/participation/ParticipationQueueLinks';
 
 const sections = [
   { id: 'about', label: 'communityAbout', Icon: BookOpen },
@@ -125,20 +126,31 @@ export function CommunityDetailsLayout({
               <MapPin aria-hidden="true" className="size-4 shrink-0" />
               {item.cityName}
             </p>
-            {item.memberCount !== undefined ? (
-              <p className="flex items-center gap-2">
-                <UsersRound aria-hidden="true" className="size-4 shrink-0" />
-                {t('communityMemberCount', { count: item.memberCount })}
-              </p>
-            ) : null}
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+              {item.memberCount !== undefined ? (
+                <p className="flex items-center gap-2">
+                  <UsersRound aria-hidden="true" className="size-4 shrink-0" />
+                  {t('communityMemberCount', { count: item.memberCount })}
+                </p>
+              ) : null}
+              {canManage ? (
+                <ParticipationQueueLinks kind="communities" resourceId={item.id} />
+              ) : null}
+            </div>
             <p>
-              {t('hostedByLabel')}{' '}
-              {hostPath ? (
-                <Link className="font-semibold text-text hover:underline" to={hostPath}>
-                  {item.hostName}
-                </Link>
+              {item.ownerType === 'user' && viewerId === item.ownerId ? (
+                t('hostedByYou')
               ) : (
-                item.hostName
+                <>
+                  {t('hostedByLabel')}{' '}
+                  {hostPath ? (
+                    <Link className="font-semibold text-text hover:underline" to={hostPath}>
+                      {item.hostName}
+                    </Link>
+                  ) : (
+                    item.hostName
+                  )}
+                </>
               )}
             </p>
           </div>
@@ -251,8 +263,7 @@ export function CommunityDetailsLayout({
           {selected === 'members' ? (
             canViewMembers ? (
               <>
-                <CommunityMembersTab key={item.id} communityId={item.id} />
-                {canManage ? managementPanel : null}
+                <CommunityMembersTab key={item.id} communityId={item.id} canManage={canManage} />
               </>
             ) : (
               <section className="grid gap-3">
@@ -266,6 +277,7 @@ export function CommunityDetailsLayout({
           {selected === 'discussion' ? (
             <CommunityTopics key={item.id} communityId={item.id} canPost={canViewMembers} />
           ) : null}
+          {canManage ? managementPanel : null}
         </div>
         <aside
           aria-label={t('communitySidebar')}

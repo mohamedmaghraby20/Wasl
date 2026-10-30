@@ -1,11 +1,12 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { I18nextProvider } from 'react-i18next';
 import { MemoryRouter } from 'react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { i18n } from '@/lib/i18n';
 import { OrganizerParticipationPanel } from './OrganizerParticipationPanel';
+import { ApiError } from '@/api/fetcher';
 
 const mocks = vi.hoisted(() => ({
   participants: vi.fn(),
@@ -28,14 +29,18 @@ vi.mock('@/api/generated/participation/participation', () => ({
   }),
 }));
 
-function renderPanel(): void {
-  render(
+function renderPanel(
+  mode: 'all' | 'requests' | 'directory' = 'all',
+  entry = '/',
+  kind: 'communities' | 'events' = 'communities',
+): ReturnType<typeof render> {
+  return render(
     <I18nextProvider i18n={i18n}>
-      <MemoryRouter>
+      <MemoryRouter initialEntries={[entry]}>
         <QueryClientProvider
           client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
         >
-          <OrganizerParticipationPanel kind="communities" resourceId="community-1" />
+          <OrganizerParticipationPanel kind={kind} resourceId="community-1" mode={mode} />
         </QueryClientProvider>
       </MemoryRouter>
     </I18nextProvider>,
@@ -98,5 +103,105 @@ describe('OrganizerParticipationPanel', () => {
     });
     renderPanel();
     expect(screen.getByText('This community does not have any participants yet.')).toBeVisible();
+  });
+
+  it('hides the request preview and disables participant loading when both queues are empty', () => {
+    mocks.counts.mockReturnValue({
+      data: { PENDING: 0, WAITLISTED: 0, ACTIVE: 4 },
+      isPending: false,
+      isError: false,
+    });
+    const { container } = renderPanel('requests');
+    expect(container).toBeEmptyDOMElement();
+    expect(mocks.participants).toHaveBeenNthCalledWith(1, 'community-1', {
+      query: { enabled: false },
+    });
+  });
+
+  it('shows only five waiting participants in compact rows with a see-all link', () => {
+    mocks.counts.mockReturnValue({
+      data: { PENDING: 6, WAITLISTED: 1, ACTIVE: 1, admissionMode: 'approval' },
+      isPending: false,
+      isError: false,
+    });
+    mocks.participants.mockReturnValue({
+      data: Array.from({ length: 8 }, (_, index) => ({
+        id: `request-${index}`,
+        userId: `user-${index}`,
+        displayName: `Person ${index}`,
+        avatarUrl: null,
+        status: index === 7 ? 'ACTIVE' : index === 6 ? 'WAITLISTED' : 'PENDING',
+      })),
+      isPending: false,
+      isError: false,
+    });
+    const { container } = renderPanel('requests');
+    expect(screen.getAllByRole('listitem')).toHaveLength(5);
+    expect(screen.queryByText('Person 7')).not.toBeInTheDocument();
+    expect(container.querySelector('details')).toBeNull();
+    expect(screen.getByRole('link', { name: 'See all' })).toHaveAttribute(
+      'href',
+      '/communities/community-1/participants?status=PENDING',
+    );
+  });
+
+  it('opens the waitlist filter from the URL and supports search and promotion', async () => {
+    const user = userEvent.setup();
+    mocks.counts.mockReturnValue({
+      data: { PENDING: 1, WAITLISTED: 2, ACTIVE: 1, admissionMode: 'approval' },
+      isPending: false,
+      isError: false,
+    });
+    mocks.participants.mockReturnValue({
+      data: [
+        { id: 'pending-1', userId: 'user-1', displayName: 'Pending Person', status: 'PENDING' },
+        { id: 'waiting-1', userId: 'user-2', displayName: 'Samira', status: 'WAITLISTED' },
+        { id: 'waiting-2', userId: 'user-3', displayName: 'Basim', status: 'WAITLISTED' },
+      ],
+      isPending: false,
+      isError: false,
+    });
+    renderPanel('directory', '/communities/community-1/participants?status=WAITLISTED');
+    expect(screen.queryByText('Pending Person')).not.toBeInTheDocument();
+    await user.type(screen.getByRole('textbox', { name: 'Search participants' }), 'sam');
+    expect(screen.getByText('Samira')).toBeVisible();
+    expect(screen.queryByText('Basim')).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Promote from waitlist' }));
+    expect(mocks.decision).toHaveBeenCalledWith({
+      id: 'community-1',
+      participantId: 'waiting-1',
+      action: 'promote',
+    });
+    await user.clear(screen.getByRole('textbox', { name: 'Search participants' }));
+    await user.click(
+      within(screen.getByRole('navigation', { name: 'Participant status' })).getByRole('button', {
+        name: /Pending/,
+      }),
+    );
+    expect(screen.getByText('Pending Person')).toBeVisible();
+    expect(screen.queryByText('Samira')).not.toBeInTheDocument();
+  });
+
+  it('uses the same review controls for event registration decisions', async () => {
+    const user = userEvent.setup();
+    renderPanel('directory', '/events/community-1/participants?status=PENDING', 'events');
+    await user.click(screen.getByRole('button', { name: 'Reject' }));
+    expect(mocks.decision).toHaveBeenCalledWith({
+      id: 'community-1',
+      participantId: 'membership-1',
+      action: 'reject',
+    });
+  });
+
+  it('does not display participant rows when the server denies organizer access', () => {
+    mocks.counts.mockReturnValue({
+      isError: true,
+      isPending: false,
+      error: new ApiError('Forbidden', 403),
+    });
+    renderPanel('directory');
+    expect(screen.getByText('Only organizers can manage participants.')).toBeVisible();
+    expect(screen.queryByText('Samira')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Approve' })).not.toBeInTheDocument();
   });
 });

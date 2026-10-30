@@ -17,6 +17,9 @@ vi.mock('@/features/discussions/CommunityTopics', () => ({
   CommunityTopics: () => <p>Discussion content</p>,
 }));
 vi.mock('./CommunityEvents', () => ({ CommunityEvents: () => <p>Community event list</p> }));
+vi.mock('@/features/participation/ParticipationQueueLinks', () => ({
+  ParticipationQueueLinks: () => null,
+}));
 
 const community: CommunityPublicDto = {
   id: 'community-1',
@@ -42,6 +45,7 @@ function renderLayout(owner = false, member = false): void {
           item={community}
           canManage={owner}
           canViewMembers={owner || member}
+          viewerId={owner ? 'host' : 'viewer'}
           membershipAction={<button>Join community</button>}
           managementActions={<button>Edit community</button>}
           managementPanel={<p>Manage requests</p>}
@@ -79,6 +83,7 @@ describe('CommunityDetailsLayout', () => {
     const navigation = screen.getByRole('navigation', { name: 'Community sections' });
     expect(within(navigation).getAllByRole('link')).toHaveLength(4);
     expect(screen.getByRole('heading', { name: 'About us' })).toBeVisible();
+    expect(screen.getByText('Hosted by you')).toBeVisible();
     await user.click(within(navigation).getByRole('link', { name: 'Events' }));
     expect(screen.getByText('Community event list')).toBeVisible();
     expect(screen.queryByText(community.description)).not.toBeInTheDocument();

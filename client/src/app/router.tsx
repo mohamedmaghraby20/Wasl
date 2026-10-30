@@ -66,11 +66,23 @@ export const router = createBrowserRouter([
           return { Component: CommunityTopicPage };
         },
       },
+      ...(['communities', 'events'] as const).map((kind) => ({
+        path: `${kind}/:id/participants`,
+        handle: { requiresAuth: true },
+        lazy: async () => {
+          const { ParticipationReviewPage } = await import(
+            '@/features/participation/ParticipationReviewPage'
+          );
+          return { Component: () => <ParticipationReviewPage kind={kind} /> };
+        },
+      })),
       {
         path: 'events/:id/attendees',
         handle: { requiresAuth: true },
         lazy: async () => {
-          const { CommunityMembersPage } = await import('@/features/participation/CommunityMembersPage');
+          const { CommunityMembersPage } = await import(
+            '@/features/participation/CommunityMembersPage'
+          );
           return { Component: () => <CommunityMembersPage kind="events" /> };
         },
       },

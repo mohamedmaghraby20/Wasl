@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Archive, ArrowLeft, ChevronDown, MessageSquare, Pencil, Share2 } from 'lucide-react';
+import { Archive, ArrowLeft, MessageSquare, Pencil, Share2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
@@ -130,7 +130,6 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
   const openCommunityChat = useMessagingControllerCommunity();
   const openEventChat = useMessagingControllerEvent();
   const [chatError, setChatError] = useState(false);
-  const [participationPanelOpen, setParticipationPanelOpen] = useState(false);
   const { confirm, dialog } = useConfirm();
   const resourceName = t(kind === 'events' ? 'event' : 'community').toLocaleLowerCase(
     i18n.language,
@@ -478,20 +477,7 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
             </>
           }
           managementPanel={
-            <details
-              className="rounded-(--shape-radius-card) border border-border bg-card"
-              onToggle={(event) => setParticipationPanelOpen(event.currentTarget.open)}
-            >
-              <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-5 py-3 [&::-webkit-details-marker]:hidden">
-                <span className="font-semibold">{t('manageMembers')}</span>
-                <ChevronDown aria-hidden="true" className="size-4" />
-              </summary>
-              {participationPanelOpen ? (
-                <div className="border-t border-border p-5">
-                  <OrganizerParticipationPanel kind="communities" resourceId={item.id} />
-                </div>
-              ) : null}
-            </details>
+            <OrganizerParticipationPanel kind="communities" resourceId={item.id} mode="requests" />
           }
           chatAction={
             canViewMembers ? (
@@ -570,6 +556,11 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
                 </Button>
               </>
             ) : null}
+            <Button asChild size="sm" variant="outline">
+              <Link to={`/events/${item.id}/participants?status=PENDING`}>
+                {t('reviewRequests')}
+              </Link>
+            </Button>
           </div>
           <OrganizerParticipationPanel
             kind={kind}

@@ -168,5 +168,6 @@ When the user corrects your approach, append a one-line rule here before ending 
 - Keep owner-facing MVP checklists standalone when requested: use a new file, remove the old handoff and its incoming references, and add no cross-file links.
 - For development Supabase data, accept the owner's authorization and seed samples directly; explain owner-only admin setup as exact signup and browser steps, never ask the owner to find internal Wasl IDs.
 - Use tall host-first attendee cards with an overlapping light-green badge for events; use separate organizer/message and compact member-avatar cards for communities.
+- Show pending/waitlisted requests as at most five compact stacked rows, never a dropdown or card grid; hide the preview when both queues are empty and link to the reusable review page.
 
 ---
