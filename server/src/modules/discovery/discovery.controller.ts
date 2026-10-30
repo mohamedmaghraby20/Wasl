@@ -100,7 +100,10 @@ export class DiscoveryController {
         .orderBy(desc(communities.createdAt))
         .limit(pageSize)
         .offset((page - 1) * pageSize),
-      db.select({ total: sql<number>`count(*)::int` }).from(communities).where(where),
+      db
+        .select({ total: sql<number>`count(*)::int` })
+        .from(communities)
+        .where(where),
     ]);
     const total = Number(countRows[0]?.total ?? 0);
     return {
@@ -116,6 +119,7 @@ export class DiscoveryController {
   @listingQuery()
   @ApiQuery({ name: 'from', required: false, type: String })
   @ApiQuery({ name: 'to', required: false, type: String })
+  @ApiQuery({ name: 'communityId', required: false, type: String })
   @ApiOkResponse({ type: EventPageDto })
   async listEvents(@Query() query: Record<string, string | undefined>) {
     const { page, pageSize, filters } = this.parse(query, 'event');
@@ -132,6 +136,7 @@ export class DiscoveryController {
       );
     if (query.from) filters.conditions.push(gte(events.startsAt, this.date(query.from)));
     if (query.to) filters.conditions.push(lt(events.startsAt, this.date(query.to, true)));
+    if (query.communityId) filters.conditions.push(eq(events.communityId, query.communityId));
     const where = and(eq(events.visibility, 'public'), ...filters.conditions);
     const [rows, countRows] = await Promise.all([
       db
@@ -165,7 +170,10 @@ export class DiscoveryController {
         .orderBy(asc(events.startsAt))
         .limit(pageSize)
         .offset((page - 1) * pageSize),
-      db.select({ total: sql<number>`count(*)::int` }).from(events).where(where),
+      db
+        .select({ total: sql<number>`count(*)::int` })
+        .from(events)
+        .where(where),
     ]);
     const total = Number(countRows[0]?.total ?? 0);
     return {
@@ -193,6 +201,7 @@ export class DiscoveryController {
         hostName: sql<string>`COALESCE(${organizations.name}, ${communities.hostName})`,
         ownerType: communities.ownerType,
         ownerId: communities.ownerId,
+        memberCount: sql<number>`(select count(*)::int from community_memberships m where m.community_id = ${communities.id} and m.status = 'ACTIVE') + case when ${communities.ownerType} = 'user' and not exists (select 1 from community_memberships m where m.community_id = ${communities.id} and m.status = 'ACTIVE' and m.user_id::text = ${communities.ownerId}) then 1 else 0 end`,
         organizationSlug: organizations.slug,
         cityId: cities.id,
         cityName: this.cityName(query.lang),

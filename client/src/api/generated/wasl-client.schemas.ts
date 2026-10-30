@@ -1274,6 +1274,7 @@ export interface CommunityPublicDto {
   hostName: string;
   ownerType: string;
   ownerId: string;
+  memberCount?: number;
   /** @nullable */
   organizationSlug?: string | null;
   cityId: string;
@@ -1461,6 +1462,7 @@ export const OrganizationsControllerPublicProfileLang = {
 } as const;
 
 export type DiscoveryControllerListEventsParams = {
+communityId?: string;
 to?: string;
 from?: string;
 q?: string;

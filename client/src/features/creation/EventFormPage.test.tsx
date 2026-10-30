@@ -36,12 +36,12 @@ vi.mock('@/api/generated/discovery/discovery', () => ({
   useDiscoveryControllerEvent: mocks.event,
 }));
 
-function renderPage(): void {
+function renderPage(initialEntry = '/create/event'): void {
   render(
     <I18nextProvider i18n={i18n}>
       <UnheadProvider head={createHead()}>
         <QueryClientProvider client={new QueryClient()}>
-          <MemoryRouter initialEntries={['/create/event']}>
+          <MemoryRouter initialEntries={[initialEntry]}>
             <Routes>
               <Route path="/create/event" element={<EventFormPage />} />
             </Routes>
@@ -94,4 +94,10 @@ describe('EventFormPage organization host choice', () => {
     expect(communityHost).toHaveTextContent('My community');
     expect(organizationHost).toHaveTextContent('No organization');
   }, 20_000);
+
+  it('preselects the community when creating an event from its page', () => {
+    renderPage('/create/event?communityId=community-1');
+    expect(screen.getByLabelText('Host this event as')).toHaveTextContent('My community');
+    expect(screen.getByLabelText('Organization (optional)')).toHaveTextContent('No organization');
+  });
 });

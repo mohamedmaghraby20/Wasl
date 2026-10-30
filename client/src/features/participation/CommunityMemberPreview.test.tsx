@@ -5,11 +5,15 @@ import { MemoryRouter } from 'react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { i18n } from '@/lib/i18n';
 import { CommunityMemberPreview } from './CommunityMemberPreview';
+import type { CommunityPublicDto } from '@/api/generated/wasl-client.schemas';
 
 const mocks = vi.hoisted(() => ({ preview: vi.fn() }));
 
 vi.mock('@/api/generated/participation/participation', () => ({
   useParticipationControllerCommunityMemberPreview: mocks.preview,
+}));
+vi.mock('@/api/generated/users/users', () => ({
+  useUsersControllerPublicProfile: () => ({ data: undefined }),
 }));
 
 describe('CommunityMemberPreview', () => {
@@ -54,5 +58,30 @@ describe('CommunityMemberPreview', () => {
       'href',
       '/communities/community-1/members',
     );
+  });
+
+  it('does not request or display private member identities for visitors', () => {
+    const community = {
+      ownerId: 'public-host',
+      ownerType: 'user',
+      hostName: 'Public Host',
+      memberCount: 12,
+    } as CommunityPublicDto;
+    render(
+      <I18nextProvider i18n={i18n}>
+        <MemoryRouter>
+          <QueryClientProvider client={new QueryClient()}>
+            <CommunityMemberPreview
+              communityId="community-1"
+              community={community}
+              canViewMembers={false}
+            />
+          </QueryClientProvider>
+        </MemoryRouter>
+      </I18nextProvider>,
+    );
+    expect(mocks.preview).toHaveBeenLastCalledWith('community-1', { query: { enabled: false } });
+    expect(screen.getByText('Join this community to view its members.')).toBeVisible();
+    expect(screen.queryByText('Samira')).not.toBeInTheDocument();
   });
 });

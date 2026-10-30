@@ -19,6 +19,7 @@ export class CommunityPublicDto {
   @ApiProperty() hostName!: string;
   @ApiProperty() ownerType!: string;
   @ApiProperty() ownerId!: string;
+  @ApiPropertyOptional() memberCount?: number;
   @ApiPropertyOptional({ type: String, nullable: true }) organizationSlug!: string | null;
   @ApiProperty() cityId!: string;
   @ApiProperty() cityName!: string;

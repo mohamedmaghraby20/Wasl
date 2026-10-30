@@ -101,7 +101,7 @@ export function EventFormPage(): React.JSX.Element {
       locationName: '',
       admissionMode: 'instant',
       capacity: '',
-      communityId: '',
+      communityId: editing ? '' : (new URLSearchParams(location.search).get('communityId') ?? ''),
       organizationId: '',
     },
   });
@@ -278,9 +278,7 @@ export function EventFormPage(): React.JSX.Element {
               <Field
                 error={communities.isError ? t('managedCommunitiesLoadError') : undefined}
                 hint={
-                  communities.isPending
-                    ? t('loading', { resource: t('communities') })
-                    : undefined
+                  communities.isPending ? t('loading', { resource: t('communities') }) : undefined
                 }
                 id="event-host"
                 label={t('eventHost')}
@@ -364,11 +362,7 @@ export function EventFormPage(): React.JSX.Element {
                 value={form.watch('visibility')}
               />
             </Field>
-            <Field
-              hint={t('eventAdmissionHint')}
-              id="event-admission"
-              label={t('admissionPolicy')}
-            >
+            <Field hint={t('eventAdmissionHint')} id="event-admission" label={t('admissionPolicy')}>
               <Select
                 id="event-admission"
                 onValueChange={(value) =>
@@ -499,7 +493,11 @@ export function EventFormPage(): React.JSX.Element {
               {categories.data?.map((category) => {
                 const checked = categoryIds.includes(category.id);
                 const categoryName =
-                  lang === 'ar' ? category.nameAr : lang === 'tr' ? category.nameTr : category.nameEn;
+                  lang === 'ar'
+                    ? category.nameAr
+                    : lang === 'tr'
+                      ? category.nameTr
+                      : category.nameEn;
                 return (
                   <div
                     className={cn(

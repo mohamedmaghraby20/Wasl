@@ -1,12 +1,5 @@
 import { useState } from 'react';
-import {
-  Archive,
-  ArrowLeft,
-  ChevronDown,
-  MessageSquare,
-  Pencil,
-  Share2,
-} from 'lucide-react';
+import { Archive, ArrowLeft, ChevronDown, MessageSquare, Pencil, Share2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
@@ -54,7 +47,6 @@ import { usePageMetadata } from './usePageMetadata';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { OrganizerParticipationPanel } from '@/features/participation/OrganizerParticipationPanel';
 import { EventDiscussion } from '@/features/discussions/EventDiscussion';
-import { CommunityTopics } from '@/features/discussions/CommunityTopics';
 import { ReportAction } from '@/features/moderation/ReportAction';
 import { useModeratorAssignmentsControllerPermissions } from '@/api/generated/moderation/moderation';
 import {
@@ -62,8 +54,8 @@ import {
   useMessagingControllerEvent,
 } from '@/api/generated/messaging/messaging';
 import { ResourceOverview } from './ResourceOverview';
-import { CommunityMemberPreview } from '@/features/participation/CommunityMemberPreview';
 import { EventAttendeePreview } from '@/features/participation/EventAttendeePreview';
+import { CommunityDetailsLayout } from './CommunityDetailsLayout';
 
 export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX.Element {
   const { t, i18n } = useTranslation();
@@ -85,9 +77,13 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
   );
   const query = kind === 'communities' ? community : event;
   const item = query.data;
-  const scopedPermissions = useModeratorAssignmentsControllerPermissions(kind === 'events' ? 'event' : 'community', item?.id ?? '', {
-    query: { enabled: Boolean(user && item) },
-  });
+  const scopedPermissions = useModeratorAssignmentsControllerPermissions(
+    kind === 'events' ? 'event' : 'community',
+    item?.id ?? '',
+    {
+      query: { enabled: Boolean(user && item) },
+    },
+  );
   const currentUser = useUsersControllerCurrent(
     { lang: language },
     { query: { enabled: Boolean(user) } },
@@ -112,8 +108,15 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
   const communityStatus = useParticipationControllerCommunityStatus(item?.id ?? '', {
     query: {
       enabled: Boolean(
-        user && currentUser.isSuccess && item && kind === 'communities' &&
-        !(!('startsAt' in item) && item.ownerType === 'user' && item.ownerId === currentUser.data.id),
+        user &&
+          currentUser.isSuccess &&
+          item &&
+          kind === 'communities' &&
+          !(
+            !('startsAt' in item) &&
+            item.ownerType === 'user' &&
+            item.ownerId === currentUser.data.id
+          ),
       ),
     },
   });
@@ -160,7 +163,11 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
   const copyShareLink = async (): Promise<void> => {
     try {
       if (!navigator.clipboard) throw new Error('Clipboard API is unavailable.');
-      await navigator.clipboard.writeText(window.location.href);
+      await navigator.clipboard.writeText(
+        kind === 'communities' && item
+          ? `${window.location.origin}/communities/${item.slug}`
+          : window.location.href,
+      );
       toast.success(t('linkCopied'));
     } catch {
       toast.error(t('linkCopyFailed'));
@@ -196,12 +203,22 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
         className="mx-auto w-full max-w-(--container-reading) bg-card"
         title={t('notFoundResource', { resource: resourceName })}
         role="alert"
-        action={<Button asChild size="sm" variant="outline"><Link to={`/${kind}`}>{t('backTo', { resource: t(kind) })}</Link></Button>}
+        action={
+          <Button asChild size="sm" variant="outline">
+            <Link to={`/${kind}`}>{t('backTo', { resource: t(kind) })}</Link>
+          </Button>
+        }
       />
     );
   }
   if (!item) {
-    return <EmptyState className="bg-card" role="alert" title={t('notFoundResource', { resource: resourceName })} />;
+    return (
+      <EmptyState
+        className="bg-card"
+        role="alert"
+        title={t('notFoundResource', { resource: resourceName })}
+      />
+    );
   }
 
   const eventItem = 'startsAt' in item ? item : undefined;
@@ -247,9 +264,15 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
     try {
       await archiveCommunity.mutateAsync({ id: item.id });
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: getDiscoveryControllerCommunityQueryKey(item.id).slice(0, 1) }),
-        queryClient.invalidateQueries({ queryKey: getDiscoveryControllerListCommunitiesQueryKey().slice(0, 1) }),
-        queryClient.invalidateQueries({ queryKey: getCommunitiesControllerMineQueryKey().slice(0, 1) }),
+        queryClient.invalidateQueries({
+          queryKey: getDiscoveryControllerCommunityQueryKey(item.id).slice(0, 1),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: getDiscoveryControllerListCommunitiesQueryKey().slice(0, 1),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: getCommunitiesControllerMineQueryKey().slice(0, 1),
+        }),
       ]);
       toast.success(t('communityArchived'));
       void navigate('/communities');
@@ -270,8 +293,12 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
     try {
       await cancelEvent.mutateAsync({ id: item.id });
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: getDiscoveryControllerEventQueryKey(item.id).slice(0, 1) }),
-        queryClient.invalidateQueries({ queryKey: getDiscoveryControllerListEventsQueryKey().slice(0, 1) }),
+        queryClient.invalidateQueries({
+          queryKey: getDiscoveryControllerEventQueryKey(item.id).slice(0, 1),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: getDiscoveryControllerListEventsQueryKey().slice(0, 1),
+        }),
       ]);
       toast.success(t('eventCancelled'));
     } catch {
@@ -333,9 +360,12 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
         );
       }
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: kind === 'communities'
-          ? getParticipationControllerCommunityStatusQueryKey(item.id)
-          : getParticipationControllerEventStatusQueryKey(item.id) }),
+        queryClient.invalidateQueries({
+          queryKey:
+            kind === 'communities'
+              ? getParticipationControllerCommunityStatusQueryKey(item.id)
+              : getParticipationControllerEventStatusQueryKey(item.id),
+        }),
         queryClient.invalidateQueries({ queryKey: getParticipationControllerMyActivityQueryKey() }),
       ]);
       if (messagingSyncPending) toast.warning(t('messagingSyncPending'));
@@ -358,7 +388,9 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
     try {
       if (eventItem) await openEventChat.mutateAsync({ id: eventItem.id });
       else await openCommunityChat.mutateAsync({ id: communityItem!.id });
-      await queryClient.invalidateQueries({ queryKey: getMessagingControllerConversationsQueryKey() });
+      await queryClient.invalidateQueries({
+        queryKey: getMessagingControllerConversationsQueryKey(),
+      });
       void navigate('/messages');
     } catch {
       setChatError(true);
@@ -371,6 +403,121 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
     automatic: 'admissionAutomatic',
   };
   const admissionLabel = admissionLabels[item.admissionMode] ?? 'admissionUnknown';
+  if (communityItem) {
+    const canViewMembers = Boolean(user && (isManager || participationStatus === 'ACTIVE'));
+    return (
+      <>
+        <CommunityDetailsLayout
+          item={communityItem}
+          hostPath={hostPath}
+          canManage={Boolean(isManager)}
+          canViewMembers={canViewMembers}
+          viewerId={currentUser.data?.id}
+          onCopyShare={() => void copyShareLink()}
+          managementActions={
+            <>
+              <Button
+                asChild
+                aria-label={t('editCommunity')}
+                size="icon"
+                title={t('editCommunity')}
+                variant="outline"
+              >
+                <Link to={`/communities/${item.id}/edit`}>
+                  <Pencil aria-hidden="true" />
+                </Link>
+              </Button>
+              <Button
+                aria-label={t('archiveCommunity')}
+                className="border-danger/30 text-danger hover:bg-danger-soft hover:text-danger"
+                disabled={archiveCommunity.isPending}
+                onClick={() => void archive()}
+                size="icon"
+                title={t('archiveCommunity')}
+                variant="outline"
+              >
+                <Archive aria-hidden="true" />
+              </Button>
+              <ReportAction iconOnly targetType="community" targetId={item.id} />
+            </>
+          }
+          membershipAction={
+            <>
+              {!user ? (
+                <Button asChild size="sm">
+                  <Link to={`/sign-in?returnTo=${encodeURIComponent(returnTo)}`}>
+                    {t('joinCommunity')}
+                  </Link>
+                </Button>
+              ) : currentUser.isPending || participationPending ? (
+                <p className="text-sm text-text-muted" role="status">
+                  {t('loadingParticipation')}
+                </p>
+              ) : currentUser.isError || participationError ? (
+                <p className="text-sm text-danger" role="alert">
+                  {t('participationActionError')}
+                </p>
+              ) : (
+                <>
+                  {participationStatus ? (
+                    <span className="text-xs text-text-muted" role="status">
+                      {t(`participationStatus_${participationStatus}`)}
+                    </span>
+                  ) : null}
+                  <Button
+                    disabled={participationBusy}
+                    onClick={() => void runParticipationAction()}
+                    size="sm"
+                    variant={participationLeaving ? 'outline' : 'primary'}
+                  >
+                    {t(participationLeaving ? 'leaveCommunity' : 'joinCommunity')}
+                  </Button>
+                </>
+              )}
+              <ReportAction iconOnly targetType="community" targetId={item.id} />
+            </>
+          }
+          managementPanel={
+            <details
+              className="rounded-(--shape-radius-card) border border-border bg-card"
+              onToggle={(event) => setParticipationPanelOpen(event.currentTarget.open)}
+            >
+              <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-5 py-3 [&::-webkit-details-marker]:hidden">
+                <span className="font-semibold">{t('manageMembers')}</span>
+                <ChevronDown aria-hidden="true" className="size-4" />
+              </summary>
+              {participationPanelOpen ? (
+                <div className="border-t border-border p-5">
+                  <OrganizerParticipationPanel kind="communities" resourceId={item.id} />
+                </div>
+              ) : null}
+            </details>
+          }
+          chatAction={
+            canViewMembers ? (
+              <div className="grid gap-2">
+                <Button
+                  className="w-full"
+                  disabled={openCommunityChat.isPending}
+                  onClick={() => void openChat()}
+                  variant="outline"
+                >
+                  <MessageSquare aria-hidden="true" />
+                  {t('openResourceChat')}
+                </Button>
+                {chatError ? (
+                  <p role="alert" className="text-sm text-danger">
+                    {t('resourceChatError')}
+                  </p>
+                ) : null}
+              </div>
+            ) : null
+          }
+        />
+        {dialog}
+      </>
+    );
+  }
   return (
     <article className="mx-auto grid max-w-(--container-reading) gap-6">
       <div className="grid justify-items-start gap-3">
@@ -382,45 +529,28 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
           {t('backTo', { resource: t(kind) })}
         </Link>
         <div className="flex flex-wrap items-center gap-2">
-          {isManager && communityItem ? (
-            <>
-              <Button asChild aria-label={t('editCommunity')} size="icon" title={t('editCommunity')} variant="outline"><Link to={`/communities/${item.id}/edit`}><Pencil aria-hidden="true" /></Link></Button>
-              <Button aria-label={t('archiveCommunity')} className="border-danger/30 text-danger hover:bg-danger-soft hover:text-danger" disabled={archiveCommunity.isPending} onClick={() => void archive()} size="icon" title={t('archiveCommunity')} variant="outline"><Archive aria-hidden="true" /></Button>
-            </>
-          ) : null}
-          <Button aria-label={t('copyShare')} onClick={() => void copyShareLink()} size="icon" title={t('copyShare')} variant="outline">
+          <Button
+            aria-label={t('copyShare')}
+            onClick={() => void copyShareLink()}
+            size="icon"
+            title={t('copyShare')}
+            variant="outline"
+          >
             <Share2 aria-hidden="true" />
           </Button>
-          <ReportAction iconOnly targetType={kind === 'events' ? 'event' : 'community'} targetId={item.id} />
+          <ReportAction
+            iconOnly
+            targetType={kind === 'events' ? 'event' : 'community'}
+            targetId={item.id}
+          />
         </div>
       </div>
 
       <ResourceOverview item={item} hostPath={hostPath} admissionLabel={admissionLabel} />
-      {communityItem &&
+      {eventItem &&
       currentUser.isSuccess &&
-      (isManager || participationStatus === 'ACTIVE') ? (
-        <CommunityMemberPreview communityId={communityItem.id} viewerId={currentUser.data?.id} />
-      ) : null}
-      {eventItem && currentUser.isSuccess && (isManager || ['ACCEPTED', 'ATTENDED', 'NO_SHOW'].includes(participationStatus ?? '')) ? (
+      (isManager || ['ACCEPTED', 'ATTENDED', 'NO_SHOW'].includes(participationStatus ?? '')) ? (
         <EventAttendeePreview eventId={eventItem.id} />
-      ) : null}
-      {isManager && communityItem ? (
-        <details
-          className="rounded-(--shape-radius-card) border border-border bg-card"
-          onToggle={(event) => setParticipationPanelOpen(event.currentTarget.open)}
-        >
-          <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-5 py-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary [&::-webkit-details-marker]:hidden">
-            <span aria-level={2} id="organizer-participation-heading" role="heading">
-              {t('manageMembers')}
-            </span>
-            <ChevronDown aria-hidden="true" className="size-4 shrink-0 transition-transform open:rotate-180" />
-          </summary>
-          {participationPanelOpen ? (
-            <div className="grid gap-4 border-t border-border p-5">
-              <OrganizerParticipationPanel kind="communities" resourceId={item.id} />
-            </div>
-          ) : null}
-        </details>
       ) : null}
       {isManager && eventItem ? (
         <section className="grid gap-4 rounded-(--shape-radius-card) border border-border bg-card p-5">
@@ -450,7 +580,8 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
           />
         </section>
       ) : null}
-      {currentUser.isSuccess && !isManager &&
+      {currentUser.isSuccess &&
+        !isManager &&
         !eventItem?.cancelled &&
         !(eventItem && new Date(eventItem.startsAt).getTime() <= Date.now()) && (
           <section
@@ -525,12 +656,6 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
             ) : null}
           </section>
         )}
-      {communityItem && (
-        <CommunityTopics
-          communityId={communityItem.id}
-          canPost={Boolean(user && (isManager || participationStatus === 'ACTIVE'))}
-        />
-      )}
       {eventItem && (
         <EventDiscussion
           eventId={eventItem.id}
