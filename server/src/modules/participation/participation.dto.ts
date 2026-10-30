@@ -67,8 +67,22 @@ export class ParticipantListItemDto {
   @ApiProperty({ format: 'uuid' }) id!: string;
   @ApiProperty({ format: 'uuid' }) userId!: string;
   @ApiProperty() displayName!: string;
+  @ApiProperty({ type: String, nullable: true }) avatarUrl!: string | null;
   @ApiProperty() status!: string;
   @ApiProperty({ format: 'date-time' }) requestedAt!: string;
+}
+
+export class CommunityMemberDto {
+  @ApiProperty() isHost!: boolean;
+  @ApiProperty({ format: 'uuid' }) userId!: string;
+  @ApiProperty() displayName!: string;
+  @ApiProperty({ type: String, nullable: true }) avatarUrl!: string | null;
+}
+
+export class CommunityMemberPreviewDto {
+  @ApiProperty({ type: CommunityMemberDto, nullable: true }) host!: CommunityMemberDto | null;
+  @ApiProperty() total!: number;
+  @ApiProperty({ type: [CommunityMemberDto] }) members!: CommunityMemberDto[];
 }
 
 export class ParticipationCountsDto {

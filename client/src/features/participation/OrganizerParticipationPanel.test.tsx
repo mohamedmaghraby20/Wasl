@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { I18nextProvider } from 'react-i18next';
+import { MemoryRouter } from 'react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { i18n } from '@/lib/i18n';
 import { OrganizerParticipationPanel } from './OrganizerParticipationPanel';
@@ -30,11 +31,13 @@ vi.mock('@/api/generated/participation/participation', () => ({
 function renderPanel(): void {
   render(
     <I18nextProvider i18n={i18n}>
-      <QueryClientProvider
-        client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
-      >
-        <OrganizerParticipationPanel kind="communities" resourceId="community-1" />
-      </QueryClientProvider>
+      <MemoryRouter>
+        <QueryClientProvider
+          client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
+        >
+          <OrganizerParticipationPanel kind="communities" resourceId="community-1" />
+        </QueryClientProvider>
+      </MemoryRouter>
     </I18nextProvider>,
   );
 }
@@ -49,6 +52,7 @@ describe('OrganizerParticipationPanel', () => {
           id: 'membership-1',
           userId: 'user-1',
           displayName: 'Samira',
+          avatarUrl: 'https://example.test/avatar.png',
           status: 'PENDING',
           requestedAt: '2026-10-01T00:00:00Z',
         },
@@ -71,6 +75,8 @@ describe('OrganizerParticipationPanel', () => {
     renderPanel();
 
     expect(screen.getByText('Samira')).toBeVisible();
+    expect(screen.getByRole('link', { name: 'Samira' })).toHaveAttribute('href', '/users/user-1');
+    expect(screen.getByAltText('')).toHaveAttribute('src', 'https://example.test/avatar.png');
     expect(screen.getByText('Pending')).toBeVisible();
     expect(screen.getByText('3')).toBeVisible();
     expect(screen.getByText('10')).toBeVisible();
@@ -81,5 +87,16 @@ describe('OrganizerParticipationPanel', () => {
       participantId: 'membership-1',
       action: 'approve',
     });
+  });
+
+  it('shows a community-specific empty state when there are no participants', () => {
+    mocks.participants.mockReturnValue({
+      data: [],
+      isPending: false,
+      isError: false,
+      refetch: vi.fn(),
+    });
+    renderPanel();
+    expect(screen.getByText('This community does not have any participants yet.')).toBeVisible();
   });
 });

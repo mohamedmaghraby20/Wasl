@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
+import { Link } from 'react-router';
 import {
   useParticipationControllerCommunityCounts,
   useParticipationControllerCommunityDecision,
@@ -84,7 +85,12 @@ export function OrganizerParticipationPanel({
   const busy = communityDecision.isPending || eventDecision.isPending;
   const setModerator = async (userId: string, enabled: boolean): Promise<void> => {
     try {
-      if (enabled) await assignModerator.mutateAsync({ kind: moderationKind, id: resourceId, data: { userId } });
+      if (enabled)
+        await assignModerator.mutateAsync({
+          kind: moderationKind,
+          id: resourceId,
+          data: { userId },
+        });
       else await removeModerator.mutateAsync({ kind: moderationKind, id: resourceId, userId });
       await queryClient.invalidateQueries();
     } catch {
@@ -93,13 +99,12 @@ export function OrganizerParticipationPanel({
   };
 
   return (
-    <section
-      className="grid gap-4 border-t border-border pt-5"
-      aria-labelledby="organizer-participation-heading"
-    >
-      <h2 id="organizer-participation-heading" className="font-heading text-xl font-bold">
-        {kind === 'communities' ? t('manageMembers') : t('manageRegistrations')}
-      </h2>
+    <section className="grid gap-4 border-t border-border pt-5">
+      {kind === 'events' ? (
+        <h2 id="organizer-participation-heading" className="font-heading text-xl font-bold">
+          {t('manageRegistrations')}
+        </h2>
+      ) : null}
       {isPending ? (
         <p role="status">{t('loadingParticipation')}</p>
       ) : isError ? (
@@ -125,22 +130,54 @@ export function OrganizerParticipationPanel({
             />
           </dl>
           {participants.data.length ? (
-            <ul className="grid gap-3">
+            <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
               {participants.data.map((participant) => (
                 <li
                   key={participant.id}
-                  className="flex flex-wrap items-center justify-between gap-3 rounded-(--shape-radius-card) border border-border bg-card p-4"
+                  className="grid content-start gap-3 rounded-(--shape-radius-card) border border-border bg-card p-3"
                 >
-                  <div className="grid gap-1">
-                    <p className="font-semibold">{participant.displayName}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {t(`participationStatus_${participant.status}`)}
-                    </p>
+                  <div className="flex min-w-0 items-center gap-3">
+                    <span className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-full bg-primary-soft text-sm font-bold text-primary-soft-text">
+                      {participant.avatarUrl ? (
+                        <img
+                          alt=""
+                          className="size-full object-cover"
+                          src={participant.avatarUrl}
+                        />
+                      ) : (
+                        participant.displayName.trim().slice(0, 1).toLocaleUpperCase()
+                      )}
+                    </span>
+                    <div className="min-w-0">
+                      <Link
+                        className="block truncate font-semibold hover:underline"
+                        to={`/users/${participant.userId}`}
+                      >
+                        {participant.displayName}
+                      </Link>
+                      <p className="text-xs text-muted-foreground">
+                        {t(`participationStatus_${participant.status}`)}
+                      </p>
+                    </div>
                   </div>
-                    <div className="flex flex-wrap gap-2">
-                    {moderators.isSuccess && (kind === 'communities' ? participant.status === 'ACTIVE' : participant.status === 'ACCEPTED') ? (
-                      <Button disabled={assignModerator.isPending || removeModerator.isPending} onClick={() => void setModerator(participant.userId, !moderators.data.some((entry) => entry.userId === participant.userId))} variant="outline">
-                        {moderators.data.some((entry) => entry.userId === participant.userId) ? t('removeModerator') : t('assignModerator')}
+                  <div className="flex flex-wrap gap-2">
+                    {moderators.isSuccess &&
+                    (kind === 'communities'
+                      ? participant.status === 'ACTIVE'
+                      : participant.status === 'ACCEPTED') ? (
+                      <Button
+                        disabled={assignModerator.isPending || removeModerator.isPending}
+                        onClick={() =>
+                          void setModerator(
+                            participant.userId,
+                            !moderators.data.some((entry) => entry.userId === participant.userId),
+                          )
+                        }
+                        variant="outline"
+                      >
+                        {moderators.data.some((entry) => entry.userId === participant.userId)
+                          ? t('removeModerator')
+                          : t('assignModerator')}
                       </Button>
                     ) : null}
                     {participant.status === 'PENDING' && (

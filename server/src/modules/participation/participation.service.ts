@@ -1,12 +1,14 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Inject,
   Injectable,
   NotFoundException,
   Optional,
   ServiceUnavailableException,
 } from '@nestjs/common';
-import { and, asc, count, desc, eq, inArray } from 'drizzle-orm';
+import { ConfigService } from '@nestjs/config';
+import { and, asc, count, desc, eq, inArray, sql } from 'drizzle-orm';
 import { DATABASE, type Database } from '../../db/database.module';
 import {
   communities,
@@ -38,6 +40,7 @@ export class ParticipationService {
     private readonly eventsService: EventsService,
     @Optional() private readonly messaging?: MessagingService,
     @Optional() private readonly notifications?: NotificationsService,
+    @Optional() private readonly config?: ConfigService,
   ) {}
 
   async joinCommunity(user: AuthenticatedUser, communityId: string) {
@@ -370,11 +373,12 @@ export class ParticipationService {
 
   async communityParticipants(user: AuthenticatedUser, communityId: string) {
     await this.communitiesService.assertCanManage(user.id, communityId);
-    return this.database()
+    const participants = await this.database()
       .select({
         id: communityMemberships.id,
         userId: communityMemberships.userId,
         displayName: profiles.displayName,
+        avatarPath: profiles.avatarPath,
         status: communityMemberships.status,
         requestedAt: communityMemberships.requestedAt,
       })
@@ -382,15 +386,20 @@ export class ParticipationService {
       .innerJoin(profiles, eq(profiles.id, communityMemberships.userId))
       .where(eq(communityMemberships.communityId, communityId))
       .orderBy(communityMemberships.requestedAt);
+    return participants.map(({ avatarPath, ...participant }) => ({
+      ...participant,
+      avatarUrl: this.publicAvatarUrl(avatarPath),
+    }));
   }
 
   async eventParticipants(user: AuthenticatedUser, eventId: string) {
     await this.eventsService.assertCanManageById(user, eventId);
-    return this.database()
+    const participants = await this.database()
       .select({
         id: eventRegistrations.id,
         userId: eventRegistrations.userId,
         displayName: profiles.displayName,
+        avatarPath: profiles.avatarPath,
         status: eventRegistrations.status,
         requestedAt: eventRegistrations.requestedAt,
       })
@@ -398,6 +407,10 @@ export class ParticipationService {
       .innerJoin(profiles, eq(profiles.id, eventRegistrations.userId))
       .where(eq(eventRegistrations.eventId, eventId))
       .orderBy(eventRegistrations.requestedAt);
+    return participants.map(({ avatarPath, ...participant }) => ({
+      ...participant,
+      avatarUrl: this.publicAvatarUrl(avatarPath),
+    }));
   }
 
   async communityCounts(user: AuthenticatedUser, communityId: string) {
@@ -418,6 +431,131 @@ export class ParticipationService {
       admissionMode: community.admissionMode,
       ...countStatuses(counts),
     };
+  }
+
+  async communityMembers(user: AuthenticatedUser, communityId: string) {
+    await this.assertCanViewCommunityMembers(user, communityId);
+    const rows = await this.database()
+      .select({
+        userId: profiles.id,
+        displayName: profiles.displayName,
+        avatarPath: profiles.avatarPath,
+      })
+      .from(communityMemberships)
+      .innerJoin(profiles, eq(profiles.id, communityMemberships.userId))
+      .where(
+        and(
+          eq(communityMemberships.communityId, communityId),
+          eq(communityMemberships.status, 'ACTIVE'),
+        ),
+      )
+      .orderBy(communityMemberships.requestedAt);
+    const host = await this.communityHost(communityId);
+    const members = rows
+      .filter((member) => member.userId !== host?.userId)
+      .map(({ avatarPath, ...member }) => ({
+        ...member,
+        isHost: false,
+        avatarUrl: this.publicAvatarUrl(avatarPath),
+      }));
+    return host
+      ? [
+          {
+            userId: host.userId,
+            displayName: host.displayName,
+            avatarUrl: this.publicAvatarUrl(host.avatarPath),
+            isHost: true,
+          },
+          ...members,
+        ]
+      : members;
+  }
+
+  async communityMemberPreview(user: AuthenticatedUser, communityId: string) {
+    await this.assertCanViewCommunityMembers(user, communityId);
+    const db = this.database();
+    const [totalRows, members, host] = await Promise.all([
+      db
+        .select({ total: count() })
+        .from(communityMemberships)
+        .where(
+          and(
+            eq(communityMemberships.communityId, communityId),
+            eq(communityMemberships.status, 'ACTIVE'),
+          ),
+        ),
+      db
+        .select({
+          userId: profiles.id,
+          displayName: profiles.displayName,
+          avatarPath: profiles.avatarPath,
+        })
+        .from(communityMemberships)
+        .innerJoin(profiles, eq(profiles.id, communityMemberships.userId))
+        .where(
+          and(
+            eq(communityMemberships.communityId, communityId),
+            eq(communityMemberships.status, 'ACTIVE'),
+          ),
+        )
+        .orderBy(communityMemberships.requestedAt)
+        .limit(6),
+      this.communityHost(communityId),
+    ]);
+    return {
+      host: host
+        ? {
+            userId: host.userId,
+            displayName: host.displayName,
+            avatarUrl: this.publicAvatarUrl(host.avatarPath),
+            isHost: true,
+          }
+        : null,
+      total: Number(totalRows[0]?.total ?? 0) + (host && !host.isMember ? 1 : 0),
+      members: members.map(({ avatarPath, ...member }) => ({
+        ...member,
+        isHost: member.userId === host?.userId,
+        avatarUrl: this.publicAvatarUrl(avatarPath),
+      })),
+    };
+  }
+
+  private async communityHost(communityId: string) {
+    const [host] = await this.database()
+      .select({
+        userId: profiles.id,
+        displayName: profiles.displayName,
+        avatarPath: profiles.avatarPath,
+        isMember: sql<boolean>`exists (select 1 from ${communityMemberships} where ${communityMemberships.communityId} = ${communityId} and ${communityMemberships.userId} = ${profiles.id} and ${communityMemberships.status} = 'ACTIVE')`,
+      })
+      .from(communities)
+      .innerJoin(profiles, sql`${profiles.id}::text = ${communities.ownerId}`)
+      .where(and(eq(communities.id, communityId), eq(communities.ownerType, 'user')))
+      .limit(1);
+    return host;
+  }
+
+  private async assertCanViewCommunityMembers(user: AuthenticatedUser, communityId: string) {
+    try {
+      await this.communitiesService.assertCanManage(user.id, communityId);
+      return;
+    } catch (error) {
+      if (!(error instanceof ForbiddenException)) throw error;
+    }
+    const [membership] = await this.database()
+      .select({ id: communityMemberships.id })
+      .from(communityMemberships)
+      .innerJoin(communities, eq(communities.id, communityMemberships.communityId))
+      .where(
+        and(
+          eq(communityMemberships.communityId, communityId),
+          eq(communityMemberships.userId, user.id),
+          eq(communityMemberships.status, 'ACTIVE'),
+          eq(communities.archived, false),
+        ),
+      )
+      .limit(1);
+    if (!membership) throw new ForbiddenException('Join this community to view its members.');
   }
 
   async eventCounts(user: AuthenticatedUser, eventId: string) {
@@ -816,6 +954,15 @@ export class ParticipationService {
   private database(): Database {
     if (!this.db) throw new ServiceUnavailableException('Database is not configured.');
     return this.db;
+  }
+
+  private publicAvatarUrl(path: string | null): string | null {
+    const supabaseUrl = this.config?.get<string>('SUPABASE_URL');
+    if (!path || !supabaseUrl) return null;
+    return `${supabaseUrl.replace(/\/+$/, '')}/storage/v1/object/public/profile-photos/${path
+      .split('/')
+      .map(encodeURIComponent)
+      .join('/')}`;
   }
 }
 

@@ -10,6 +10,7 @@ import { ParticipationService } from './participation.service';
 function query(rows: unknown[]) {
   const builder = {
     from: () => builder,
+    innerJoin: () => builder,
     where: () => builder,
     for: () => builder,
     orderBy: () => builder,
@@ -108,6 +109,75 @@ describe('ParticipationService', () => {
     ).rejects.toBeInstanceOf(ForbiddenException);
     expect(communitiesService.assertCanManage).toHaveBeenCalledWith(user.id, 'community');
     expect(transaction).not.toHaveBeenCalled();
+  });
+
+  it('allows active community members to see active member profiles', async () => {
+    const database = {
+      select: vi
+        .fn()
+        .mockImplementationOnce(() => query([{ id: 'membership' }]))
+        .mockImplementationOnce(() =>
+          query([{ userId: 'member-id', displayName: 'Member Name', avatarPath: null }]),
+        )
+        .mockImplementationOnce(() => query([])),
+    };
+    const communitiesService = {
+      assertCanManage: vi.fn().mockRejectedValue(new ForbiddenException()),
+    };
+    const service = new ParticipationService(
+      database as unknown as Database,
+      communitiesService as unknown as CommunitiesService,
+      {} as EventsService,
+    );
+
+    await expect(service.communityMembers(user, 'community')).resolves.toEqual([
+      { userId: 'member-id', displayName: 'Member Name', avatarUrl: null, isHost: false },
+    ]);
+  });
+
+  it('denies community member lists to users without an active membership', async () => {
+    const database = { select: vi.fn(() => query([])) };
+    const communitiesService = {
+      assertCanManage: vi.fn().mockRejectedValue(new ForbiddenException()),
+    };
+    const service = new ParticipationService(
+      database as unknown as Database,
+      communitiesService as unknown as CommunitiesService,
+      {} as EventsService,
+    );
+
+    await expect(service.communityMembers(user, 'community')).rejects.toBeInstanceOf(
+      ForbiddenException,
+    );
+    expect(database.select).toHaveBeenCalledTimes(1);
+  });
+
+  it('includes the owner as the preview host even without a membership row', async () => {
+    const database = {
+      select: vi
+        .fn()
+        .mockImplementationOnce(() => query([{ total: 4 }]))
+        .mockImplementationOnce(() =>
+          query([{ userId: 'member-id', displayName: 'Member', avatarPath: null }]),
+        )
+        .mockImplementationOnce(() =>
+          query([{ userId: user.id, displayName: 'Host Name', avatarPath: null, isMember: false }]),
+        ),
+    };
+    const service = new ParticipationService(
+      database as unknown as Database,
+      { assertCanManage: vi.fn().mockResolvedValue({}) } as unknown as CommunitiesService,
+      {} as EventsService,
+    );
+    const preview = await service.communityMemberPreview(user, 'community');
+    expect(preview.total).toBe(5);
+    expect(preview.host).toEqual({
+      userId: user.id,
+      displayName: 'Host Name',
+      avatarUrl: null,
+      isHost: true,
+    });
+    expect(preview.members[0]?.isHost).toBe(false);
   });
 
   it('denies organizer decisions before opening a transaction for an event they do not manage', async () => {

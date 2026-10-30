@@ -15,6 +15,8 @@ import { getAuthenticatedUser } from '../auth/authenticated-user';
 import { SupabaseAuthGuard } from '../auth/supabase-auth.guard';
 import {
   MembershipStateDto,
+  CommunityMemberDto,
+  CommunityMemberPreviewDto,
   MyActivityDto,
   ParticipantListItemDto,
   ParticipationCountsDto,
@@ -37,19 +39,19 @@ export class ParticipationController {
 
   @Post('communities/:id/join')
   @ApiOkResponse({ type: MembershipStateDto })
-  joinCommunity(@Req() request: FastifyRequest, @Param('id', ParseUUIDPipe) id: string) {
+  joinCommunity(@Req() request: FastifyRequest, @Param('id') id: string) {
     return this.participation.joinCommunity(getAuthenticatedUser(request), id);
   }
 
   @Patch('communities/:id/leave')
   @ApiOkResponse({ type: MembershipStateDto })
-  leaveCommunity(@Req() request: FastifyRequest, @Param('id', ParseUUIDPipe) id: string) {
+  leaveCommunity(@Req() request: FastifyRequest, @Param('id') id: string) {
     return this.participation.leaveCommunity(getAuthenticatedUser(request), id);
   }
 
   @Get('communities/:id/membership')
   @ApiOkResponse({ type: MembershipStateDto })
-  communityStatus(@Req() request: FastifyRequest, @Param('id', ParseUUIDPipe) id: string) {
+  communityStatus(@Req() request: FastifyRequest, @Param('id') id: string) {
     return this.participation.myCommunityStatus(getAuthenticatedUser(request), id);
   }
 
@@ -73,21 +75,33 @@ export class ParticipationController {
 
   @Get('communities/:id/participants')
   @ApiOkResponse({ type: ParticipantListItemDto, isArray: true })
-  communityParticipants(@Req() request: FastifyRequest, @Param('id', ParseUUIDPipe) id: string) {
+  communityParticipants(@Req() request: FastifyRequest, @Param('id') id: string) {
     return this.participation.communityParticipants(getAuthenticatedUser(request), id);
   }
 
   @Get('communities/:id/participation-counts')
   @ApiOkResponse({ type: ParticipationCountsDto })
-  communityCounts(@Req() request: FastifyRequest, @Param('id', ParseUUIDPipe) id: string) {
+  communityCounts(@Req() request: FastifyRequest, @Param('id') id: string) {
     return this.participation.communityCounts(getAuthenticatedUser(request), id);
+  }
+
+  @Get('communities/:id/members')
+  @ApiOkResponse({ type: CommunityMemberDto, isArray: true })
+  communityMembers(@Req() request: FastifyRequest, @Param('id') id: string) {
+    return this.participation.communityMembers(getAuthenticatedUser(request), id);
+  }
+
+  @Get('communities/:id/member-preview')
+  @ApiOkResponse({ type: CommunityMemberPreviewDto })
+  communityMemberPreview(@Req() request: FastifyRequest, @Param('id') id: string) {
+    return this.participation.communityMemberPreview(getAuthenticatedUser(request), id);
   }
 
   @Patch('communities/:id/participants/:participantId/:action')
   @ApiOkResponse({ type: ParticipationDecisionDto })
   communityDecision(
     @Req() request: FastifyRequest,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @Param('participantId', ParseUUIDPipe) participantId: string,
     @Param('action') action: string,
   ) {

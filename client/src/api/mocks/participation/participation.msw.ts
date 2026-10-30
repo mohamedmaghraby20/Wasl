@@ -17,6 +17,8 @@ import type {
 } from 'msw';
 
 import type {
+  CommunityMemberDto,
+  CommunityMemberPreviewDto,
   MembershipStateDto,
   MyActivityDto,
   ParticipantListItemDto,
@@ -40,13 +42,17 @@ export const getParticipationControllerCancelEventRegistrationResponseMock = (ov
 
 export const getParticipationControllerEventStatusResponseMock = (overrideResponse: Partial<Extract<RegistrationStateDto, object>> = {}): RegistrationStateDto => ({status: faker.helpers.arrayElement([faker.helpers.arrayElement(['PENDING','WAITLISTED','ACCEPTED','REJECTED','CANCELLED_BY_USER','REMOVED_BY_ORGANIZER','ATTENDED','NO_SHOW'] as const), null]), messagingSyncPending: faker.datatype.boolean(), ...overrideResponse})
 
-export const getParticipationControllerCommunityParticipantsResponseMock = (): ParticipantListItemDto[] => (Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), userId: faker.string.uuid(), displayName: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.string.alpha({length: {min: 10, max: 20}}), requestedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})))
+export const getParticipationControllerCommunityParticipantsResponseMock = (): ParticipantListItemDto[] => (Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), userId: faker.string.uuid(), displayName: faker.string.alpha({length: {min: 10, max: 20}}), avatarUrl: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), status: faker.string.alpha({length: {min: 10, max: 20}}), requestedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})))
 
 export const getParticipationControllerCommunityCountsResponseMock = (overrideResponse: Partial<Extract<ParticipationCountsDto, object>> = {}): ParticipationCountsDto => ({capacity: faker.string.alpha({length: {min: 10, max: 20}}), admissionMode: faker.string.alpha({length: {min: 10, max: 20}}), PENDING: faker.number.float({fractionDigits: 2}), WAITLISTED: faker.number.float({fractionDigits: 2}), ACTIVE: faker.number.float({fractionDigits: 2}), ACCEPTED: faker.number.float({fractionDigits: 2}), REJECTED: faker.number.float({fractionDigits: 2}), LEFT: faker.number.float({fractionDigits: 2}), REMOVED: faker.number.float({fractionDigits: 2}), CANCELLED_BY_USER: faker.number.float({fractionDigits: 2}), REMOVED_BY_ORGANIZER: faker.number.float({fractionDigits: 2}), ATTENDED: faker.number.float({fractionDigits: 2}), NO_SHOW: faker.number.float({fractionDigits: 2}), ...overrideResponse})
 
+export const getParticipationControllerCommunityMembersResponseMock = (): CommunityMemberDto[] => (Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({isHost: faker.datatype.boolean(), userId: faker.string.uuid(), displayName: faker.string.alpha({length: {min: 10, max: 20}}), avatarUrl: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null])})))
+
+export const getParticipationControllerCommunityMemberPreviewResponseMock = (overrideResponse: Partial<Extract<CommunityMemberPreviewDto, object>> = {}): CommunityMemberPreviewDto => ({host: faker.helpers.arrayElement([{isHost: faker.datatype.boolean(), userId: faker.string.uuid(), displayName: faker.string.alpha({length: {min: 10, max: 20}}), avatarUrl: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null])},null,]), total: faker.number.float({fractionDigits: 2}), members: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({isHost: faker.datatype.boolean(), userId: faker.string.uuid(), displayName: faker.string.alpha({length: {min: 10, max: 20}}), avatarUrl: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null])})), ...overrideResponse})
+
 export const getParticipationControllerCommunityDecisionResponseMock = (overrideResponse: Partial<Extract<ParticipationDecisionDto, object>> = {}): ParticipationDecisionDto => ({participantId: faker.string.uuid(), status: faker.string.alpha({length: {min: 10, max: 20}}), messagingSyncPending: faker.datatype.boolean(), ...overrideResponse})
 
-export const getParticipationControllerEventParticipantsResponseMock = (): ParticipantListItemDto[] => (Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), userId: faker.string.uuid(), displayName: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.string.alpha({length: {min: 10, max: 20}}), requestedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})))
+export const getParticipationControllerEventParticipantsResponseMock = (): ParticipantListItemDto[] => (Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), userId: faker.string.uuid(), displayName: faker.string.alpha({length: {min: 10, max: 20}}), avatarUrl: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), status: faker.string.alpha({length: {min: 10, max: 20}}), requestedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})))
 
 export const getParticipationControllerEventCountsResponseMock = (overrideResponse: Partial<Extract<ParticipationCountsDto, object>> = {}): ParticipationCountsDto => ({capacity: faker.string.alpha({length: {min: 10, max: 20}}), admissionMode: faker.string.alpha({length: {min: 10, max: 20}}), PENDING: faker.number.float({fractionDigits: 2}), WAITLISTED: faker.number.float({fractionDigits: 2}), ACTIVE: faker.number.float({fractionDigits: 2}), ACCEPTED: faker.number.float({fractionDigits: 2}), REJECTED: faker.number.float({fractionDigits: 2}), LEFT: faker.number.float({fractionDigits: 2}), REMOVED: faker.number.float({fractionDigits: 2}), CANCELLED_BY_USER: faker.number.float({fractionDigits: 2}), REMOVED_BY_ORGANIZER: faker.number.float({fractionDigits: 2}), ATTENDED: faker.number.float({fractionDigits: 2}), NO_SHOW: faker.number.float({fractionDigits: 2}), ...overrideResponse})
 
@@ -161,6 +167,30 @@ export const getParticipationControllerCommunityCountsMockHandler = (overrideRes
   }, options)
 }
 
+export const getParticipationControllerCommunityMembersMockHandler = (overrideResponse?: CommunityMemberDto[] | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<CommunityMemberDto[]> | CommunityMemberDto[]), options?: RequestHandlerOptions) => {
+  return http.get('*/api/v1/communities/:id/members', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getParticipationControllerCommunityMembersResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getParticipationControllerCommunityMemberPreviewMockHandler = (overrideResponse?: CommunityMemberPreviewDto | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<CommunityMemberPreviewDto> | CommunityMemberPreviewDto), options?: RequestHandlerOptions) => {
+  return http.get('*/api/v1/communities/:id/member-preview', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getParticipationControllerCommunityMemberPreviewResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
 export const getParticipationControllerCommunityDecisionMockHandler = (overrideResponse?: ParticipationDecisionDto | ((info: Parameters<Parameters<typeof http.patch>[1]>[0]) => Promise<ParticipationDecisionDto> | ParticipationDecisionDto), options?: RequestHandlerOptions) => {
   return http.patch('*/api/v1/communities/:id/participants/:participantId/:action', async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {
 
@@ -218,6 +248,8 @@ export const getParticipationMock = () => [
   getParticipationControllerEventStatusMockHandler(),
   getParticipationControllerCommunityParticipantsMockHandler(),
   getParticipationControllerCommunityCountsMockHandler(),
+  getParticipationControllerCommunityMembersMockHandler(),
+  getParticipationControllerCommunityMemberPreviewMockHandler(),
   getParticipationControllerCommunityDecisionMockHandler(),
   getParticipationControllerEventParticipantsMockHandler(),
   getParticipationControllerEventCountsMockHandler(),

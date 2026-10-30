@@ -50,6 +50,16 @@ export const router = createBrowserRouter([
         },
       },
       {
+        path: 'communities/:id/members',
+        handle: { requiresAuth: true },
+        lazy: async () => {
+          const { CommunityMembersPage } = await import(
+            '@/features/participation/CommunityMembersPage'
+          );
+          return { Component: CommunityMembersPage };
+        },
+      },
+      {
         path: 'communities/:id/topics/:topicId',
         lazy: async () => {
           const { CommunityTopicPage } = await import('@/features/discussions/CommunityTopicPage');

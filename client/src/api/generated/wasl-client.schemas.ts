@@ -705,6 +705,8 @@ export interface ParticipantListItemDto {
   id: string;
   userId: string;
   displayName: string;
+  /** @nullable */
+  avatarUrl: string | null;
   status: string;
   requestedAt: string;
 }
@@ -723,6 +725,20 @@ export interface ParticipationCountsDto {
   REMOVED_BY_ORGANIZER: number;
   ATTENDED: number;
   NO_SHOW: number;
+}
+
+export interface CommunityMemberDto {
+  isHost: boolean;
+  userId: string;
+  displayName: string;
+  /** @nullable */
+  avatarUrl: string | null;
+}
+
+export interface CommunityMemberPreviewDto {
+  host: CommunityMemberDto | null;
+  total: number;
+  members: CommunityMemberDto[];
 }
 
 export interface ParticipationDecisionDto {

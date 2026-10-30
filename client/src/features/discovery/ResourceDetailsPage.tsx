@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import {
+  Archive,
   ArrowLeft,
+  ChevronDown,
   MessageSquare,
+  Pencil,
   Share2,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -59,6 +62,7 @@ import {
   useMessagingControllerEvent,
 } from '@/api/generated/messaging/messaging';
 import { ResourceOverview } from './ResourceOverview';
+import { CommunityMemberPreview } from '@/features/participation/CommunityMemberPreview';
 
 export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX.Element {
   const { t, i18n } = useTranslation();
@@ -105,10 +109,15 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
   const archiveCommunity = useCommunitiesControllerArchive();
   const cancelEvent = useEventsControllerCancel();
   const communityStatus = useParticipationControllerCommunityStatus(item?.id ?? '', {
-    query: { enabled: Boolean(user) && kind === 'communities' && Boolean(item) },
+    query: {
+      enabled: Boolean(
+        user && currentUser.isSuccess && item && kind === 'communities' &&
+        !(!('startsAt' in item) && item.ownerType === 'user' && item.ownerId === currentUser.data.id),
+      ),
+    },
   });
   const eventStatus = useParticipationControllerEventStatus(item?.id ?? '', {
-    query: { enabled: Boolean(user) && kind === 'events' && Boolean(item) },
+    query: { enabled: Boolean(user && currentUser.isSuccess && kind === 'events' && item) },
   });
   const joinCommunity = useParticipationControllerJoinCommunity();
   const leaveCommunity = useParticipationControllerLeaveCommunity();
@@ -117,6 +126,7 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
   const openCommunityChat = useMessagingControllerCommunity();
   const openEventChat = useMessagingControllerEvent();
   const [chatError, setChatError] = useState(false);
+  const [participationPanelOpen, setParticipationPanelOpen] = useState(false);
   const { confirm, dialog } = useConfirm();
   const resourceName = t(kind === 'events' ? 'event' : 'community').toLocaleLowerCase(
     i18n.language,
@@ -362,7 +372,7 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
   const admissionLabel = admissionLabels[item.admissionMode] ?? 'admissionUnknown';
   return (
     <article className="mx-auto grid max-w-(--container-reading) gap-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="grid justify-items-start gap-3">
         <Link
           className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-text-muted transition-colors hover:text-text"
           to={`/${kind}`}
@@ -370,48 +380,62 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
           <ArrowLeft aria-hidden="true" className="size-4 rtl:rotate-180" />
           {t('backTo', { resource: t(kind) })}
         </Link>
-        <Button onClick={() => void copyShareLink()} size="sm" variant="outline">
-          <Share2 aria-hidden="true" />
-          {t('copyShare')}
-        </Button>
-        <ReportAction targetType={kind === 'events' ? 'event' : 'community'} targetId={item.id} />
+        <div className="flex flex-wrap items-center gap-2">
+          {isManager && communityItem ? (
+            <>
+              <Button asChild aria-label={t('editCommunity')} size="icon" title={t('editCommunity')} variant="outline"><Link to={`/communities/${item.id}/edit`}><Pencil aria-hidden="true" /></Link></Button>
+              <Button aria-label={t('archiveCommunity')} className="border-danger/30 text-danger hover:bg-danger-soft hover:text-danger" disabled={archiveCommunity.isPending} onClick={() => void archive()} size="icon" title={t('archiveCommunity')} variant="outline"><Archive aria-hidden="true" /></Button>
+            </>
+          ) : null}
+          <Button aria-label={t('copyShare')} onClick={() => void copyShareLink()} size="icon" title={t('copyShare')} variant="outline">
+            <Share2 aria-hidden="true" />
+          </Button>
+          <ReportAction iconOnly targetType={kind === 'events' ? 'event' : 'community'} targetId={item.id} />
+        </div>
       </div>
 
       <ResourceOverview item={item} hostPath={hostPath} admissionLabel={admissionLabel} />
-      {isManager ? (
+      {communityItem &&
+      currentUser.isSuccess &&
+      (isManager || participationStatus === 'ACTIVE') ? (
+        <CommunityMemberPreview communityId={communityItem.id} />
+      ) : null}
+      {isManager && communityItem ? (
+        <details
+          className="rounded-(--shape-radius-card) border border-border bg-card"
+          onToggle={(event) => setParticipationPanelOpen(event.currentTarget.open)}
+        >
+          <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-5 py-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary [&::-webkit-details-marker]:hidden">
+            <span aria-level={2} id="organizer-participation-heading" role="heading">
+              {t('manageMembers')}
+            </span>
+            <ChevronDown aria-hidden="true" className="size-4 shrink-0 transition-transform open:rotate-180" />
+          </summary>
+          {participationPanelOpen ? (
+            <div className="grid gap-4 border-t border-border p-5">
+              <OrganizerParticipationPanel kind="communities" resourceId={item.id} />
+            </div>
+          ) : null}
+        </details>
+      ) : null}
+      {isManager && eventItem ? (
         <section className="grid gap-4 rounded-(--shape-radius-card) border border-border bg-card p-5">
           <div className="flex flex-wrap gap-3">
-            {eventItem ? (
-              !eventItem.cancelled ? (
-                <>
-                  <Button asChild variant="outline">
-                    <Link to={`/events/${item.id}/edit`}>{t('editEvent')}</Link>
-                  </Button>
-                  <Button
-                    className="border-danger/30 text-danger hover:bg-danger-soft hover:text-danger"
-                    disabled={cancelEvent.isPending}
-                    onClick={() => void cancel()}
-                    variant="outline"
-                  >
-                    {t('cancelEventAction')}
-                  </Button>
-                </>
-              ) : null
-            ) : (
+            {!eventItem.cancelled ? (
               <>
                 <Button asChild variant="outline">
-                  <Link to={`/communities/${item.id}/edit`}>{t('editCommunity')}</Link>
+                  <Link to={`/events/${item.id}/edit`}>{t('editEvent')}</Link>
                 </Button>
                 <Button
                   className="border-danger/30 text-danger hover:bg-danger-soft hover:text-danger"
-                  disabled={archiveCommunity.isPending}
-                  onClick={() => void archive()}
+                  disabled={cancelEvent.isPending}
+                  onClick={() => void cancel()}
                   variant="outline"
                 >
-                  {t('archiveCommunity')}
+                  {t('cancelEventAction')}
                 </Button>
               </>
-            )}
+            ) : null}
           </div>
           <OrganizerParticipationPanel
             kind={kind}
@@ -422,7 +446,7 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
           />
         </section>
       ) : null}
-      {!isManager &&
+      {currentUser.isSuccess && !isManager &&
         !eventItem?.cancelled &&
         !(eventItem && new Date(eventItem.startsAt).getTime() <= Date.now()) && (
           <section

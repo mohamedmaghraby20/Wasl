@@ -8,9 +8,10 @@ import { Button } from '@/components/ui/Button';
 import { TextPromptDialog } from '@/components/ui/TextPromptDialog';
 import { useAuth } from '@/features/auth/AuthProvider';
 
-export function ReportAction({ targetType, targetId }: {
+export function ReportAction({ targetType, targetId, iconOnly = false }: {
   targetType: 'user' | 'community' | 'event' | 'organization' | 'post';
   targetId: string;
+  iconOnly?: boolean;
 }): React.JSX.Element {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -23,8 +24,8 @@ export function ReportAction({ targetType, targetId }: {
 
   return (
     <>
-      <Button asChild={!user} onClick={user ? () => setOpen(true) : undefined} size="sm" variant="ghost">
-        {user ? <><Flag aria-hidden="true" />{t('reportContent')}</> : <Link to={signIn}><Flag aria-hidden="true" />{t('reportContent')}</Link>}
+      <Button aria-label={iconOnly ? t('reportContent') : undefined} asChild={!user} onClick={user ? () => setOpen(true) : undefined} size={iconOnly ? 'icon' : 'sm'} title={iconOnly ? t('reportContent') : undefined} variant="ghost">
+        {user ? <><Flag aria-hidden="true" />{iconOnly ? null : t('reportContent')}</> : <Link to={signIn}><Flag aria-hidden="true" />{iconOnly ? null : t('reportContent')}</Link>}
       </Button>
       <TextPromptDialog
         open={open}

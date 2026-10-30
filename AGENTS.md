@@ -167,5 +167,6 @@ When the user corrects your approach, append a one-line rule here before ending 
 - When asked what can proceed without an owner handoff, list concrete task IDs and distinguish executable preparation from tasks that can be completed.
 - Keep owner-facing MVP checklists standalone when requested: use a new file, remove the old handoff and its incoming references, and add no cross-file links.
 - For development Supabase data, accept the owner's authorization and seed samples directly; explain owner-only admin setup as exact signup and browser steps, never ask the owner to find internal Wasl IDs.
+- Match attendee reference proportions: large circular portraits, tall centered cards, host first with an overlapping light-green badge, and a final remaining-attendees card.
 
 ---

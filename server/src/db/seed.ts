@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import { createClient } from '@supabase/supabase-js';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import { and, eq, sql } from 'drizzle-orm';
@@ -130,8 +131,8 @@ const categorySeed = [
 // Empty versioned policy slots required by docs/launch-decisions.md. Content stays null and the
 // status stays DRAFT until counsel supplies approved text; nothing here is published.
 const legalDocumentSlots = [
-  ...['TERMS_OF_USE', 'PRIVACY_NOTICE', 'AGE_ELIGIBILITY_POLICY', 'COOKIE_NOTICE'].flatMap(
-    (type) => ['ar', 'en', 'tr'].map((locale) => ({ type, locale })),
+  ...['TERMS_OF_USE', 'PRIVACY_NOTICE', 'AGE_ELIGIBILITY_POLICY', 'COOKIE_NOTICE'].flatMap((type) =>
+    ['ar', 'en', 'tr'].map((locale) => ({ type, locale })),
   ),
   ...['TAKEDOWN_PROCEDURE', 'PROCESSOR_TRANSFER_REGISTER', 'RETENTION_SCHEDULE'].map((type) => ({
     type,
@@ -142,18 +143,78 @@ const legalDocumentSlots = [
 // Category-level retention slots from docs/launch-decisions.md §4. Durations remain TBD-LEGAL on
 // purpose: no blanket period is invented here, and the erasure job stays disabled until approval.
 const retentionPolicySeed = [
-  ['User credentials and auth provider records', 'Registration / account closure', 'Coordinate Supabase Auth closure; retain no unnecessary tokens', 'Identity'],
-  ['Public profile and preferences', 'Active account / deletion request', 'Delete or anonymize subject to justified exceptions', 'Identity'],
-  ['Age eligibility status/evidence', 'Verification / expiration', 'Keep only the eligibility result and decision metadata', 'Identity'],
-  ['Terms acceptance and consent history', 'Acceptance / withdrawal', 'Preserve necessary minimal evidence', 'Compliance'],
-  ['Membership, registration and attendance', 'Participation end / account closure', 'Preserve counts and integrity without exposing deleted user', 'Participation'],
-  ['User-authored communities, events and media', 'Archive/cancel/closure', 'Prefer archive or cancel for resources with history; review ownership', 'Communities/Events'],
-  ['Discussion posts and replies', 'Deletion, moderation or closure', 'Anonymize or delete as approved; preserve narrowly justified evidence', 'Discussions'],
-  ['Stream DMs, group messages and attachments', 'Message removal / account closure', 'Configure Stream retention/deletion and reconcile Wasl IDs', 'Messaging'],
-  ['Reports, moderation actions and security evidence', 'Case closure', 'Restrict access; preserve only justified evidence', 'Moderation'],
-  ['Email and notification delivery logs', 'Delivery / account closure', 'Minimize message content and provider metadata', 'Notifications'],
-  ['Operational logs and backups', 'Creation / rotation', 'Set rotation and restore-based deletion policy', 'Operations'],
-  ['Privacy requests and decisions', 'Case completion', 'Retain minimal auditable response evidence', 'Compliance'],
+  [
+    'User credentials and auth provider records',
+    'Registration / account closure',
+    'Coordinate Supabase Auth closure; retain no unnecessary tokens',
+    'Identity',
+  ],
+  [
+    'Public profile and preferences',
+    'Active account / deletion request',
+    'Delete or anonymize subject to justified exceptions',
+    'Identity',
+  ],
+  [
+    'Age eligibility status/evidence',
+    'Verification / expiration',
+    'Keep only the eligibility result and decision metadata',
+    'Identity',
+  ],
+  [
+    'Terms acceptance and consent history',
+    'Acceptance / withdrawal',
+    'Preserve necessary minimal evidence',
+    'Compliance',
+  ],
+  [
+    'Membership, registration and attendance',
+    'Participation end / account closure',
+    'Preserve counts and integrity without exposing deleted user',
+    'Participation',
+  ],
+  [
+    'User-authored communities, events and media',
+    'Archive/cancel/closure',
+    'Prefer archive or cancel for resources with history; review ownership',
+    'Communities/Events',
+  ],
+  [
+    'Discussion posts and replies',
+    'Deletion, moderation or closure',
+    'Anonymize or delete as approved; preserve narrowly justified evidence',
+    'Discussions',
+  ],
+  [
+    'Stream DMs, group messages and attachments',
+    'Message removal / account closure',
+    'Configure Stream retention/deletion and reconcile Wasl IDs',
+    'Messaging',
+  ],
+  [
+    'Reports, moderation actions and security evidence',
+    'Case closure',
+    'Restrict access; preserve only justified evidence',
+    'Moderation',
+  ],
+  [
+    'Email and notification delivery logs',
+    'Delivery / account closure',
+    'Minimize message content and provider metadata',
+    'Notifications',
+  ],
+  [
+    'Operational logs and backups',
+    'Creation / rotation',
+    'Set rotation and restore-based deletion policy',
+    'Operations',
+  ],
+  [
+    'Privacy requests and decisions',
+    'Case completion',
+    'Retain minimal auditable response evidence',
+    'Compliance',
+  ],
 ].map(([dataGroup, triggerEvent, handling, owner]) => ({
   dataGroup: dataGroup!,
   triggerEvent: triggerEvent!,
@@ -258,6 +319,24 @@ async function run(): Promise<void> {
       : [];
     const seedOwnerId = configuredOwner?.id ?? sampleOwnerId;
     const seedHostName = configuredOwner?.displayName ?? 'Wasl Sample Host';
+    const storageUrl = process.env.SUPABASE_URL;
+    const storageKey = process.env.SUPABASE_SECRET_KEY ?? process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!storageUrl || !storageKey)
+      throw new Error('Supabase Storage credentials are required to seed profile pictures.');
+    const storage = createClient(storageUrl, storageKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    for (const [index, attendee] of sampleAttendees.entries()) {
+      const response = await fetch(`https://i.pravatar.cc/160?img=${index + 11}`);
+      if (!response.ok) throw new Error(`Sample portrait download failed: ${response.status}`);
+      const { error } = await storage.storage
+        .from('profile-photos')
+        .upload(`dev-seed/${attendee.id}.jpg`, await response.arrayBuffer(), {
+          contentType: 'image/jpeg',
+          upsert: true,
+        });
+      if (error) throw error;
+    }
     await database.transaction(async (tx) => {
       if (!configuredOwner) {
         await tx
@@ -280,10 +359,14 @@ async function run(): Promise<void> {
             id,
             displayName,
             cityId,
+            avatarPath: `dev-seed/${id}.jpg`,
             bio: 'Fictional profile added by the Wasl development seed.',
           })),
         )
-        .onConflictDoNothing();
+        .onConflictDoUpdate({
+          target: profiles.id,
+          set: { avatarPath: sql`excluded.avatar_path` },
+        });
       const communityRows = sampleCommunities.map((community, index) => ({
         ...community,
         ownerType: 'user',
@@ -310,14 +393,22 @@ async function run(): Promise<void> {
         .values(
           sampleCommunities.flatMap((community, index) => {
             const status = index % 2 === 0 ? ('ACTIVE' as const) : ('PENDING' as const);
-            return [index, (index + 1) % sampleAttendees.length].map((attendeeIndex) => ({
+            return [
+              index,
+              (index + 1) % sampleAttendees.length,
+              (index + 2) % sampleAttendees.length,
+              (index + 3) % sampleAttendees.length,
+            ].map((attendeeIndex) => ({
               communityId: community.id,
               userId: sampleAttendees[attendeeIndex]!.id,
               status,
             }));
           }),
         )
-        .onConflictDoNothing();
+        .onConflictDoUpdate({
+          target: [communityMemberships.communityId, communityMemberships.userId],
+          set: { status: sql`excluded.status` },
+        });
       await tx
         .insert(communityCategories)
         .values(
