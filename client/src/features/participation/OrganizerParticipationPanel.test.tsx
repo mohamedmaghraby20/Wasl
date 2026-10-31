@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { I18nextProvider } from 'react-i18next';
 import { MemoryRouter } from 'react-router';
@@ -85,8 +85,14 @@ describe('OrganizerParticipationPanel', () => {
     expect(screen.getByText('Pending')).toBeVisible();
     expect(screen.getByText('3')).toBeVisible();
     expect(screen.getByText('10')).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Approve' })).toHaveClass('size-9', 'hover:text-success');
-    expect(screen.getByRole('button', { name: 'Reject' })).toHaveClass('size-9', 'hover:text-danger');
+    expect(screen.getByRole('button', { name: 'Approve' })).toHaveClass(
+      'size-9',
+      'hover:text-success',
+    );
+    expect(screen.getByRole('button', { name: 'Reject' })).toHaveClass(
+      'size-9',
+      'hover:text-danger',
+    );
     await user.click(screen.getByRole('button', { name: 'Approve' }));
 
     expect(mocks.decision).toHaveBeenCalledWith({
@@ -201,7 +207,53 @@ describe('OrganizerParticipationPanel', () => {
     expect(promote).toHaveAttribute('title', 'Promote from waitlist');
     expect(promote).toHaveTextContent('');
     await userEvent.click(promote);
-    expect(mocks.decision).toHaveBeenCalledWith({ id: 'community-1', participantId: 'waiting-1', action: 'promote' });
+    expect(mocks.decision).toHaveBeenCalledWith({
+      id: 'community-1',
+      participantId: 'waiting-1',
+      action: 'promote',
+    });
+  });
+
+  it('explains and disables promotion when the community is at capacity', () => {
+    mocks.counts.mockReturnValue({
+      data: { PENDING: 0, WAITLISTED: 1, ACTIVE: 6, capacity: 6, admissionMode: 'approval' },
+      isPending: false,
+      isError: false,
+    });
+    mocks.participants.mockReturnValue({
+      data: [{ id: 'waiting-1', userId: 'user-1', displayName: 'Samira', status: 'WAITLISTED' }],
+      isPending: false,
+      isError: false,
+    });
+    renderPanel('directory', '/communities/community-1/participants?status=WAITLISTED');
+    expect(screen.getByRole('note')).toHaveTextContent(
+      'Capacity is full. Free a space before promoting someone from the waitlist.',
+    );
+    expect(
+      screen.getByRole('button', { name: 'Waitlist promotion unavailable: capacity is full' }),
+    ).toBeDisabled();
+  });
+
+  it('shows progress while an action is updating and keeps other actions disabled', async () => {
+    const user = userEvent.setup();
+    let finish!: (result: { status: string }) => void;
+    mocks.decision.mockReturnValueOnce(
+      new Promise((resolve) => {
+        finish = resolve;
+      }),
+    );
+    renderPanel();
+
+    await user.click(screen.getByRole('button', { name: 'Approve' }));
+    expect(screen.getByRole('status')).toHaveTextContent('Updating participation…');
+    expect(screen.getByRole('button', { name: 'Updating participation…' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Reject' })).toBeDisabled();
+
+    await act(async () => {
+      finish({ status: 'ACTIVE' });
+      await Promise.resolve();
+    });
+    await waitFor(() => expect(screen.queryByRole('status')).not.toBeInTheDocument());
   });
 
   it('uses the same review controls for event registration decisions', async () => {
@@ -244,7 +296,13 @@ describe('OrganizerParticipationPanel', () => {
     expect(remove.querySelector('svg')).toHaveClass('lucide-user-minus');
     await user.click(remove);
     expect(mocks.decision).not.toHaveBeenCalled();
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
-    expect(mocks.decision).toHaveBeenCalledWith({ id: 'community-1', participantId: 'membership-1', action: 'remove' });
+    await user.click(
+      within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }),
+    );
+    expect(mocks.decision).toHaveBeenCalledWith({
+      id: 'community-1',
+      participantId: 'membership-1',
+      action: 'remove',
+    });
   });
 });
