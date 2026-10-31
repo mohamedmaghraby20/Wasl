@@ -301,7 +301,7 @@ export function CommunityFormPage(): React.JSX.Element {
             className="grid gap-3"
             tabIndex={-1}
           >
-            <legend className="text-sm font-medium text-text">{t('chooseCategories')}</legend>
+            <legend className="mb-3 text-sm font-medium text-text">{t('chooseCategories')}</legend>
             <div className="flex flex-wrap gap-2">
               {categories.isPending ? (
                 <p className="text-sm text-text-muted" role="status">
