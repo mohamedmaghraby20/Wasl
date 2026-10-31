@@ -246,7 +246,7 @@ export function CommunityFormPage(): React.JSX.Element {
             />
           </Field>
 
-          <div className="grid gap-5 sm:grid-cols-2">
+          <div className="grid items-start gap-5 sm:grid-cols-2 [&_label]:leading-5">
             <Field
               error={errors.cityId ? t('formFieldInvalid') : undefined}
               id="community-city"
@@ -324,6 +324,7 @@ export function CommunityFormPage(): React.JSX.Element {
                   >
                     <Checkbox
                       checked={checked}
+                      className="size-3.5 rounded-xs [&_svg]:size-2.5"
                       id={`category-${category.id}`}
                       onCheckedChange={(next) => {
                         const nextIds = next
