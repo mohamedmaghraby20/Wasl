@@ -31,13 +31,11 @@ export function ParticipationReviewPage({
   );
   const resource = kind === 'communities' ? community : event;
   const title = t(
-    params.get('status') === (kind === 'communities' ? 'ACTIVE' : 'ACCEPTED')
-      ? kind === 'communities'
+    kind === 'events'
+      ? 'manageRegistrations'
+      : params.get('status') === 'ACTIVE'
         ? 'communityMembers'
-        : 'attendees'
-      : kind === 'communities'
-        ? 'membershipRequests'
-        : 'registrationRequests',
+        : 'membershipRequests',
   );
   const name = resource.data ? localizedResourceTitle(resource.data) : '';
   usePageMetadata(title, name, { noindex: true });

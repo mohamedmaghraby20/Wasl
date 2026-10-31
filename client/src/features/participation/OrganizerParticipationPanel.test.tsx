@@ -190,6 +190,59 @@ describe('OrganizerParticipationPanel', () => {
     expect(screen.queryByText('Samira')).not.toBeInTheDocument();
   });
 
+  it('caps the event registration preview at five and links to the shared management page', () => {
+    mocks.counts.mockReturnValue({
+      data: { PENDING: 0, WAITLISTED: 0, ACCEPTED: 8, capacity: 'unlimited' },
+      isPending: false,
+      isError: false,
+    });
+    mocks.participants.mockReturnValue({
+      data: Array.from({ length: 8 }, (_, index) => ({
+        id: `registration-${index}`,
+        userId: `user-${index}`,
+        displayName: `Attendee ${index}`,
+        status: 'ACCEPTED',
+      })),
+      isPending: false,
+      isError: false,
+    });
+    renderPanel('all', '/', 'events');
+    expect(screen.getAllByRole('listitem')).toHaveLength(5);
+    expect(screen.queryByText('Attendee 5')).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'See all' })).toHaveAttribute(
+      'href',
+      '/events/community-1/participants?status=ACCEPTED',
+    );
+  });
+
+  it('keeps all registrations and attendance controls reachable in the event directory', async () => {
+    const user = userEvent.setup();
+    mocks.counts.mockReturnValue({
+      data: { PENDING: 0, WAITLISTED: 0, ACCEPTED: 6, ATTENDED: 1, NO_SHOW: 1 },
+      isPending: false,
+      isError: false,
+    });
+    mocks.participants.mockReturnValue({
+      data: Array.from({ length: 8 }, (_, index) => ({
+        id: `registration-${index}`,
+        userId: `user-${index}`,
+        displayName: `Attendee ${index}`,
+        status: index === 6 ? 'ATTENDED' : index === 7 ? 'NO_SHOW' : 'ACCEPTED',
+      })),
+      isPending: false,
+      isError: false,
+    });
+    renderPanel('directory', '/events/community-1/participants?status=ACCEPTED', 'events');
+    expect(screen.getAllByRole('listitem')).toHaveLength(6);
+    const filters = within(screen.getByRole('navigation', { name: 'Participant status' }));
+    await user.click(filters.getByRole('button', { name: /Attendance recorded/ }));
+    expect(screen.getByRole('link', { name: 'Attendee 6' })).toBeVisible();
+    expect(screen.queryByText('Attendee 0')).not.toBeInTheDocument();
+    await user.click(filters.getByRole('button', { name: /Marked as did not attend/ }));
+    expect(screen.getByRole('link', { name: 'Attendee 7' })).toBeVisible();
+    expect(screen.queryByText('Attendee 6')).not.toBeInTheDocument();
+  });
+
   it('keeps waitlist promotion compact and named in the request preview', async () => {
     mocks.counts.mockReturnValue({
       data: { PENDING: 0, WAITLISTED: 1, ACTIVE: 1, admissionMode: 'approval' },

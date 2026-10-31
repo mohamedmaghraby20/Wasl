@@ -55,9 +55,13 @@ export function OrganizerParticipationPanel({
   );
   const [params, setParams] = useSearchParams();
   const activeStatus = kind === 'communities' ? 'ACTIVE' : 'ACCEPTED';
-  const selectedStatus = ['PENDING', 'WAITLISTED', activeStatus].includes(
-    params.get('status') ?? '',
-  )
+  const statuses = [
+    'PENDING',
+    'WAITLISTED',
+    activeStatus,
+    ...(kind === 'events' ? ['ATTENDED', 'NO_SHOW'] : []),
+  ];
+  const selectedStatus = statuses.includes(params.get('status') ?? '')
     ? params.get('status')!
     : 'PENDING';
   const queryClient = useQueryClient();
@@ -100,7 +104,7 @@ export function OrganizerParticipationPanel({
     return true;
   });
   const visibleParticipants =
-    mode === 'requests' ? filteredParticipants.slice(0, 5) : filteredParticipants;
+    mode === 'directory' ? filteredParticipants : filteredParticipants.slice(0, 5);
 
   const decide = async (participantId: string, action: string): Promise<void> => {
     if (
@@ -200,22 +204,27 @@ export function OrganizerParticipationPanel({
           : 'grid gap-4'
       }
     >
-      {mode === 'requests' ? (
+      {mode === 'requests' || (mode === 'all' && kind === 'events') ? (
         <div className="flex items-center justify-between gap-3">
-          <h2 className="font-heading text-xl font-bold">
-            {t(kind === 'communities' ? 'membershipRequests' : 'registrationRequests')}
+          <h2
+            id={mode === 'all' ? 'organizer-participation-heading' : undefined}
+            className="font-heading text-xl font-bold"
+          >
+            {t(
+              mode === 'all'
+                ? 'manageRegistrations'
+                : kind === 'communities'
+                  ? 'membershipRequests'
+                  : 'registrationRequests',
+            )}
           </h2>
           <Link
             className="shrink-0 text-sm font-semibold text-primary-soft-text hover:underline"
-            to={`/${kind}/${resourceId}/participants?status=${counts.data?.PENDING ? 'PENDING' : 'WAITLISTED'}`}
+            to={`/${kind}/${resourceId}/participants?status=${counts.data?.PENDING ? 'PENDING' : mode === 'requests' || counts.data?.WAITLISTED ? 'WAITLISTED' : activeStatus}`}
           >
             {t('seeAll')}
           </Link>
         </div>
-      ) : mode === 'all' && kind === 'events' ? (
-        <h2 id="organizer-participation-heading" className="font-heading text-xl font-bold">
-          {t('manageRegistrations')}
-        </h2>
       ) : null}
       {isPending ? (
         <p role="status">{t('loadingParticipants')}</p>
@@ -261,7 +270,7 @@ export function OrganizerParticipationPanel({
           {mode === 'directory' ? (
             <>
               <nav aria-label={t('participationFilters')} className="flex flex-wrap gap-2">
-                {['PENDING', 'WAITLISTED', activeStatus].map((status) => (
+                {statuses.map((status) => (
                   <Button
                     key={status}
                     aria-current={selectedStatus === status ? 'page' : undefined}
@@ -278,12 +287,18 @@ export function OrganizerParticipationPanel({
                         ? 'countPending'
                         : status === 'WAITLISTED'
                           ? 'countWaitlisted'
-                          : kind === 'communities'
-                            ? 'countActive'
-                            : 'countAccepted',
+                          : status === activeStatus
+                            ? kind === 'communities'
+                              ? 'countActive'
+                              : 'countAccepted'
+                            : `participationStatus_${status}`,
                     )}{' '}
                     <span>
-                      {counts.data[status as 'PENDING' | 'WAITLISTED' | 'ACTIVE' | 'ACCEPTED']}
+                      {
+                        counts.data[
+                          status as 'PENDING' | 'WAITLISTED' | 'ACTIVE' | 'ACCEPTED' | 'ATTENDED' | 'NO_SHOW'
+                        ]
+                      }
                     </span>
                   </Button>
                 ))}
@@ -307,7 +322,9 @@ export function OrganizerParticipationPanel({
                     'items-center gap-x-3 gap-y-2 rounded-(--shape-radius-card) border border-border bg-card px-3 py-2',
                     mode === 'requests'
                       ? 'grid grid-cols-[minmax(0,1fr)_auto]'
-                      : 'flex flex-wrap justify-between',
+                      : mode === 'all'
+                        ? 'grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_auto]'
+                        : 'flex flex-wrap justify-between',
                   )}
                 >
                   <div className="flex min-w-0 items-center gap-3">

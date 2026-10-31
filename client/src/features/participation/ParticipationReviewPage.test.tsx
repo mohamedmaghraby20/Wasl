@@ -46,7 +46,7 @@ describe('ParticipationReviewPage', () => {
     );
     expect(
       screen.getByRole('heading', {
-        name: kind === 'communities' ? 'Membership requests' : 'Registration requests',
+        name: kind === 'communities' ? 'Membership requests' : 'Manage event registrations',
       }),
     ).toBeVisible();
     expect(panel).toHaveBeenCalledWith(
