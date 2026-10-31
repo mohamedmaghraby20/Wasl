@@ -25,11 +25,12 @@ async function mockApi(page: Page) {
   });
 }
 
-test('home search focus uses a single outline', async ({ page }) => {
+test('home search focus uses a single inset frame', async ({ page }) => {
   await mockApi(page);
   await page.goto('/');
-  const input = page.getByRole('searchbox', { name: 'Search' });
+  const input = page.getByRole('searchbox', { name: 'Search communities and events' });
   await input.focus();
+  await expect(page.locator('.search-field')).toHaveCSS('box-shadow', /2px inset/);
   const styles = await input.evaluate((element) => {
     const style = getComputedStyle(element);
     return {
@@ -39,9 +40,8 @@ test('home search focus uses a single outline', async ({ page }) => {
       outlineOffset: style.outlineOffset,
     };
   });
-  expect(styles.outlineStyle).toBe('solid');
-  expect(styles.outlineWidth).toBe('1px');
-  expect(styles.outlineOffset).toBe('-1px');
+  expect(styles.outlineStyle).toBe('none');
+  expect(styles.outlineWidth).toBe('0px');
   await page.screenshot({
     path: 'C:/Users/seif/AppData/Local/Temp/opencode/home-search-focus.png',
     fullPage: false,

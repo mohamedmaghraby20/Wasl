@@ -3,6 +3,7 @@ import { useRef, type ComponentProps } from 'react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/cn';
 import { Input } from './Input';
+import { IconButton } from './IconButton';
 
 export function SearchInput({
   value,
@@ -10,6 +11,7 @@ export function SearchInput({
   onClear,
   className,
   ref,
+  onKeyDown,
   ...props
 }: Omit<ComponentProps<'input'>, 'type' | 'value' | 'onChange'> & {
   value: string;
@@ -18,19 +20,38 @@ export function SearchInput({
 }): React.JSX.Element {
   const { t } = useTranslation();
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const clearSearch = (): void => {
+    onValueChange('');
+    onClear?.();
+    inputRef.current?.focus();
+  };
   return (
-    <div className="relative w-full min-w-0 flex-1">
+    <div className="search-field relative w-full min-w-0 flex-1">
       <Search
         aria-hidden="true"
-        className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-text-subtle"
+        className="search-field-icon pointer-events-none absolute start-3.5 top-1/2 size-4 -translate-y-1/2 text-text-subtle"
       />
       <Input
         aria-label={props['aria-label'] ?? t('search')}
         autoComplete="off"
         enterKeyHint="search"
         {...props}
-        className={cn('ps-9 pe-11 [&::-webkit-search-cancel-button]:appearance-none', className)}
+        className={cn('ps-10 pe-12 text-base sm:text-sm', className)}
         onChange={(event) => onValueChange(event.currentTarget.value)}
+        onKeyDown={(event) => {
+          onKeyDown?.(event);
+          if (
+            event.key === 'Escape' &&
+            !event.defaultPrevented &&
+            !event.nativeEvent.isComposing &&
+            value &&
+            !props.readOnly &&
+            !props.disabled
+          ) {
+            event.preventDefault();
+            clearSearch();
+          }
+        }}
         ref={(element) => {
           inputRef.current = element;
           if (typeof ref === 'function') return ref(element);
@@ -40,20 +61,14 @@ export function SearchInput({
         value={value}
       />
       {value && !props.readOnly ? (
-        <button
-          aria-label={t('clearSearch')}
-          className="absolute end-0 top-0 grid h-full min-w-11 place-items-center rounded-(--shape-radius-control) text-text-subtle transition-colors hover:bg-danger-soft hover:text-danger focus-visible:bg-danger-soft focus-visible:text-danger disabled:cursor-not-allowed disabled:opacity-(--opacity-disabled)"
+        <IconButton
+          className="search-field-clear absolute end-0 top-1/2 -translate-y-1/2 hover:bg-primary-soft focus-visible:bg-primary-soft"
           disabled={props.disabled}
-          onClick={() => {
-            onValueChange('');
-            onClear?.();
-            inputRef.current?.focus();
-          }}
-          title={t('clearSearch')}
+          icon={X}
+          label={t('clearSearch')}
+          onClick={clearSearch}
           type="button"
-        >
-          <X aria-hidden="true" className="size-4" />
-        </button>
+        />
       ) : null}
     </div>
   );

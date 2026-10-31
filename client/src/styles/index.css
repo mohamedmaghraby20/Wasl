@@ -103,6 +103,65 @@ input[type='search']::-webkit-search-cancel-button {
   display: none;
 }
 
+/* Search has one frame, including when focus moves to its clear action. */
+.search-field {
+  border-radius: var(--shape-radius-control, var(--shape-radius-md));
+  background: var(--color-surface);
+  box-shadow: inset 0 0 0 1px var(--color-border-control);
+  transition: box-shadow var(--motion-duration-fast) var(--motion-ease-standard);
+}
+@media (hover: hover) {
+  .search-field:hover:not(
+      :focus-within,
+      :has(input:disabled, input:read-only, input[aria-invalid='true'])
+    ) {
+    box-shadow: inset 0 0 0 1px var(--color-border-control-hover);
+  }
+}
+.search-field:focus-within {
+  box-shadow: inset 0 0 0 2px var(--color-ring);
+}
+.search-field:focus-within .search-field-icon {
+  color: var(--color-ring);
+}
+.search-field:has(input[aria-invalid='true']) {
+  box-shadow: inset 0 0 0 1px var(--color-danger);
+}
+.search-field:has(input[aria-invalid='true']):focus-within {
+  box-shadow: inset 0 0 0 2px var(--color-danger);
+}
+.search-field:has(input:disabled) {
+  cursor: not-allowed;
+  background: var(--color-surface-soft);
+  opacity: var(--opacity-disabled);
+}
+.search-field > input {
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  box-shadow: none;
+  outline: none;
+  opacity: 1;
+}
+.search-field > input[type='search']:focus {
+  outline: none;
+  box-shadow: none;
+}
+.search-field > .search-field-clear:focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: -4px;
+}
+@media (forced-colors: active) {
+  .search-field {
+    outline: 1px solid CanvasText;
+    outline-offset: -1px;
+  }
+  .search-field:focus-within {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
