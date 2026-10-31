@@ -14,7 +14,6 @@ const mocks = vi.hoisted(() => ({
   cities: vi.fn(),
   community: vi.fn(),
   create: vi.fn(),
-  createCategory: vi.fn(),
   mineCommunities: vi.fn(),
   mineOrganizations: vi.fn(),
   update: vi.fn(),
@@ -29,11 +28,9 @@ vi.mock('@/api/generated/organizations/organizations', () => ({
   useOrganizationsControllerMine: mocks.mineOrganizations,
 }));
 vi.mock('@/api/generated/discovery/discovery', () => ({
-  getDiscoveryControllerCategoriesQueryKey: () => ['discoveryControllerCategories'],
   useDiscoveryControllerCategories: mocks.categories,
   useDiscoveryControllerCities: mocks.cities,
   useDiscoveryControllerCommunity: mocks.community,
-  useDiscoveryControllerCreateCategory: mocks.createCategory,
 }));
 
 function renderPage(): void {
@@ -61,7 +58,6 @@ describe('CommunityFormPage organization host choice', () => {
     mocks.cities.mockReturnValue({ data: [], isError: false });
     mocks.community.mockReturnValue({ data: undefined, isPending: false, isError: false });
     mocks.create.mockReturnValue({ mutateAsync: vi.fn(), isPending: false });
-    mocks.createCategory.mockReturnValue({ mutateAsync: vi.fn(), isPending: false });
     mocks.update.mockReturnValue({ mutateAsync: vi.fn(), isPending: false });
   });
 

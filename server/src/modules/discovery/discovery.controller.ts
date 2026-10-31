@@ -1,17 +1,14 @@
 import {
   BadRequestException,
-  Body,
   Controller,
   Get,
   NotFoundException,
   Param,
-  Post,
   Query,
   ServiceUnavailableException,
-  UseGuards,
   applyDecorators,
 } from '@nestjs/common';
-import { ApiCreatedResponse, ApiOkResponse, ApiQuery } from '@nestjs/swagger';
+import { ApiOkResponse, ApiQuery } from '@nestjs/swagger';
 import { and, asc, desc, eq, ilike, inArray, or, gte, lt, sql, type SQL } from 'drizzle-orm';
 import { DATABASE, type Database } from '../../db/database.module';
 import { Inject } from '@nestjs/common';
@@ -25,13 +22,11 @@ import {
   organizations,
 } from '../../db/schema';
 import { ReferenceDataRepository } from './reference-data.repository';
-import { SupabaseAuthGuard } from '../auth/supabase-auth.guard';
 import {
   CategoryPublicDto,
   CityPublicDto,
   CommunityPageDto,
   CommunityPublicDto,
-  CreateCategoryDto,
   EventPageDto,
   EventPublicDto,
 } from './discovery.dto';
@@ -60,13 +55,6 @@ export class DiscoveryController {
   @ApiOkResponse({ type: CategoryPublicDto, isArray: true })
   categories() {
     return this.reference.listCategories();
-  }
-
-  @Post('reference/categories')
-  @UseGuards(SupabaseAuthGuard)
-  @ApiCreatedResponse({ type: CategoryPublicDto })
-  createCategory(@Body() body: CreateCategoryDto) {
-    return this.reference.createCategory(body.name);
   }
 
   @Get('communities')

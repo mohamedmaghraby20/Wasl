@@ -123,23 +123,25 @@ const provinceNames = [
 });
 
 const categorySeed = [
-  { id: 'education', nameTr: 'Eğitim', nameAr: 'تعليم', nameEn: 'Education' },
-  { id: 'culture', nameTr: 'Kültür', nameAr: 'ثقافة', nameEn: 'Culture' },
-  { id: 'sports', nameTr: 'Spor', nameAr: 'رياضة', nameEn: 'Sports' },
+  { id: 'social', nameTr: 'Sosyal ve Topluluk', nameAr: 'اجتماعي ومجتمعي', nameEn: 'Social & Community' },
   { id: 'technology', nameTr: 'Teknoloji', nameAr: 'تقنية', nameEn: 'Technology' },
-  { id: 'business', nameTr: 'İş ve Girişimcilik', nameAr: 'أعمال وريادة', nameEn: 'Business & Entrepreneurship' },
+  { id: 'business', nameTr: 'Kariyer ve İş', nameAr: 'مسار مهني وأعمال', nameEn: 'Career & Business' },
   { id: 'arts', nameTr: 'Sanat ve Tasarım', nameAr: 'فنون وتصميم', nameEn: 'Arts & Design' },
+  { id: 'culture', nameTr: 'Kültür ve Miras', nameAr: 'ثقافة وتراث', nameEn: 'Culture & Heritage' },
   { id: 'music', nameTr: 'Müzik', nameAr: 'موسيقى', nameEn: 'Music' },
+  { id: 'sports', nameTr: 'Spor ve Fitness', nameAr: 'رياضة ولياقة', nameEn: 'Sports & Fitness' },
   { id: 'health', nameTr: 'Sağlık ve İyi Yaşam', nameAr: 'صحة وعافية', nameEn: 'Health & Wellness' },
-  { id: 'environment', nameTr: 'Çevre', nameAr: 'بيئة', nameEn: 'Environment' },
-  { id: 'volunteering', nameTr: 'Gönüllülük', nameAr: 'تطوع', nameEn: 'Volunteering' },
   { id: 'food', nameTr: 'Yemek ve İçecek', nameAr: 'طعام وشراب', nameEn: 'Food & Drink' },
   { id: 'travel', nameTr: 'Seyahat ve Doğa', nameAr: 'سفر وطبيعة', nameEn: 'Travel & Outdoors' },
-  { id: 'family', nameTr: 'Aile ve Çocuk', nameAr: 'عائلة وأطفال', nameEn: 'Family & Kids' },
-  { id: 'gaming', nameTr: 'Oyun', nameAr: 'ألعاب', nameEn: 'Gaming' },
-  { id: 'books', nameTr: 'Kitap ve Edebiyat', nameAr: 'كتب وأدب', nameEn: 'Books & Literature' },
-  { id: 'language', nameTr: 'Dil Değişimi', nameAr: 'تبادل لغوي', nameEn: 'Language Exchange' },
+  { id: 'education', nameTr: 'Eğitim', nameAr: 'تعليم', nameEn: 'Education' },
+  { id: 'gaming', nameTr: 'Oyunlar', nameAr: 'ألعاب', nameEn: 'Games' },
   { id: 'film', nameTr: 'Film ve Medya', nameAr: 'أفلام وإعلام', nameEn: 'Film & Media' },
+  { id: 'books', nameTr: 'Kitap ve Edebiyat', nameAr: 'كتب وأدب', nameEn: 'Books & Literature' },
+  { id: 'language', nameTr: 'Dil ve Kültür', nameAr: 'لغة وثقافة', nameEn: 'Language & Culture' },
+  { id: 'family', nameTr: 'Ebeveyn ve Aile', nameAr: 'آباء وعائلة', nameEn: 'Parents & Family' },
+  { id: 'volunteering', nameTr: 'Gönüllülük ve Yardım', nameAr: 'تطوع وقضايا', nameEn: 'Volunteering & Causes' },
+  { id: 'environment', nameTr: 'Çevre', nameAr: 'بيئة', nameEn: 'Environment' },
+  { id: 'photography', nameTr: 'Fotoğrafçılık', nameAr: 'تصوير', nameEn: 'Photography' },
 ];
 
 // Empty versioned policy slots required by docs/launch-decisions.md. Content stays null and the
