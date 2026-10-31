@@ -1,6 +1,6 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { and, eq, inArray, isNotNull, isNull } from 'drizzle-orm';
-import { DATABASE, type Database } from '../../db/database.module';
+import { DATABASE, PROVIDER_DATABASE, type Database } from '../../db/database.module';
 import { messagingConversations } from '../../db/schema';
 import { StreamChatAdapter } from './stream-chat.adapter';
 
@@ -10,6 +10,7 @@ export class ChannelDeletionService {
   constructor(
     @Inject(DATABASE) private readonly db: Database | undefined,
     private readonly stream: StreamChatAdapter,
+    @Inject(PROVIDER_DATABASE) private readonly providerDb?: Database,
   ) {}
 
   async process(ids?: string[]): Promise<boolean> {
@@ -29,7 +30,7 @@ export class ChannelDeletionService {
     let incomplete = false;
     for (const { id } of pending) {
       try {
-        await this.db.transaction(async (tx) => {
+        await (this.providerDb ?? this.db).transaction(async (tx) => {
           const [conversation] = await tx
             .select()
             .from(messagingConversations)

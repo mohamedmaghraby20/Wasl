@@ -10,7 +10,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { and, eq, inArray, isNull, or, sql } from 'drizzle-orm';
 import { randomUUID } from 'node:crypto';
-import { DATABASE, type Database } from '../../db/database.module';
+import { DATABASE, PROVIDER_DATABASE, type Database } from '../../db/database.module';
 import {
   communities,
   communityMemberships,
@@ -39,6 +39,7 @@ export class MessagingService {
     private readonly stream: StreamChatAdapter,
     private readonly communitiesService: CommunitiesService,
     private readonly eventsService: EventsService,
+    @Inject(PROVIDER_DATABASE) private readonly providerDb?: Database,
   ) {}
 
   async session(user: AuthenticatedUser) {
@@ -535,7 +536,7 @@ export class MessagingService {
   }
 
   private async withLiveConversation(id: string, work: () => Promise<void>): Promise<void> {
-    await this.database().transaction(async (tx) => {
+    await (this.providerDb ?? this.database()).transaction(async (tx) => {
       const [conversation] = await tx
         .select({ id: messagingConversations.id })
         .from(messagingConversations)

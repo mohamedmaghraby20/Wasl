@@ -157,7 +157,7 @@ describe('messaging token boundary', () => {
     },
   );
 
-  it('provisions an accepted Event attendee in the mapped channel', async () => {
+  it('provisions an accepted Event attendee using the isolated provider transaction pool', async () => {
     const responses = [
       [{ id: 'event-1' }],
       [{ status: 'ACTIVE' }],
@@ -176,7 +176,9 @@ describe('messaging token boundary', () => {
         onConflictDoUpdate: () => Promise.resolve(),
       }),
     }));
-    const db = { select, insert, transaction: liveConversationTransaction } as unknown as Database;
+    const mainTransaction = vi.fn();
+    const providerTransaction = vi.fn(liveConversationTransaction);
+    const db = { select, insert, transaction: mainTransaction } as unknown as Database;
     const config = { get: () => 'true' } as unknown as ConfigService;
     const stream = {
       upsertUser: vi.fn(() => Promise.resolve()),
@@ -194,6 +196,7 @@ describe('messaging token boundary', () => {
       stream as unknown as StreamChatAdapter,
       undefined!,
       eventManager,
+      { transaction: providerTransaction } as unknown as Database,
     );
     expect(await service.openResourceChannel(user, 'event', 'event-1')).toEqual({
       conversationId: 'conversation-1',
@@ -207,6 +210,8 @@ describe('messaging token boundary', () => {
       false,
     );
     expect(stream.removeMember).not.toHaveBeenCalled();
+    expect(mainTransaction).not.toHaveBeenCalled();
+    expect(providerTransaction).toHaveBeenCalledOnce();
   });
 
   it('grants a channel-scoped moderator role to an Event manager', async () => {

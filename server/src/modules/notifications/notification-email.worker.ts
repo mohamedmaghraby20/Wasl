@@ -1,6 +1,6 @@
 import { Inject, Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { eq, sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { DATABASE, type Database } from '../../db/database.module';
 import { communities, events, notificationEmailDeliveries, notifications, organizations, users } from '../../db/schema';
 import { ResendEmailAdapter } from './resend-email.adapter';
@@ -66,7 +66,7 @@ export class NotificationEmailWorker implements OnModuleInit, OnModuleDestroy {
   }
 
   private async sendOne(messageId: string, notificationId: string): Promise<void> {
-    await this.db!.transaction(async (tx) => {
+    const claimed = await this.db!.transaction(async (tx) => {
       const [delivery] = await tx
         .select({
           status: notificationEmailDeliveries.status,
@@ -111,50 +111,55 @@ export class NotificationEmailWorker implements OnModuleInit, OnModuleDestroy {
         return;
       }
 
+      const attemptCount = delivery.attemptCount + 1;
       const now = new Date();
-      try {
-        const origin = this.config.get<string>('CLIENT_ORIGIN') ?? 'http://localhost:5173';
-        const path = delivery.communitySlug
-          ? `/communities/${delivery.communitySlug}`
-          : delivery.eventSlug
-            ? `/events/${delivery.eventSlug}`
-            : delivery.organizationSlug
-              ? `/organizations/${delivery.organizationSlug}`
-              : '/notifications';
-        const providerMessageId = await this.provider.send({
-          id: notificationId,
-          to: delivery.recipient,
-          subject: 'An update from Wasl',
-          text: `You have an update about your Wasl activity. View it at ${new URL(path, origin).toString()}`,
-        });
-        await tx
-          .update(notificationEmailDeliveries)
-          .set({
-            status: 'SENT',
-            attemptCount: delivery.attemptCount + 1,
-            lastAttemptAt: now,
-            sentAt: now,
-            providerMessageId,
-            lastError: null,
-          })
-          .where(eq(notificationEmailDeliveries.notificationId, notificationId));
+      // The lease outlasts the provider's 10-second timeout and survives worker crashes.
+      await tx.update(notificationEmailDeliveries).set({
+        status: 'RETRY', attemptCount, lastAttemptAt: now,
+        nextAttemptAt: new Date(now.getTime() + 60_000),
+      }).where(eq(notificationEmailDeliveries.notificationId, notificationId));
+      return { ...delivery, attemptCount };
+    });
+    if (!claimed) return;
+
+    let providerMessageId: string | undefined;
+    try {
+      const origin = this.config.get<string>('CLIENT_ORIGIN') ?? 'http://localhost:5173';
+      const path = claimed.communitySlug
+        ? `/communities/${claimed.communitySlug}`
+        : claimed.eventSlug
+          ? `/events/${claimed.eventSlug}`
+          : claimed.organizationSlug
+            ? `/organizations/${claimed.organizationSlug}`
+            : '/notifications';
+      providerMessageId = await this.provider.send({
+        id: notificationId,
+        to: claimed.recipient,
+        subject: 'An update from Wasl',
+        text: `You have an update about your Wasl activity. View it at ${new URL(path, origin).toString()}`,
+      });
+    } catch {
+      this.logger.warn('Notification email delivery failed; retry will be scheduled.');
+    }
+
+    const now = new Date();
+    const seconds = Math.min(3600, 30 * 2 ** Math.min(claimed.attemptCount, 7));
+    await this.db!.transaction(async (tx) => {
+      const [updated] = await tx.update(notificationEmailDeliveries).set(providerMessageId ? {
+        status: 'SENT', sentAt: now, providerMessageId, lastError: null,
+      } : {
+        status: 'RETRY', nextAttemptAt: new Date(now.getTime() + seconds * 1000),
+        lastError: 'Email delivery failed; retry scheduled.',
+      }).where(and(
+        eq(notificationEmailDeliveries.notificationId, notificationId),
+        eq(notificationEmailDeliveries.attemptCount, claimed.attemptCount),
+        eq(notificationEmailDeliveries.status, 'RETRY'),
+      )).returning({ id: notificationEmailDeliveries.notificationId });
+      if (!updated) return;
+      if (providerMessageId) {
         await tx.execute(sql`select pgmq.archive('notification_emails', ${messageId}::bigint)`);
-      } catch {
-        const attemptCount = delivery.attemptCount + 1;
-        const seconds = Math.min(3600, 30 * 2 ** Math.min(attemptCount, 7));
-        await tx
-          .update(notificationEmailDeliveries)
-          .set({
-            status: 'RETRY',
-            attemptCount,
-            lastAttemptAt: now,
-            nextAttemptAt: new Date(now.getTime() + seconds * 1000),
-            lastError: 'Email delivery failed; retry scheduled.',
-          })
-          .where(eq(notificationEmailDeliveries.notificationId, notificationId));
-        await tx.execute(
-          sql`select pgmq.set_vt('notification_emails', ${messageId}::bigint, ${seconds}::integer)`,
-        );
+      } else {
+        await tx.execute(sql`select pgmq.set_vt('notification_emails', ${messageId}::bigint, ${seconds}::integer)`);
       }
     });
   }
