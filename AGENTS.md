@@ -141,6 +141,12 @@ Keep these instructions useful and concise. When the user corrects an approach, 
 - Keep secrets out of source control. Client environment values must be safe to expose; privileged keys and database credentials stay on the server.
 -When running tests run those tests just on this specific feature, don't load passed test only failed ones gets loaded
 
+### Client
+
+- Use Meetup-like compact Lucide outline icons throughout `client/src`: 14px for metadata, 16px beside labels and in compact actions, 18px for standalone actions, and 20px for prominent navigation or feedback; use a consistent 1.75 stroke. Larger icons belong only in proportional avatar/illustration placeholders, not action controls.
+- Let shared controls own icon sizing; keep icons centered and non-shrinking. Compact icon buttons are 36px for fine pointers and at least 44px for touch; do not enlarge the glyph to fill its hit target.
+- Give all actions hover and keyboard-focus feedback using semantic tokens: pale-red surfaces with readable red icons for delete/reject/remove, green for approve/promote, amber for caution/archive, and brand emphasis for ordinary actions. Preserve disabled/loading states, accessible names and titles for icon-only actions, and visible controls on touch devices; never convey an action by color alone.
+
 ### Forbidden
 
 - Do not place database access or authoritative business authorization in client code.

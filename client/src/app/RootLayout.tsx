@@ -190,7 +190,7 @@ export function RootLayout(): React.JSX.Element {
                     ))}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
-                      className="text-danger [&_svg]:text-danger"
+                      className="text-danger data-[highlighted]:bg-danger-soft data-[highlighted]:text-danger"
                       onSelect={() => void signOut().catch(() => toast.error(t('genericError')))}
                     >
                       <LogOut aria-hidden="true" />
@@ -259,7 +259,7 @@ export function RootLayout(): React.JSX.Element {
                           <NavLink
                             className={({ isActive }) =>
                               cn(
-                                'flex h-11 min-w-0 items-center gap-3 rounded-(--shape-radius-control) px-3 text-[0.95rem] font-medium transition-colors [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:text-text-subtle',
+                                'flex h-11 min-w-0 items-center gap-3 rounded-(--shape-radius-control) px-3 text-[0.95rem] font-medium transition-colors [&_svg]:size-4 [&_svg]:shrink-0',
                                 isActive
                                   ? 'bg-surface-soft text-text'
                                   : 'text-text-muted hover:bg-surface-soft hover:text-text',

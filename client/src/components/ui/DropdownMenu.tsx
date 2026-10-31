@@ -54,7 +54,7 @@ export function DropdownMenuItem({
   return (
     <DropdownMenuPrimitive.Item
       className={cn(
-        'relative flex min-h-11 cursor-pointer select-none items-center gap-2.5 rounded-md px-2.5 py-2 text-sm text-text outline-hidden transition-colors duration-(--motion-duration-fast) data-[disabled]:pointer-events-none data-[disabled]:opacity-(--opacity-disabled) data-[highlighted]:bg-surface-soft [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:text-text-subtle',
+        'relative flex min-h-11 cursor-pointer select-none items-center gap-2.5 rounded-md px-2.5 py-2 text-sm text-text outline-hidden transition-colors duration-(--motion-duration-fast) data-[disabled]:pointer-events-none data-[disabled]:opacity-(--opacity-disabled) data-[highlighted]:bg-surface-soft data-[highlighted]:text-primary-soft-text [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:text-inherit',
         inset && 'ps-8',
         className,
       )}

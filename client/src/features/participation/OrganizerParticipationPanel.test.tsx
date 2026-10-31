@@ -85,6 +85,8 @@ describe('OrganizerParticipationPanel', () => {
     expect(screen.getByText('Pending')).toBeVisible();
     expect(screen.getByText('3')).toBeVisible();
     expect(screen.getByText('10')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Approve' })).toHaveClass('size-9', 'hover:text-success');
+    expect(screen.getByRole('button', { name: 'Reject' })).toHaveClass('size-9', 'hover:text-danger');
     await user.click(screen.getByRole('button', { name: 'Approve' }));
 
     expect(mocks.decision).toHaveBeenCalledWith({
@@ -180,6 +182,26 @@ describe('OrganizerParticipationPanel', () => {
     );
     expect(screen.getByText('Pending Person')).toBeVisible();
     expect(screen.queryByText('Samira')).not.toBeInTheDocument();
+  });
+
+  it('keeps waitlist promotion compact and named in the request preview', async () => {
+    mocks.counts.mockReturnValue({
+      data: { PENDING: 0, WAITLISTED: 1, ACTIVE: 1, admissionMode: 'approval' },
+      isPending: false,
+      isError: false,
+    });
+    mocks.participants.mockReturnValue({
+      data: [{ id: 'waiting-1', userId: 'user-1', displayName: 'Samira', status: 'WAITLISTED' }],
+      isPending: false,
+      isError: false,
+    });
+    renderPanel('requests');
+    const promote = screen.getByRole('button', { name: 'Promote from waitlist' });
+    expect(promote).toHaveClass('size-9', 'hover:text-success');
+    expect(promote).toHaveAttribute('title', 'Promote from waitlist');
+    expect(promote).toHaveTextContent('');
+    await userEvent.click(promote);
+    expect(mocks.decision).toHaveBeenCalledWith({ id: 'community-1', participantId: 'waiting-1', action: 'promote' });
   });
 
   it('uses the same review controls for event registration decisions', async () => {

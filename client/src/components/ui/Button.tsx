@@ -13,21 +13,26 @@ const buttonVariants = cva(
         secondary:
           'rounded-(--shape-radius-control) border border-primary/25 bg-primary-soft text-primary-soft-text hover:border-primary/45 hover:bg-primary-soft/70 active:bg-primary-soft/60',
         outline:
-          'rounded-(--shape-radius-control) border border-border-control bg-surface text-text hover:border-border-control-hover hover:bg-surface-soft active:bg-surface-soft/70',
+          'rounded-(--shape-radius-control) border border-border-control bg-surface text-text hover:border-border-control-hover hover:bg-surface-soft hover:text-primary-soft-text focus-visible:bg-surface-soft focus-visible:text-primary-soft-text active:bg-surface-soft/70',
         ghost:
-          'rounded-(--shape-radius-control) text-text-muted hover:bg-surface-soft hover:text-text',
+          'rounded-(--shape-radius-control) text-text-muted hover:bg-surface-soft hover:text-primary-soft-text focus-visible:bg-surface-soft focus-visible:text-primary-soft-text',
         danger:
           'rounded-(--shape-radius-control) bg-danger text-white shadow-xs hover:bg-danger-hover active:bg-danger-hover',
         'danger-ghost':
-          'rounded-(--shape-radius-control) text-danger hover:bg-danger-soft hover:text-danger',
+          'rounded-(--shape-radius-control) text-danger hover:bg-danger-soft hover:text-danger focus-visible:bg-danger-soft focus-visible:text-danger',
         link: 'rounded-(--shape-radius-sm) text-primary-soft-text underline decoration-primary/50 decoration-2 underline-offset-4 hover:decoration-primary',
       },
       size: {
         sm: 'h-11 px-3 text-[0.8125rem]',
         md: 'h-11 px-4 text-sm',
         lg: 'h-12 px-5 text-[0.9375rem]',
-        icon: 'size-11 p-0',
-        'icon-sm': 'size-11 p-0',
+        icon: 'size-11 p-0 [&_svg]:size-4.5',
+        'icon-sm': 'size-9 p-0 pointer-coarse:size-11 [&_svg]:size-4',
+      },
+      intent: {
+        success: 'hover:border-success/40 hover:bg-success-soft hover:text-success focus-visible:border-success/40 focus-visible:bg-success-soft focus-visible:text-success',
+        danger: 'hover:border-danger/40 hover:bg-danger-soft hover:text-danger focus-visible:border-danger/40 focus-visible:bg-danger-soft focus-visible:text-danger',
+        warning: 'hover:border-warning/40 hover:bg-warning-soft hover:text-warning focus-visible:border-warning/40 focus-visible:bg-warning-soft focus-visible:text-warning',
       },
       block: { true: 'w-full', false: '' },
     },
@@ -43,12 +48,13 @@ export function Button({
   variant,
   size,
   block,
+  intent,
   asChild = false,
   ...props
 }: ButtonProps): React.JSX.Element {
   const Component = asChild ? Slot : 'button';
   return (
-    <Component className={cn(buttonVariants({ variant, size, block }), className)} {...props} />
+    <Component className={cn(buttonVariants({ variant, size, block, intent }), className)} {...props} />
   );
 }
 

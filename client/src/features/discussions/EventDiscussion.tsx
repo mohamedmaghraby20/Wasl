@@ -222,6 +222,7 @@ export function EventDiscussion({
                     ) : null}
                     <Button
                       disabled={removePost.isPending}
+                      intent="danger"
                       onClick={() => void remove(post.id)}
                       size="sm"
                       variant="ghost"

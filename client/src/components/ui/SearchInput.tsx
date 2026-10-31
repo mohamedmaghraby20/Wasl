@@ -42,7 +42,7 @@ export function SearchInput({
       {value && !props.readOnly ? (
         <button
           aria-label={t('clearSearch')}
-          className="absolute end-0 top-0 grid h-full min-w-11 place-items-center rounded-(--shape-radius-control) text-text-subtle transition-colors hover:bg-surface-soft hover:text-text disabled:cursor-not-allowed disabled:opacity-(--opacity-disabled)"
+          className="absolute end-0 top-0 grid h-full min-w-11 place-items-center rounded-(--shape-radius-control) text-text-subtle transition-colors hover:bg-danger-soft hover:text-danger focus-visible:bg-danger-soft focus-visible:text-danger disabled:cursor-not-allowed disabled:opacity-(--opacity-disabled)"
           disabled={props.disabled}
           onClick={() => {
             onValueChange('');

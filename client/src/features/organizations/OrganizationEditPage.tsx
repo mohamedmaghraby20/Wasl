@@ -193,7 +193,7 @@ export function OrganizationEditPage(): React.JSX.Element {
               {logoSource ? (
                 <img alt="" className="size-full object-cover" src={logoSource} />
               ) : (
-                <Building2 aria-hidden="true" size={38} />
+                <Building2 aria-hidden="true" className="size-9" />
               )}
             </div>
             <div className="grid justify-items-start gap-2">
@@ -202,7 +202,7 @@ export function OrganizationEditPage(): React.JSX.Element {
               </h2>
               <p className="text-sm text-text-muted">{t('organizationLogoHint')}</p>
               <div className="flex flex-wrap gap-2">
-                <label className="inline-flex h-11 cursor-pointer items-center gap-2 rounded-(--shape-radius-control) border border-input bg-background px-4 text-sm font-semibold text-text transition-colors hover:bg-surface-soft has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-background">
+                <label className="inline-flex h-11 cursor-pointer items-center gap-2 rounded-(--shape-radius-control) border border-input bg-background px-4 text-sm font-semibold text-text transition-colors hover:bg-surface-soft hover:text-primary-soft-text has-[:focus-visible]:text-primary-soft-text has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-background">
                   <Camera aria-hidden="true" className="size-4" />
                   {t('choosePhoto')}
                   <input
@@ -217,6 +217,7 @@ export function OrganizationEditPage(): React.JSX.Element {
                 </label>
                 {organization.data.logoUrl && !removeLogo ? (
                   <Button
+                    intent="danger"
                     onClick={() => {
                       setSelectedLogo(null);
                       setRemoveLogo(true);

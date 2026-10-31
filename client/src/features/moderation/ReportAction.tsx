@@ -24,7 +24,7 @@ export function ReportAction({ targetType, targetId, iconOnly = false }: {
 
   return (
     <>
-      <Button aria-label={iconOnly ? t('reportContent') : undefined} asChild={!user} onClick={user ? () => setOpen(true) : undefined} size={iconOnly ? 'icon' : 'sm'} title={iconOnly ? t('reportContent') : undefined} variant="ghost">
+      <Button aria-label={iconOnly ? t('reportContent') : undefined} asChild={!user} intent="warning" onClick={user ? () => setOpen(true) : undefined} size={iconOnly ? 'icon-sm' : 'sm'} title={iconOnly ? t('reportContent') : undefined} variant="ghost">
         {user ? <><Flag aria-hidden="true" />{iconOnly ? null : t('reportContent')}</> : <Link to={signIn}><Flag aria-hidden="true" />{iconOnly ? null : t('reportContent')}</Link>}
       </Button>
       <TextPromptDialog

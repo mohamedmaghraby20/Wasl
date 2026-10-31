@@ -170,7 +170,7 @@ export function CommunityDetailsLayout({
                 <a
                   key={label}
                   aria-label={label}
-                  className={buttonVariants({ size: 'icon', variant: 'ghost' })}
+                  className={buttonVariants({ size: 'icon-sm', variant: 'ghost' })}
                   href={href}
                   rel="noopener noreferrer"
                   target={href.startsWith('mailto:') ? undefined : '_blank'}
@@ -182,7 +182,7 @@ export function CommunityDetailsLayout({
               <Button
                 aria-label={t('copyShare')}
                 onClick={onCopyShare}
-                size="icon"
+                size="icon-sm"
                 title={t('copyShare')}
                 variant="ghost"
               >
@@ -209,7 +209,7 @@ export function CommunityDetailsLayout({
               >
                 <Icon
                   aria-hidden="true"
-                  className={`size-5 ${selected === id ? 'text-primary-soft-text' : 'text-text-subtle'}`}
+                  className="size-4.5"
                 />
                 {t(label)}
               </Link>

@@ -350,6 +350,7 @@ export function PlatformModerationPage(): React.JSX.Element {
                         disabled={Boolean(busyId)}
                         size="sm"
                         onClick={() => void review(report.id, action)}
+                        intent={action === 'ARCHIVE_COMMUNITY' ? 'warning' : 'danger'}
                       >
                         {t(`admin_${action}`)}
                       </Button>
@@ -360,6 +361,7 @@ export function PlatformModerationPage(): React.JSX.Element {
                         size="sm"
                         variant="secondary"
                         onClick={() => void review(report.id, 'RESTORE_USER')}
+                        intent="success"
                       >
                         {t('admin_RESTORE_USER')}
                       </Button>
@@ -398,6 +400,7 @@ export function PlatformModerationPage(): React.JSX.Element {
                   disabled={Boolean(busyId)}
                   size="sm"
                   onClick={() => void decideVerification(request.id, 'APPROVE')}
+                  intent="success"
                 >
                   {t('adminApprove')}
                 </Button>
@@ -406,6 +409,7 @@ export function PlatformModerationPage(): React.JSX.Element {
                   size="sm"
                   variant="secondary"
                   onClick={() => void decideVerification(request.id, 'REJECT')}
+                  intent="danger"
                 >
                   {t('adminReject')}
                 </Button>
@@ -468,6 +472,7 @@ export function PlatformModerationPage(): React.JSX.Element {
                 <Button
                   disabled={Boolean(busyId)}
                   onClick={() => void reviewPrivacy(request.id, 'APPROVE')}
+                  intent="success"
                   size="sm"
                 >
                   {t('adminApproveRequest')}
@@ -475,6 +480,7 @@ export function PlatformModerationPage(): React.JSX.Element {
                 <Button
                   disabled={Boolean(busyId)}
                   onClick={() => void reviewPrivacy(request.id, 'REJECT')}
+                  intent="danger"
                   size="sm"
                   variant="secondary"
                 >

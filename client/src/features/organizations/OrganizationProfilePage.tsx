@@ -88,7 +88,7 @@ export function OrganizationProfilePage(): React.JSX.Element {
           />
         ) : (
           <div className="grid size-24 shrink-0 place-items-center rounded-(--shape-radius-card) border border-border bg-primary-soft text-primary-soft-text">
-            <Building2 aria-hidden="true" size={38} />
+            <Building2 aria-hidden="true" className="size-9" />
           </div>
         )}
         <div className="min-w-0 flex-1">

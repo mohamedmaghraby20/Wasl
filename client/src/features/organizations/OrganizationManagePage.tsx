@@ -35,9 +35,6 @@ import { Textarea } from '@/components/ui/Textarea';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { languageCode } from '@/features/resources/resource-utils';
 
-const dangerButtonClass =
-  'border-danger/30 text-danger hover:bg-danger-soft hover:text-danger';
-
 function ManageSection({
   id,
   title,
@@ -429,7 +426,7 @@ export function OrganizationManagePage(): React.JSX.Element {
                 </div>
                 {isOwner && manager.role === 'ADMIN' ? (
                   <Button
-                    className={dangerButtonClass}
+                    intent="danger"
                     disabled={removeAdmin.isPending}
                     onClick={() => void remove(manager.userId)}
                     size="sm"
@@ -479,7 +476,7 @@ export function OrganizationManagePage(): React.JSX.Element {
                   />
                 </Field>
                 <Button
-                  className={dangerButtonClass}
+                  intent="warning"
                   disabled={transferOwnership.isPending || !transferTargetId}
                   type="submit"
                   variant="outline"
@@ -592,7 +589,7 @@ export function OrganizationManagePage(): React.JSX.Element {
                       </p>
                     </div>
                     <Button
-                      className={dangerButtonClass}
+                      intent="danger"
                       disabled={revokeInvitation.isPending}
                       onClick={() => void revoke(invitation.id)}
                       size="sm"

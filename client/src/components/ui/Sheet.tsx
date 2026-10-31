@@ -38,7 +38,7 @@ export function SheetContent({
         {children}
         <DialogPrimitive.Close
           aria-label={closeLabel}
-          className="absolute end-2 top-2 grid size-11 place-items-center rounded-full text-text-muted transition-colors hover:bg-surface-soft hover:text-text"
+          className="absolute end-2 top-2 grid size-11 place-items-center rounded-full text-text-muted transition-colors hover:bg-surface-soft hover:text-primary-soft-text focus-visible:bg-surface-soft focus-visible:text-primary-soft-text"
         >
           <X aria-hidden="true" className="size-4" />
         </DialogPrimitive.Close>

@@ -70,7 +70,7 @@ export function TagInput({
           <span className="truncate">{item}</span>
           <button
             aria-label={t('removeInterest', { interest: item })}
-            className="grid size-6 shrink-0 place-items-center rounded-full text-text-subtle transition-colors hover:bg-surface hover:text-text disabled:pointer-events-none"
+            className="grid size-6 shrink-0 place-items-center rounded-full text-text-subtle transition-colors hover:bg-danger-soft hover:text-danger focus-visible:bg-danger-soft focus-visible:text-danger disabled:pointer-events-none pointer-coarse:size-11"
             disabled={disabled}
             onClick={() => onChange(value.filter((current) => current !== item))}
             type="button"

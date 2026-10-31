@@ -219,7 +219,7 @@ export function DiscoveryFilters({
                 </span>
                 <button
                   aria-label={removeLabel}
-                  className="grid size-9 place-items-center rounded-full text-text-muted transition-colors hover:bg-surface hover:text-text"
+                  className="grid size-9 place-items-center rounded-full text-text-muted transition-colors hover:bg-danger-soft hover:text-danger focus-visible:bg-danger-soft focus-visible:text-danger pointer-coarse:size-11"
                   onClick={filter.onRemove}
                   title={removeLabel}
                   type="button"
@@ -230,7 +230,7 @@ export function DiscoveryFilters({
             );
           })}
           <Button
-            className="text-text-muted"
+            intent="danger"
             onClick={onClear}
             size="sm"
             type="button"

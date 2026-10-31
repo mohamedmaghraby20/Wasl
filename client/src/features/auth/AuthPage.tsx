@@ -77,7 +77,7 @@ export function AuthPage(): React.JSX.Element {
       <aside className="relative flex min-h-64 flex-col justify-between overflow-hidden bg-foreground p-7 text-background sm:p-10 lg:p-12">
         <div className="relative z-10 flex items-center gap-2 font-heading text-lg font-extrabold">
           <span className="grid size-9 place-items-center rounded-full bg-primary text-primary-foreground">
-            <UsersRound aria-hidden="true" size={18} />
+            <UsersRound aria-hidden="true" className="size-4.5" />
           </span>
           {t('brand')}
         </div>

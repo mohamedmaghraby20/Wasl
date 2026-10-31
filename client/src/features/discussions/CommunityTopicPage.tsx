@@ -245,6 +245,7 @@ export function CommunityTopicPage(): React.JSX.Element {
                     ) : null}
                     <Button
                       disabled={remove.isPending}
+                      intent="danger"
                       onClick={() => void removePost(post.id)}
                       size="sm"
                       variant="ghost"

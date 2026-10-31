@@ -38,16 +38,31 @@ h4 {
 p {
   text-wrap: pretty;
 }
-button,
-input,
-select,
-textarea {
-  font: inherit;
-  color: inherit;
+@layer base {
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+  /* Utilities and component sizing override the compact fallback, not SVG attributes. */
+  :where(.lucide) {
+    width: var(--icon-size-sm);
+    height: var(--icon-size-sm);
+    flex-shrink: 0;
+    stroke-width: 1.75;
+    transition: color var(--motion-duration-fast) var(--motion-ease-standard);
+  }
 }
-a {
+
+/* Action icons follow their control's semantic state, including formerly fixed icon colors. */
+:where(a, button, [role='menuitem']):is(:hover, :focus-visible, [data-highlighted]):not(:disabled, [aria-disabled='true'], [data-disabled]) .lucide {
   color: inherit;
-  text-decoration: none;
 }
 ::selection {
   background: var(--color-primary);

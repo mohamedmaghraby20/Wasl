@@ -422,7 +422,7 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
               <Button
                 asChild
                 aria-label={t('editCommunity')}
-                size="icon"
+                size="icon-sm"
                 title={t('editCommunity')}
                 variant="outline"
               >
@@ -432,10 +432,10 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
               </Button>
               <Button
                 aria-label={t('archiveCommunity')}
-                className="border-danger/30 text-danger hover:bg-danger-soft hover:text-danger"
+                intent="warning"
                 disabled={archiveCommunity.isPending}
                 onClick={() => void archive()}
-                size="icon"
+                size="icon-sm"
                 title={t('archiveCommunity')}
                 variant="outline"
               >
@@ -444,7 +444,7 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
               <ReportAction iconOnly targetType="community" targetId={item.id} />
               <Button
                 aria-label={t('deleteCommunity')}
-                className="border-danger/30 text-danger hover:bg-danger-soft hover:text-danger"
+                intent="danger"
                 disabled={deleteCommunity.isPending}
                 onClick={() =>
                   requestDeletion({
@@ -488,7 +488,7 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
                     },
                   })
                 }
-                size="icon"
+                size="icon-sm"
                 title={t('deleteCommunity')}
                 variant="outline"
               >
@@ -523,6 +523,7 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
                     disabled={participationBusy}
                     onClick={() => void runParticipationAction()}
                     size="sm"
+                    intent={participationLeaving ? 'danger' : undefined}
                     variant={participationLeaving ? 'outline' : 'primary'}
                   >
                     {t(participationLeaving ? 'leaveCommunity' : 'joinCommunity')}
@@ -575,7 +576,7 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
           <Button
             aria-label={t('copyShare')}
             onClick={() => void copyShareLink()}
-            size="icon"
+            size="icon-sm"
             title={t('copyShare')}
             variant="outline"
           >
@@ -604,7 +605,7 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
                   <Link to={`/events/${item.id}/edit`}>{t('editEvent')}</Link>
                 </Button>
                 <Button
-                  className="border-danger/30 text-danger hover:bg-danger-soft hover:text-danger"
+                  intent="danger"
                   disabled={cancelEvent.isPending}
                   onClick={() => void cancel()}
                   variant="outline"
@@ -657,6 +658,7 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
                       className="w-fit"
                       disabled={participationBusy}
                       onClick={() => void runParticipationAction()}
+                      intent={participationLeaving ? 'danger' : undefined}
                       variant={participationLeaving ? 'outline' : 'primary'}
                     >
                       {kind === 'communities'

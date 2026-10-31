@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
-import { Check, X } from 'lucide-react';
+import { ArrowUp, Check, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { Link, useSearchParams } from 'react-router';
@@ -19,6 +19,7 @@ import { ApiError } from '@/api/fetcher';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Field } from '@/components/ui/Field';
 import { SearchInput } from '@/components/ui/SearchInput';
+import { cn } from '@/lib/cn';
 import {
   useModeratorAssignmentsControllerAssign,
   useModeratorAssignmentsControllerList,
@@ -252,7 +253,10 @@ export function OrganizerParticipationPanel({
               {visibleParticipants.map((participant) => (
                 <li
                   key={participant.id}
-                  className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-(--shape-radius-card) border border-border bg-card px-3 py-2"
+                  className={cn(
+                    'items-center gap-x-3 gap-y-2 rounded-(--shape-radius-card) border border-border bg-card px-3 py-2',
+                    mode === 'requests' ? 'grid grid-cols-[minmax(0,1fr)_auto]' : 'flex flex-wrap justify-between',
+                  )}
                 >
                   <div className="flex min-w-0 items-center gap-3">
                     <span
@@ -316,7 +320,8 @@ export function OrganizerParticipationPanel({
                         <Button
                           aria-label={t('approveParticipant')}
                           title={t('approveParticipant')}
-                          size="icon"
+                          size="icon-sm"
+                          intent="success"
                           disabled={busy}
                           onClick={() => void decide(participant.id, 'approve')}
                           variant="outline"
@@ -326,7 +331,8 @@ export function OrganizerParticipationPanel({
                         <Button
                           aria-label={t('rejectParticipant')}
                           title={t('rejectParticipant')}
-                          size="icon"
+                          size="icon-sm"
+                          intent="danger"
                           disabled={busy}
                           onClick={() => void decide(participant.id, 'reject')}
                           variant="outline"
@@ -339,17 +345,26 @@ export function OrganizerParticipationPanel({
                       <>
                         {counts.data.admissionMode === 'approval' && (
                           <Button
+                            aria-label={mode === 'requests' ? t('promoteParticipant') : undefined}
                             disabled={busy}
                             onClick={() => void decide(participant.id, 'promote')}
+                            intent="success"
+                            size={mode === 'requests' ? 'icon-sm' : 'md'}
+                            title={mode === 'requests' ? t('promoteParticipant') : undefined}
                             variant="outline"
                           >
-                            {t('promoteParticipant')}
+                            {mode === 'requests' ? (
+                              <ArrowUp aria-hidden="true" />
+                            ) : (
+                              t('promoteParticipant')
+                            )}
                           </Button>
                         )}
                         <Button
                           aria-label={t('rejectParticipant')}
                           title={t('rejectParticipant')}
-                          size="icon"
+                          size="icon-sm"
+                          intent="danger"
                           disabled={busy}
                           onClick={() => void decide(participant.id, 'reject')}
                           variant="outline"
@@ -366,6 +381,7 @@ export function OrganizerParticipationPanel({
                           <Button
                             disabled={busy}
                             onClick={() => void decide(participant.id, 'attended')}
+                            intent="success"
                             variant="outline"
                           >
                             {t('markAttended')}
@@ -375,6 +391,7 @@ export function OrganizerParticipationPanel({
                           <Button
                             disabled={busy}
                             onClick={() => void decide(participant.id, 'no-show')}
+                            intent="warning"
                             variant="outline"
                           >
                             {t('markNoShow')}
@@ -382,7 +399,7 @@ export function OrganizerParticipationPanel({
                         )}
                         {(kind === 'communities' || participant.status === 'ACCEPTED') && (
                           <Button
-                            className="text-destructive"
+                            intent="danger"
                             disabled={busy}
                             onClick={() => void decide(participant.id, 'remove')}
                             variant="outline"

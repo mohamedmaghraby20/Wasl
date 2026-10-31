@@ -53,7 +53,7 @@ export function PublicUserProfilePage(): React.JSX.Element {
           />
         ) : (
           <div className="grid size-24 shrink-0 place-items-center rounded-full bg-primary-soft text-3xl font-bold text-primary-soft-text">
-            {initials || <CircleUserRound aria-hidden="true" size={38} />}
+            {initials || <CircleUserRound aria-hidden="true" className="size-9" />}
           </div>
         )}
         <div className="min-w-0 flex-1">
