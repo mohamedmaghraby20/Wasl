@@ -66,15 +66,13 @@ export function ProfilePage(): React.JSX.Element {
             ) : null}
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button asChild>
+            <Button asChild aria-label={t('editProfile')} title={t('editProfile')} size="icon-sm">
               <Link to="/profile/edit">
                 <PencilLine aria-hidden="true" />
-                {t('editProfile')}
               </Link>
             </Button>
-            <Button asChild variant="outline">
+            <Button asChild aria-label={t('viewPublicProfile')} title={t('viewPublicProfile')} size="icon-sm" variant="outline">
               <Link to={`/users/${person.id}`}>
-                {t('viewPublicProfile')}
                 <ArrowUpRight aria-hidden="true" className="rtl:rotate-90" />
               </Link>
             </Button>

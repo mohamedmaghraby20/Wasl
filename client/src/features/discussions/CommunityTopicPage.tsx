@@ -1,4 +1,4 @@
-import { ArrowLeft, Pencil, Reply, Trash2 } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, LockKeyhole, Pencil, Reply, Trash2, X } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router';
@@ -17,6 +17,7 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { useUsersControllerCurrent } from '@/api/generated/users/users';
 import { ApiError } from '@/api/fetcher';
 import { Button } from '@/components/ui/Button';
+import { IconButton } from '@/components/ui/IconButton';
 import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { useDeleteConfirmation } from '@/components/ui/DeleteDialog';
 import { Field } from '@/components/ui/Field';
@@ -161,15 +162,14 @@ export function CommunityTopicPage(): React.JSX.Element {
         </p>
         <p className="whitespace-pre-wrap text-sm leading-relaxed text-text-muted">{topic.body}</p>
         {isManager && !topic.archived ? (
-          <Button
-            className="w-fit"
+          <IconButton
+            icon={LockKeyhole}
+            label={t('closeTopic')}
+            intent="warning"
             disabled={close.isPending}
             onClick={() => void closeTopic()}
-            size="sm"
             variant="outline"
-          >
-            {t('closeTopic')}
-          </Button>
+          />
         ) : null}
       </header>
 
@@ -225,68 +225,60 @@ export function CommunityTopicPage(): React.JSX.Element {
                       >
                         {t('saveChanges')}
                       </Button>
-                      <Button onClick={() => setEditing(null)} size="sm" variant="outline">
-                        {t('cancelReply')}
-                      </Button>
+                      <IconButton icon={X} label={t('cancelReply')} onClick={() => setEditing(null)} variant="outline" />
                     </div>
                   </div>
                 ) : null}
                 {(isManager || currentUser.data?.id === post.authorId) && post.body ? (
                   <div className="flex flex-wrap gap-2">
                     {isManager || canPost ? (
-                      <Button
+                      <IconButton
+                        icon={Pencil}
+                        label={t('editComment')}
                         onClick={() => setEditing({ id: post.id, body: post.body! })}
-                        size="sm"
                         variant="ghost"
-                      >
-                        <Pencil aria-hidden="true" />
-                        {t('editComment')}
-                      </Button>
+                      />
                     ) : null}
-                    <Button
+                    <IconButton
+                      icon={Trash2}
+                      label={t('removeComment')}
                       disabled={remove.isPending}
                       intent="danger"
                       onClick={() => void removePost(post.id)}
-                      size="sm"
                       variant="ghost"
-                    >
-                      <Trash2 aria-hidden="true" />
-                      {t('removeComment')}
-                    </Button>
+                    />
                   </div>
                 ) : null}
                 {canPost && !post.parentId && post.body ? (
-                  <Button
-                    className="w-fit"
+                  <IconButton
+                    icon={Reply}
+                    label={t('replyToDiscussionPost')}
+                    className="[&_svg]:rtl:rotate-180"
                     onClick={() => setReplyTo({ id: post.id, name: post.authorName })}
-                    size="sm"
                     variant="outline"
-                  >
-                    <Reply aria-hidden="true" className="rtl:rotate-180" />
-                    {t('replyToDiscussionPost')}
-                  </Button>
+                  />
                 ) : null}
               </li>
             ))}
           </ol>
         )}
         <nav aria-label={t('topicPages')} className="flex gap-2 border-t border-border pt-4">
-          <Button
+          <IconButton
+            icon={ChevronLeft}
+            label={t('previousPage')}
+            className="[&_svg]:rtl:rotate-180"
             disabled={page <= 1}
             onClick={() => setPage(page - 1)}
-            size="sm"
             variant="outline"
-          >
-            {t('previousPage')}
-          </Button>
-          <Button
+          />
+          <IconButton
+            icon={ChevronRight}
+            label={t('nextPage')}
+            className="[&_svg]:rtl:rotate-180"
             disabled={!topic.posts.hasMore}
             onClick={() => setPage(page + 1)}
-            size="sm"
             variant="outline"
-          >
-            {t('nextPage')}
-          </Button>
+          />
         </nav>
       </section>
 
@@ -298,9 +290,7 @@ export function CommunityTopicPage(): React.JSX.Element {
           {replyTo ? (
             <div className="flex flex-wrap items-center gap-2 rounded-lg bg-primary-soft px-3 py-2 text-sm text-primary-soft-text">
               <span className="font-medium">{t('replyingTo', { name: replyTo.name })}</span>
-              <Button onClick={() => setReplyTo(null)} size="sm" type="button" variant="ghost">
-                {t('cancelReply')}
-              </Button>
+              <IconButton icon={X} label={t('cancelReply')} onClick={() => setReplyTo(null)} type="button" />
             </div>
           ) : null}
           <Field id="topic-comment" label={t('writeEventComment')} required>

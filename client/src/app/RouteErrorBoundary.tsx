@@ -1,6 +1,8 @@
+import { RotateCw } from 'lucide-react';
 import { Link, isRouteErrorResponse, useRouteError } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
+import { IconButton } from '@/components/ui/IconButton';
 
 export function RouteErrorBoundary(): React.JSX.Element {
   const error = useRouteError();
@@ -18,9 +20,7 @@ export function RouteErrorBoundary(): React.JSX.Element {
           <Link to="/">{t('backHome')}</Link>
         </Button>
         {!isNotFound && (
-          <Button onClick={() => window.location.reload()} type="button" variant="outline">
-            {t('reloadPage')}
-          </Button>
+          <IconButton icon={RotateCw} label={t('reloadPage')} onClick={() => window.location.reload()} type="button" variant="outline" />
         )}
       </div>
     </main>

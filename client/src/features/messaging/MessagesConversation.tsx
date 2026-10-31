@@ -1,6 +1,6 @@
 import { createContext, useContext, useMemo, type ComponentProps } from 'react';
-import { ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
+import { ArrowLeft, Ban, Flag, ShieldOff } from 'lucide-react';
+import { IconButton } from '@/components/ui/IconButton';
 import type { MessagingConversationItemDto } from '@/api/generated/wasl-client.schemas';
 import type { StreamChat, Channel as StreamChannel } from 'stream-chat';
 import {
@@ -114,10 +114,10 @@ export default function MessagesConversation({
             <div className={cn('min-h-0 flex-col', selected ? 'flex' : 'hidden md:flex')}>
               {selected ? <>
                   <div className="flex flex-wrap items-center gap-2 border-b border-border p-2">
-                    <Button className="md:hidden" onClick={onBack} size="sm" variant="ghost"><ArrowLeft aria-hidden="true" className="rtl:rotate-180" />{t('backToConversations')}</Button>
+                    <IconButton icon={ArrowLeft} label={t('backToConversations')} className="md:hidden [&_svg]:rtl:rotate-180" onClick={onBack} />
                     {selectedRecord?.kind === 'dm' ? <div className="ms-auto flex gap-2">
-                      <Button intent="warning" onClick={onReport} size="sm" variant="ghost">{t('reportUser')}</Button>
-                      {isBlocked ? <Button intent="success" onClick={onUnblock} size="sm" variant="ghost">{t('unblockUser')}</Button> : <Button intent="danger" onClick={onBlock} size="sm" variant="ghost">{t('blockUser')}</Button>}
+                      <IconButton icon={Flag} label={t('reportUser')} intent="warning" onClick={onReport} />
+                      {isBlocked ? <IconButton icon={ShieldOff} label={t('unblockUser')} intent="success" onClick={onUnblock} /> : <IconButton icon={Ban} label={t('blockUser')} intent="danger" onClick={onBlock} />}
                     </div> : null}
                   </div>
                   {isBlocked ? <p className="m-auto p-5 text-center">{t('conversationBlocked')}</p> : <WithComponents overrides={{ MessageActions: SharedMessageActions }}><Channel channel={selected}><Window><MessageList /><MessageComposer /><Thread /></Window></Channel></WithComponents>}

@@ -1,3 +1,4 @@
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router';
@@ -8,6 +9,7 @@ import {
   useCommunityDiscussionsControllerList,
 } from '@/api/generated/discussions/discussions';
 import { Button } from '@/components/ui/Button';
+import { IconButton } from '@/components/ui/IconButton';
 import { Field } from '@/components/ui/Field';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
@@ -77,22 +79,22 @@ export function CommunityTopics({
             ))}
           </ul>
           <nav aria-label={t('topicPages')} className="flex gap-2">
-            <Button
+            <IconButton
+              icon={ChevronLeft}
+              label={t('previousPage')}
+              className="[&_svg]:rtl:rotate-180"
               disabled={page <= 1}
               onClick={() => setPage(page - 1)}
-              size="sm"
               variant="outline"
-            >
-              {t('previousPage')}
-            </Button>
-            <Button
+            />
+            <IconButton
+              icon={ChevronRight}
+              label={t('nextPage')}
+              className="[&_svg]:rtl:rotate-180"
               disabled={!query.data.hasMore}
               onClick={() => setPage(page + 1)}
-              size="sm"
               variant="outline"
-            >
-              {t('nextPage')}
-            </Button>
+            />
           </nav>
         </>
       )}

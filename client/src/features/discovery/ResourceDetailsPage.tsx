@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Archive, ArrowLeft, MessageSquare, Pencil, Share2, Trash2 } from 'lucide-react';
+import { Archive, ArrowLeft, CalendarX, ClipboardList, LogOut, MessageSquare, Pencil, Share2, TicketPlus, TicketX, Trash2, UserPlus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
@@ -35,6 +35,7 @@ import {
 import { ApiError } from '@/api/fetcher';
 import { getMessagingControllerConversationsQueryKey } from '@/api/generated/messaging/messaging';
 import { Button } from '@/components/ui/Button';
+import { IconButton } from '@/components/ui/IconButton';
 import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { useDeleteConfirmation } from '@/components/ui/DeleteDialog';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -441,7 +442,7 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
               >
                 <Archive aria-hidden="true" />
               </Button>
-              <ReportAction iconOnly targetType="community" targetId={item.id} />
+              <ReportAction targetType="community" targetId={item.id} />
               <Button
                 aria-label={t('deleteCommunity')}
                 intent="danger"
@@ -499,9 +500,9 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
           membershipAction={
             <>
               {!user ? (
-                <Button asChild size="sm">
+                <Button asChild aria-label={t('joinCommunity')} title={t('joinCommunity')} size="icon-sm">
                   <Link to={`/sign-in?returnTo=${encodeURIComponent(returnTo)}`}>
-                    {t('joinCommunity')}
+                    <UserPlus aria-hidden="true" />
                   </Link>
                 </Button>
               ) : currentUser.isPending || participationPending ? (
@@ -519,18 +520,17 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
                       {t(`participationStatus_${participationStatus}`)}
                     </span>
                   ) : null}
-                  <Button
+                  <IconButton
+                    icon={participationLeaving ? LogOut : UserPlus}
+                    label={t(participationLeaving ? 'leaveCommunity' : 'joinCommunity')}
                     disabled={participationBusy}
                     onClick={() => void runParticipationAction()}
-                    size="sm"
                     intent={participationLeaving ? 'danger' : undefined}
                     variant={participationLeaving ? 'outline' : 'primary'}
-                  >
-                    {t(participationLeaving ? 'leaveCommunity' : 'joinCommunity')}
-                  </Button>
+                  />
                 </>
               )}
-              <ReportAction iconOnly targetType="community" targetId={item.id} />
+              <ReportAction targetType="community" targetId={item.id} />
             </>
           }
           managementPanel={
@@ -539,15 +539,13 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
           chatAction={
             canViewMembers ? (
               <div className="grid gap-2">
-                <Button
-                  className="w-full"
+                <IconButton
+                  icon={MessageSquare}
+                  label={t('openResourceChat')}
                   disabled={openCommunityChat.isPending}
                   onClick={() => void openChat()}
                   variant="outline"
-                >
-                  <MessageSquare aria-hidden="true" />
-                  {t('openResourceChat')}
-                </Button>
+                />
                 {chatError ? (
                   <p role="alert" className="text-sm text-danger">
                     {t('resourceChatError')}
@@ -583,7 +581,6 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
             <Share2 aria-hidden="true" />
           </Button>
           <ReportAction
-            iconOnly
             targetType={kind === 'events' ? 'event' : 'community'}
             targetId={item.id}
           />
@@ -601,22 +598,22 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
           <div className="flex flex-wrap gap-3">
             {!eventItem.cancelled ? (
               <>
-                <Button asChild variant="outline">
-                  <Link to={`/events/${item.id}/edit`}>{t('editEvent')}</Link>
+                <Button asChild aria-label={t('editEvent')} title={t('editEvent')} size="icon-sm" variant="outline">
+                  <Link to={`/events/${item.id}/edit`}><Pencil aria-hidden="true" /></Link>
                 </Button>
-                <Button
+                <IconButton
+                  icon={CalendarX}
+                  label={t('cancelEventAction')}
                   intent="danger"
                   disabled={cancelEvent.isPending}
                   onClick={() => void cancel()}
                   variant="outline"
-                >
-                  {t('cancelEventAction')}
-                </Button>
+                />
               </>
             ) : null}
-            <Button asChild size="sm" variant="outline">
+            <Button asChild aria-label={t('reviewRequests')} title={t('reviewRequests')} size="icon-sm" variant="outline">
               <Link to={`/events/${item.id}/participants?status=PENDING`}>
-                {t('reviewRequests')}
+                <ClipboardList aria-hidden="true" />
               </Link>
             </Button>
           </div>
@@ -654,30 +651,23 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
                     </p>
                   ) : null}
                   {!(eventItem && ['ATTENDED', 'NO_SHOW'].includes(participationStatus ?? '')) && (
-                    <Button
-                      className="w-fit"
+                    <IconButton
+                      icon={participationLeaving ? TicketX : TicketPlus}
+                      label={t(participationLeaving ? 'cancelRegistration' : 'registerForEvent')}
                       disabled={participationBusy}
                       onClick={() => void runParticipationAction()}
                       intent={participationLeaving ? 'danger' : undefined}
                       variant={participationLeaving ? 'outline' : 'primary'}
-                    >
-                      {kind === 'communities'
-                        ? participationLeaving
-                          ? t('leaveCommunity')
-                          : t('joinCommunity')
-                        : participationLeaving
-                          ? t('cancelRegistration')
-                          : t('registerForEvent')}
-                    </Button>
+                    />
                   )}
                 </>
               )
             ) : (
-              <Button asChild className="w-fit">
+              <Button asChild aria-label={t('registerForEvent')} title={t('registerForEvent')} size="icon-sm">
                 <Link
                   to={{ pathname: '/sign-in', search: `?returnTo=${encodeURIComponent(returnTo)}` }}
                 >
-                  {kind === 'communities' ? t('joinCommunity') : t('registerForEvent')}
+                  <TicketPlus aria-hidden="true" />
                 </Link>
               </Button>
             )}
@@ -690,15 +680,13 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
             ? participationStatus === 'ACTIVE'
             : participationStatus === 'ACCEPTED')) && (
           <section className="flex flex-wrap items-center gap-3">
-            <Button
-              className="w-fit"
+            <IconButton
+              icon={MessageSquare}
+              label={t('openResourceChat')}
               disabled={openCommunityChat.isPending || openEventChat.isPending}
               onClick={() => void openChat()}
               variant="outline"
-            >
-              <MessageSquare aria-hidden="true" />
-              {t('openResourceChat')}
-            </Button>
+            />
             {chatError ? (
               <p className="text-sm font-medium text-danger" role="alert">
                 {t('resourceChatError')}

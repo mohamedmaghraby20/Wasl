@@ -1,4 +1,4 @@
-import { Download, FileText, ShieldCheck } from 'lucide-react';
+import { Download, FileText, ShieldCheck, X } from 'lucide-react';
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -20,6 +20,7 @@ import type {
 import { QueryError } from '@/components/feedback/QueryError';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { IconButton } from '@/components/ui/IconButton';
 import { Card } from '@/components/ui/Card';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { useConfirm } from '@/components/ui/ConfirmDialog';
@@ -373,16 +374,14 @@ export function PrivacyDataPage(): React.JSX.Element {
             </h2>
           </div>
           <p className="text-sm leading-relaxed text-text-muted">{t('privacyExportHint')}</p>
-          <Button
-            className="w-fit"
+          <IconButton
+            icon={Download}
+            label={t('privacyExportAction')}
             disabled={exporting}
             onClick={() => void downloadExport()}
             type="button"
             variant="outline"
-          >
-            <Download aria-hidden="true" />
-            {t('privacyExportAction')}
-          </Button>
+          />
         </section>
       </Card>
 
@@ -462,16 +461,15 @@ export function PrivacyDataPage(): React.JSX.Element {
                       </p>
                     ) : null}
                     {['RECEIVED', 'IN_REVIEW'].includes(request.status) ? (
-                      <Button
-                        className="w-fit"
+                      <IconButton
+                        icon={X}
+                        label={t('privacyCancelRequest')}
+                        intent="danger"
                         disabled={busyId === request.id}
                         onClick={() => void cancelRequestRow(request.id)}
-                        size="sm"
                         type="button"
                         variant="ghost"
-                      >
-                        {t('privacyCancelRequest')}
-                      </Button>
+                      />
                     ) : null}
                   </li>
                 ))}

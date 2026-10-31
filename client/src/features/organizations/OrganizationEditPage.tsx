@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
 import { useHead } from '@unhead/react';
-import { ArrowLeft, Building2, Camera, X } from 'lucide-react';
+import { ArrowLeft, Building2, Camera, ImageOff } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -15,6 +15,7 @@ import { useDiscoveryControllerCities } from '@/api/generated/discovery/discover
 import { ApiError } from '@/api/fetcher';
 import { QueryError } from '@/components/feedback/QueryError';
 import { Button } from '@/components/ui/Button';
+import { IconButton } from '@/components/ui/IconButton';
 import { Card } from '@/components/ui/Card';
 import { Field } from '@/components/ui/Field';
 import { Input } from '@/components/ui/Input';
@@ -202,9 +203,9 @@ export function OrganizationEditPage(): React.JSX.Element {
               </h2>
               <p className="text-sm text-text-muted">{t('organizationLogoHint')}</p>
               <div className="flex flex-wrap gap-2">
-                <label className="inline-flex h-11 cursor-pointer items-center gap-2 rounded-(--shape-radius-control) border border-input bg-background px-4 text-sm font-semibold text-text transition-colors hover:bg-surface-soft hover:text-primary-soft-text has-[:focus-visible]:text-primary-soft-text has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-background">
+                <label title={t('choosePhoto')} className="inline-flex size-11 cursor-pointer items-center justify-center rounded-(--shape-radius-control) border border-input bg-background text-text transition-colors hover:bg-surface-soft hover:text-primary-soft-text has-[:focus-visible]:text-primary-soft-text has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-background">
                   <Camera aria-hidden="true" className="size-4" />
-                  {t('choosePhoto')}
+                  <span className="sr-only">{t('choosePhoto')}</span>
                   <input
                     accept="image/jpeg,image/png,image/webp"
                     className="sr-only"
@@ -216,7 +217,9 @@ export function OrganizationEditPage(): React.JSX.Element {
                   />
                 </label>
                 {organization.data.logoUrl && !removeLogo ? (
-                  <Button
+                  <IconButton
+                    icon={ImageOff}
+                    label={t('removePhoto')}
                     intent="danger"
                     onClick={() => {
                       setSelectedLogo(null);
@@ -224,10 +227,7 @@ export function OrganizationEditPage(): React.JSX.Element {
                     }}
                     type="button"
                     variant="outline"
-                  >
-                    <X aria-hidden="true" />
-                    {t('removePhoto')}
-                  </Button>
+                  />
                 ) : null}
               </div>
             </div>

@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useHead } from '@unhead/react';
-import { ArrowLeft, Copy, Mail, Pencil, UserPlus, X } from 'lucide-react';
+import { ArrowLeft, Copy, Mail, MailX, Pencil, UserMinus, UserPlus } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -27,6 +27,7 @@ import { ApiError } from '@/api/fetcher';
 import { QueryError } from '@/components/feedback/QueryError';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { IconButton } from '@/components/ui/IconButton';
 import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { Field } from '@/components/ui/Field';
 import { Input } from '@/components/ui/Input';
@@ -310,10 +311,9 @@ export function OrganizationManagePage(): React.JSX.Element {
             {t('organizationManageIntro')}
           </p>
         </div>
-        <Button asChild variant="outline">
+        <Button asChild aria-label={t('editOrganization')} title={t('editOrganization')} size="icon-sm" variant="outline">
           <Link to={`/organizations/${organization.slug}/edit`}>
             <Pencil aria-hidden="true" />
-            {t('editOrganization')}
           </Link>
         </Button>
       </header>
@@ -425,16 +425,14 @@ export function OrganizationManagePage(): React.JSX.Element {
                   </p>
                 </div>
                 {isOwner && manager.role === 'ADMIN' ? (
-                  <Button
+                  <IconButton
+                    icon={UserMinus}
+                    label={t('removeAdmin')}
                     intent="danger"
                     disabled={removeAdmin.isPending}
                     onClick={() => void remove(manager.userId)}
-                    size="sm"
                     variant="outline"
-                  >
-                    <X aria-hidden="true" />
-                    {t('removeAdmin')}
-                  </Button>
+                  />
                 ) : null}
               </li>
             ))}
@@ -541,15 +539,13 @@ export function OrganizationManagePage(): React.JSX.Element {
               <div className="grid gap-2 rounded-lg bg-surface-soft p-4">
                 <p className="text-sm font-semibold text-text">{t('organizationInviteCreated')}</p>
                 <p className="break-all text-sm text-text-muted">{invitationLink}</p>
-                <Button
+                <IconButton
+                  icon={Copy}
+                  label={t('copyInvitationLink')}
                   className="justify-self-start"
                   onClick={() => void copyInvitationLink()}
-                  size="sm"
                   variant="outline"
-                >
-                  <Copy aria-hidden="true" />
-                  {t('copyInvitationLink')}
-                </Button>
+                />
               </div>
             ) : null}
           </ManageSection>
@@ -588,16 +584,14 @@ export function OrganizationManagePage(): React.JSX.Element {
                         })}
                       </p>
                     </div>
-                    <Button
+                    <IconButton
+                      icon={MailX}
+                      label={t('revokeInvitation')}
                       intent="danger"
                       disabled={revokeInvitation.isPending}
                       onClick={() => void revoke(invitation.id)}
-                      size="sm"
                       variant="outline"
-                    >
-                      <X aria-hidden="true" />
-                      {t('revokeInvitation')}
-                    </Button>
+                    />
                   </li>
                 ))}
               </ul>

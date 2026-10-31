@@ -1,4 +1,4 @@
-import { CalendarDays, UsersRound } from 'lucide-react';
+import { CalendarDays, LogOut, TicketX, UsersRound } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, Navigate } from 'react-router';
 import { toast } from 'sonner';
@@ -9,7 +9,7 @@ import {
   useParticipationControllerMyActivity,
 } from '@/api/generated/participation/participation';
 import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
+import { IconButton } from '@/components/ui/IconButton';
 import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { QueryError } from '@/components/feedback/QueryError';
@@ -112,14 +112,14 @@ export function MyActivityPage(): React.JSX.Element {
                   </Badge>
                 </div>
                 {['ACTIVE', 'PENDING', 'WAITLISTED'].includes(item.status) ? (
-                  <Button
+                  <IconButton
+                    icon={LogOut}
+                    label={t('leaveCommunity')}
+                    intent="danger"
                     disabled={leave.isPending}
                     onClick={() => void leaveCommunity(item.id)}
-                    size="sm"
                     variant="ghost"
-                  >
-                    {t('leaveCommunity')}
-                  </Button>
+                  />
                 ) : null}
               </li>
             ))}
@@ -166,14 +166,14 @@ export function MyActivityPage(): React.JSX.Element {
                   ) : null}
                 </div>
                 {['ACCEPTED', 'PENDING', 'WAITLISTED'].includes(item.status) && !item.cancelled ? (
-                  <Button
+                  <IconButton
+                    icon={TicketX}
+                    label={t('cancelRegistration')}
+                    intent="danger"
                     disabled={cancel.isPending}
                     onClick={() => void cancelRegistration(item.id)}
-                    size="sm"
                     variant="ghost"
-                  >
-                    {t('cancelRegistration')}
-                  </Button>
+                  />
                 ) : null}
               </li>
             ))}

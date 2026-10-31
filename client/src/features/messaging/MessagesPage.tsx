@@ -16,8 +16,9 @@ import {
   getMessagingControllerConversationsQueryKey,
   getMessagingControllerBlockedUsersQueryKey,
 } from '@/api/generated/messaging/messaging';
-import { MessageSquarePlus } from 'lucide-react';
+import { MessageSquarePlus, ShieldOff } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { IconButton } from '@/components/ui/IconButton';
 import { Field } from '@/components/ui/Field';
 import { SearchableSelect } from '@/components/ui/SearchableSelect';
 import { TextPromptDialog } from '@/components/ui/TextPromptDialog';
@@ -394,14 +395,14 @@ export function MessagesPage(): React.JSX.Element {
             {blockedUsers.data.map((item) => (
               <li className="flex flex-wrap items-center justify-between gap-2" key={item.userId}>
                 <span className="text-sm text-text">{item.displayName}</span>
-                <Button
+                <IconButton
+                  icon={ShieldOff}
+                  label={t('unblockUser')}
+                  intent="success"
                   disabled={unblock.isPending}
                   onClick={() => void runUnblock(item.userId)}
-                  size="sm"
                   variant="outline"
-                >
-                  {t('unblockUser')}
-                </Button>
+                />
               </li>
             ))}
           </ul>

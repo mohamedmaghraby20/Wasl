@@ -69,10 +69,9 @@ export function PublicUserProfilePage(): React.JSX.Element {
           ) : null}
         </div>
         {user && currentUser.data && currentUser.data.id !== id ? (
-          <Button asChild variant="outline">
+          <Button asChild aria-label={t('startDirectMessage')} title={t('startDirectMessage')} size="icon-sm" variant="outline">
             <Link to={`/messages?to=${encodeURIComponent(id)}`}>
               <MessageSquare aria-hidden="true" />
-              {t('startDirectMessage')}
             </Link>
           </Button>
         ) : null}

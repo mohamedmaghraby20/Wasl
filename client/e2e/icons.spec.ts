@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 for (const touch of [false, true]) {
   test.describe(touch ? 'touch icons' : 'desktop icons', () => {
-    test.use({ hasTouch: touch, viewport: { width: touch ? 375 : 1280, height: 900 }, reducedMotion: 'reduce' });
+    test.use({ hasTouch: touch, viewport: { width: touch ? 375 : 1280, height: 900 }, contextOptions: { reducedMotion: 'reduce' } });
 
     test('resource actions stay compact and expose semantic hover and keyboard feedback', async ({ page }) => {
       await page.route('**/api/v1/**', (route) => {
@@ -18,6 +18,7 @@ for (const touch of [false, true]) {
       const report = page.getByRole('link', { name: 'Report', exact: true });
       for (const action of [share, report]) {
         await expect(action).toHaveAttribute('title');
+        await expect(action).toHaveText('');
         expect((await action.boundingBox())!.width).toBe(touch ? 44 : 36);
         await expect(action.locator('svg')).toHaveCSS('width', '16px');
         await expect(action.locator('svg')).toHaveCSS('stroke-width', '1.75px');

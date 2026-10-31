@@ -1,4 +1,4 @@
-import { Pencil, Reply, Trash2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, LockKeyhole, Pencil, Reply, Trash2, X } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -12,6 +12,7 @@ import {
   useDiscussionsControllerUpdate,
 } from '@/api/generated/discussions/discussions';
 import { Button } from '@/components/ui/Button';
+import { IconButton } from '@/components/ui/IconButton';
 import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { useDeleteConfirmation } from '@/components/ui/DeleteDialog';
 import { Field } from '@/components/ui/Field';
@@ -137,14 +138,14 @@ export function EventDiscussion({
           {t('eventDiscussion')}
         </h2>
         {moderator && query.data && !query.data.closed ? (
-          <Button
+          <IconButton
+            icon={LockKeyhole}
+            label={t('closeDiscussion')}
+            intent="warning"
             disabled={closeDiscussion.isPending}
             onClick={() => void close()}
-            size="sm"
             variant="outline"
-          >
-            {t('closeDiscussion')}
-          </Button>
+          />
         ) : null}
       </div>
       {query.data?.closed ? (
@@ -202,49 +203,41 @@ export function EventDiscussion({
                       >
                         {t('saveChanges')}
                       </Button>
-                      <Button onClick={() => setEditing(null)} size="sm" variant="outline">
-                        {t('cancelReply')}
-                      </Button>
+                      <IconButton icon={X} label={t('cancelReply')} onClick={() => setEditing(null)} variant="outline" />
                     </div>
                   </div>
                 ) : null}
                 {(moderator || viewerId === post.authorId) && post.body ? (
                   <div className="flex flex-wrap gap-2">
                     {canEditOthers || (viewerId === post.authorId && canPost) ? (
-                      <Button
+                      <IconButton
+                        icon={Pencil}
+                        label={t('editComment')}
                         onClick={() => setEditing({ id: post.id, body: post.body! })}
-                        size="sm"
                         variant="ghost"
-                      >
-                        <Pencil aria-hidden="true" />
-                        {t('editComment')}
-                      </Button>
+                      />
                     ) : null}
-                    <Button
+                    <IconButton
+                      icon={Trash2}
+                      label={t('removeComment')}
                       disabled={removePost.isPending}
                       intent="danger"
                       onClick={() => void remove(post.id)}
-                      size="sm"
                       variant="ghost"
-                    >
-                      <Trash2 aria-hidden="true" />
-                      {t('removeComment')}
-                    </Button>
+                    />
                   </div>
                 ) : null}
                 {post.body && viewerId !== post.authorId ? (
                   <ReportAction targetType="post" targetId={post.id} />
                 ) : null}
                 {canPost && !post.parentId && post.body ? (
-                  <Button
-                    className="w-fit"
+                  <IconButton
+                    icon={Reply}
+                    label={t('replyToDiscussionPost')}
+                    className="[&_svg]:rtl:rotate-180"
                     onClick={() => setReplyTo({ id: post.id, name: post.authorName })}
-                    size="sm"
                     variant="outline"
-                  >
-                    <Reply aria-hidden="true" className="rtl:rotate-180" />
-                    {t('replyToDiscussionPost')}
-                  </Button>
+                  />
                 ) : null}
               </li>
             ))}
@@ -254,22 +247,22 @@ export function EventDiscussion({
               aria-label={t('discussionPages')}
               className="flex gap-2 border-t border-border pt-4"
             >
-              <Button
+              <IconButton
+                icon={ChevronLeft}
+                label={t('previousPage')}
+                className="[&_svg]:rtl:rotate-180"
                 disabled={page <= 1}
                 onClick={() => setPage(page - 1)}
-                size="sm"
                 variant="outline"
-              >
-                {t('previousPage')}
-              </Button>
-              <Button
+              />
+              <IconButton
+                icon={ChevronRight}
+                label={t('nextPage')}
+                className="[&_svg]:rtl:rotate-180"
                 disabled={!query.data.hasMore}
                 onClick={() => setPage(page + 1)}
-                size="sm"
                 variant="outline"
-              >
-                {t('nextPage')}
-              </Button>
+              />
             </nav>
           ) : null}
         </>
@@ -287,9 +280,7 @@ export function EventDiscussion({
           {replyTo ? (
             <div className="flex flex-wrap items-center gap-2 rounded-lg bg-primary-soft px-3 py-2 text-sm text-primary-soft-text">
               <span className="font-medium">{t('replyingTo', { name: replyTo.name })}</span>
-              <Button onClick={() => setReplyTo(null)} size="sm" type="button" variant="ghost">
-                {t('cancelReply')}
-              </Button>
+              <IconButton icon={X} label={t('cancelReply')} onClick={() => setReplyTo(null)} type="button" />
             </div>
           ) : null}
           <Field id="event-comment" label={t('writeEventComment')} required>

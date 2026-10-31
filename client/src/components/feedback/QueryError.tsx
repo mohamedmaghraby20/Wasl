@@ -1,5 +1,6 @@
+import { RotateCw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui/Button';
+import { IconButton } from '@/components/ui/IconButton';
 
 export function QueryError({
   message,
@@ -15,9 +16,7 @@ export function QueryError({
       role="alert"
     >
       <p>{message}</p>
-      <Button onClick={onRetry} type="button" variant="outline">
-        {t('retry')}
-      </Button>
+      <IconButton icon={RotateCw} label={t('retry')} onClick={onRetry} type="button" variant="outline" />
     </div>
   );
 }

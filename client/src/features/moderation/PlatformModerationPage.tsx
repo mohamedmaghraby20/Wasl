@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Archive, CalendarX, Check, ClipboardCheck, ExternalLink, RotateCw, UserCheck, UserX, X } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Navigate, Link } from 'react-router';
@@ -21,6 +22,7 @@ import {
 } from '@/api/generated/privacy/privacy';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { IconButton } from '@/components/ui/IconButton';
 import { Field } from '@/components/ui/Field';
 import { Input } from '@/components/ui/Input';
 import { TextPromptDialog } from '@/components/ui/TextPromptDialog';
@@ -299,7 +301,7 @@ export function PlatformModerationPage(): React.JSX.Element {
         {reports.isPending ? (
           <p role="status">{t('authWorking')}</p>
         ) : reports.isError ? (
-          <Button onClick={() => void reports.refetch()}>{t('reloadPage')}</Button>
+          <IconButton icon={RotateCw} label={t('reloadPage')} onClick={() => void reports.refetch()} />
         ) : reports.data?.filter((report) => report.status === 'OPEN').length ? (
           reports.data
             .filter((report) => report.status === 'OPEN')
@@ -333,38 +335,35 @@ export function PlatformModerationPage(): React.JSX.Element {
                   <p className="whitespace-pre-wrap wrap-break-word">{report.reason}</p>
                   <div className="flex flex-wrap gap-2">
                     {href && (
-                      <Button asChild size="sm" variant="ghost">
-                        <Link to={href}>{t('viewNotificationContext')}</Link>
+                      <Button asChild aria-label={t('viewNotificationContext')} title={t('viewNotificationContext')} size="icon-sm" variant="ghost">
+                        <Link to={href}><ExternalLink aria-hidden="true" /></Link>
                       </Button>
                     )}
-                    <Button
+                    <IconButton
+                      icon={X}
+                      label={t('adminDismiss')}
                       disabled={Boolean(busyId)}
-                      size="sm"
                       variant="secondary"
                       onClick={() => void review(report.id, 'DISMISSED')}
-                    >
-                      {t('adminDismiss')}
-                    </Button>
+                    />
                     {action && (
-                      <Button
+                      <IconButton
+                        icon={action === 'ARCHIVE_COMMUNITY' ? Archive : action === 'CANCEL_EVENT' ? CalendarX : UserX}
+                        label={t(`admin_${action}`)}
                         disabled={Boolean(busyId)}
-                        size="sm"
                         onClick={() => void review(report.id, action)}
                         intent={action === 'ARCHIVE_COMMUNITY' ? 'warning' : 'danger'}
-                      >
-                        {t(`admin_${action}`)}
-                      </Button>
+                      />
                     )}
                     {report.targetType === 'user' && (
-                      <Button
+                      <IconButton
+                        icon={UserCheck}
+                        label={t('admin_RESTORE_USER')}
                         disabled={Boolean(busyId)}
-                        size="sm"
                         variant="secondary"
                         onClick={() => void review(report.id, 'RESTORE_USER')}
                         intent="success"
-                      >
-                        {t('admin_RESTORE_USER')}
-                      </Button>
+                      />
                     )}
                   </div>
                 </article>
@@ -379,7 +378,7 @@ export function PlatformModerationPage(): React.JSX.Element {
         {requests.isPending ? (
           <p role="status">{t('authWorking')}</p>
         ) : requests.isError ? (
-          <Button onClick={() => void requests.refetch()}>{t('reloadPage')}</Button>
+          <IconButton icon={RotateCw} label={t('reloadPage')} onClick={() => void requests.refetch()} />
         ) : requests.data?.length ? (
           requests.data.map((request) => (
             <article
@@ -396,23 +395,21 @@ export function PlatformModerationPage(): React.JSX.Element {
                 <p className="whitespace-pre-wrap wrap-break-word text-sm">{request.requestNote}</p>
               )}
               <div className="flex gap-2">
-                <Button
+                <IconButton
+                  icon={Check}
+                  label={t('adminApprove')}
                   disabled={Boolean(busyId)}
-                  size="sm"
                   onClick={() => void decideVerification(request.id, 'APPROVE')}
                   intent="success"
-                >
-                  {t('adminApprove')}
-                </Button>
-                <Button
+                />
+                <IconButton
+                  icon={X}
+                  label={t('adminReject')}
                   disabled={Boolean(busyId)}
-                  size="sm"
                   variant="secondary"
                   onClick={() => void decideVerification(request.id, 'REJECT')}
                   intent="danger"
-                >
-                  {t('adminReject')}
-                </Button>
+                />
               </div>
             </article>
           ))
@@ -425,7 +422,7 @@ export function PlatformModerationPage(): React.JSX.Element {
         {privacyRequests.isPending ? (
           <p role="status">{t('authWorking')}</p>
         ) : privacyRequests.isError ? (
-          <Button onClick={() => void privacyRequests.refetch()}>{t('reloadPage')}</Button>
+          <IconButton icon={RotateCw} label={t('reloadPage')} onClick={() => void privacyRequests.refetch()} />
         ) : openPrivacy.length ? (
           openPrivacy.map((request) => (
             <article
@@ -460,41 +457,37 @@ export function PlatformModerationPage(): React.JSX.Element {
               ) : null}
               <div className="flex flex-wrap gap-2">
                 {request.status === 'RECEIVED' ? (
-                  <Button
+                  <IconButton
+                    icon={ClipboardCheck}
+                    label={t('adminStartReview')}
                     disabled={Boolean(busyId)}
                     onClick={() => void reviewPrivacy(request.id, 'START_REVIEW')}
-                    size="sm"
                     variant="secondary"
-                  >
-                    {t('adminStartReview')}
-                  </Button>
+                  />
                 ) : null}
-                <Button
+                <IconButton
+                  icon={Check}
+                  label={t('adminApproveRequest')}
                   disabled={Boolean(busyId)}
                   onClick={() => void reviewPrivacy(request.id, 'APPROVE')}
                   intent="success"
-                  size="sm"
-                >
-                  {t('adminApproveRequest')}
-                </Button>
-                <Button
+                />
+                <IconButton
+                  icon={X}
+                  label={t('adminRejectRequest')}
                   disabled={Boolean(busyId)}
                   onClick={() => void reviewPrivacy(request.id, 'REJECT')}
                   intent="danger"
-                  size="sm"
                   variant="secondary"
-                >
-                  {t('adminRejectRequest')}
-                </Button>
+                />
                 {request.status === 'PENDING_PROVIDER' ? (
-                  <Button
+                  <IconButton
+                    icon={RotateCw}
+                    label={t('adminRetryProviders')}
                     disabled={Boolean(busyId)}
                     onClick={() => void retryPrivacyActions(request.id)}
-                    size="sm"
                     variant="ghost"
-                  >
-                    {t('adminRetryProviders')}
-                  </Button>
+                  />
                 ) : null}
               </div>
             </article>

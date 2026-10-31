@@ -1,9 +1,11 @@
+import { CalendarPlus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { useDiscoveryControllerListEvents } from '@/api/generated/discovery/discovery';
 import { QueryError } from '@/components/feedback/QueryError';
 import { Button } from '@/components/ui/Button';
+import { IconButton } from '@/components/ui/IconButton';
 import { ResourceCard } from '@/features/resources/ResourceCard';
 import { languageCode } from '@/features/resources/resource-utils';
 
@@ -29,9 +31,9 @@ export function CommunityEvents({
           {t('events')}
         </h2>
         {canManage ? (
-          <Button asChild size="sm" variant="outline">
+          <Button asChild aria-label={t('createEventTitle')} title={t('createEventTitle')} size="icon-sm" variant="outline">
             <Link to={`/create/event?communityId=${encodeURIComponent(communityId)}`}>
-              {t('createEventTitle')}
+              <CalendarPlus aria-hidden="true" />
             </Link>
           </Button>
         ) : null}
@@ -52,22 +54,22 @@ export function CommunityEvents({
           </div>
           {page > 1 || query.data.hasMore ? (
             <nav aria-label={t('pagination')} className="flex gap-2">
-              <Button
+              <IconButton
+                icon={ChevronLeft}
+                label={t('previousPage')}
+                className="[&_svg]:rtl:rotate-180"
                 disabled={page === 1}
                 onClick={() => setPage(page - 1)}
-                size="sm"
                 variant="outline"
-              >
-                {t('previousPage')}
-              </Button>
-              <Button
+              />
+              <IconButton
+                icon={ChevronRight}
+                label={t('nextPage')}
+                className="[&_svg]:rtl:rotate-180"
                 disabled={!query.data.hasMore}
                 onClick={() => setPage(page + 1)}
-                size="sm"
                 variant="outline"
-              >
-                {t('nextPage')}
-              </Button>
+              />
             </nav>
           ) : null}
         </>

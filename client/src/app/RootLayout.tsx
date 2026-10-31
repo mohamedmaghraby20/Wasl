@@ -159,10 +159,9 @@ export function RootLayout(): React.JSX.Element {
             </Button>
             {user ? (
               <>
-                <Button asChild className="hidden sm:inline-flex" variant="secondary">
+                <Button asChild aria-label={t('create')} title={t('create')} className="hidden sm:inline-flex" size="icon-sm" variant="secondary">
                   <Link to="/create">
                     <Plus aria-hidden="true" />
-                    {t('create')}
                   </Link>
                 </Button>
                 <DropdownMenu>

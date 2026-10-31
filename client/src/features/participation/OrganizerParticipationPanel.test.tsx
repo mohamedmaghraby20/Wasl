@@ -229,4 +229,22 @@ describe('OrganizerParticipationPanel', () => {
     expect(screen.queryByText('Samira')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Approve' })).not.toBeInTheDocument();
   });
+
+  it('renders active-member removal as an icon and preserves its confirmation workflow', async () => {
+    const user = userEvent.setup();
+    mocks.participants.mockReturnValue({
+      data: [{ id: 'membership-1', userId: 'user-1', displayName: 'Samira', status: 'ACTIVE' }],
+      isPending: false,
+      isError: false,
+    });
+    renderPanel('directory', '/communities/community-1/participants?status=ACTIVE');
+    const remove = screen.getByRole('button', { name: 'Remove' });
+    expect(remove.textContent).toBe('');
+    expect(remove).toHaveAttribute('title', 'Remove');
+    expect(remove.querySelector('svg')).toHaveClass('lucide-user-minus');
+    await user.click(remove);
+    expect(mocks.decision).not.toHaveBeenCalled();
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
+    expect(mocks.decision).toHaveBeenCalledWith({ id: 'community-1', participantId: 'membership-1', action: 'remove' });
+  });
 });

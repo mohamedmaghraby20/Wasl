@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
-import { ArrowUp, Check, X } from 'lucide-react';
+import { ArrowUp, Check, ShieldMinus, ShieldPlus, UserCheck, UserMinus, UserX, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { Link, useSearchParams } from 'react-router';
@@ -13,6 +13,7 @@ import {
   useParticipationControllerEventParticipants,
 } from '@/api/generated/participation/participation';
 import { Button } from '@/components/ui/Button';
+import { IconButton } from '@/components/ui/IconButton';
 import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { QueryError } from '@/components/feedback/QueryError';
 import { ApiError } from '@/api/fetcher';
@@ -300,7 +301,10 @@ export function OrganizerParticipationPanel({
                     (kind === 'communities'
                       ? participant.status === 'ACTIVE'
                       : participant.status === 'ACCEPTED') ? (
-                      <Button
+                      <IconButton
+                        icon={moderators.data.some((entry) => entry.userId === participant.userId) ? ShieldMinus : ShieldPlus}
+                        label={t(moderators.data.some((entry) => entry.userId === participant.userId) ? 'removeModerator' : 'assignModerator')}
+                        intent={moderators.data.some((entry) => entry.userId === participant.userId) ? 'warning' : 'success'}
                         disabled={assignModerator.isPending || removeModerator.isPending}
                         onClick={() =>
                           void setModerator(
@@ -309,11 +313,7 @@ export function OrganizerParticipationPanel({
                           )
                         }
                         variant="outline"
-                      >
-                        {moderators.data.some((entry) => entry.userId === participant.userId)
-                          ? t('removeModerator')
-                          : t('assignModerator')}
-                      </Button>
+                      />
                     ) : null}
                     {participant.status === 'PENDING' && (
                       <>
@@ -344,21 +344,14 @@ export function OrganizerParticipationPanel({
                     {participant.status === 'WAITLISTED' && (
                       <>
                         {counts.data.admissionMode === 'approval' && (
-                          <Button
-                            aria-label={mode === 'requests' ? t('promoteParticipant') : undefined}
+                          <IconButton
+                            icon={ArrowUp}
+                            label={t('promoteParticipant')}
                             disabled={busy}
                             onClick={() => void decide(participant.id, 'promote')}
                             intent="success"
-                            size={mode === 'requests' ? 'icon-sm' : 'md'}
-                            title={mode === 'requests' ? t('promoteParticipant') : undefined}
                             variant="outline"
-                          >
-                            {mode === 'requests' ? (
-                              <ArrowUp aria-hidden="true" />
-                            ) : (
-                              t('promoteParticipant')
-                            )}
-                          </Button>
+                          />
                         )}
                         <Button
                           aria-label={t('rejectParticipant')}
@@ -378,34 +371,34 @@ export function OrganizerParticipationPanel({
                       : ['ACCEPTED', 'ATTENDED', 'NO_SHOW'].includes(participant.status)) && (
                       <>
                         {kind === 'events' && eventStarted && participant.status !== 'ATTENDED' && (
-                          <Button
+                          <IconButton
+                            icon={UserCheck}
+                            label={t('markAttended')}
                             disabled={busy}
                             onClick={() => void decide(participant.id, 'attended')}
                             intent="success"
                             variant="outline"
-                          >
-                            {t('markAttended')}
-                          </Button>
+                          />
                         )}
                         {kind === 'events' && eventStarted && participant.status !== 'NO_SHOW' && (
-                          <Button
+                          <IconButton
+                            icon={UserX}
+                            label={t('markNoShow')}
                             disabled={busy}
                             onClick={() => void decide(participant.id, 'no-show')}
                             intent="warning"
                             variant="outline"
-                          >
-                            {t('markNoShow')}
-                          </Button>
+                          />
                         )}
                         {(kind === 'communities' || participant.status === 'ACCEPTED') && (
-                          <Button
+                          <IconButton
+                            icon={UserMinus}
+                            label={t('removeParticipant')}
                             intent="danger"
                             disabled={busy}
                             onClick={() => void decide(participant.id, 'remove')}
                             variant="outline"
-                          >
-                            {t('removeParticipant')}
-                          </Button>
+                          />
                         )}
                       </>
                     )}

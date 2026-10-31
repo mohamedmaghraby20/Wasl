@@ -1,4 +1,4 @@
-import { Bell } from 'lucide-react';
+import { Bell, MailCheck } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Link, Navigate } from 'react-router';
@@ -8,7 +8,7 @@ import {
   useNotificationsControllerList,
   useNotificationsControllerMarkRead,
 } from '@/api/generated/notifications/notifications';
-import { Button } from '@/components/ui/Button';
+import { IconButton } from '@/components/ui/IconButton';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { QueryError } from '@/components/feedback/QueryError';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -91,14 +91,13 @@ export function NotificationsPage(): React.JSX.Element {
                 ) : null}
               </div>
               {!item.readAt ? (
-                <Button
+                <IconButton
+                  icon={MailCheck}
+                  label={t('markNotificationRead')}
                   disabled={markRead.isPending}
                   onClick={() => void read(item.id)}
-                  size="sm"
                   variant="ghost"
-                >
-                  {t('markNotificationRead')}
-                </Button>
+                />
               ) : null}
             </li>
           ))}

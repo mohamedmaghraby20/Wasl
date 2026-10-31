@@ -1,9 +1,10 @@
-import { Search, X } from 'lucide-react';
+import { FilterX, Search, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { CategoryPublicDto, CityPublicDto } from '@/api/generated/wasl-client.schemas';
 import { QueryError } from '@/components/feedback/QueryError';
 import { Button } from '@/components/ui/Button';
+import { IconButton } from '@/components/ui/IconButton';
 import { DatePicker } from '@/components/ui/DatePicker';
 import { SearchableSelect } from '@/components/ui/SearchableSelect';
 import { SearchInput } from '@/components/ui/SearchInput';
@@ -229,16 +230,14 @@ export function DiscoveryFilters({
               </span>
             );
           })}
-          <Button
+          <IconButton
+            icon={FilterX}
+            label={t('clearFilters')}
             intent="danger"
             onClick={onClear}
-            size="sm"
             type="button"
             variant="ghost"
-          >
-            <X aria-hidden="true" />
-            {t('clearFilters')}
-          </Button>
+          />
         </div>
       ) : null}
 

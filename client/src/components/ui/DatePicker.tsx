@@ -1,9 +1,10 @@
-import { CalendarDays, X } from 'lucide-react';
+import { CalendarCheck, CalendarDays, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/cn';
 import { useDownwardDropdown } from '@/lib/use-downward-dropdown';
 import { Calendar } from './Calendar';
+import { IconButton } from './IconButton';
 import { Popover, PopoverContent, PopoverTrigger } from './Popover';
 
 function useCompactViewport(): boolean {
@@ -114,28 +115,26 @@ export function DatePicker({
           selected={selected}
         />
         <div className="mt-1 flex items-center justify-between gap-2 border-t border-border pt-2">
-          <button
-            className="min-h-9 rounded-md px-3 text-xs font-semibold text-text-muted hover:bg-surface-soft hover:text-text"
+          <IconButton
+            icon={CalendarCheck}
+            label={t('today')}
             onClick={() => {
               onChange(toIsoDate(new Date()));
               onOpenChange(false);
             }}
             type="button"
-          >
-            {t('today')}
-          </button>
+          />
           {value ? (
-            <button
-              className="inline-flex min-h-9 items-center gap-1 rounded-md px-3 text-xs font-semibold text-danger hover:bg-danger-soft"
+            <IconButton
+              icon={X}
+              label={t('clear')}
+              intent="danger"
               onClick={() => {
                 onChange('');
                 onOpenChange(false);
               }}
               type="button"
-            >
-              <X aria-hidden="true" className="size-3" />
-              {t('clear')}
-            </button>
+            />
           ) : null}
         </div>
       </PopoverContent>

@@ -114,10 +114,9 @@ export function OrganizationProfilePage(): React.JSX.Element {
           ) : null}
         </div>
         {canManage ? (
-          <Button asChild variant="outline">
+          <Button asChild aria-label={t('manageOrganization')} title={t('manageOrganization')} size="icon-sm" variant="outline">
             <Link to={`/organizations/${organization.slug}/manage`}>
               <Settings2 aria-hidden="true" />
-              {t('manageOrganization')}
             </Link>
           </Button>
         ) : null}

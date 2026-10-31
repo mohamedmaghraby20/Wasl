@@ -145,6 +145,7 @@ Keep these instructions useful and concise. When the user corrects an approach, 
 
 - Use Meetup-like compact Lucide outline icons throughout `client/src`: 14px for metadata, 16px beside labels and in compact actions, 18px for standalone actions, and 20px for prominent navigation or feedback; use a consistent 1.75 stroke. Larger icons belong only in proportional avatar/illustration placeholders, not action controls.
 - Let shared controls own icon sizing; keep icons centered and non-shrinking. Compact icon buttons are 36px for fine pointers and at least 44px for touch; do not enlarge the glyph to fill its hit target.
+- Use icon-only controls for secondary row, panel, and toolbar actions across the whole client (including remove, moderator, attendance, edit, reply, report, and pagination actions), not icons beside visible action text. Use `IconButton` with a translated accessible label and matching tooltip; retain text for headings, statuses, navigation destinations, primary form submissions, and explicit confirmation dialogs.
 - Give all actions hover and keyboard-focus feedback using semantic tokens: pale-red surfaces with readable red icons for delete/reject/remove, green for approve/promote, amber for caution/archive, and brand emphasis for ordinary actions. Preserve disabled/loading states, accessible names and titles for icon-only actions, and visible controls on touch devices; never convey an action by color alone.
 
 ### Forbidden
@@ -163,7 +164,7 @@ Keep these instructions useful and concise. When the user corrects an approach, 
 
 When the user corrects your approach, append a one-line rule here before ending the session. Write it concretely ("Always use X for Y" not "be careful with Y"), never abstractly. If an existing line already covers the correction, tighten it instead of adding a new one. Remove lines when the underlying issue goes away (model upgrades, refactors, process changes).
 
-- Review the whole `client/src` surface for client-wide React quality requests, even when earlier work focused on one feature phase.
+- Review the whole `client/src` surface for client-wide UI requests; cover secondary actions in every state, including active-member removal, moderator roles, attendance and admin rows—not only request previews.
 - Use PascalCase filenames for React component modules; keep tests and Storybook stories in their existing naming pattern.
 - Identify deployment origins and migration targets from environment files, deployment configuration, and connected provider metadata before asking the user; distinguish confirmed values from environment intent that remains unlabeled.
 - Complete each requested task or phase end to end, including required database schema changes, migrations, and verification, before starting the next phase.
