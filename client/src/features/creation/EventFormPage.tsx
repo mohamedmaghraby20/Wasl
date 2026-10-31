@@ -13,7 +13,6 @@ import {
   useEventsControllerUpdate,
 } from '@/api/generated/events/events';
 import {
-  useDiscoveryControllerCategories,
   useDiscoveryControllerCities,
   useDiscoveryControllerEvent,
 } from '@/api/generated/discovery/discovery';
@@ -29,8 +28,8 @@ import { Select } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { languageCode } from '@/features/resources/resource-utils';
-import { cn } from '@/lib/cn';
 import { focusFirstInvalid } from '@/lib/focus-first-invalid';
+import { CategoryPicker } from './CategoryPicker';
 import { fromTurkeyDateTime, parseCapacity, toTurkeyIso } from './creation-utils';
 
 const formSchema = z
@@ -76,7 +75,6 @@ export function EventFormPage(): React.JSX.Element {
   const lang = languageCode(i18n.language);
   const existing = useDiscoveryControllerEvent(id, { lang }, { query: { enabled: editing } });
   const cities = useDiscoveryControllerCities();
-  const categories = useDiscoveryControllerCategories();
   const communities = useCommunitiesControllerMine({
     query: { enabled: Boolean(user) && !editing },
   });
@@ -476,73 +474,14 @@ export function EventFormPage(): React.JSX.Element {
             </div>
           ) : null}
 
-          <fieldset
-            aria-busy={categories.isPending}
-            aria-describedby={errors.categoryIds ? 'event-categories-error' : undefined}
-            aria-invalid={Boolean(errors.categoryIds)}
-            className="grid gap-3"
-            tabIndex={-1}
-          >
-            <legend className="text-sm font-medium text-text">{t('chooseCategories')}</legend>
-            <div className="flex flex-wrap gap-2">
-              {categories.isPending ? (
-                <p className="text-sm text-text-muted" role="status">
-                  {t('loadingCategories')}
-                </p>
-              ) : null}
-              {categories.data?.map((category) => {
-                const checked = categoryIds.includes(category.id);
-                const categoryName =
-                  lang === 'ar'
-                    ? category.nameAr
-                    : lang === 'tr'
-                      ? category.nameTr
-                      : category.nameEn;
-                return (
-                  <div
-                    className={cn(
-                      'flex items-center gap-2 rounded-full border px-3 py-1.5 transition-colors',
-                      checked
-                        ? 'border-primary/40 bg-primary-soft'
-                        : 'border-border-control bg-surface-soft hover:border-border-control-hover',
-                    )}
-                    key={category.id}
-                  >
-                    <Checkbox
-                      checked={checked}
-                      id={`event-category-${category.id}`}
-                      onCheckedChange={(next) => {
-                        const nextIds = next
-                          ? [...categoryIds, category.id]
-                          : categoryIds.filter((idValue) => idValue !== category.id);
-                        form.setValue('categoryIds', nextIds, {
-                          shouldDirty: true,
-                          shouldValidate: true,
-                        });
-                      }}
-                    />
-                    <Label
-                      className={cn(
-                        'cursor-pointer text-sm font-medium',
-                        checked ? 'text-primary-soft-text' : 'text-text-muted',
-                      )}
-                      htmlFor={`event-category-${category.id}`}
-                    >
-                      {categoryName}
-                    </Label>
-                  </div>
-                );
-              })}
-            </div>
-            {categories.isError ? (
-              <p className="text-xs font-medium text-danger">{t('categoriesLoadError')}</p>
-            ) : null}
-            {errors.categoryIds ? (
-              <p className="text-xs font-medium text-danger" id="event-categories-error">
-                {t('formFieldInvalid')}
-              </p>
-            ) : null}
-          </fieldset>
+          <CategoryPicker
+            error={Boolean(errors.categoryIds)}
+            idPrefix="event"
+            onChange={(nextIds) =>
+              form.setValue('categoryIds', nextIds, { shouldDirty: true, shouldValidate: true })
+            }
+            value={categoryIds}
+          />
 
           {formError ? (
             <p

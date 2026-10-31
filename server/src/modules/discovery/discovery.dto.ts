@@ -1,10 +1,19 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsString, MaxLength, MinLength } from 'class-validator';
 
 export class CategoryPublicDto {
   @ApiProperty() id!: string;
   @ApiProperty() nameEn!: string;
   @ApiProperty() nameAr!: string;
   @ApiProperty() nameTr!: string;
+}
+
+export class CreateCategoryDto {
+  @ApiProperty({ minLength: 2, maxLength: 40 })
+  @IsString()
+  @MinLength(2)
+  @MaxLength(40)
+  name!: string;
 }
 
 export class CityPublicDto extends CategoryPublicDto {}

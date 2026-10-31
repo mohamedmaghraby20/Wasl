@@ -126,6 +126,20 @@ const categorySeed = [
   { id: 'education', nameTr: 'Eğitim', nameAr: 'تعليم', nameEn: 'Education' },
   { id: 'culture', nameTr: 'Kültür', nameAr: 'ثقافة', nameEn: 'Culture' },
   { id: 'sports', nameTr: 'Spor', nameAr: 'رياضة', nameEn: 'Sports' },
+  { id: 'technology', nameTr: 'Teknoloji', nameAr: 'تقنية', nameEn: 'Technology' },
+  { id: 'business', nameTr: 'İş ve Girişimcilik', nameAr: 'أعمال وريادة', nameEn: 'Business & Entrepreneurship' },
+  { id: 'arts', nameTr: 'Sanat ve Tasarım', nameAr: 'فنون وتصميم', nameEn: 'Arts & Design' },
+  { id: 'music', nameTr: 'Müzik', nameAr: 'موسيقى', nameEn: 'Music' },
+  { id: 'health', nameTr: 'Sağlık ve İyi Yaşam', nameAr: 'صحة وعافية', nameEn: 'Health & Wellness' },
+  { id: 'environment', nameTr: 'Çevre', nameAr: 'بيئة', nameEn: 'Environment' },
+  { id: 'volunteering', nameTr: 'Gönüllülük', nameAr: 'تطوع', nameEn: 'Volunteering' },
+  { id: 'food', nameTr: 'Yemek ve İçecek', nameAr: 'طعام وشراب', nameEn: 'Food & Drink' },
+  { id: 'travel', nameTr: 'Seyahat ve Doğa', nameAr: 'سفر وطبيعة', nameEn: 'Travel & Outdoors' },
+  { id: 'family', nameTr: 'Aile ve Çocuk', nameAr: 'عائلة وأطفال', nameEn: 'Family & Kids' },
+  { id: 'gaming', nameTr: 'Oyun', nameAr: 'ألعاب', nameEn: 'Gaming' },
+  { id: 'books', nameTr: 'Kitap ve Edebiyat', nameAr: 'كتب وأدب', nameEn: 'Books & Literature' },
+  { id: 'language', nameTr: 'Dil Değişimi', nameAr: 'تبادل لغوي', nameEn: 'Language Exchange' },
+  { id: 'film', nameTr: 'Film ve Medya', nameAr: 'أفلام وإعلام', nameEn: 'Film & Media' },
 ];
 
 // Empty versioned policy slots required by docs/launch-decisions.md. Content stays null and the

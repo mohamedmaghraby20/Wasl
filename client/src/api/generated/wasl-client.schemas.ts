@@ -1263,6 +1263,14 @@ export interface CategoryPublicDto {
   nameTr: string;
 }
 
+export interface CreateCategoryDto {
+  /**
+     * @minLength 2
+     * @maxLength 40
+     */
+  name: string;
+}
+
 export interface CommunityPublicDto {
   id: string;
   slug: string;

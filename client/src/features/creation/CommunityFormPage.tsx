@@ -12,23 +12,20 @@ import {
 } from '@/api/generated/communities/communities';
 import { useOrganizationsControllerMine } from '@/api/generated/organizations/organizations';
 import {
-  useDiscoveryControllerCategories,
   useDiscoveryControllerCities,
   useDiscoveryControllerCommunity,
 } from '@/api/generated/discovery/discovery';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { Checkbox } from '@/components/ui/Checkbox';
 import { Field } from '@/components/ui/Field';
 import { Input } from '@/components/ui/Input';
-import { Label } from '@/components/ui/Label';
 import { SearchableSelect } from '@/components/ui/SearchableSelect';
 import { Select } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { languageCode } from '@/features/resources/resource-utils';
-import { cn } from '@/lib/cn';
 import { focusFirstInvalid } from '@/lib/focus-first-invalid';
+import { CategoryPicker } from './CategoryPicker';
 
 const formSchema = z.object({
   name: z.string().trim().min(1).max(100),
@@ -56,7 +53,6 @@ export function CommunityFormPage(): React.JSX.Element {
   const lang = languageCode(i18n.language);
   const existing = useDiscoveryControllerCommunity(id, { lang }, { query: { enabled: editing } });
   const cities = useDiscoveryControllerCities();
-  const categories = useDiscoveryControllerCategories();
   const organizations = useOrganizationsControllerMine({
     query: { enabled: Boolean(user) && !editing },
   });
@@ -294,70 +290,14 @@ export function CommunityFormPage(): React.JSX.Element {
             </Field>
           </div>
 
-          <fieldset
-            aria-busy={categories.isPending}
-            aria-describedby={errors.categoryIds ? 'community-categories-error' : undefined}
-            aria-invalid={Boolean(errors.categoryIds)}
-            className="grid gap-3"
-            tabIndex={-1}
-          >
-            <legend className="mb-3 text-sm font-medium text-text">{t('chooseCategories')}</legend>
-            <div className="flex flex-wrap gap-2">
-              {categories.isPending ? (
-                <p className="text-sm text-text-muted" role="status">
-                  {t('loadingCategories')}
-                </p>
-              ) : null}
-              {categories.data?.map((category) => {
-                const checked = categoryIds.includes(category.id);
-                const categoryName =
-                  lang === 'ar' ? category.nameAr : lang === 'tr' ? category.nameTr : category.nameEn;
-                return (
-                  <div
-                    className={cn(
-                      'flex items-center gap-2 rounded-full border px-3 py-1.5 transition-colors',
-                      checked
-                        ? 'border-primary/40 bg-primary-soft'
-                        : 'border-border-control bg-surface-soft hover:border-border-control-hover',
-                    )}
-                    key={category.id}
-                  >
-                    <Checkbox
-                      checked={checked}
-                      className="size-3.5 rounded-xs [&_svg]:size-2.5"
-                      id={`category-${category.id}`}
-                      onCheckedChange={(next) => {
-                        const nextIds = next
-                          ? [...categoryIds, category.id]
-                          : categoryIds.filter((idValue) => idValue !== category.id);
-                        form.setValue('categoryIds', nextIds, {
-                          shouldDirty: true,
-                          shouldValidate: true,
-                        });
-                      }}
-                    />
-                    <Label
-                      className={cn(
-                        'cursor-pointer text-sm font-medium',
-                        checked ? 'text-primary-soft-text' : 'text-text-muted',
-                      )}
-                      htmlFor={`category-${category.id}`}
-                    >
-                      {categoryName}
-                    </Label>
-                  </div>
-                );
-              })}
-            </div>
-            {categories.isError ? (
-              <p className="text-xs font-medium text-danger">{t('categoriesLoadError')}</p>
-            ) : null}
-            {errors.categoryIds ? (
-              <p className="text-xs font-medium text-danger" id="community-categories-error">
-                {t('formFieldInvalid')}
-              </p>
-            ) : null}
-          </fieldset>
+          <CategoryPicker
+            error={Boolean(errors.categoryIds)}
+            idPrefix="community"
+            onChange={(nextIds) =>
+              form.setValue('categoryIds', nextIds, { shouldDirty: true, shouldValidate: true })
+            }
+            value={categoryIds}
+          />
 
           {formError ? (
             <p

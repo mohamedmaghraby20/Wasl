@@ -14,6 +14,7 @@ const mocks = vi.hoisted(() => ({
   cities: vi.fn(),
   communities: vi.fn(),
   create: vi.fn(),
+  createCategory: vi.fn(),
   event: vi.fn(),
   mineOrganizations: vi.fn(),
   update: vi.fn(),
@@ -31,8 +32,10 @@ vi.mock('@/api/generated/organizations/organizations', () => ({
   useOrganizationsControllerMine: mocks.mineOrganizations,
 }));
 vi.mock('@/api/generated/discovery/discovery', () => ({
+  getDiscoveryControllerCategoriesQueryKey: () => ['discoveryControllerCategories'],
   useDiscoveryControllerCategories: mocks.categories,
   useDiscoveryControllerCities: mocks.cities,
+  useDiscoveryControllerCreateCategory: mocks.createCategory,
   useDiscoveryControllerEvent: mocks.event,
 }));
 
@@ -64,6 +67,7 @@ describe('EventFormPage organization host choice', () => {
       isError: false,
     });
     mocks.create.mockReturnValue({ mutateAsync: vi.fn(), isPending: false });
+    mocks.createCategory.mockReturnValue({ mutateAsync: vi.fn(), isPending: false });
     mocks.event.mockReturnValue({ data: undefined, isPending: false, isError: false });
     mocks.mineOrganizations.mockReturnValue({
       data: [{ id: 'org-1', slug: 'my-group', name: 'My group', role: 'ADMIN' }],
