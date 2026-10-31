@@ -19,23 +19,35 @@ export async function waslFetch<T>(url: string, options?: RequestInit): Promise<
   const runtimeEnv = (import.meta as ImportMeta & { env: { VITE_API_URL?: string } }).env;
   const headers = new Headers(options?.headers);
   if (!headers.has('Accept')) headers.set('Accept', 'application/json');
-  const accessToken = await getCurrentAccessToken();
-  if (accessToken && !headers.has('Authorization')) {
-    headers.set('Authorization', `Bearer ${accessToken}`);
-  }
   const controller = new AbortController();
+  const signal = options?.signal
+    ? AbortSignal.any([options.signal, controller.signal])
+    : controller.signal;
   const timeout = window.setTimeout(() => controller.abort(), 30_000);
   let response: Response;
+  let abortSession: (() => void) | undefined;
   try {
+    signal.throwIfAborted();
+    if (!headers.has('Authorization') && !isPublicRead(url, options?.method)) {
+      const accessToken = await Promise.race([
+        getCurrentAccessToken(),
+        new Promise<never>((_resolve, reject) => {
+          abortSession = () => reject(
+            signal.reason instanceof Error ? signal.reason : new DOMException('Aborted', 'AbortError'),
+          );
+          signal.addEventListener('abort', abortSession, { once: true });
+        }),
+      ]);
+      if (accessToken) headers.set('Authorization', `Bearer ${accessToken}`);
+    }
     response = await fetch(resolveApiUrl(url, runtimeEnv.VITE_API_URL), {
       ...options,
       headers,
-      signal: options?.signal
-        ? AbortSignal.any([options.signal, controller.signal])
-        : controller.signal,
+      signal,
     });
   } finally {
     window.clearTimeout(timeout);
+    if (abortSession) signal.removeEventListener('abort', abortSession);
   }
   if (!response.ok) {
     let body: unknown;
@@ -54,5 +66,18 @@ export async function waslFetch<T>(url: string, options?: RequestInit): Promise<
   }
   if (response.status === 204) return undefined as T;
   return (await response.json()) as T;
+}
+
+function isPublicRead(url: string, method = 'GET'): boolean {
+  if (method.toUpperCase() !== 'GET') return false;
+  const path = url.split(/[?#]/)[0]!;
+  return [
+    /^\/api\/v1\/health(?:\/ready)?$/,
+    /^\/api\/v1\/reference\/(?:cities|categories)$/,
+    /^\/api\/v1\/communities(?:\/(?!mine$)[^/]+(?:\/topics(?:\/[^/]+)?)?)?$/,
+    /^\/api\/v1\/events(?:\/[^/]+(?:\/discussion)?)?$/,
+    /^\/api\/v1\/organizations\/(?!mine$)[^/]+$/,
+    /^\/api\/v1\/users\/[0-9a-f-]{36}$/i,
+  ].some((pattern) => pattern.test(path));
 }
 import { getCurrentAccessToken } from '@/lib/supabase';

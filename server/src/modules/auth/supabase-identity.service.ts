@@ -13,6 +13,38 @@ export class SupabaseIdentityService {
 
   async resolve(authUser: VerifiedSupabaseUser): Promise<AuthenticatedUser> {
     const db = this.database();
+    const [existing] = await db
+      .select({
+        id: users.id,
+        accountStatus: users.accountStatus,
+        normalizedEmail: users.normalizedEmail,
+        emailVerifiedAt: users.emailVerifiedAt,
+        profileId: profiles.id,
+      })
+      .from(authIdentities)
+      .innerJoin(users, eq(users.id, authIdentities.userId))
+      .leftJoin(profiles, eq(profiles.id, users.id))
+      .where(
+        and(
+          eq(authIdentities.provider, 'email'),
+          eq(authIdentities.providerUserId, authUser.authUserId),
+        ),
+      )
+      .limit(1);
+    if (existing) {
+      if (!['ACTIVE', 'DELETION_PENDING'].includes(existing.accountStatus)) {
+        throw new ForbiddenException('This Wasl account is not active.');
+      }
+      if (
+        existing.profileId &&
+        existing.normalizedEmail === authUser.email &&
+        existing.emailVerifiedAt?.getTime() === authUser.emailVerifiedAt?.getTime()
+      ) {
+        return { id: existing.id, accountStatus: existing.accountStatus, authUserId: authUser.authUserId };
+      }
+    }
+
+    // Only provisioning or changed identity fields need to serialize concurrent requests.
     const resolved = await db.transaction(async (tx) => {
       const provider = 'email';
       await tx.execute(

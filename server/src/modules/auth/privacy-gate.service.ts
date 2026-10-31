@@ -28,36 +28,37 @@ export class PrivacyGateService {
 
   async stateFor(userId: string): Promise<PrivacyGateState> {
     const db = this.database();
-    const [age] = await db
-      .select({ status: ageEligibilities.status })
-      .from(ageEligibilities)
-      .where(eq(ageEligibilities.userId, userId))
-      .limit(1);
-
-    const published = await db
-      .select({
-        documentType: legalDocuments.type,
-        version: legalDocuments.version,
-        publishedAt: legalDocuments.publishedAt,
-      })
-      .from(legalDocuments)
-      .where(
-        and(
-          eq(legalDocuments.status, 'PUBLISHED'),
-          inArray(legalDocuments.type, [...REQUIRED_DOCUMENT_TYPES]),
-        ),
-      )
-      .orderBy(desc(legalDocuments.publishedAt));
+    const [[age], published, accepted] = await Promise.all([
+      db
+        .select({ status: ageEligibilities.status })
+        .from(ageEligibilities)
+        .where(eq(ageEligibilities.userId, userId))
+        .limit(1),
+      db
+        .select({
+          documentType: legalDocuments.type,
+          version: legalDocuments.version,
+          publishedAt: legalDocuments.publishedAt,
+        })
+        .from(legalDocuments)
+        .where(
+          and(
+            eq(legalDocuments.status, 'PUBLISHED'),
+            inArray(legalDocuments.type, [...REQUIRED_DOCUMENT_TYPES]),
+          ),
+        )
+        .orderBy(desc(legalDocuments.publishedAt)),
+      db
+        .select({ documentType: legalAcceptances.documentType, version: legalAcceptances.version })
+        .from(legalAcceptances)
+        .where(eq(legalAcceptances.userId, userId)),
+    ]);
 
     const latest = new Map<string, string>();
     for (const document of published) {
       if (!latest.has(document.documentType)) latest.set(document.documentType, document.version);
     }
 
-    const accepted = await db
-      .select({ documentType: legalAcceptances.documentType, version: legalAcceptances.version })
-      .from(legalAcceptances)
-      .where(eq(legalAcceptances.userId, userId));
     const acceptedKeys = new Set(accepted.map((row) => `${row.documentType}:${row.version}`));
 
     const ageEligibility = age?.status ?? 'UNVERIFIED';
