@@ -1,23 +1,22 @@
 import 'dotenv/config';
 import { createClient } from '@supabase/supabase-js';
 import { drizzle } from 'drizzle-orm/node-postgres';
+import { readMigrationFiles } from 'drizzle-orm/migrator';
 import { Pool } from 'pg';
 import { and, eq, sql } from 'drizzle-orm';
 import {
   authIdentities,
   categories,
   cities,
-  communityMemberships,
   communities,
-  communityCategories,
-  eventRegistrations,
-  events,
-  eventCategories,
   legalDocuments,
   profiles,
   retentionPolicies,
   users,
 } from './schema';
+import * as schema from './schema';
+import { seedDevelopmentData } from './development-seed';
+import { sampleOwnerId } from './development-seed-data';
 
 const provinceNames = [
   'Adana|أضنة',
@@ -239,63 +238,22 @@ const retentionPolicySeed = [
   status: 'TBD_LEGAL' as const,
 }));
 
-// Public development examples have a synthetic owner, not a sign-in account.
-const sampleOwnerId = '00000000-0000-4000-8000-000000000001';
-const sampleAttendees = Array.from({ length: 10 }, (_, index) => ({
-  id: `20000000-0000-4000-8000-${String(index + 1).padStart(12, '0')}`,
-  normalizedEmail: `seed-attendee-${String(index + 1).padStart(2, '0')}@wasl.invalid`,
-  displayName: `Sample Attendee ${String(index + 1).padStart(2, '0')}`,
-  cityId: [
-    'istanbul',
-    'ankara',
-    'izmir',
-    'antalya',
-    'bursa',
-    'konya',
-    'gaziantep',
-    'eskisehir',
-    'trabzon',
-    'mugla',
-  ][index]!,
-}));
-const sampleCommunities = [
-  ['istanbul-language-exchange', 'Istanbul Language Exchange'],
-  ['ankara-book-club', 'Ankara Book Club'],
-  ['izmir-coastal-walkers', 'Izmir Coastal Walkers'],
-  ['antalya-weekend-cyclists', 'Antalya Weekend Cyclists'],
-  ['bursa-board-game-circle', 'Bursa Board Game Circle'],
-  ['konya-art-and-culture', 'Konya Art and Culture'],
-  ['gaziantep-food-explorers', 'Gaziantep Food Explorers'],
-  ['eskisehir-tech-meetup', 'Eskisehir Tech Meetup'],
-  ['trabzon-outdoor-friends', 'Trabzon Outdoor Friends'],
-  ['mugla-community-garden', 'Mugla Community Garden'],
-].map(([slug, name], index) => ({
-  id: `dev-seed-community-${String(index + 1).padStart(2, '0')}`,
-  slug: `dev-seed-${slug}`,
-  name: `${name} (Sample)`,
-  description: `Sample community ${index + 1} for testing discovery and joining. Not a real organizer.`,
-  cityId: [
-    'istanbul',
-    'ankara',
-    'izmir',
-    'antalya',
-    'bursa',
-    'konya',
-    'gaziantep',
-    'eskisehir',
-    'trabzon',
-    'mugla',
-  ][index]!,
-}));
-
 async function run(): Promise<void> {
   if (process.env.NODE_ENV === 'production')
     throw new Error('Development reference seeds are disabled in production.');
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) throw new Error('DATABASE_URL is required to seed development data.');
   const pool = new Pool({ connectionString });
-  const database = drizzle(pool);
+  const database = drizzle(pool, { schema });
   try {
+    const latest = readMigrationFiles({ migrationsFolder: './drizzle' }).at(-1);
+    const applied = await database.execute<{ hash: string }>(
+      sql`select hash from drizzle.__drizzle_migrations order by created_at desc limit 1`,
+    );
+    if (!latest || applied.rows[0]?.hash !== latest.hash)
+      throw new Error(
+        'Database migrations are not current. Run corepack pnpm db:migrate before seeding.',
+      );
     await database
       .insert(cities)
       .values(provinceNames)
@@ -333,8 +291,23 @@ async function run(): Promise<void> {
           )
           .limit(1)
       : [];
-    const seedOwnerId = configuredOwner?.id ?? sampleOwnerId;
-    const seedHostName = configuredOwner?.displayName ?? 'Wasl Sample Host';
+    if (configuredOwnerEmail && !configuredOwner)
+      throw new Error('WASL_SEED_OWNER_EMAIL must belong to an existing signed-up account.');
+    const [existingOwner] = configuredOwner
+      ? []
+      : await database
+          .select({ id: users.id, displayName: profiles.displayName })
+          .from(communities)
+          .innerJoin(users, eq(sql`${users.id}::text`, communities.ownerId))
+          .innerJoin(authIdentities, eq(authIdentities.userId, users.id))
+          .leftJoin(profiles, eq(profiles.id, users.id))
+          .where(
+            and(eq(communities.id, 'dev-seed-community-01'), eq(communities.ownerType, 'user')),
+          )
+          .limit(1);
+    const seedOwnerId = configuredOwner?.id ?? existingOwner?.id ?? sampleOwnerId;
+    const seedHostName =
+      configuredOwner?.displayName ?? existingOwner?.displayName ?? 'Wasl Sample Host';
     const storageUrl = process.env.SUPABASE_URL;
     const storageKey = process.env.SUPABASE_SECRET_KEY ?? process.env.SUPABASE_SERVICE_ROLE_KEY;
     if (!storageUrl || !storageKey)
@@ -342,154 +315,7 @@ async function run(): Promise<void> {
     const storage = createClient(storageUrl, storageKey, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
-    for (const [index, attendee] of sampleAttendees.entries()) {
-      const response = await fetch(`https://i.pravatar.cc/160?img=${index + 11}`);
-      if (!response.ok) throw new Error(`Sample portrait download failed: ${response.status}`);
-      const { error } = await storage.storage
-        .from('profile-photos')
-        .upload(`dev-seed/${attendee.id}.jpg`, await response.arrayBuffer(), {
-          contentType: 'image/jpeg',
-          upsert: true,
-        });
-      if (error) throw error;
-    }
-    await database.transaction(async (tx) => {
-      if (!configuredOwner) {
-        await tx
-          .insert(users)
-          .values({ id: sampleOwnerId, normalizedEmail: 'seed-owner@wasl.invalid' })
-          .onConflictDoNothing();
-        await tx
-          .insert(profiles)
-          .values({ id: sampleOwnerId, displayName: 'Wasl Sample Host', cityId: 'istanbul' })
-          .onConflictDoNothing();
-      }
-      await tx
-        .insert(users)
-        .values(sampleAttendees.map(({ id, normalizedEmail }) => ({ id, normalizedEmail })))
-        .onConflictDoNothing();
-      await tx
-        .insert(profiles)
-        .values(
-          sampleAttendees.map(({ id, displayName, cityId }) => ({
-            id,
-            displayName,
-            cityId,
-            avatarPath: `dev-seed/${id}.jpg`,
-            bio: 'Fictional profile added by the Wasl development seed.',
-          })),
-        )
-        .onConflictDoUpdate({
-          target: profiles.id,
-          set: { avatarPath: sql`excluded.avatar_path` },
-        });
-      const communityRows = sampleCommunities.map((community, index) => ({
-        ...community,
-        ownerType: 'user',
-        ownerId: seedOwnerId,
-        createdByUserId: seedOwnerId,
-        hostName: seedHostName,
-        admissionMode: index % 2 === 0 ? 'open' : 'approval',
-        capacity: 30 + index * 5,
-      }));
-      await tx
-        .insert(communities)
-        .values(communityRows)
-        .onConflictDoUpdate({
-          target: communities.id,
-          set: {
-            ownerType: 'user',
-            ownerId: seedOwnerId,
-            createdByUserId: seedOwnerId,
-            hostName: seedHostName,
-          },
-        });
-      await tx
-        .insert(communityMemberships)
-        .values(
-          sampleCommunities.flatMap((community, index) => {
-            const status = index % 2 === 0 ? ('ACTIVE' as const) : ('PENDING' as const);
-            return [
-              index,
-              (index + 1) % sampleAttendees.length,
-              (index + 2) % sampleAttendees.length,
-              (index + 3) % sampleAttendees.length,
-            ].map((attendeeIndex) => ({
-              communityId: community.id,
-              userId: sampleAttendees[attendeeIndex]!.id,
-              status,
-            }));
-          }),
-        )
-        .onConflictDoUpdate({
-          target: [communityMemberships.communityId, communityMemberships.userId],
-          set: { status: sql`excluded.status` },
-        });
-      await tx
-        .insert(communityCategories)
-        .values(
-          sampleCommunities.map((community, index) => ({
-            communityId: community.id,
-            categoryId: ['culture', 'education', 'sports'][index % 3]!,
-          })),
-        )
-        .onConflictDoNothing();
-
-      const eventRows = sampleCommunities.map((community, index) => {
-        const startsAt = new Date();
-        startsAt.setUTCDate(startsAt.getUTCDate() + 7 + index * 3);
-        return {
-          id: `dev-seed-event-${String(index + 1).padStart(2, '0')}`,
-          slug: `dev-seed-${community.slug.replace('dev-seed-', '')}-event`,
-          title: `${community.name.replace(' (Sample)', '')} Meetup (Sample)`,
-          description: `Sample upcoming event ${index + 1} for testing discovery and registration. Not a real event.`,
-          visibility: 'public',
-          hostType: 'community',
-          hostId: community.id,
-          createdByUserId: seedOwnerId,
-          hostName: seedHostName,
-          communityId: community.id,
-          cityId: community.cityId,
-          online: false,
-          locationName: `Sample location ${index + 1} (not a real venue)`,
-          startsAt,
-          endsAt: new Date(startsAt.getTime() + 2 * 60 * 60 * 1000),
-          admissionMode: index % 2 === 0 ? 'instant' : 'approval',
-          capacity: 20 + index * 5,
-        };
-      });
-      await tx
-        .insert(events)
-        .values(eventRows)
-        .onConflictDoUpdate({
-          target: events.id,
-          set: { createdByUserId: seedOwnerId, hostName: seedHostName },
-        });
-      await tx
-        .insert(eventRegistrations)
-        .values(
-          eventRows.flatMap((event, index) => {
-            return Array.from({ length: index % 2 === 0 ? 4 : 6 }, (_, offset) => ({
-              eventId: event.id,
-              userId: sampleAttendees[(index + offset) % sampleAttendees.length]!.id,
-              status: offset < 4 ? ('ACCEPTED' as const) : ('PENDING' as const),
-            }));
-          }),
-        )
-        .onConflictDoUpdate({
-          target: [eventRegistrations.eventId, eventRegistrations.userId],
-          set: { status: sql`excluded.status` },
-        });
-      await tx
-        .insert(eventCategories)
-        .values(
-          eventRows.map((event, index) => ({
-            eventId: event.id,
-            categoryId: ['culture', 'education', 'sports'][index % 3]!,
-          })),
-        )
-        .onConflictDoNothing();
-    });
+    const summary = await seedDevelopmentData(database, storage, seedOwnerId, seedHostName);
     await database
       .insert(legalDocuments)
       .values(legalDocumentSlots)
@@ -500,9 +326,13 @@ async function run(): Promise<void> {
       .insert(retentionPolicies)
       .values(retentionPolicySeed)
       .onConflictDoNothing({ target: retentionPolicies.dataGroup });
+    console.log('Development seed completed:', summary);
   } finally {
     await pool.end();
   }
 }
 
-void run();
+void run().catch((error: unknown) => {
+  console.error(error);
+  process.exitCode = 1;
+});
