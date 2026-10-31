@@ -7,6 +7,7 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { and, desc, eq, inArray } from 'drizzle-orm';
+import { isUUID } from 'class-validator';
 import { DATABASE, type Database } from '../../db/database.module';
 import {
   communities,
@@ -188,6 +189,8 @@ export class ModerationService {
   }
 
   async report(reporterUserId: string, input: CreateReportDto) {
+    if (!['community', 'event'].includes(input.targetType) && !isUUID(input.targetId))
+      throw new BadRequestException('This report target requires a UUID.');
     const reason = input.reason.trim();
     if (!reason) throw new BadRequestException('Enter a report reason.');
     if (input.targetType === 'user' && reporterUserId === input.targetId)

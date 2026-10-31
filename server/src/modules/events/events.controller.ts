@@ -1,14 +1,4 @@
-import {
-  Body,
-  Controller,
-  Param,
-  ParseUUIDPipe,
-  Patch,
-  Post,
-  Put,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Param, Patch, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import type { FastifyRequest } from 'fastify';
 import { getAuthenticatedUser } from '../auth/authenticated-user';
@@ -32,18 +22,14 @@ export class EventsController {
   @Put(':id')
   @UseGuards(SupabaseAuthGuard)
   @ApiOkResponse({ type: CreatedResourceDto })
-  update(
-    @Req() request: FastifyRequest,
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() input: UpdateEventDto,
-  ) {
+  update(@Req() request: FastifyRequest, @Param('id') id: string, @Body() input: UpdateEventDto) {
     return this.events.update(getAuthenticatedUser(request), id, input);
   }
 
   @Patch(':id/cancel')
   @UseGuards(SupabaseAuthGuard)
   @ApiOkResponse({ type: CreatedResourceDto })
-  cancel(@Req() request: FastifyRequest, @Param('id', ParseUUIDPipe) id: string) {
+  cancel(@Req() request: FastifyRequest, @Param('id') id: string) {
     return this.events.cancel(getAuthenticatedUser(request), id);
   }
 }

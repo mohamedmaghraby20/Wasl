@@ -1,6 +1,17 @@
 import 'dotenv/config';
 import * as assert from 'node:assert/strict';
 import { Pool } from 'pg';
+import { ForbiddenException } from '@nestjs/common';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { eq } from 'drizzle-orm';
+import * as schema from '../src/db/schema';
+import type { Database } from '../src/db/database.module';
+import { CommunitiesService } from '../src/modules/communities/communities.service';
+import { EventsService } from '../src/modules/events/events.service';
+import { ModerationService } from '../src/modules/moderation/moderation.service';
+import { NotificationsService } from '../src/modules/notifications/notifications.service';
+import { OrganizationsService } from '../src/modules/organizations/organizations.service';
+import { ParticipationService } from '../src/modules/participation/participation.service';
 
 async function main(): Promise<void> {
   if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is required.');
@@ -107,6 +118,85 @@ async function main(): Promise<void> {
     ] as const)
       assert.ok(report[key] > 0, key);
     console.log('Development seed database coverage verified:', report);
+    const rollback = new Error('Rollback sample action checks');
+    await assert.rejects(
+      drizzle(pool, { schema }).transaction(async (tx) => {
+        const db = tx as unknown as Database;
+        const organizations = new OrganizationsService(db, undefined, undefined);
+        const communities = new CommunitiesService(db, organizations);
+        const events = new EventsService(db, communities, organizations);
+        const moderation = new ModerationService(
+          db,
+          communities,
+          events,
+          new NotificationsService(db),
+        );
+        const participation = new ParticipationService(db, communities, events);
+        const communityId = 'dev-seed-community-07';
+        const [community] = await tx
+          .select()
+          .from(schema.communities)
+          .where(eq(schema.communities.id, communityId));
+        assert.ok(community);
+        const owner = { id: community.ownerId, authUserId: '' };
+        assert.equal(
+          (await moderation.permissions(owner.id, 'community', communityId)).manager,
+          true,
+        );
+        const rows = await participation.communityParticipants(owner, communityId);
+        const pending = rows.find((row) => row.status === 'PENDING')!;
+        const waitlisted = rows.find((row) => row.status === 'WAITLISTED')!;
+        const active = rows.find((row) => row.status === 'ACTIVE')!;
+        assert.ok(pending && waitlisted && active);
+        await assert.rejects(
+          participation.decideCommunity(
+            { id: pending.userId, authUserId: '' },
+            communityId,
+            pending.id,
+            'approve',
+          ),
+          ForbiddenException,
+        );
+        assert.equal(
+          (await participation.decideCommunity(owner, communityId, pending.id, 'approve')).status,
+          'ACTIVE',
+        );
+        assert.equal(
+          (await participation.decideCommunity(owner, communityId, waitlisted.id, 'promote'))
+            .status,
+          'ACTIVE',
+        );
+        assert.equal(
+          (await participation.decideCommunity(owner, communityId, active.id, 'remove')).status,
+          'REMOVED',
+        );
+        await moderation.assignModerator(owner.id, 'community', communityId, pending.userId);
+        assert.equal(await moderation.isModerator(pending.userId, 'community', communityId), true);
+        assert.ok(
+          (await moderation.listModerators(owner.id, 'community', communityId)).some(
+            (row) => row.userId === pending.userId,
+          ),
+        );
+        await moderation.removeModerator(owner.id, 'community', communityId, pending.userId);
+        assert.equal(await moderation.isModerator(pending.userId, 'community', communityId), false);
+        await moderation.report(pending.userId, {
+          targetType: 'community',
+          targetId: communityId,
+          reason: 'Rollback-only sample report',
+        });
+        await moderation.report(pending.userId, {
+          targetType: 'event',
+          targetId: 'dev-seed-event-07',
+          reason: 'Rollback-only sample report',
+        });
+        await communities.archive(owner, communityId);
+        throw rollback;
+      }),
+      (error: unknown) => error === rollback,
+    );
+    console.log(
+      'Seeded community approval, promotion, removal, moderator assignment/removal, reporting, archive, and authorization verified; all action changes rolled back.',
+    );
   } finally {
     await pool.end();
   }

@@ -6,7 +6,11 @@ export class CreateReportDto {
   @IsIn(['user', 'community', 'event', 'organization', 'post'])
   targetType!: 'user' | 'community' | 'event' | 'organization' | 'post';
 
-  @ApiProperty({ format: 'uuid' }) @IsUUID() targetId!: string;
+  @ApiProperty({ minLength: 1, maxLength: 80 })
+  @IsString()
+  @MinLength(1)
+  @MaxLength(80)
+  targetId!: string;
   @ApiProperty({ minLength: 1, maxLength: 2000 })
   @IsString()
   @MinLength(1)

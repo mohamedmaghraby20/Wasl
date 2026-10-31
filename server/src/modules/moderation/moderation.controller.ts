@@ -76,7 +76,7 @@ export class ModeratorAssignmentsController {
   permissions(
     @Req() request: FastifyRequest,
     @Param('kind', new ParseEnumPipe(ModerationKind)) kind: ModerationKind,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
   ) {
     return this.moderation.permissions(getAuthenticatedUser(request).id, kind, id);
   }
@@ -87,7 +87,7 @@ export class ModeratorAssignmentsController {
   list(
     @Req() request: FastifyRequest,
     @Param('kind', new ParseEnumPipe(ModerationKind)) kind: ModerationKind,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
   ) {
     return this.moderation.listModerators(getAuthenticatedUser(request).id, kind, id);
   }
@@ -98,7 +98,7 @@ export class ModeratorAssignmentsController {
   assign(
     @Req() request: FastifyRequest,
     @Param('kind', new ParseEnumPipe(ModerationKind)) kind: ModerationKind,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @Body() input: ModeratorUserDto,
   ) {
     return this.moderation.assignModerator(
@@ -115,7 +115,7 @@ export class ModeratorAssignmentsController {
   remove(
     @Req() request: FastifyRequest,
     @Param('kind', new ParseEnumPipe(ModerationKind)) kind: ModerationKind,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @Param('userId', ParseUUIDPipe) userId: string,
   ) {
     return this.moderation.removeModerator(getAuthenticatedUser(request).id, kind, id, userId);

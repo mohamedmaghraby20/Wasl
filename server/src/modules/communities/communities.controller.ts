@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   Param,
-  ParseUUIDPipe,
   Patch,
   Post,
   Put,
@@ -53,7 +52,7 @@ export class CommunitiesController {
   @ApiOkResponse({ type: CreatedResourceDto })
   update(
     @Req() request: FastifyRequest,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @Body() input: UpdateCommunityDto,
   ) {
     return this.communities.update(getAuthenticatedUser(request), id, input);
@@ -62,7 +61,7 @@ export class CommunitiesController {
   @Patch(':id/archive')
   @UseGuards(SupabaseAuthGuard)
   @ApiOkResponse({ type: CreatedResourceDto })
-  archive(@Req() request: FastifyRequest, @Param('id', ParseUUIDPipe) id: string) {
+  archive(@Req() request: FastifyRequest, @Param('id') id: string) {
     return this.communities.archive(getAuthenticatedUser(request), id);
   }
 

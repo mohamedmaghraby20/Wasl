@@ -21,6 +21,8 @@ The seed checks the latest Drizzle migration hash before writing. If it is missi
 
 `dev-seed-community-01` is a full approval community with pending and waitlisted requests. `dev-seed-community-12` is empty. `dev-seed-event-13` and `dev-seed-event-14` have attendance history; `dev-seed-event-15` is cancelled; `dev-seed-event-16` is a full two-person event. Public slugs and display names clearly identify samples.
 
+Community and event IDs are text, including these stable sample IDs; moderation, editing, archive/cancel, and reporting accept them. User, participant, organization, and post IDs remain UUIDs. Browser API access requires CORS to allow `PUT`, `PATCH`, and `DELETE` as well as reads and creation.
+
 ## Safety and reruns
 
 Existing sample IDs are reused. Optional `WASL_SEED_OWNER_EMAIL` selects an existing signed-up owner; otherwise the existing signed-in owner of sample community 01 is preserved, falling back to the synthetic host only when necessary. This does not modify the real owner's profile or grant platform-admin access.
