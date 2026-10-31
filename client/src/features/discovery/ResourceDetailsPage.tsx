@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Archive, ArrowLeft, MessageSquare, Pencil, Share2 } from 'lucide-react';
+import { Archive, ArrowLeft, MessageSquare, Pencil, Share2, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
@@ -7,6 +7,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useUsersControllerCurrent } from '@/api/generated/users/users';
 import {
   useCommunitiesControllerArchive,
+  useCommunitiesControllerRemove,
   getCommunitiesControllerMineQueryKey,
   useCommunitiesControllerMine,
 } from '@/api/generated/communities/communities';
@@ -35,6 +36,7 @@ import { ApiError } from '@/api/fetcher';
 import { getMessagingControllerConversationsQueryKey } from '@/api/generated/messaging/messaging';
 import { Button } from '@/components/ui/Button';
 import { useConfirm } from '@/components/ui/ConfirmDialog';
+import { useDeleteConfirmation } from '@/components/ui/DeleteDialog';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { QueryError } from '@/components/feedback/QueryError';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -104,6 +106,8 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
     query: { enabled: Boolean(user) && managesViaOrganization },
   });
   const archiveCommunity = useCommunitiesControllerArchive();
+  const deleteCommunity = useCommunitiesControllerRemove();
+  const { requestDeletion, deleteDialog } = useDeleteConfirmation();
   const cancelEvent = useEventsControllerCancel();
   const communityStatus = useParticipationControllerCommunityStatus(item?.id ?? '', {
     query: {
@@ -438,6 +442,58 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
                 <Archive aria-hidden="true" />
               </Button>
               <ReportAction iconOnly targetType="community" targetId={item.id} />
+              <Button
+                aria-label={t('deleteCommunity')}
+                className="border-danger/30 text-danger hover:bg-danger-soft hover:text-danger"
+                disabled={deleteCommunity.isPending}
+                onClick={() =>
+                  requestDeletion({
+                    title: t('deleteCommunity'),
+                    description: t('deleteCommunityWarning'),
+                    confirmationText: communityItem.name,
+                    confirmLabel: t('deleteCommunity'),
+                    successMessage: t('communityDeleted'),
+                    errorMessage: t('communityDeleteError'),
+                    onDelete: async () => {
+                      const result = await deleteCommunity.mutateAsync({
+                        id: item.id,
+                        data: { confirmationName: communityItem.name },
+                      });
+                      return result.chatCleanupPending
+                        ? t('communityDeletedChatPending')
+                        : t('communityDeleted');
+                    },
+                    onComplete: () => {
+                      void navigate('/communities');
+                      queryClient.removeQueries({
+                        queryKey: getDiscoveryControllerCommunityQueryKey(id, { lang: language }),
+                      });
+                      void Promise.all([
+                        queryClient.invalidateQueries({
+                          queryKey: getDiscoveryControllerListCommunitiesQueryKey().slice(0, 1),
+                        }),
+                        queryClient.invalidateQueries({
+                          queryKey: getDiscoveryControllerListEventsQueryKey().slice(0, 1),
+                        }),
+                        queryClient.invalidateQueries({
+                          queryKey: getCommunitiesControllerMineQueryKey(),
+                        }),
+                        queryClient.invalidateQueries({
+                          queryKey: getParticipationControllerMyActivityQueryKey(),
+                        }),
+                        queryClient.invalidateQueries({
+                          queryKey: getMessagingControllerConversationsQueryKey(),
+                        }),
+                      ]);
+                    },
+                  })
+                }
+                size="icon"
+                title={t('deleteCommunity')}
+                variant="outline"
+              >
+                <Trash2 aria-hidden="true" />
+              </Button>
             </>
           }
           membershipAction={
@@ -501,6 +557,7 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
           }
         />
         {dialog}
+        {deleteDialog}
       </>
     );
   }

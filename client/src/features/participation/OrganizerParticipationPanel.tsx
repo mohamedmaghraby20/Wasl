@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
+import { Check, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { Link, useSearchParams } from 'react-router';
@@ -17,7 +18,7 @@ import { QueryError } from '@/components/feedback/QueryError';
 import { ApiError } from '@/api/fetcher';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Field } from '@/components/ui/Field';
-import { Input } from '@/components/ui/Input';
+import { SearchInput } from '@/components/ui/SearchInput';
 import {
   useModeratorAssignmentsControllerAssign,
   useModeratorAssignmentsControllerList,
@@ -237,10 +238,11 @@ export function OrganizerParticipationPanel({
                 ))}
               </nav>
               <Field id="participant-review-search" label={t('searchParticipants')}>
-                <Input
+                <SearchInput
+                  aria-label={t('searchParticipants')}
                   id="participant-review-search"
                   value={search}
-                  onChange={(event) => setSearch(event.currentTarget.value)}
+                  onValueChange={setSearch}
                 />
               </Field>
             </>
@@ -312,18 +314,24 @@ export function OrganizerParticipationPanel({
                     {participant.status === 'PENDING' && (
                       <>
                         <Button
+                          aria-label={t('approveParticipant')}
+                          title={t('approveParticipant')}
+                          size="icon"
                           disabled={busy}
                           onClick={() => void decide(participant.id, 'approve')}
                           variant="outline"
                         >
-                          {t('approveParticipant')}
+                          <Check aria-hidden="true" />
                         </Button>
                         <Button
+                          aria-label={t('rejectParticipant')}
+                          title={t('rejectParticipant')}
+                          size="icon"
                           disabled={busy}
                           onClick={() => void decide(participant.id, 'reject')}
                           variant="outline"
                         >
-                          {t('rejectParticipant')}
+                          <X aria-hidden="true" />
                         </Button>
                       </>
                     )}
@@ -339,11 +347,14 @@ export function OrganizerParticipationPanel({
                           </Button>
                         )}
                         <Button
+                          aria-label={t('rejectParticipant')}
+                          title={t('rejectParticipant')}
+                          size="icon"
                           disabled={busy}
                           onClick={() => void decide(participant.id, 'reject')}
                           variant="outline"
                         >
-                          {t('rejectParticipant')}
+                          <X aria-hidden="true" />
                         </Button>
                       </>
                     )}

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, Search } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router';
 import {
@@ -14,7 +14,7 @@ import { ApiError } from '@/api/fetcher';
 import { QueryError } from '@/components/feedback/QueryError';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Field } from '@/components/ui/Field';
-import { Input } from '@/components/ui/Input';
+import { SearchInput } from '@/components/ui/SearchInput';
 import { languageCode, localizedResourceTitle } from '@/features/resources/resource-utils';
 import { Avatar } from './ParticipantAvatar';
 import { usePageMetadata } from '../discovery/usePageMetadata';
@@ -130,18 +130,12 @@ export function CommunityMembersPage({
           id="member-search"
           label={t(kind === 'events' ? 'searchAttendees' : 'searchMembers')}
         >
-          <div className="relative">
-            <Search
-              aria-hidden="true"
-              className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-text-muted rtl:left-auto rtl:right-3"
-            />
-            <Input
-              className="pl-10 rtl:pl-3 rtl:pr-10"
-              id="member-search"
-              onChange={(event) => setSearch(event.currentTarget.value)}
-              value={search}
-            />
-          </div>
+          <SearchInput
+            aria-label={t(kind === 'events' ? 'searchAttendees' : 'searchMembers')}
+            id="member-search"
+            onValueChange={setSearch}
+            value={search}
+          />
         </Field>
         <span className="rounded-full bg-primary-soft px-4 py-2 text-sm font-semibold text-primary-soft-text">
           {t(heading)}: {members.data.length}

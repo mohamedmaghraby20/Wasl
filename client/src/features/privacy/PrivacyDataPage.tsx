@@ -23,6 +23,7 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { useConfirm } from '@/components/ui/ConfirmDialog';
+import { useDeleteConfirmation } from '@/components/ui/DeleteDialog';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Field } from '@/components/ui/Field';
 import { Label } from '@/components/ui/Label';
@@ -66,6 +67,7 @@ export function PrivacyDataPage(): React.JSX.Element {
   const createRequest = usePrivacyControllerCreateRequest();
   const cancelRequest = usePrivacyControllerCancelRequest();
   const { confirm, dialog } = useConfirm();
+  const { requestDeletion, deleteDialog } = useDeleteConfirmation();
   const [confirmedAdult, setConfirmedAdult] = useState(false);
   const [requestType, setRequestType] = useState<PrivacyRequestDtoRequestType>('ACCESS');
   const [note, setNote] = useState('');
@@ -150,16 +152,26 @@ export function PrivacyDataPage(): React.JSX.Element {
     event.preventDefault();
     setError('');
     setNotice('');
-    if (
-      requestType === 'DELETION' &&
-      !(await confirm({
+    if (requestType === 'DELETION') {
+      requestDeletion({
         title: t('privacyDeletionConfirmTitle'),
         description: t('privacyDeletionConfirm'),
+        confirmationText: t('privacyRequestType_DELETION'),
         confirmLabel: t('privacyRequestType_DELETION'),
-        destructive: true,
-      }))
-    )
+        successMessage: t('privacyDeletionRequestCreated'),
+        errorMessage: t('privacyRequestError'),
+        onDelete: async () => {
+          await createRequest.mutateAsync({
+            data: { requestType: 'DELETION', ...(note.trim() ? { note: note.trim() } : {}) },
+          });
+          setNote('');
+        },
+        onComplete: () => {
+          void refresh();
+        },
+      });
       return;
+    }
     setBusyId('new');
     try {
       const created = await createRequest.mutateAsync({
@@ -475,6 +487,7 @@ export function PrivacyDataPage(): React.JSX.Element {
         </section>
       </Card>
       {dialog}
+      {deleteDialog}
     </div>
   );
 }

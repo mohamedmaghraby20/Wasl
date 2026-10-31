@@ -141,6 +141,19 @@ export interface UpdateCommunityDto {
   organizationId?: string | null;
 }
 
+export interface DeleteCommunityDto {
+  /**
+     * @minLength 1
+     * @maxLength 100
+     */
+  confirmationName: string;
+}
+
+export interface DeletedCommunityDto {
+  id: string;
+  chatCleanupPending: boolean;
+}
+
 export type ManagedOrganizationDtoRole = typeof ManagedOrganizationDtoRole[keyof typeof ManagedOrganizationDtoRole];
 
 

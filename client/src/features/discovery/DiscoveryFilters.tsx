@@ -6,6 +6,7 @@ import { QueryError } from '@/components/feedback/QueryError';
 import { Button } from '@/components/ui/Button';
 import { DatePicker } from '@/components/ui/DatePicker';
 import { SearchableSelect } from '@/components/ui/SearchableSelect';
+import { SearchInput } from '@/components/ui/SearchInput';
 import { Select } from '@/components/ui/Select';
 import { localizedName } from '@/features/resources/resource-utils';
 import type { DiscoveryKind } from './discovery-utils';
@@ -133,37 +134,14 @@ export function DiscoveryFilters({
       role="search"
     >
       <div className="flex flex-col gap-2 sm:flex-row">
-        <div className="relative flex-1">
-          <Search
-            aria-hidden="true"
-            className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-text-subtle"
-          />
-          <input
-            aria-label={t('search')}
-            autoComplete="off"
-            className="h-11 w-full rounded-(--shape-radius-control) border border-input bg-background ps-9 pe-12 text-sm text-text shadow-xs transition-[border-color,box-shadow] duration-(--motion-duration-fast) placeholder:text-text-subtle hover:border-border-control-hover aria-invalid:border-danger"
-            enterKeyHint="search"
-            name="q"
-            onChange={(event) => setSearchDraft(event.target.value)}
-            placeholder={t('searchHint')}
-            type="search"
-            value={searchDraft}
-          />
-          {searchDraft ? (
-            <button
-              aria-label={t('clearSearch')}
-              className="absolute end-0 top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-full text-text-subtle transition-colors hover:bg-surface-soft hover:text-text"
-              onClick={() => {
-                setSearchDraft('');
-                onSearch('');
-              }}
-              title={t('clearSearch')}
-              type="button"
-            >
-              <X aria-hidden="true" className="size-4" />
-            </button>
-          ) : null}
-        </div>
+        <SearchInput
+          aria-label={t('search')}
+          name="q"
+          onValueChange={setSearchDraft}
+          onClear={() => onSearch('')}
+          placeholder={t('searchHint')}
+          value={searchDraft}
+        />
         <Button className="sm:px-6" type="submit">
           <Search aria-hidden="true" className="hidden sm:block" />
           {t('search')}
@@ -189,7 +167,9 @@ export function DiscoveryFilters({
         />
         <Select
           aria-busy={categoriesPending}
-          aria-label={categoryValue ? `${t('categoryFilter')}: ${categoryName}` : t('allCategories')}
+          aria-label={
+            categoryValue ? `${t('categoryFilter')}: ${categoryName}` : t('allCategories')
+          }
           className={filterControlClass}
           disabled={categoriesPending || categoriesError || !categories}
           onValueChange={(value) => onFilterChange('category', value)}
@@ -224,11 +204,7 @@ export function DiscoveryFilters({
       </div>
 
       {showClear ? (
-        <div
-          aria-label={t('filters')}
-          className="flex flex-wrap items-center gap-2"
-          role="group"
-        >
+        <div aria-label={t('filters')} className="flex flex-wrap items-center gap-2" role="group">
           {activeFilters.map((filter) => {
             const removeLabel = t('removeFilter', {
               name: `${filter.label}: ${filter.value}`,

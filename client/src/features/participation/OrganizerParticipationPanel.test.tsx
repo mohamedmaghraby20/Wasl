@@ -163,7 +163,7 @@ describe('OrganizerParticipationPanel', () => {
     });
     renderPanel('directory', '/communities/community-1/participants?status=WAITLISTED');
     expect(screen.queryByText('Pending Person')).not.toBeInTheDocument();
-    await user.type(screen.getByRole('textbox', { name: 'Search participants' }), 'sam');
+    await user.type(screen.getByRole('searchbox', { name: 'Search participants' }), 'sam');
     expect(screen.getByText('Samira')).toBeVisible();
     expect(screen.queryByText('Basim')).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Promote from waitlist' }));
@@ -172,7 +172,7 @@ describe('OrganizerParticipationPanel', () => {
       participantId: 'waiting-1',
       action: 'promote',
     });
-    await user.clear(screen.getByRole('textbox', { name: 'Search participants' }));
+    await user.click(screen.getByRole('button', { name: 'Clear search' }));
     await user.click(
       within(screen.getByRole('navigation', { name: 'Participant status' })).getByRole('button', {
         name: /Pending/,
@@ -185,7 +185,10 @@ describe('OrganizerParticipationPanel', () => {
   it('uses the same review controls for event registration decisions', async () => {
     const user = userEvent.setup();
     renderPanel('directory', '/events/community-1/participants?status=PENDING', 'events');
-    await user.click(screen.getByRole('button', { name: 'Reject' }));
+    const reject = screen.getByRole('button', { name: 'Reject' });
+    expect(reject).toHaveTextContent('');
+    expect(reject.querySelector('svg')).not.toBeNull();
+    await user.click(reject);
     expect(mocks.decision).toHaveBeenCalledWith({
       id: 'community-1',
       participantId: 'membership-1',

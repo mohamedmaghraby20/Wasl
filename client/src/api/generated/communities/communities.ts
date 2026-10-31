@@ -26,6 +26,8 @@ import type {
 import type {
   CreateCommunityDto,
   CreatedResourceDto,
+  DeleteCommunityDto,
+  DeletedCommunityDto,
   ManagedCommunityDto,
   UpdateCommunityDto
 } from '../wasl-client.schemas';
@@ -308,6 +310,88 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getCommunitiesControllerUpdateMutationOptions(options), queryClient);
+    }
+    export const getCommunitiesControllerRemoveUrl = (id: string,) => {
+
+
+
+
+  return `/api/v1/communities/${id}`
+}
+
+export const communitiesControllerRemove = async (id: string,
+    deleteCommunityDto: DeleteCommunityDto, options?: Parameters<typeof waslFetch>[1]): Promise<DeletedCommunityDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return waslFetch<DeletedCommunityDto>(getCommunitiesControllerRemoveUrl(id),
+  {
+    ...options,
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(deleteCommunityDto)
+  }
+);}
+
+
+
+
+
+export const getCommunitiesControllerRemoveMutationKey = () => ['communitiesControllerRemove'] as const;
+
+export const getCommunitiesControllerRemoveMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof communitiesControllerRemove>>, TError,CommunitiesControllerRemoveMutationVariables, TContext>, request?: SecondParameter<typeof waslFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof communitiesControllerRemove>>, TError,CommunitiesControllerRemoveMutationVariables, TContext> => {
+
+const mutationKey = getCommunitiesControllerRemoveMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof communitiesControllerRemove>>, CommunitiesControllerRemoveMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  communitiesControllerRemove(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CommunitiesControllerRemoveMutationResult = NonNullable<Awaited<ReturnType<typeof communitiesControllerRemove>>>
+    export type CommunitiesControllerRemoveMutationBody = DeleteCommunityDto
+    export type CommunitiesControllerRemoveMutationError = unknown
+    export type CommunitiesControllerRemoveMutationVariables = {id: string;data: DeleteCommunityDto}
+
+    export const useCommunitiesControllerRemove = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof communitiesControllerRemove>>, TError,CommunitiesControllerRemoveMutationVariables, TContext>, request?: SecondParameter<typeof waslFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof communitiesControllerRemove>>,
+        TError,
+        CommunitiesControllerRemoveMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCommunitiesControllerRemoveMutationOptions(options), queryClient);
     }
     export const getCommunitiesControllerArchiveUrl = (id: string,) => {
 

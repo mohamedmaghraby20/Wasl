@@ -60,6 +60,19 @@ export class CreateCommunityDto {
 
 export class UpdateCommunityDto extends CreateCommunityDto {}
 
+export class DeleteCommunityDto {
+  @ApiProperty({ minLength: 1, maxLength: 100 })
+  @IsString()
+  @MinLength(1)
+  @MaxLength(100)
+  confirmationName!: string;
+}
+
+export class DeletedCommunityDto {
+  @ApiProperty() id!: string;
+  @ApiProperty() chatCleanupPending!: boolean;
+}
+
 export class ManagedCommunityDto {
   @ApiProperty({ format: 'uuid' }) id!: string;
   @ApiProperty() name!: string;

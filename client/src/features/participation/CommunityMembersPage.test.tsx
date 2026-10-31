@@ -69,7 +69,7 @@ describe('CommunityMembersPage', () => {
 
     expect(screen.getByRole('link', { name: /Samira/ })).toHaveAttribute('href', '/users/user-1');
     expect(screen.getByText('Language Circle')).toBeVisible();
-    await user.type(screen.getByRole('textbox', { name: 'Search members' }), 'bas');
+    await user.type(screen.getByRole('searchbox', { name: 'Search members' }), 'bas');
     expect(screen.getByText('Basim')).toBeVisible();
     expect(screen.queryByText('Samira')).not.toBeInTheDocument();
   });
@@ -82,7 +82,7 @@ describe('CommunityMembersPage', () => {
       'href',
       '/events/resource-1',
     );
-    expect(screen.getByRole('textbox', { name: 'Search attendees' })).toBeVisible();
+    expect(screen.getByRole('searchbox', { name: 'Search attendees' })).toBeVisible();
     expect(screen.getByRole('link', { name: /Event Host/ })).toHaveAttribute(
       'href',
       '/users/host-1',

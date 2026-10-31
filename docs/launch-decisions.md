@@ -20,7 +20,7 @@
 - Architecture: React client; NestJS/Fastify server authoritative for authorization/business rules; PostgreSQL/Drizzle hosted at Supabase; Supabase Auth and Storage; Stream for realtime messages (message bodies/history primarily in Stream); Resend for transactional email. Third-party provider access, retention and deletion must be included in privacy processing and requests.
 - Arabic and English are launch languages; use understandable, accessible notices in both. Turkish localization can be added later, but Turkish legal-language requirements need counsel review.
 - No marketing email/SMS, advertising, paid tickets, payments, subscription or monetization at MVP launch. Do not implement marketing consent as required for ordinary participation.
-- Preserve necessary security/moderation evidence only where a documented legal basis and retention rule support it. Avoid irreversible hard deletes of resources with members, attendees or history.
+- Preserve necessary security/moderation evidence only where a documented legal basis and retention rule support it. Community managers may permanently delete a community, including its events, participation history, discussions and chat channels, after an explicit impact warning and exact-name confirmation. User accounts and moderation reports remain unchanged; minimal channel tombstones preserve report references and durable provider-cleanup retries. Archive remains the non-permanent alternative.
 
 ## 2. Decision register — approved product direction vs legal gaps
 

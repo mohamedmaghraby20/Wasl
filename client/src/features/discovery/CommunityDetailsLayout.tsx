@@ -95,7 +95,7 @@ export function CommunityDetailsLayout({
   ];
 
   return (
-    <article className="mx-auto grid w-full max-w-(--container-max) gap-8 sm:gap-10">
+    <article className="mx-auto grid w-full min-w-0 max-w-(--container-max) gap-8 sm:gap-10">
       <Link
         className="inline-flex min-h-11 w-fit items-center gap-2 text-sm font-medium text-text-muted hover:text-text"
         to="/communities"
@@ -107,7 +107,7 @@ export function CommunityDetailsLayout({
         <div className="relative isolate">
           <div
             aria-hidden="true"
-            className="absolute inset-0 -z-10 translate-x-2 translate-y-2 rotate-1 rounded-(--shape-radius-2xl) bg-primary-soft rtl:-translate-x-2"
+            className="absolute inset-0 -z-10 translate-x-1 translate-y-2 rotate-1 rounded-(--shape-radius-2xl) bg-primary-soft sm:translate-x-2 rtl:-translate-x-1 sm:rtl:-translate-x-2"
           />
           <img
             alt={t('defaultCommunityCoverAlt')}
@@ -264,6 +264,7 @@ export function CommunityDetailsLayout({
             canViewMembers ? (
               <>
                 <CommunityMembersTab key={item.id} communityId={item.id} canManage={canManage} />
+                {canManage ? managementPanel : null}
               </>
             ) : (
               <section className="grid gap-3">
@@ -277,7 +278,6 @@ export function CommunityDetailsLayout({
           {selected === 'discussion' ? (
             <CommunityTopics key={item.id} communityId={item.id} canPost={canViewMembers} />
           ) : null}
-          {canManage ? managementPanel : null}
         </div>
         <aside
           aria-label={t('communitySidebar')}

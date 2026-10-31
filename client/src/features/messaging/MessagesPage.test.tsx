@@ -57,6 +57,8 @@ const api = vi.hoisted(() => ({
 
 vi.mock('stream-chat', () => ({ StreamChat: { getInstance: () => stream } }));
 vi.mock('stream-chat-react', () => ({
+  defaultMessageActionSet: [],
+  WithComponents: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   Streami18n: class {
     constructor() {}
   },

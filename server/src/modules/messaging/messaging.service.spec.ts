@@ -9,6 +9,16 @@ import type { EventsService } from '../events/events.service';
 
 const user = { id: 'a7289f17-c7fe-479e-adff-85716c9a9730', authUserId: 'auth-1' };
 
+function liveConversationTransaction(work: (tx: unknown) => Promise<unknown>) {
+  const query = {
+    from: () => query,
+    where: () => query,
+    for: () => query,
+    limit: () => Promise.resolve([{ id: 'conversation-1' }]),
+  };
+  return work({ select: () => query });
+}
+
 function mockSelect(responses: unknown[][]) {
   const select = vi.fn(() => {
     const builder: {
@@ -166,7 +176,7 @@ describe('messaging token boundary', () => {
         onConflictDoUpdate: () => Promise.resolve(),
       }),
     }));
-    const db = { select, insert } as unknown as Database;
+    const db = { select, insert, transaction: liveConversationTransaction } as unknown as Database;
     const config = { get: () => 'true' } as unknown as ConfigService;
     const stream = {
       upsertUser: vi.fn(() => Promise.resolve()),
@@ -216,7 +226,7 @@ describe('messaging token boundary', () => {
         onConflictDoUpdate: () => Promise.resolve(),
       }),
     }));
-    const db = { select, insert } as unknown as Database;
+    const db = { select, insert, transaction: liveConversationTransaction } as unknown as Database;
     const config = { get: () => 'true' } as unknown as ConfigService;
     const stream = {
       upsertUser: vi.fn(() => Promise.resolve()),
@@ -245,5 +255,46 @@ describe('messaging token boundary', () => {
       true,
     );
     expect(stream.addMember).not.toHaveBeenCalled();
+  });
+
+  it('does not recreate a channel deleted while a provisioning request was in flight', async () => {
+    const select = mockSelect([
+      [{ id: 'event-1' }],
+      [{ status: 'ACTIVE' }],
+      [{ closed: false }],
+      [{ name: 'Mariam' }],
+      [{ id: 'conversation-1', channelId: 'wasl_conversation1' }],
+    ]);
+    const query = {
+      from: () => query,
+      where: () => query,
+      for: () => query,
+      limit: () => Promise.resolve([]),
+    };
+    const insert = vi.fn(() => ({
+      values: () => ({
+        onConflictDoNothing: () => Promise.resolve(),
+        onConflictDoUpdate: () => Promise.resolve(),
+      }),
+    }));
+    const db = {
+      select,
+      insert,
+      transaction: (work: (tx: unknown) => Promise<unknown>) => work({ select: () => query }),
+    } as unknown as Database;
+    const stream = { ensureChannel: vi.fn(), setMemberRole: vi.fn(), upsertUser: vi.fn() };
+    const service = new MessagingService(
+      db,
+      { get: () => 'true' } as unknown as ConfigService,
+      stream as unknown as StreamChatAdapter,
+      undefined!,
+      { assertCanManageById: () => Promise.resolve() } as unknown as EventsService,
+    );
+    await expect(service.openResourceChannel(user, 'event', 'event-1')).rejects.toBeInstanceOf(
+      ForbiddenException,
+    );
+    expect(stream.ensureChannel).not.toHaveBeenCalled();
+    expect(stream.setMemberRole).not.toHaveBeenCalled();
+    expect(insert).toHaveBeenCalledTimes(3);
   });
 });

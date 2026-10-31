@@ -18,6 +18,7 @@ import type {
 
 import type {
   CreatedResourceDto,
+  DeletedCommunityDto,
   ManagedCommunityDto
 } from '../../generated/wasl-client.schemas';
 
@@ -27,6 +28,8 @@ export const getCommunitiesControllerMineResponseMock = (): ManagedCommunityDto[
 export const getCommunitiesControllerCreateResponseMock = (overrideResponse: Partial<Extract<CreatedResourceDto, object>> = {}): CreatedResourceDto => ({id: faker.string.uuid(), slug: faker.string.alpha({length: {min: 10, max: 20}}), ...overrideResponse})
 
 export const getCommunitiesControllerUpdateResponseMock = (overrideResponse: Partial<Extract<CreatedResourceDto, object>> = {}): CreatedResourceDto => ({id: faker.string.uuid(), slug: faker.string.alpha({length: {min: 10, max: 20}}), ...overrideResponse})
+
+export const getCommunitiesControllerRemoveResponseMock = (overrideResponse: Partial<Extract<DeletedCommunityDto, object>> = {}): DeletedCommunityDto => ({id: faker.string.alpha({length: {min: 10, max: 20}}), chatCleanupPending: faker.datatype.boolean(), ...overrideResponse})
 
 export const getCommunitiesControllerArchiveResponseMock = (overrideResponse: Partial<Extract<CreatedResourceDto, object>> = {}): CreatedResourceDto => ({id: faker.string.uuid(), slug: faker.string.alpha({length: {min: 10, max: 20}}), ...overrideResponse})
 
@@ -67,6 +70,18 @@ export const getCommunitiesControllerUpdateMockHandler = (overrideResponse?: Cre
   }, options)
 }
 
+export const getCommunitiesControllerRemoveMockHandler = (overrideResponse?: DeletedCommunityDto | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<DeletedCommunityDto> | DeletedCommunityDto), options?: RequestHandlerOptions) => {
+  return http.delete('*/api/v1/communities/:id', async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getCommunitiesControllerRemoveResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
 export const getCommunitiesControllerArchiveMockHandler = (overrideResponse?: CreatedResourceDto | ((info: Parameters<Parameters<typeof http.patch>[1]>[0]) => Promise<CreatedResourceDto> | CreatedResourceDto), options?: RequestHandlerOptions) => {
   return http.patch('*/api/v1/communities/:id/archive', async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {
 
@@ -82,5 +97,6 @@ export const getCommunitiesMock = () => [
   getCommunitiesControllerMineMockHandler(),
   getCommunitiesControllerCreateMockHandler(),
   getCommunitiesControllerUpdateMockHandler(),
+  getCommunitiesControllerRemoveMockHandler(),
   getCommunitiesControllerArchiveMockHandler()
 ]

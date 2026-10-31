@@ -1,9 +1,9 @@
-import { Check, ChevronDown, Search } from 'lucide-react';
+import { Check, ChevronDown } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/cn';
 import { useDownwardDropdown } from '@/lib/use-downward-dropdown';
-import { Input } from './Input';
+import { SearchInput } from './SearchInput';
 import { Popover, PopoverContent, PopoverTrigger } from './Popover';
 
 export type SearchableSelectOption = {
@@ -149,28 +149,23 @@ export function SearchableSelect({
         }}
       >
         <div className="relative m-1 mb-2">
-          <Search aria-hidden="true" className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-text-subtle" />
-          <Input
+          <SearchInput
             role="combobox"
             aria-busy={ariaBusy || loading}
-            aria-activedescendant={
-              activeIndex >= 0 ? `${id}-option-${activeIndex}` : undefined
-            }
+            aria-activedescendant={activeIndex >= 0 ? `${id}-option-${activeIndex}` : undefined}
             aria-autocomplete="list"
             aria-controls={`${id}-listbox`}
             aria-expanded={open}
             aria-label={searchPlaceholder ?? t('searchOptions')}
             autoComplete="off"
-            className="h-9 ps-9 py-1"
-            onChange={(event) => {
-              setSearch(event.target.value);
-              onSearch?.(event.target.value);
+            onValueChange={(value) => {
+              setSearch(value);
+              onSearch?.(value);
               setActiveIndex(0);
             }}
             onKeyDown={onSearchKeyDown}
             placeholder={searchPlaceholder ?? t('searchOptions')}
             ref={searchRef}
-            type="search"
             value={search}
           />
         </div>

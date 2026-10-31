@@ -262,6 +262,8 @@ export const messagingConversations = pgTable(
     dmUserLowId: uuid('dm_user_low_id').references(() => users.id, { onDelete: 'restrict' }),
     dmUserHighId: uuid('dm_user_high_id').references(() => users.id, { onDelete: 'restrict' }),
     providerChannelId: text('provider_channel_id').notNull().unique(),
+    deletedAt: timestamp('deleted_at', { withTimezone: true }),
+    providerDeletedAt: timestamp('provider_deleted_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
@@ -275,8 +277,15 @@ export const messagingConversations = pgTable(
     ),
     check(
       'messaging_conversations_kind_check',
-      sql`(${table.kind} = 'community' and ${table.communityId} is not null and ${table.eventId} is null and ${table.dmUserLowId} is null and ${table.dmUserHighId} is null) or (${table.kind} = 'event' and ${table.eventId} is not null and ${table.communityId} is null and ${table.dmUserLowId} is null and ${table.dmUserHighId} is null) or (${table.kind} = 'dm' and ${table.communityId} is null and ${table.eventId} is null and ${table.dmUserLowId} is not null and ${table.dmUserHighId} is not null and ${table.dmUserLowId} < ${table.dmUserHighId})`,
+      sql`(${table.deletedAt} is not null and ${table.kind} in ('community', 'event') and ${table.communityId} is null and ${table.eventId} is null and ${table.dmUserLowId} is null and ${table.dmUserHighId} is null) or (${table.deletedAt} is null and ((${table.kind} = 'community' and ${table.communityId} is not null and ${table.eventId} is null and ${table.dmUserLowId} is null and ${table.dmUserHighId} is null) or (${table.kind} = 'event' and ${table.eventId} is not null and ${table.communityId} is null and ${table.dmUserLowId} is null and ${table.dmUserHighId} is null) or (${table.kind} = 'dm' and ${table.communityId} is null and ${table.eventId} is null and ${table.dmUserLowId} is not null and ${table.dmUserHighId} is not null and ${table.dmUserLowId} < ${table.dmUserHighId})))`,
     ),
+    check(
+      'messaging_conversations_deletion_check',
+      sql`${table.providerDeletedAt} is null or ${table.deletedAt} is not null`,
+    ),
+    index('messaging_conversations_pending_deletion_idx')
+      .on(table.deletedAt)
+      .where(sql`${table.deletedAt} is not null and ${table.providerDeletedAt} is null`),
   ],
 ).enableRLS();
 

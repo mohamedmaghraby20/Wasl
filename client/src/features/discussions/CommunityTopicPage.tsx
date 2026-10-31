@@ -18,6 +18,7 @@ import { useUsersControllerCurrent } from '@/api/generated/users/users';
 import { ApiError } from '@/api/fetcher';
 import { Button } from '@/components/ui/Button';
 import { useConfirm } from '@/components/ui/ConfirmDialog';
+import { useDeleteConfirmation } from '@/components/ui/DeleteDialog';
 import { Field } from '@/components/ui/Field';
 import { Textarea } from '@/components/ui/Textarea';
 import { QueryError } from '@/components/feedback/QueryError';
@@ -34,6 +35,7 @@ export function CommunityTopicPage(): React.JSX.Element {
   const [posted, setPosted] = useState(false);
   const [editing, setEditing] = useState<{ id: string; body: string } | null>(null);
   const { confirm, dialog } = useConfirm();
+  const { requestDeletion, deleteDialog } = useDeleteConfirmation();
   const queryClient = useQueryClient();
   const query = useCommunityDiscussionsControllerDetails(id, topicId, { page });
   const membership = useParticipationControllerCommunityStatus(id, {
@@ -84,22 +86,21 @@ export function CommunityTopicPage(): React.JSX.Element {
       setError(true);
     }
   };
-  const removePost = async (postId: string) => {
-    if (
-      !(await confirm({
-        title: t('removeComment'),
-        description: t('confirmRemoveComment'),
-        confirmLabel: t('removeComment'),
-        destructive: true,
-      }))
-    )
-      return;
-    try {
-      await remove.mutateAsync({ id, topicId, postId });
-      await refresh();
-    } catch {
-      setError(true);
-    }
+  const removePost = (postId: string) => {
+    requestDeletion({
+      title: t('removeComment'),
+      description: t('confirmRemoveComment'),
+      confirmLabel: t('removeComment'),
+      confirmationText: t('removeComment'),
+      successMessage: t('commentRemoved'),
+      errorMessage: t('discussionPostError'),
+      onDelete: async () => {
+        await remove.mutateAsync({ id, topicId, postId });
+      },
+      onComplete: () => {
+        void refresh();
+      },
+    });
   };
   usePageMetadata(
     query.data?.title ?? t('communityTopics'),
@@ -335,6 +336,7 @@ export function CommunityTopicPage(): React.JSX.Element {
         </p>
       ) : null}
       {dialog}
+      {deleteDialog}
     </article>
   );
 }

@@ -4,13 +4,13 @@ import { CommunitiesModule } from '../communities/communities.module';
 import { EventsModule } from '../events/events.module';
 import { MessagingController } from './messaging.controller';
 import { MessagingService } from './messaging.service';
-import { StreamChatAdapter } from './stream-chat.adapter';
 import { MessagingSyncWorker } from './messaging-sync.worker';
+import { StreamChatModule } from './stream-chat.module';
 
 @Module({
-  imports: [AuthModule, CommunitiesModule, EventsModule],
+  imports: [AuthModule, CommunitiesModule, EventsModule, StreamChatModule],
   controllers: [MessagingController],
-  providers: [MessagingService, StreamChatAdapter, MessagingSyncWorker],
-  exports: [MessagingService, StreamChatAdapter],
+  providers: [MessagingService, MessagingSyncWorker],
+  exports: [MessagingService, StreamChatModule],
 })
 export class MessagingModule {}

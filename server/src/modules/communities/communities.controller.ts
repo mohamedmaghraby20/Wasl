@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseUUIDPipe,
@@ -17,15 +18,21 @@ import { SupabaseAuthGuard } from '../auth/supabase-auth.guard';
 import {
   CreatedResourceDto,
   CreateCommunityDto,
+  DeleteCommunityDto,
+  DeletedCommunityDto,
   ManagedCommunityDto,
   UpdateCommunityDto,
 } from './communities.dto';
 import { CommunitiesService } from './communities.service';
+import { CommunityDeletionService } from './community-deletion.service';
 
 @ApiTags('communities')
 @Controller('communities')
 export class CommunitiesController {
-  constructor(private readonly communities: CommunitiesService) {}
+  constructor(
+    private readonly communities: CommunitiesService,
+    private readonly deletion: CommunityDeletionService,
+  ) {}
 
   @Get('mine')
   @UseGuards(SupabaseAuthGuard)
@@ -57,5 +64,16 @@ export class CommunitiesController {
   @ApiOkResponse({ type: CreatedResourceDto })
   archive(@Req() request: FastifyRequest, @Param('id', ParseUUIDPipe) id: string) {
     return this.communities.archive(getAuthenticatedUser(request), id);
+  }
+
+  @Delete(':id')
+  @UseGuards(SupabaseAuthGuard)
+  @ApiOkResponse({ type: DeletedCommunityDto })
+  remove(
+    @Req() request: FastifyRequest,
+    @Param('id') id: string,
+    @Body() input: DeleteCommunityDto,
+  ) {
+    return this.deletion.remove(getAuthenticatedUser(request), id, input.confirmationName);
   }
 }

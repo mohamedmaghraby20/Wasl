@@ -84,14 +84,17 @@ describe('CommunityDetailsLayout', () => {
     expect(within(navigation).getAllByRole('link')).toHaveLength(4);
     expect(screen.getByRole('heading', { name: 'About us' })).toBeVisible();
     expect(screen.getByText('Hosted by you')).toBeVisible();
+    expect(screen.queryByText('Manage requests')).not.toBeInTheDocument();
     await user.click(within(navigation).getByRole('link', { name: 'Events' }));
     expect(screen.getByText('Community event list')).toBeVisible();
+    expect(screen.queryByText('Manage requests')).not.toBeInTheDocument();
     expect(screen.queryByText(community.description)).not.toBeInTheDocument();
     await user.click(within(navigation).getByRole('link', { name: 'Members' }));
     expect(screen.getByText('Member directory')).toBeVisible();
     expect(screen.getByText('Manage requests')).toBeVisible();
     await user.click(within(navigation).getByRole('link', { name: 'Discussion' }));
     expect(screen.getByText('Discussion content')).toBeVisible();
+    expect(screen.queryByText('Manage requests')).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Edit community' })).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Join community' })).not.toBeInTheDocument();
   });

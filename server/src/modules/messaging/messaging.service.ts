@@ -8,7 +8,7 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { and, eq, inArray, or, sql } from 'drizzle-orm';
+import { and, eq, inArray, isNull, or, sql } from 'drizzle-orm';
 import { randomUUID } from 'node:crypto';
 import { DATABASE, type Database } from '../../db/database.module';
 import {
@@ -145,9 +145,11 @@ export class MessagingService {
 
     const isManager = await this.isManager(user.id, kind, resource.id);
     try {
-      await this.stream.upsertUser(streamUserId, profile.name);
-      await this.stream.ensureChannel(conversation.channelId);
-      await this.stream.setMemberRole(conversation.channelId, streamUserId, isManager);
+      await this.withLiveConversation(conversation.id, async () => {
+        await this.stream.upsertUser(streamUserId, profile.name);
+        await this.stream.ensureChannel(conversation.channelId);
+        await this.stream.setMemberRole(conversation.channelId, streamUserId, isManager);
+      });
       await db
         .insert(messagingMemberSync)
         .values({
@@ -168,6 +170,7 @@ export class MessagingService {
           },
         });
     } catch (error) {
+      if (error instanceof ForbiddenException) throw error;
       await db
         .insert(messagingMemberSync)
         .values({
@@ -487,19 +490,21 @@ export class MessagingService {
     if (desired === current && (!desired || !channelId.startsWith('wasl_'))) return;
     const providerId = providerUserId(userId);
     try {
-      if (desired) {
-        const [profile] = await this.database()
-          .select({ name: profiles.displayName })
-          .from(profiles)
-          .where(eq(profiles.id, userId))
-          .limit(1);
-        if (!profile) throw new ServiceUnavailableException('Messaging profile is unavailable.');
-        await this.stream.upsertUser(providerId, profile.name);
-        await this.stream.ensureChannel(channelId);
-        await this.stream.setMemberRole(channelId, providerId, moderator);
-      } else {
-        await this.stream.removeMember(channelId, providerId);
-      }
+      await this.withLiveConversation(conversationId, async () => {
+        if (desired) {
+          const [profile] = await this.database()
+            .select({ name: profiles.displayName })
+            .from(profiles)
+            .where(eq(profiles.id, userId))
+            .limit(1);
+          if (!profile) throw new ServiceUnavailableException('Messaging profile is unavailable.');
+          await this.stream.upsertUser(providerId, profile.name);
+          await this.stream.ensureChannel(channelId);
+          await this.stream.setMemberRole(channelId, providerId, moderator);
+        } else {
+          await this.stream.removeMember(channelId, providerId);
+        }
+      });
       await this.database()
         .update(messagingMemberSync)
         .set({ providerMember: desired, lastError: null, lastCheckedAt: new Date() })
@@ -527,6 +532,20 @@ export class MessagingService {
         );
       throw new ServiceUnavailableException('Messaging access synchronization is pending.');
     }
+  }
+
+  private async withLiveConversation(id: string, work: () => Promise<void>): Promise<void> {
+    await this.database().transaction(async (tx) => {
+      const [conversation] = await tx
+        .select({ id: messagingConversations.id })
+        .from(messagingConversations)
+        .where(and(eq(messagingConversations.id, id), isNull(messagingConversations.deletedAt)))
+        .for('share')
+        .limit(1);
+      if (!conversation) throw new ForbiddenException('This conversation has been deleted.');
+      // Resource deletion takes an exclusive row lock, so in-flight sync cannot recreate deleted channels.
+      await work();
+    });
   }
 
   private async otherDmUser(conversationId: string, userId: string): Promise<string> {
@@ -591,6 +610,7 @@ export class MessagingService {
         and(
           eq(messagingMemberSync.userId, user.id),
           eq(messagingMemberSync.desiredMember, true),
+          isNull(messagingConversations.deletedAt),
           or(
             eq(messagingConversations.kind, 'community'),
             eq(messagingConversations.kind, 'event'),

@@ -1,10 +1,10 @@
-import { ArrowRight, Eye, Search, X } from 'lucide-react';
+import { ArrowRight, Eye } from 'lucide-react';
 import { useState } from 'react';
 import { Form, Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useSeoMeta } from '@unhead/react';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
+import { SearchInput } from '@/components/ui/SearchInput';
 import { HomeSection } from './HomeSection';
 import {
   useDiscoveryControllerListCommunities,
@@ -70,34 +70,14 @@ export function HomePage(): React.JSX.Element {
             <label className="text-sm font-semibold text-text" htmlFor="home-search">
               {t('homeSearchLabel')}
             </label>
-            <div className="relative">
-              <Search
-                aria-hidden="true"
-                className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-text-subtle"
-              />
-              <Input
-                autoComplete="off"
-                className={query ? 'ps-9 pe-12' : 'ps-9'}
-                enterKeyHint="search"
-                id="home-search"
-                name="q"
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder={t('exploreByName')}
-                type="search"
-                value={query}
-              />
-              {query ? (
-                <button
-                  aria-label={t('clearSearch')}
-                  className="absolute end-0 top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-full text-text-subtle transition-colors hover:bg-surface-soft hover:text-text"
-                  onClick={() => setQuery('')}
-                  title={t('clearSearch')}
-                  type="button"
-                >
-                  <X aria-hidden="true" className="size-4" />
-                </button>
-              ) : null}
-            </div>
+            <SearchInput
+              aria-label={t('homeSearchLabel')}
+              id="home-search"
+              name="q"
+              onValueChange={setQuery}
+              placeholder={t('exploreByName')}
+              value={query}
+            />
             <Button block type="submit">
               {t('search')}
             </Button>

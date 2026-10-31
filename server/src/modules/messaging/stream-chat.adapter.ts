@@ -57,6 +57,16 @@ export class StreamChatAdapter {
     await this.configured().deactivateUser(providerUserId);
   }
 
+  async deleteChannel(channelId: string): Promise<void> {
+    try {
+      await this.configured().channel('messaging', channelId).delete({ hard_delete: true });
+    } catch (error) {
+      // Stream code 16 means the channel is already absent, including retries after a crash.
+      if (!(error && typeof error === 'object' && 'code' in error && error.code === 16))
+        throw error;
+    }
+  }
+
   token(providerUserId: string): { token: string; expiresAt: string } {
     const expiresAt = Math.floor(Date.now() / 1000) + 15 * 60;
     return {

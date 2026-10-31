@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { I18nextProvider } from 'react-i18next';
 import { MemoryRouter, Route, Routes } from 'react-router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -15,9 +16,10 @@ function renderCommunity(viewer: 'owner' | 'member' | 'visitor'): void {
   vi.stubEnv('VITE_API_URL', 'http://localhost:3000');
   vi.stubGlobal(
     'fetch',
-    vi.fn((input: string) => {
+    vi.fn((input: string, options?: RequestInit) => {
       const url = new URL(input);
       let data: unknown = {};
+      if (options?.method === 'DELETE') data = { id: 'community-1', chatCleanupPending: false };
       if (url.pathname === '/api/v1/communities/language-circle')
         data = {
           id: 'community-1',
@@ -62,6 +64,7 @@ function renderCommunity(viewer: 'owner' | 'member' | 'visitor'): void {
         <MemoryRouter initialEntries={['/communities/language-circle']}>
           <Routes>
             <Route path="/communities/:id" element={<ResourceDetailsPage kind="communities" />} />
+            <Route path="/communities" element={<h1>Community list</h1>} />
           </Routes>
         </MemoryRouter>
       </QueryClientProvider>
@@ -78,13 +81,14 @@ describe('Community detail viewer controls', () => {
     vi.unstubAllEnvs();
   });
 
-  it('offers edit and archive only to the owner', async () => {
+  it('offers edit, archive, and delete only to the owner', async () => {
     renderCommunity('owner');
     expect(await screen.findByRole('link', { name: 'Edit community' })).toHaveAttribute(
       'href',
       '/communities/community-1/edit',
     );
     expect(screen.getByRole('button', { name: 'Archive community' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Delete community' })).toBeVisible();
     expect(screen.getByText('Hosted by you')).toBeVisible();
     expect(screen.queryByRole('heading', { name: 'Membership requests' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Leave community' })).not.toBeInTheDocument();
@@ -95,6 +99,31 @@ describe('Community detail viewer controls', () => {
     expect(await screen.findByRole('button', { name: 'Leave community' })).toBeVisible();
     expect(screen.getByRole('button', { name: 'Open chat' })).toBeVisible();
     expect(screen.queryByRole('link', { name: 'Edit community' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Delete community' })).not.toBeInTheDocument();
+  });
+
+  it('deletes by canonical ID only after exact-name confirmation and reports completion', async () => {
+    const user = userEvent.setup();
+    renderCommunity('owner');
+    await user.click(await screen.findByRole('button', { name: 'Delete community' }));
+    const dialog = screen.getByRole('alertdialog');
+    expect(within(dialog).getByText(/all its events and registrations/)).toBeVisible();
+    const remove = within(dialog).getByRole('button', { name: 'Delete community' });
+    expect(remove).toBeDisabled();
+    await user.type(within(dialog).getByRole('textbox'), 'Language Circle');
+    await user.click(remove);
+    expect(
+      await screen.findByText('Community and its related content permanently deleted.'),
+    ).toBeVisible();
+    expect(fetch).toHaveBeenCalledWith(
+      'http://localhost:3000/api/v1/communities/community-1',
+      expect.objectContaining({
+        method: 'DELETE',
+        body: JSON.stringify({ confirmationName: 'Language Circle' }),
+      }),
+    );
+    await user.click(screen.getByRole('button', { name: 'Done' }));
+    expect(await screen.findByRole('heading', { name: 'Community list' })).toBeVisible();
   });
 
   it('offers sign-in to join and keeps member identities private for visitors', async () => {

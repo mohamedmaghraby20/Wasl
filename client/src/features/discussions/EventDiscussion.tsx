@@ -13,6 +13,7 @@ import {
 } from '@/api/generated/discussions/discussions';
 import { Button } from '@/components/ui/Button';
 import { useConfirm } from '@/components/ui/ConfirmDialog';
+import { useDeleteConfirmation } from '@/components/ui/DeleteDialog';
 import { Field } from '@/components/ui/Field';
 import { Textarea } from '@/components/ui/Textarea';
 import { QueryError } from '@/components/feedback/QueryError';
@@ -45,6 +46,7 @@ export function EventDiscussion({
   const [posted, setPosted] = useState(false);
   const [editing, setEditing] = useState<{ id: string; body: string } | null>(null);
   const { confirm, dialog } = useConfirm();
+  const { requestDeletion, deleteDialog } = useDeleteConfirmation();
   const queryClient = useQueryClient();
   const query = useDiscussionsControllerListEventPosts(eventId, { page });
   const createPost = useDiscussionsControllerCreateEventPost();
@@ -71,23 +73,21 @@ export function EventDiscussion({
       setError(true);
     }
   };
-  const remove = async (postId: string) => {
-    if (
-      !(await confirm({
-        title: t('removeComment'),
-        description: t('confirmRemoveComment'),
-        confirmLabel: t('removeComment'),
-        destructive: true,
-      }))
-    )
-      return;
-    setError(false);
-    try {
-      await removePost.mutateAsync({ id: eventId, postId });
-      await refresh();
-    } catch {
-      setError(true);
-    }
+  const remove = (postId: string) => {
+    requestDeletion({
+      title: t('removeComment'),
+      description: t('confirmRemoveComment'),
+      confirmLabel: t('removeComment'),
+      confirmationText: t('removeComment'),
+      successMessage: t('commentRemoved'),
+      errorMessage: t('discussionPostError'),
+      onDelete: async () => {
+        await removePost.mutateAsync({ id: eventId, postId });
+      },
+      onComplete: () => {
+        void refresh();
+      },
+    });
   };
   const close = async () => {
     if (
@@ -231,7 +231,9 @@ export function EventDiscussion({
                     </Button>
                   </div>
                 ) : null}
-                {post.body && viewerId !== post.authorId ? <ReportAction targetType="post" targetId={post.id} /> : null}
+                {post.body && viewerId !== post.authorId ? (
+                  <ReportAction targetType="post" targetId={post.id} />
+                ) : null}
                 {canPost && !post.parentId && post.body ? (
                   <Button
                     className="w-fit"
@@ -323,6 +325,7 @@ export function EventDiscussion({
         </Link>
       )}
       {dialog}
+      {deleteDialog}
     </section>
   );
 }

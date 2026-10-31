@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { useParticipationControllerCommunityMembers } from '@/api/generated/participation/participation';
 import { QueryError } from '@/components/feedback/QueryError';
-import { Input } from '@/components/ui/Input';
+import { SearchInput } from '@/components/ui/SearchInput';
 import { Field } from '@/components/ui/Field';
 import { Avatar } from './ParticipantAvatar';
 
@@ -43,10 +43,11 @@ export function CommunityMembersTab({
         ) : null}
       </div>
       <Field id="community-member-search" label={t('searchMembers')}>
-        <Input
+        <SearchInput
+          aria-label={t('searchMembers')}
           id="community-member-search"
           value={search}
-          onChange={(event) => setSearch(event.currentTarget.value)}
+          onValueChange={setSearch}
         />
       </Field>
       {members.length ? (

@@ -172,6 +172,9 @@ describe('PrivacyDataPage', () => {
     await user.click(screen.getByRole('button', { name: 'Submit request' }));
 
     const dialog = await screen.findByRole('alertdialog');
+    expect(within(dialog).getByRole('button', { name: 'Account deletion' })).toBeDisabled();
+    expect(mocks.createRequest).not.toHaveBeenCalled();
+    await user.type(within(dialog).getByRole('textbox'), 'Account deletion');
     await user.click(within(dialog).getByRole('button', { name: 'Account deletion' }));
 
     await waitFor(() =>
