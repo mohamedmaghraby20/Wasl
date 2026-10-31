@@ -67,8 +67,8 @@ export class PrivacyService {
 
   async status(userId: string) {
     const db = this.database();
-    const state = await this.gate.stateFor(userId);
-    const [documents, accepted, openRequests] = await Promise.all([
+    const [state, documents, accepted, openRequests] = await Promise.all([
+      this.gate.stateFor(userId),
       db
         .select({
           id: legalDocuments.id,

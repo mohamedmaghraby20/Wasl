@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { I18nextProvider } from 'react-i18next';
 import { MemoryRouter, Route, Routes } from 'react-router';
@@ -11,13 +11,14 @@ const auth = vi.hoisted(() => ({ user: null as { id: string } | null }));
 vi.mock('@/features/auth/AuthProvider', () => ({ useAuth: () => auth }));
 vi.mock('./usePageMetadata', () => ({ usePageMetadata: vi.fn() }));
 
-function renderCommunity(viewer: 'owner' | 'member' | 'visitor'): void {
+function renderCommunity(viewer: 'owner' | 'member' | 'visitor', currentUser?: Promise<Response>): void {
   auth.user = viewer === 'visitor' ? null : { id: viewer };
   vi.stubEnv('VITE_API_URL', 'http://localhost:3000');
   vi.stubGlobal(
     'fetch',
     vi.fn((input: string, options?: RequestInit) => {
       const url = new URL(input);
+      if (url.pathname === '/api/v1/users/me' && currentUser) return currentUser;
       let data: unknown = {};
       if (options?.method === 'DELETE') data = { id: 'community-1', chatCleanupPending: false };
       if (url.pathname === '/api/v1/communities/language-circle')
@@ -100,6 +101,15 @@ describe('Community detail viewer controls', () => {
     expect(screen.getByRole('button', { name: 'Open chat' })).toBeVisible();
     expect(screen.queryByRole('link', { name: 'Edit community' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Delete community' })).not.toBeInTheDocument();
+  });
+
+  it('starts membership loading without waiting for the current profile', async () => {
+    renderCommunity('member', new Promise(() => {}));
+    await waitFor(() => expect(fetch).toHaveBeenCalledWith(
+      expect.stringContaining('/api/v1/communities/community-1/membership'),
+      expect.anything(),
+    ));
+    expect(await screen.findByRole('heading', { name: 'Language Circle' })).toBeVisible();
   });
 
   it('deletes by canonical ID only after exact-name confirmation and reports completion', async () => {

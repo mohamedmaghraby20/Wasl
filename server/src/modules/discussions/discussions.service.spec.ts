@@ -58,3 +58,40 @@ describe('Event discussion posting authorization', () => {
     expect(select).not.toHaveBeenCalled();
   });
 });
+
+describe('Event discussion reads', () => {
+  it('joins the event and thread, then starts count and posts together', async () => {
+    let finishCount!: (rows: unknown[]) => void;
+    const countResult = new Promise<unknown[]>((resolve) => { finishCount = resolve; });
+    const select = vi.fn((fields: Record<string, unknown>) => {
+      const result = 'threadId' in fields
+        ? Promise.resolve([{ id: eventId, threadId: 'thread-1', archivedAt: new Date() }])
+        : 'total' in fields ? countResult : Promise.resolve([]);
+      const builder = {
+        from: () => builder,
+        leftJoin: () => builder,
+        innerJoin: () => builder,
+        where: () => builder,
+        orderBy: () => builder,
+        limit: () => builder,
+        offset: () => builder,
+        then: result.then.bind(result),
+      };
+      return builder;
+    });
+    const service = new DiscussionsService({ select } as unknown as Database, undefined!, undefined!);
+    const pending = service.eventPosts(eventId);
+    await vi.waitFor(() => expect(select).toHaveBeenCalledTimes(3));
+    finishCount([{ total: 0 }]);
+    await expect(pending).resolves.toMatchObject({ items: [], total: 0, closed: true });
+  });
+
+  it('returns an empty page without count or post reads when no thread exists', async () => {
+    const select = vi.fn(() => ({ from: () => ({
+      leftJoin: () => ({ where: () => ({ limit: () => Promise.resolve([{ id: eventId, threadId: null }]) }) }),
+    }) }));
+    const service = new DiscussionsService({ select } as unknown as Database, undefined!, undefined!);
+    await expect(service.eventPosts(eventId)).resolves.toMatchObject({ items: [], total: 0, closed: false });
+    expect(select).toHaveBeenCalledOnce();
+  });
+});

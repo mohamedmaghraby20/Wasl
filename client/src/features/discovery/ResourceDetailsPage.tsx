@@ -114,19 +114,18 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
     query: {
       enabled: Boolean(
         user &&
-          currentUser.isSuccess &&
           item &&
           kind === 'communities' &&
           !(
             !('startsAt' in item) &&
             item.ownerType === 'user' &&
-            item.ownerId === currentUser.data.id
+            item.ownerId === currentUser.data?.id
           ),
       ),
     },
   });
   const eventStatus = useParticipationControllerEventStatus(item?.id ?? '', {
-    query: { enabled: Boolean(user && currentUser.isSuccess && kind === 'events' && item) },
+    query: { enabled: Boolean(user && kind === 'events' && item) },
   });
   const joinCommunity = useParticipationControllerJoinCommunity();
   const leaveCommunity = useParticipationControllerLeaveCommunity();

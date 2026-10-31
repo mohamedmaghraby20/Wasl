@@ -506,18 +506,14 @@ export class DiscussionsService {
     const pageSize = this.pageSizeNumber(pageSizeInput);
     const db = this.database();
     const [event] = await db
-      .select({ id: events.id })
+      .select({ id: events.id, threadId: discussionThreads.id, archivedAt: discussionThreads.archivedAt })
       .from(events)
+      .leftJoin(discussionThreads, eq(discussionThreads.eventId, events.id))
       .where(or(eq(events.id, eventId), eq(events.slug, eventId)))
       .limit(1);
     if (!event) throw new NotFoundException('Event not found.');
 
-    const [thread] = await db
-      .select({ id: discussionThreads.id, archivedAt: discussionThreads.archivedAt })
-      .from(discussionThreads)
-      .where(eq(discussionThreads.eventId, event.id))
-      .limit(1);
-    return this.postPage(thread?.id, page, pageSize, Boolean(thread?.archivedAt));
+    return this.postPage(event.threadId ?? undefined, page, pageSize, Boolean(event.archivedAt));
   }
 
   private async publicCommunity(value: string) {
@@ -613,12 +609,12 @@ export class DiscussionsService {
     if (!threadId) return { items: [], page, pageSize, hasMore: false, total: 0, closed: false };
     const db = this.database();
 
-    const [result] = await db
-      .select({ total: count() })
-      .from(discussionPosts)
-      .where(eq(discussionPosts.threadId, threadId));
-
-    const rows = await db
+    const [[result], rows] = await Promise.all([
+      db
+        .select({ total: count() })
+        .from(discussionPosts)
+        .where(eq(discussionPosts.threadId, threadId)),
+      db
       .select({
         id: discussionPosts.id,
         parentId: discussionPosts.parentId,
@@ -634,7 +630,8 @@ export class DiscussionsService {
       .where(eq(discussionPosts.threadId, threadId))
       .orderBy(asc(discussionPosts.createdAt), asc(discussionPosts.depth), asc(discussionPosts.id))
       .limit(pageSize + 1)
-      .offset((page - 1) * pageSize);
+      .offset((page - 1) * pageSize),
+    ]);
 
     return {
       items: rows.slice(0, pageSize).map(({ deletedAt, body, ...post }) => ({

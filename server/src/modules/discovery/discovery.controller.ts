@@ -81,6 +81,7 @@ export class DiscoveryController {
           slug: communities.slug,
           name: communities.name,
           description: communities.description,
+          categories: this.categorySelection('community'),
           admissionMode: communities.admissionMode,
           capacity: communities.capacity,
           hostName: sql<string>`COALESCE(${organizations.name}, ${communities.hostName})`,
@@ -107,7 +108,7 @@ export class DiscoveryController {
     ]);
     const total = Number(countRows[0]?.total ?? 0);
     return {
-      items: await this.addCommunityCategories(rows),
+      items: rows,
       page,
       pageSize,
       total,
@@ -145,6 +146,7 @@ export class DiscoveryController {
           slug: events.slug,
           title: events.title,
           description: events.description,
+          categories: this.categorySelection('event'),
           visibility: events.visibility,
           hostName: sql<string>`COALESCE(${organizations.name}, ${events.hostName})`,
           hostType: events.hostType,
@@ -177,7 +179,7 @@ export class DiscoveryController {
     ]);
     const total = Number(countRows[0]?.total ?? 0);
     return {
-      items: await this.addEventCategories(rows),
+      items: rows,
       page,
       pageSize,
       total,
@@ -196,6 +198,7 @@ export class DiscoveryController {
         slug: communities.slug,
         name: communities.name,
         description: communities.description,
+        categories: this.categorySelection('community'),
         admissionMode: communities.admissionMode,
         capacity: communities.capacity,
         hostName: sql<string>`COALESCE(${organizations.name}, ${communities.hostName})`,
@@ -217,7 +220,7 @@ export class DiscoveryController {
       )
       .limit(1);
     if (!row) throw new NotFoundException('Community not found.');
-    return (await this.addCommunityCategories([row]))[0];
+    return row;
   }
 
   @Get('events/:id')
@@ -231,6 +234,7 @@ export class DiscoveryController {
         slug: events.slug,
         title: events.title,
         description: events.description,
+        categories: this.categorySelection('event'),
         visibility: events.visibility,
         hostName: sql<string>`COALESCE(${organizations.name}, ${events.hostName})`,
         hostType: events.hostType,
@@ -255,7 +259,7 @@ export class DiscoveryController {
       .where(or(eq(events.id, id), eq(events.slug, id)))
       .limit(1);
     if (!row) throw new NotFoundException('Event not found.');
-    return (await this.addEventCategories([row]))[0];
+    return row;
   }
 
   private parse(query: Record<string, string | undefined>, resource: 'community' | 'event') {
@@ -323,54 +327,17 @@ export class DiscoveryController {
   private cityName(language?: string) {
     return language === 'ar' ? cities.nameAr : language === 'tr' ? cities.nameTr : cities.nameEn;
   }
-  private async addCommunityCategories<T extends { id: string }>(rows: T[]) {
-    if (!rows.length) return [];
-    const db = this.database();
-    const ids = rows.map((row) => row.id);
-    const links = await db
-      .select({
-        resourceId: communityCategories.communityId,
-        id: categories.id,
-        nameEn: categories.nameEn,
-        nameAr: categories.nameAr,
-        nameTr: categories.nameTr,
-      })
-      .from(communityCategories)
-      .innerJoin(categories, eq(communityCategories.categoryId, categories.id))
-      .where(inArray(communityCategories.communityId, ids));
-    return this.attachCategories(rows, links);
-  }
-  private async addEventCategories<T extends { id: string }>(rows: T[]) {
-    if (!rows.length) return [];
-    const db = this.database();
-    const ids = rows.map((row) => row.id);
-    const links = await db
-      .select({
-        resourceId: eventCategories.eventId,
-        id: categories.id,
-        nameEn: categories.nameEn,
-        nameAr: categories.nameAr,
-        nameTr: categories.nameTr,
-      })
-      .from(eventCategories)
-      .innerJoin(categories, eq(eventCategories.categoryId, categories.id))
-      .where(inArray(eventCategories.eventId, ids));
-    return this.attachCategories(rows, links);
-  }
-  private attachCategories<T extends { id: string }>(
-    rows: T[],
-    links: { resourceId: string; id: string; nameEn: string; nameAr: string; nameTr: string }[],
-  ) {
-    return rows.map((row) => ({
-      ...row,
-      categories: links
-        .filter((link) => link.resourceId === row.id)
-        .map((link) => ({
-          id: link.id,
-          nameEn: link.nameEn,
-          nameAr: link.nameAr,
-          nameTr: link.nameTr,
-        })),
-    }));
+  private categorySelection(kind: 'community' | 'event') {
+    const link = kind === 'community' ? communityCategories : eventCategories;
+    const resourceId = kind === 'community' ? communityCategories.communityId : eventCategories.eventId;
+    const id = kind === 'community' ? communities.id : events.id;
+    return sql<Pick<typeof categories.$inferSelect, 'id' | 'nameEn' | 'nameAr' | 'nameTr'>[]>`(
+      select coalesce(json_agg(json_build_object(
+        'id', ${categories.id}, 'nameEn', ${categories.nameEn},
+        'nameAr', ${categories.nameAr}, 'nameTr', ${categories.nameTr}
+      )), '[]'::json)
+      from ${link} inner join ${categories} on ${link.categoryId} = ${categories.id}
+      where ${resourceId} = ${id}
+    )`;
   }
 }
