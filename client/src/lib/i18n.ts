@@ -555,7 +555,7 @@ void i18n.use(initReactI18next).init({
         admissionHint:
           'Open adds members immediately. Approval lets you review each request. Automatic accepts members until capacity is full.',
         capacityOptional: 'Capacity (optional)',
-        chooseCategories: 'Choose at least one category',
+        chooseCategories: 'Choose 1 to 3 categories',
         categoriesLoadError: 'Categories could not be loaded.',
         resourceSaveError: 'The change could not be saved. Check your connection and try again.',
         savingResource: 'Saving…',
@@ -1220,7 +1220,7 @@ void i18n.use(initReactI18next).init({
         admissionHint:
           'الانضمام المفتوح يضيف الأعضاء مباشرة. الموافقة تتيح لك مراجعة كل طلب. القبول التلقائي يضيف الأعضاء حتى الامتلاء.',
         capacityOptional: 'السعة (اختيارية)',
-        chooseCategories: 'اختر فئة واحدة على الأقل',
+        chooseCategories: 'اختر من فئة إلى ثلاث فئات',
         categoriesLoadError: 'تعذر تحميل الفئات.',
         resourceSaveError: 'تعذر حفظ التغيير. تحقق من اتصالك وحاول مرة أخرى.',
         savingResource: 'جارٍ الحفظ…',

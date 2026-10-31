@@ -31,7 +31,7 @@ const formSchema = z.object({
   name: z.string().trim().min(1).max(100),
   description: z.string().trim().min(1).max(5000),
   cityId: z.string().min(1),
-  categoryIds: z.array(z.string()).min(1).max(5),
+  categoryIds: z.array(z.string()).min(1).max(3),
   admissionMode: z.enum(['open', 'approval', 'automatic']),
   capacity: z
     .string()
@@ -293,6 +293,7 @@ export function CommunityFormPage(): React.JSX.Element {
           <CategoryPicker
             error={Boolean(errors.categoryIds)}
             idPrefix="community"
+            max={3}
             onChange={(nextIds) =>
               form.setValue('categoryIds', nextIds, { shouldDirty: true, shouldValidate: true })
             }

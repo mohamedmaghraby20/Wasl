@@ -36,7 +36,7 @@ const formSchema = z
   .object({
     title: z.string().trim().min(1).max(160),
     description: z.string().trim().min(1).max(5000),
-    categoryIds: z.array(z.string()).min(1).max(5),
+    categoryIds: z.array(z.string()).min(1).max(3),
     visibility: z.enum(['public', 'unlisted']),
     startsAt: z.string().min(1),
     endsAt: z.string(),
@@ -477,6 +477,7 @@ export function EventFormPage(): React.JSX.Element {
           <CategoryPicker
             error={Boolean(errors.categoryIds)}
             idPrefix="event"
+            max={3}
             onChange={(nextIds) =>
               form.setValue('categoryIds', nextIds, { shouldDirty: true, shouldValidate: true })
             }

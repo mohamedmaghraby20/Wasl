@@ -35,10 +35,10 @@ export class CreateEventDto {
   @IsIn(['public', 'unlisted'])
   visibility?: 'public' | 'unlisted';
 
-  @ApiProperty({ type: [String], minItems: 1, maxItems: 5 })
+  @ApiProperty({ type: [String], minItems: 1, maxItems: 3 })
   @IsArray()
   @ArrayMinSize(1)
-  @ArrayMaxSize(5)
+  @ArrayMaxSize(3)
   @IsString({ each: true })
   @MaxLength(80, { each: true })
   categoryIds!: string[];

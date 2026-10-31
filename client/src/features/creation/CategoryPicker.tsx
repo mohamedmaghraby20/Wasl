@@ -8,6 +8,7 @@ import { cn } from '@/lib/cn';
 type CategoryPickerProps = {
   error?: boolean;
   idPrefix: string;
+  max: number;
   onChange: (categoryIds: string[]) => void;
   value: string[];
 };
@@ -15,6 +16,7 @@ type CategoryPickerProps = {
 export function CategoryPicker({
   error,
   idPrefix,
+  max,
   onChange,
   value,
 }: CategoryPickerProps): React.JSX.Element {
@@ -39,6 +41,7 @@ export function CategoryPicker({
         ) : null}
         {categories.data?.map((category) => {
           const checked = value.includes(category.id);
+          const atLimit = !checked && value.length >= max;
           const categoryName =
             lang === 'ar' ? category.nameAr : lang === 'tr' ? category.nameTr : category.nameEn;
           return (
@@ -48,20 +51,23 @@ export function CategoryPicker({
                 checked
                   ? 'border-primary/40 bg-primary-soft'
                   : 'border-border-control bg-surface-soft hover:border-border-control-hover',
+                atLimit && 'opacity-60',
               )}
               key={category.id}
             >
               <Checkbox
                 checked={checked}
                 className="size-3.5 rounded-xs [&_svg]:size-2.5"
+                disabled={atLimit}
                 id={`${idPrefix}-category-${category.id}`}
-                onCheckedChange={(next) =>
+                onCheckedChange={(next) => {
+                  if (next && value.length >= max) return;
                   onChange(
                     next
                       ? [...value, category.id]
                       : value.filter((idValue) => idValue !== category.id),
-                  )
-                }
+                  );
+                }}
               />
               <Label
                 className={cn(
