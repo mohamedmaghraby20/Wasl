@@ -1,0 +1,15 @@
+{
+  "runs": [
+    {
+      "date": "2026-11-01T21:14:24.982736+00:00",
+      "input_tokens": null,
+      "output_tokens": null,
+      "files": 608,
+      "token_usage_available": false,
+      "note": "Host subagent tool results did not expose token usage; session usage is not zero."
+    }
+  ],
+  "total_input_tokens": 0,
+  "total_output_tokens": 0,
+  "totals_complete": false
+}
