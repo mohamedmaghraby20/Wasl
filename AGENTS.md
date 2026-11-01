@@ -154,9 +154,25 @@ Keep these instructions useful and concise. When the user corrects an approach, 
 
 ---
 
+## Agent skills
+
+### Issue tracker
+
+Issues and specs use local Markdown under `.scratch/<feature>/`.
+See `docs/agents/issue-tracker.md`.
+
+### Domain docs
+
+Single-context: root `GLOSSARY.md` and `docs/adr/`.
+See `docs/agents/domain.md`.
+
+---
+
 ## 11. Project Learnings
 
 **Accumulated corrections. This section is for the agent to maintain, not just the human.**
+
+- Keep repo-wide agent configuration in `AGENTS.md` and keep `CLAUDE.md` as an `@AGENTS.md` reference.
 
 - Preserve the existing city dropdown styling when adding search; use the shared Input tokens and hide the scrollbar while retaining scrolling.
 - Keep date pickers compact with fixed-height month grids and viewport-aware positioning; do not enlarge calendars or force popovers outside the visible viewport.
