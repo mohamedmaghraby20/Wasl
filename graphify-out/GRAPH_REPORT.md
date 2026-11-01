@@ -875,6 +875,8 @@ Host-agent token usage is unavailable in the tool results. Internal zero placeho
 
 Detection skipped four sensitive-flagged files: `.npmrc`, `client/src/styles/tokens.css`, `docs/design/tokens.css`, and `docs/design/tokens.json`. The AST extractor reported 37 code files with no modeled symbols. Semantic extraction covers the full 184-file document/image corpus, including installed skills; these are reference material, not evidence that the application implements their recommendations.
 
+The AST metadata additionally marks 43 structured-data files as intentionally skipped and one failed source: `.opencode/skills/impeccable/scripts/data/font-index.json`. The failed file's manifest hashes are left blank so a future update retries it rather than treating it as successfully indexed.
+
 ## Graph Health
 
 WARNING: 170 dangling-endpoint edges; 11 self-loop edges; 742 collapsed directed edges; 751 collapsed undirected edges. Graph is usable, but these issues limit relationship completeness.
