@@ -20,6 +20,11 @@
 
 ## Comments
 
+### Final-review Standards P2 correction — 2026-11-02
+
+- Rejected malformed coordinate structures inside the boundary loader before its promise resolves/caches; rejection resets the cache so the next explicit location action can fetch a corrected asset. Conservative containment/boundary/accuracy behavior is unchanged.
+- Browser tracer reproduced retry stuck on Istanbul, then passed after validation: malformed first asset, valid second asset, Ankara selected without reload. Thirteen public-loader shape/recovery cases and existing geometry semantics pass. Exact commands, failures/reruns and limits are in `.scratch/homepage-discovery-enhancement/review.md`.
+
 ### Implementation and source decision — 2026-11-02
 
 - Resumed the existing partial files on `feat/homepage-03-geolocation`; queried the existing graph first. Used the spec's owner-confirmed browser seams and installed TDD instructions. Preserved the incumbent UI rather than creating a new design system; no further agents were spawned.

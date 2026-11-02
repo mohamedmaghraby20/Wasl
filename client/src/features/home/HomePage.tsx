@@ -145,7 +145,6 @@ export function HomePage(): React.JSX.Element {
             <SearchableSelect
               aria-label={cityId ? `${t('cityFilter')}: ${cityName}` : t('nationwide')}
               aria-busy={cities.isPending}
-              disabled={cities.isPending || cities.isError || !cities.data}
               emptyMessage={t('noCitiesFound')}
               id="home-city"
               onValueChange={setCityId}

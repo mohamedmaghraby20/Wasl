@@ -28,6 +28,11 @@
 
 ## Comments
 
+### Supplied final-review findings closed — 2026-11-02
+
+- Closed Standards P2 malformed-map retry/cache poisoning and Specification P2 invalid remembered-city/reference-failure recovery without a redesign. Existing translated SearchableSelect nationwide option and QueryError feedback are reused; no new UX or copy.
+- Scoped two-axis disposition, TDD red/green evidence, 57 distinct browser journeys passing across main/failure-only runs, 35 client tests, 31 local API/PostgreSQL tests, typecheck, focused lint/build and actual visual evidence/limits are recorded in `.scratch/homepage-discovery-enhancement/review.md`. This is not a claim of a new independent full-codebase review.
+
 ### Implementation and verification — 2026-11-02
 
 - Worktree `C:/Users/seif/AppData/Local/Temp/opencode/wasl-homepage-07-presentation`, branch `feat/homepage-07-presentation`. Initial tracked/untracked status was clean; HEAD and integration base were both `33d4e813a7eb62c5da938d04a2aaded516bfa25b`. Read AGENTS, spec, all seven issue histories, installed TDD instructions/references and applicable frontend guidance. Source exploration started with `graphify query "HomePage discovery sections auth returnTo signup creation event community" --budget 2400`; no graph rebuild. Owner-confirmed browser/component/API seams are recorded in the spec. No subagents or original-checkout changes/copies.

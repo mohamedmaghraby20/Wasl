@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   resolveProvinceCity,
   type ProvinceBoundary,
@@ -37,6 +37,36 @@ function square(
 function boundary(id: string, geometry: ProvinceGeometry): ProvinceBoundary {
   return { id, geometry };
 }
+
+describe('province boundary loading', () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it.each([
+    ['null polygon', { type: 'Polygon', coordinates: null }],
+    ['empty polygon', { type: 'Polygon', coordinates: [] }],
+    ['missing ring', { type: 'Polygon', coordinates: [null] }],
+    ['short ring', { type: 'Polygon', coordinates: [[[30, 39], [31, 40], [30, 39]]] }],
+    ['open ring', { type: 'Polygon', coordinates: [[[30, 39], [31, 39], [31, 40], [30, 40]]] }],
+    ['missing ordinate', { type: 'Polygon', coordinates: [[[30], ...square(30, 39, 31, 40)]] }],
+    ['nonnumeric ordinate', { type: 'Polygon', coordinates: [[['30', 39], ...square(30, 39, 31, 40)]] }],
+    ['nonfinite ordinate', { type: 'Polygon', coordinates: [[[Infinity, 39], ...square(30, 39, 31, 40)]] }],
+    ['out-of-range ordinate', { type: 'Polygon', coordinates: [square(180, 39, 181, 40)] }],
+    ['invalid hole', { type: 'Polygon', coordinates: [square(30, 39, 33, 41), []] }],
+    ['empty multipolygon', { type: 'MultiPolygon', coordinates: [] }],
+    ['invalid multipolygon part', { type: 'MultiPolygon', coordinates: [[square(30, 39, 33, 41)], null] }],
+    ['unsupported geometry', { type: 'LineString', coordinates: square(30, 39, 33, 41) }],
+  ])('rejects %s before caching and accepts a corrected download', async (_name, geometry) => {
+    vi.resetModules();
+    const { loadProvinceBoundaries } = await import('./province-boundaries');
+    vi.stubGlobal('fetch', vi.fn()
+      .mockResolvedValueOnce({ ok: true, json: () => ({ provinces: [{ id: 'ankara', geometry }] }) })
+      .mockResolvedValueOnce({ ok: true, json: () => bundled }));
+    await expect(loadProvinceBoundaries()).rejects.toThrow('malformed');
+    const provinces = await loadProvinceBoundaries();
+    expect(resolveProvinceCity(provinces, 32.8597, 39.9334)).toBe('ankara');
+    expect(resolveProvinceCity(provinces, 23.7275, 37.9838)).toBeNull();
+  });
+});
 
 describe('bundled province boundaries', () => {
   it('maps one distinct boundary to every supported Wasl city id', () => {
