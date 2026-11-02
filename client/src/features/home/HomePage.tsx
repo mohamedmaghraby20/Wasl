@@ -37,15 +37,18 @@ export function HomePage(): React.JSX.Element {
   const [query, setQuery] = useState('');
   const lang: 'ar' | 'en' = i18n.language.startsWith('ar') ? 'ar' : 'en';
   const cities = useDiscoveryControllerCities();
-  const { cityId, setCityId, selectedCity, location, requestLocation } = useHomeCity(cities.data);
+  const { cityId, restoringCity, setCityId, selectedCity, location, requestLocation } = useHomeCity(
+    cities.data,
+  );
+  const cityReady = !restoringCity || cities.isError;
   const cityName = selectedCity ? localizedName(selectedCity, i18n.language) : cityId;
   const locationBusy = location.status === 'locating' || location.status === 'resolving';
   const locationError = location.status === 'error' ? locationErrorKeys[location.error] : undefined;
   const communityFilters = { pageSize: 4, lang, order: 'member-count' as const };
-  const localCommunities = useDiscoveryControllerListCommunities({
-    ...communityFilters,
-    ...(cityId ? { city: cityId } : {}),
-  });
+  const localCommunities = useDiscoveryControllerListCommunities(
+    { ...communityFilters, ...(cityId ? { city: cityId } : {}) },
+    { query: { enabled: cityReady } },
+  );
   const communityFallback = Boolean(
     cityId && localCommunities.isSuccess && localCommunities.data.items.length === 0,
   );
@@ -64,10 +67,10 @@ export function HomePage(): React.JSX.Element {
     upcoming: true,
     nonCancelled: true,
   };
-  const localEvents = useDiscoveryControllerListEvents({
-    ...eventFilters,
-    ...(cityId ? { city: cityId } : {}),
-  });
+  const localEvents = useDiscoveryControllerListEvents(
+    { ...eventFilters, ...(cityId ? { city: cityId } : {}) },
+    { query: { enabled: cityReady } },
+  );
   const fallback = Boolean(cityId && localEvents.isSuccess && localEvents.data.items.length === 0);
   const nationwideEvents = useDiscoveryControllerListEvents(eventFilters, {
     query: { enabled: fallback },

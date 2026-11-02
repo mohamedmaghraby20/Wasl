@@ -121,6 +121,7 @@ export function useHomeCity(cities: CityPublicDto[] | undefined) {
 
   return {
     cityId,
+    restoringCity: Boolean(candidate),
     setCityId,
     selectedCity: cities?.find((city) => city.id === cityId),
     location,

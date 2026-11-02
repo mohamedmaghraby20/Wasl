@@ -45,7 +45,6 @@ async function main(): Promise<void> {
         const gate = new PrivacyGateService(database);
         let streamCalls = 0;
         let holdStream = false;
-        let streamStarted!: () => void;
         let streamGate: Promise<void> = Promise.resolve();
         const stream = {
           deactivateUser: (): Promise<void> => {
@@ -61,18 +60,21 @@ async function main(): Promise<void> {
         const listedOffsets: number[] = [];
         const removedPaths: string[] = [];
         const providerClient = {
-          auth: { admin: { deleteUser: async () => ({ error: null }) } },
+          auth: { admin: { deleteUser: () => Promise.resolve({ error: null }) } },
           storage: {
             from: () => ({
-              list: async (_path: string, options: { limit?: number; offset?: number } = {}) => {
+              list: (_path: string, options: { limit?: number; offset?: number } = {}) => {
                 const all = Array.from({ length: 205 }, (_, index) => ({ name: `photo-${index}` }));
                 const offset = options.offset ?? 0;
                 listedOffsets.push(offset);
-                return { data: all.slice(offset, offset + (options.limit ?? 100)), error: null };
+                return Promise.resolve({
+                  data: all.slice(offset, offset + (options.limit ?? 100)),
+                  error: null,
+                });
               },
-              remove: async (paths: string[]) => {
+              remove: (paths: string[]) => {
                 removedPaths.push(...paths);
-                return { error: null };
+                return Promise.resolve({ error: null });
               },
             }),
           },
@@ -374,7 +376,7 @@ async function main(): Promise<void> {
           releaseStream = () => reject(new Error('Stream provider unavailable'));
         });
         streamGate = streamPromise;
-        streamStarted = started;
+        const streamStarted = started;
         const firstRetry = providerActions.process(deletion.id, admin);
         await startedPromise;
         const secondRetry = providerActions.process(deletion.id, admin);

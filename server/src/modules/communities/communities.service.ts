@@ -7,14 +7,13 @@ import {
   NotFoundException,
   ServiceUnavailableException,
 } from '@nestjs/common';
-import { and, count, eq, inArray } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
 import { DATABASE, type Database } from '../../db/database.module';
 import {
   categories,
   cities,
   communities,
   communityCategories,
-  communityMemberships,
   profiles,
 } from '../../db/schema';
 import type { AuthenticatedUser } from '../auth/authenticated-user';
@@ -121,7 +120,7 @@ export class CommunitiesService {
           description: values.description,
           cityId: input.cityId,
           admissionMode: input.admissionMode,
-           capacity: null,
+          capacity: null,
         })
         .where(eq(communities.id, id));
       await tx.delete(communityCategories).where(eq(communityCategories.communityId, id));

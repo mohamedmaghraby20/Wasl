@@ -1,17 +1,17 @@
-# Graph Report - wasl-homepage-integration  (2026-11-02)
+# Graph Report - Wasl  (2026-11-02)
 
 ## Corpus Check
-- 579 files · ~669,120 words
+- 729 files · ~733,467 words
 - Verdict: corpus is large enough that graph structure adds value.
-- Unclassified: 54 file(s) not represented in the graph (top: .csv 37, .css 8, (none) 5)
+- Unclassified: 53 file(s) not represented in the graph (top: .csv 37, .css 8, (none) 4)
 
 ## Summary
-- 4999 nodes · 13242 edges · 233 communities (163 shown, 70 thin omitted)
-- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 404 edges (avg confidence: 0.86)
+- 5780 nodes · 13990 edges · 366 communities (240 shown, 126 thin omitted)
+- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 419 edges (avg confidence: 0.86)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `e79612ae`
+- Built from commit: `0d080c0b`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -29,7 +29,7 @@
 - Schema and Data Workflows
 - Discussions API Client
 - Discovery Contracts and Mocks
-- QueryError
+- Button
 - Server Bootstrap and Dependencies
 - Design Catalog Validation
 - Shared Client Interaction Controls
@@ -38,7 +38,7 @@
 - Messaging API Client
 - Design Output Color Coherence
 - Design Search Domain Detection
-- @nestjs/swagger
+- communities.controller.ts
 - Screenshot Capture Runtime
 - Client Runtime Dependencies
 - Privacy Review API Client
@@ -74,7 +74,7 @@
 - NotificationsController
 - Interface Design Delivery Workflows
 - Design Search Behavior Tests
-- Live Session Acceptance Lifecycle
+- showToast
 - Render Deployment Configuration
 - Participation HTTP Controller
 - province-boundaries.ts
@@ -86,7 +86,7 @@
 - Continuous Integration Verification
 - Manual Edit Review State
 - Privacy and Legal Schema
-- community-actions-http.spec.ts
+- OrganizationManagePage.tsx
 - Messaging HTTP Controller
 - Moderation API Mocks
 - Live Browser DOM Helpers
@@ -94,11 +94,11 @@
 - Identity and Organization Schema
 - Svelte Live Injection Anchors
 - Release Security Integration Harness
-- database.module.ts
-- Deletion and Messaging Workers
+- drizzle-orm
+- CommunityDeletionService
 - Sitemap and Crawler Generation
 - Health API Client
-- Platform Moderation Dashboard
+- PlatformModerationPage.tsx
 - Notifications API Client
 - Shared Package Configuration
 - Vite and Showcase Configuration
@@ -113,7 +113,7 @@
 - Messaging Request Response Contracts
 - Shared TypeScript Compiler Options
 - Client Package Scripts
-- Community Topic Page
+- Issue tracker: GitHub
 - Community API Mocks
 - Discussion Storage Schema
 - Interface Audits and Adaptation
@@ -127,7 +127,7 @@
 - Server TypeScript Configuration
 - Shadcn Composition and Design Systems
 - Design Contrast and State Showcase
-- Privacy Export API Client
+- teach/SKILL.md
 - Accepted Session Cleanup
 - Tooling TypeScript Configuration
 - Messaging Conversation Storage
@@ -152,17 +152,17 @@
 - NestJS CLI Configuration
 - Frontend Design Principles
 - Homepage Discovery Enhancement
-- .update
+- Process
 - Live variant editing
 - Design Search CLI Flag Tests
 - Retrieval Metric Mathematics
 - Community Cover Asset Catalog
-- Homepage final review — P2 corrections
+- Triage
 - Wasl — Project Handoff
 - Prettier Formatting Configuration
 - Server Build TypeScript Configuration
 - Reference Category City Schema
-- Database Connection Lifecycle
+- Codebase Design
 - Shared Health and Pagination Contracts
 - Dual-assessment design critique
 - Postgres Search and Index Guidance
@@ -171,14 +171,14 @@
 - Postgres Transaction and Foreign Keys
 - Design Asset Production Review
 - Retrieval Fixture Validation
-- Privacy Retry API Client
+- During the session
 - Phase 6 native discussions, realtime chat and engagement
-- Privacy Cancellation API Client
-- Privacy Request Creation Client
+- HTML Report Format
+- template.sh
 - Public Communities and public or direct-link-only Unlisted Events
 - Comments
 - Messaging Sync and Block Schema
-- showcase-coverage.mjs
+- Steps
 - Phase 8 local hardening versus incomplete release acceptance
 - Accessible Field State Composition
 - Supabase Scoped Access Tokens
@@ -192,7 +192,7 @@
 - Notification Delivery Storage Schema
 - Comments
 - Domain Docs
-- Comments
+- onAnnotDown
 - Shadcn Small Logo
 - Chat Tool Output Presentation
 - Postgres Security Guidance History
@@ -217,10 +217,10 @@
 - Shadcn Logo Asset
 - Component Object Icon Passing
 - Web Interface Guidelines Review
-- messagingControllerConversations
+- Quick Reference
 - Public Crawler Exclusions
 - messagingControllerSession
-- getPrivacyAdminControllerDecideMutationOptions
+- PrivacyGateService
 - Issue tracker: Local Markdown
 - Approved technology baseline, not proof of installed dependencies
 - Comments
@@ -231,28 +231,151 @@
 - getMessagingControllerUnblockMutationOptions
 - 05: Nationwide online-event discovery
 - README.md
+- Ask Matt
+- Diagnosing Bugs
+- Steps
+- Test-Driven Development
+- Process
+- writing-for-agents/SKILL.md
+- Sections
+- wayfinder/SKILL.md
+- Migrate to Shoehorn
+- startVoice
+- Steps
+- Scaffold Exercises
+- to-spec/SKILL.md
+- home-geolocation.spec.ts
+- Process
+- <Questionnaire title>
+- writing-shape/SKILL.md
+- chief-of-staff/SKILL.md
+- Process
+- interface
+- interface
+- interface
+- interface
+- interface
+- interface
+- interface
+- interface
+- interface
+- interface
+- Sections
+- interface
+- interface
+- interface
+- interface
+- interface
+- interface
+- interface
+- interface
+- interface
+- interface
+- interface
+- writing-beats/SKILL.md
+- interface
+- interface
+- home-location.spec.ts
+- Homepage discovery — final closure
+- loop-me/SKILL.md
+- home-interests.spec.ts
+- interface
+- interface
+- interface
+- hitl-loop.template.sh
+- interface
+- interface
+- interface
+- interface
+- interface
+- interface
+- interface
+- interface
+- interface
+- interface
+- GLOSSARY.md Format
+- interface
+- interface
+- writing-fragments/SKILL.md
+- home-communities.spec.ts
+- getMessagingControllerDirectMessageMutationOptions
+- getOrganizationsControllerAcceptAdminInvitationMutationOptions
+- getOrganizationsControllerCreateAdminInvitationMutationOptions
+- getOrganizationsControllerCreateMutationOptions
+- getOrganizationsControllerDecideVerificationMutationOptions
+- getOrganizationsControllerRemoveAdminMutationOptions
+- getOrganizationsControllerRequestVerificationMutationOptions
+- getOrganizationsControllerRevokeAdminInvitationMutationOptions
+- getOrganizationsControllerTransferOwnershipMutationOptions
+- getOrganizationsControllerUpdateMutationOptions
+- Implement Health Checks for Microservices
+- 01: Image-led resource cards and event availability
+- block-dangerous-git.sh
+- implement-spec/SKILL.md
+- api-use-dto-serialization.md
+- api-use-interceptors.md
+- api-use-pipes.md
+- api-versioning.md
+- arch-avoid-circular-deps.md
+- arch-feature-modules.md
+- arch-module-sharing.md
+- arch-single-responsibility.md
+- arch-use-events.md
+- arch-use-repository-pattern.md
+- db-avoid-n-plus-one.md
+- db-use-migrations.md
+- db-use-transactions.md
+- devops-graceful-shutdown.md
+- devops-use-config-module.md
+- devops-use-logging.md
+- di-avoid-service-locator.md
+- di-interface-segregation.md
+- di-liskov-substitution.md
+- di-prefer-constructor-injection.md
+- di-scope-awareness.md
+- di-use-interfaces-tokens.md
+- error-handle-async-errors.md
+- error-throw-http-exceptions.md
+- error-use-exception-filters.md
+- micro-use-patterns.md
+- micro-use-queues.md
+- perf-async-hooks.md
+- perf-lazy-loading.md
+- perf-optimize-database.md
+- perf-use-caching.md
+- security-auth-jwt.md
+- security-rate-limiting.md
+- security-sanitize-output.md
+- security-use-guards.md
+- security-validate-all-input.md
+- _template.md
+- test-e2e-supertest.md
+- test-mock-external-services.md
+- test-use-testing-module.md
+- CREDITS.md
+- HealthResponseDto
 
 ## God Nodes (most connected - your core abstractions)
 1. `waslFetch()` - 114 edges
 2. `react-i18next` - 100 edges
-3. `getAuthenticatedUser()` - 89 edges
+3. `getAuthenticatedUser()` - 90 edges
 4. `react-router` - 80 edges
 5. `@nestjs/common` - 78 edges
 6. `Database` - 78 edges
 7. `AuthenticatedUser` - 78 edges
 8. `Button()` - 74 edges
 9. `react` - 64 edges
-10. `lucide-react` - 60 edges
+10. `cn()` - 62 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `Implementation and verification — ticket 06` --references--> `HomeInterests()`  [INFERRED]
   .scratch/homepage-discovery-enhancement/issues/06-content-backed-interest-browsing.md → client/src/features/home/HomeInterests.tsx
-- `Implementation and verification — 2026-11-02` --references--> `CommunityEvents()`  [INFERRED]
-  .scratch/homepage-discovery-enhancement/issues/01-image-led-resource-cards-and-event-availability.md → client/src/features/discovery/CommunityEvents.tsx
-- `Standards P2 — malformed geometry poisons the boundary cache — resolved` --references--> `loadProvinceBoundaries()`  [INFERRED]
-  .scratch/homepage-discovery-enhancement/review.md → client/src/features/home/province-boundaries.ts
-- `Standards P2 — malformed geometry poisons the boundary cache — resolved` --references--> `nearBoundary()`  [INFERRED]
-  .scratch/homepage-discovery-enhancement/review.md → client/src/features/home/province-boundaries.ts
+- `8. API Design — DTOs and OpenAPI exist; response DTOs are documentation-only (medium)` --references--> `DiscoveryController`  [INFERRED]
+  docs/BACKEND_REVIEW.md → server/src/modules/discovery/discovery.controller.ts
+- `9. Microservices / integrations — adapters and queues exist; resilience is uneven (medium/high)` --references--> `NotificationEmailWorker`  [INFERRED]
+  docs/BACKEND_REVIEW.md → server/src/modules/notifications/notification-email.worker.ts
+- `Steps` --references--> `check()`  [INFERRED]
+  .agents/skills/retro/SKILL.md → .opencode/skills/impeccable/scripts/live-browser.js
 - `Final integration merge verification — 2026-11-02` --references--> `useHomeCity()`  [INFERRED]
   .scratch/homepage-discovery-enhancement/issues/04-member-ranked-community-discovery.md → client/src/features/home/useHomeCity.ts
 
@@ -268,79 +391,79 @@
 - **Comp-led asset production, human calibration and independent fidelity review** — _opencode_skills_impeccable_reference_component_review_component_review, _opencode_skills_impeccable_reference_component_review_first_viewport_review, _opencode_skills_impeccable_reference_degraded_asset_producer_asset_producer, _opencode_skills_impeccable_reference_degraded_finish_reviewer_finish_reviewer [INFERRED 0.95]
 - **Product capacity rules, authoritative server transaction and row-lock verification form participation correctness** — docs_context_01_product_admission_invariants, docs_context_02_architecture_authoritative_participation, docs_phases_phase_4_capacity_locking [INFERRED 0.95]
 
-## Communities (233 total, 70 thin omitted)
+## Communities (366 total, 126 thin omitted)
 
 ### Community 0 - "Live Browser Design Canvas"
 Cohesion: 0.03
-Nodes (137): applyGlobalBarLabelState(), applyLiveBarPreference(), applyPlaceholderDimensions(), applyPlaceholderSizingStyles(), averageRgb01(), beginEditPin(), bindEditBadgeProxy(), bufferToBase64() (+129 more)
+Nodes (120): applyGlobalBarLabelState(), applyLiveBarPreference(), applyParamValue(), applyPlaceholderSizingStyles(), averageRgb01(), bindEditBadgeProxy(), bufferToBase64(), buildCollapsible() (+112 more)
 
 ### Community 1 - "Resource Pages and Participation"
-Cohesion: 0.06
-Nodes (69): sonner@2.0.7, useCommunitiesControllerArchive(), useCommunitiesControllerRemove(), getDiscoveryControllerCommunityQueryKey(), getDiscoveryControllerCommunityQueryOptions(), getDiscoveryControllerEventQueryKey(), getDiscoveryControllerEventQueryOptions(), getDiscoveryControllerListCommunitiesQueryKey() (+61 more)
+Cohesion: 0.07
+Nodes (77): getCommunitiesControllerMineQueryKey(), getCommunitiesControllerMineQueryOptions(), useCommunitiesControllerArchive(), useCommunitiesControllerMine(), useCommunitiesControllerRemove(), getDiscoveryControllerCommunityQueryKey(), getDiscoveryControllerEventQueryKey(), getDiscoveryControllerListCommunitiesQueryKey() (+69 more)
 
 ### Community 2 - "React Forms and Controls"
-Cohesion: 0.05
-Nodes (102): ApiError, useCommunitiesControllerCreate(), useCommunitiesControllerUpdate(), useDiscoveryControllerCities(), useEventsControllerCreate(), useEventsControllerUpdate(), getOrganizationsControllerListAdminInvitationsQueryKey(), getOrganizationsControllerListAdminInvitationsQueryOptions() (+94 more)
+Cohesion: 0.07
+Nodes (72): useCommunitiesControllerCreate(), useCommunitiesControllerUpdate(), useDiscoveryControllerCities(), useEventsControllerCreate(), useEventsControllerUpdate(), useOrganizationsControllerCreate(), useOrganizationsControllerUpdate(), usePrivacyControllerAccept() (+64 more)
 
 ### Community 3 - "Participation API Client"
 Cohesion: 0.03
 Nodes (103): getParticipationControllerCancelEventRegistrationMutationKey(), getParticipationControllerCancelEventRegistrationMutationOptions(), getParticipationControllerCancelEventRegistrationUrl(), getParticipationControllerCommunityCountsQueryKey(), getParticipationControllerCommunityCountsQueryOptions(), getParticipationControllerCommunityCountsUrl(), getParticipationControllerCommunityDecisionMutationKey(), getParticipationControllerCommunityDecisionMutationOptions() (+95 more)
 
 ### Community 4 - "Organizations API Client"
-Cohesion: 0.02
-Nodes (105): getOrganizationsControllerAcceptAdminInvitationMutationKey(), getOrganizationsControllerAcceptAdminInvitationMutationOptions(), getOrganizationsControllerAcceptAdminInvitationUrl(), getOrganizationsControllerCreateAdminInvitationMutationKey(), getOrganizationsControllerCreateAdminInvitationMutationOptions(), getOrganizationsControllerCreateAdminInvitationUrl(), getOrganizationsControllerCreateMutationKey(), getOrganizationsControllerCreateMutationOptions() (+97 more)
+Cohesion: 0.03
+Nodes (68): getOrganizationsControllerListAdminInvitationsUrl(), getOrganizationsControllerListManagersUrl(), getOrganizationsControllerListPendingVerificationRequestsUrl(), getOrganizationsControllerListVerificationRequestsUrl(), getOrganizationsControllerMineUrl(), getOrganizationsControllerPublicProfileUrl(), OrganizationsControllerAcceptAdminInvitationMutationBody, OrganizationsControllerAcceptAdminInvitationMutationError (+60 more)
 
 ### Community 5 - "Client Routing and Localization"
 Cohesion: 0.05
-Nodes (72): AppProviders(), head, AuthPage(), safeReturnPath(), authMocks, LocationOutput(), renderPage(), authErrorMessage() (+64 more)
+Nodes (67): ApiError, AppProviders(), head, AuthPage(), safeReturnPath(), authMocks, LocationOutput(), renderPage() (+59 more)
 
 ### Community 6 - "Organization Domain Services"
 Cohesion: 0.06
-Nodes (29): OrganizationsController, AcceptedOrganizationAdminInvitationDto, AcceptOrganizationAdminInvitationDto, CreatedOrganizationAdminInvitationDto, CreateOrganizationAdminInvitationDto, CreateOrganizationDto, DecidedOrganizationVerificationDto, DecideOrganizationVerificationDto (+21 more)
+Nodes (28): OrganizationsController, AcceptedOrganizationAdminInvitationDto, AcceptOrganizationAdminInvitationDto, CreatedOrganizationAdminInvitationDto, CreateOrganizationAdminInvitationDto, CreateOrganizationDto, DecidedOrganizationVerificationDto, DecideOrganizationVerificationDto (+20 more)
 
 ### Community 7 - "Privacy Requests and Providers"
-Cohesion: 0.06
+Cohesion: 0.05
 Nodes (28): PrivacyAdminController, PrivacyController, ACCEPTABLE_DOCUMENT_TYPES, AcceptDocumentDto, AcceptedDocumentDto, AdminAgeEligibilityDto, AdminPrivacyRequestDto, CreatePrivacyRequestDto (+20 more)
 
 ### Community 8 - "Database Access and Domains"
 Cohesion: 0.06
-Nodes (21): dotenv, pg, Database, AccountStatus, fastify, FastifyRequest, CommunitiesService, user (+13 more)
+Nodes (36): dotenv, drizzle-orm, pg, DATABASE, Database, PROVIDER_DATABASE, communities, communityMemberships (+28 more)
 
 ### Community 9 - "Live Session Recovery"
 Cohesion: 0.06
-Nodes (90): abortSvelteComponentInjection(), applyParamDefaults(), applyParamValue(), applySavedSessionMeta(), buildParamsPanel(), captureAndEmit(), checkpointPayload(), cleanup() (+82 more)
+Nodes (89): applyParamDefaults(), applyPlaceholderDimensions(), applySavedSessionMeta(), buildCyclingRow(), clampVariantIndex(), clearHandled(), closedClipPath(), commitAcceptedVariantToDom() (+81 more)
 
 ### Community 10 - "Schema and Data Workflows"
-Cohesion: 0.07
-Nodes (69): drizzle-orm, buildDevelopmentSeed(), capacities, communityHistory(), eventHistory(), places, sampleOwnerEmail, sampleOwnerId (+61 more)
+Cohesion: 0.06
+Nodes (61): buildDevelopmentSeed(), capacities, communityHistory(), eventHistory(), places, sampleOwnerEmail, sampleOwnerId, seedId() (+53 more)
 
 ### Community 11 - "Discussions API Client"
 Cohesion: 0.03
-Nodes (87): communityDiscussionsControllerClose(), CommunityDiscussionsControllerCloseMutationError, CommunityDiscussionsControllerCloseMutationResult, CommunityDiscussionsControllerCloseMutationVariables, communityDiscussionsControllerCreate(), CommunityDiscussionsControllerCreateMutationBody, CommunityDiscussionsControllerCreateMutationError, CommunityDiscussionsControllerCreateMutationResult (+79 more)
+Nodes (91): communityDiscussionsControllerClose(), CommunityDiscussionsControllerCloseMutationError, CommunityDiscussionsControllerCloseMutationResult, CommunityDiscussionsControllerCloseMutationVariables, communityDiscussionsControllerCreate(), CommunityDiscussionsControllerCreateMutationBody, CommunityDiscussionsControllerCreateMutationError, CommunityDiscussionsControllerCreateMutationResult (+83 more)
 
 ### Community 12 - "Discovery Contracts and Mocks"
 Cohesion: 0.03
 Nodes (66): AcceptDocumentDtoDocumentType, AcceptedDocumentDto, AcceptedOrganizationAdminInvitationDtoRole, AdminAgeEligibilityDtoStatus, AdminPrivacyRequestDtoRequestType, AdminPrivacyRequestDtoStatus, CommunityActivityItemDto, CommunityActivityItemDtoStatus (+58 more)
 
-### Community 13 - "QueryError"
-Cohesion: 0.13
-Nodes (31): useDiscoveryControllerCategories(), useDiscoveryControllerDiscoveryCategories(), useDiscoveryControllerListCommunities(), useDiscoveryControllerListEvents(), withQueryKey(), CommunityPublicDto, EventPublicDto, QueryError() (+23 more)
+### Community 13 - "Button"
+Cohesion: 0.09
+Nodes (49): useDiscoveryControllerCategories(), useDiscoveryControllerDiscoveryCategories(), useDiscoveryControllerListCommunities(), useDiscoveryControllerListEvents(), withQueryKey(), CommunityPublicDto, EventPublicDto, RouteErrorBoundary() (+41 more)
 
 ### Community 14 - "Server Bootstrap and Dependencies"
 Cohesion: 0.05
-Nodes (50): class-transformer, drizzle-kit, @fastify/helmet, @nestjs/cli, @nestjs/terminus, @nestjs/throttler, rxjs, @swc/cli (+42 more)
+Nodes (48): class-transformer, drizzle-kit, @fastify/helmet, @nestjs/cli, @nestjs/terminus, rxjs, @swc/cli, @swc/core (+40 more)
 
 ### Community 15 - "Design Catalog Validation"
 Cohesion: 0.06
 Nodes (44): read_rows(), TestAccessibilityGuidance, TestChartsTypographyAndIcons, TestCurrentReactGuidance, TestSemanticColors, TestGeneratedCatalogContract, _catalog_date(), _check_app_interface_contract() (+36 more)
 
 ### Community 16 - "Shared Client Interaction Controls"
-Cohesion: 0.08
-Nodes (53): authenticatedRoutePaths, requiresAuthentication(), accountLinks, Brand(), navItemClass(), primaryLinks, RootLayout(), AppFooter() (+45 more)
+Cohesion: 0.09
+Nodes (40): authenticatedRoutePaths, requiresAuthentication(), accountLinks, Brand(), navItemClass(), primaryLinks, RootLayout(), AppFooter() (+32 more)
 
 ### Community 17 - "Discussion Domain Services"
-Cohesion: 0.09
-Nodes (15): CommunityDiscussionsController, DiscussionsController, CommunityTopicDetailsDto, CommunityTopicDto, CommunityTopicPageDto, CreateCommunityTopicDto, CreateDiscussionPostDto, DiscussionPostDto (+7 more)
+Cohesion: 0.06
+Nodes (33): 10. DevOps & deployment — useful config and shutdown setup; startup/config parity to resolve (medium), 1. Architecture — strong foundation; verify module boundaries (low/medium), 2. Dependency injection — good patterns; optional DB weakening startup guarantees (medium), 4. Security — strong base; close input-validation and deployment gaps (high), 5. Performance — bounded lists; review query scaling and background scans (medium), 6. Testing — broad suite; improve integration and concurrency confidence (medium), 8. API Design — DTOs and OpenAPI exist; response DTOs are documentation-only (medium), 9. Microservices / integrations — adapters and queues exist; resilience is uneven (medium/high) (+25 more)
 
 ### Community 18 - "Design Reasoning Contracts"
 Cohesion: 0.06
@@ -348,7 +471,7 @@ Nodes (13): DesignSystemGenerator, _resolve_dial(), apply_decision_rules(), _obj
 
 ### Community 19 - "Messaging API Client"
 Cohesion: 0.06
-Nodes (37): getMessagingControllerBlockedUsersUrl(), getMessagingControllerDirectMessageMutationKey(), getMessagingControllerDirectMessageMutationOptions(), getMessagingControllerDirectMessageUrl(), messagingControllerBlockedUsers(), MessagingControllerBlockedUsersQueryError, MessagingControllerBlockedUsersQueryResult, MessagingControllerBlockMutationBody (+29 more)
+Nodes (36): getMessagingControllerBlockedUsersUrl(), getMessagingControllerConversationsQueryOptions(), getMessagingControllerConversationsUrl(), messagingControllerBlockedUsers(), MessagingControllerBlockedUsersQueryError, MessagingControllerBlockedUsersQueryResult, MessagingControllerBlockMutationBody, MessagingControllerBlockMutationError (+28 more)
 
 ### Community 20 - "Design Output Color Coherence"
 Cohesion: 0.05
@@ -358,9 +481,9 @@ Nodes (21): ansi_ljust(), _button_outline_text_color(), _contrast_ratio(), _deri
 Cohesion: 0.05
 Nodes (26): _contains_phrase(), detect_domain(), _domain_keywords(), _exact_match_diagnostic(), _exact_row_identity(), _exact_stack_identifier(), _file_signature(), _legacy_successor_guidance() (+18 more)
 
-### Community 22 - "@nestjs/swagger"
-Cohesion: 0.08
-Nodes (17): class-validator, @nestjs/swagger, CreateCommunityDto, CreatedResourceDto, DeleteCommunityDto, DeletedCommunityDto, ManagedCommunityDto, UpdateCommunityDto (+9 more)
+### Community 22 - "communities.controller.ts"
+Cohesion: 0.15
+Nodes (6): CreateCommunityDto, CreatedResourceDto, DeleteCommunityDto, DeletedCommunityDto, ManagedCommunityDto, UpdateCommunityDto
 
 ### Community 23 - "Screenshot Capture Runtime"
 Cohesion: 0.09
@@ -368,51 +491,51 @@ Nodes (53): ae(), be(), bt(), Ce(), Ct(), de(), dt(), _e() (+45 more)
 
 ### Community 24 - "Client Runtime Dependencies"
 Cohesion: 0.05
-Nodes (55): dependencies, class-variance-authority@0.7.1, clsx@2.1.1, @hookform/resolvers@5.2.1, i18next@25.5.2, lucide-react@0.544.0, @radix-ui/react-alert-dialog@1.2.1, @radix-ui/react-checkbox@1.4.1 (+47 more)
+Nodes (56): dependencies, class-variance-authority@0.7.1, clsx@2.1.1, @hookform/resolvers@5.2.1, i18next@25.5.2, lucide-react@0.544.0, @radix-ui/react-alert-dialog@1.2.1, @radix-ui/react-checkbox@1.4.1 (+48 more)
 
 ### Community 25 - "Privacy Review API Client"
-Cohesion: 0.04
-Nodes (66): getPrivacyAdminControllerReviewAgeMutationKey(), getPrivacyAdminControllerReviewAgeMutationOptions(), getPrivacyAdminControllerReviewAgeUrl(), getPrivacyControllerAcceptMutationKey(), getPrivacyControllerAcceptMutationOptions(), getPrivacyControllerAcceptUrl(), getPrivacyControllerDeclareAgeMutationKey(), getPrivacyControllerDeclareAgeMutationOptions() (+58 more)
+Cohesion: 0.03
+Nodes (99): getPrivacyAdminControllerDecideMutationKey(), getPrivacyAdminControllerDecideMutationOptions(), getPrivacyAdminControllerDecideUrl(), getPrivacyAdminControllerListUrl(), getPrivacyAdminControllerRetentionQueryKey(), getPrivacyAdminControllerRetentionQueryOptions(), getPrivacyAdminControllerRetentionUrl(), getPrivacyAdminControllerRetryMutationKey() (+91 more)
 
 ### Community 26 - "Design Search Tooling"
 Cohesion: 0.06
 Nodes (11): _detect_page_type(), format_page_override_md(), generate_design_system(), _generate_intelligent_overrides(), persist_design_system(), safe_slug(), _write_persisted_file(), format_output() (+3 more)
 
 ### Community 27 - "NestJS Application Modules"
-Cohesion: 0.09
-Nodes (25): @nestjs/common, @nestjs/config, HealthModule, Environment, environmentSchema, optionalText, validateEnvironment(), AuthModule (+17 more)
+Cohesion: 0.10
+Nodes (22): HealthModule, Environment, environmentSchema, optionalText, validateEnvironment(), AuthModule, SUPABASE_AUTH_CLIENT, CommunitiesModule (+14 more)
 
 ### Community 28 - "Live Configuration Toolbar"
 Cohesion: 0.08
-Nodes (54): actionLabel(), applyConfigureBarChrome(), bindConfigureCountPillTooltip(), bindConfigureInlineControlHover(), bindConfigureModifierPillHover(), buildConfigureActionControl(), buildConfigureCountControl(), buildConfigureRow() (+46 more)
+Nodes (46): actionLabel(), bindConfigureCountPillTooltip(), bindConfigureInlineControlHover(), bindConfigureModifierPillHover(), buildConfigureActionControl(), buildConfigureCountControl(), buildConfigureRow(), buildConfigureSubmitButton() (+38 more)
 
 ### Community 29 - "Live Voice and Chat"
-Cohesion: 0.08
-Nodes (54): agentHasWorkInFlight(), armPageChatForTyping(), attachSteerFocusDebug(), attachSteerFocusGuard(), buildSteerProcessingDots(), buildSteerQueueHint(), clearSteerAwaitTimer(), clearSteerFocusRecoverTimer() (+46 more)
+Cohesion: 0.09
+Nodes (46): agentHasWorkInFlight(), armPageChatForTyping(), attachSteerFocusDebug(), attachSteerFocusGuard(), buildSteerProcessingDots(), buildSteerQueueHint(), clearSteerAwaitTimer(), clearSteerFocusRecoverTimer() (+38 more)
 
 ### Community 30 - "Conversations and Confirmation Dialogs"
-Cohesion: 0.06
-Nodes (69): getCommunityDiscussionsControllerListQueryKey(), getCommunityDiscussionsControllerListQueryOptions(), getDiscussionsControllerListEventPostsQueryKey(), getDiscussionsControllerListEventPostsQueryOptions(), useCommunityDiscussionsControllerCreate(), useCommunityDiscussionsControllerList(), useDiscussionsControllerClose(), useDiscussionsControllerCreateEventPost() (+61 more)
+Cohesion: 0.07
+Nodes (50): getCommunityDiscussionsControllerListQueryKey(), getCommunityDiscussionsControllerListQueryOptions(), getDiscussionsControllerListEventPostsQueryKey(), getDiscussionsControllerListEventPostsQueryOptions(), useCommunityDiscussionsControllerCreate(), useCommunityDiscussionsControllerList(), useDiscussionsControllerClose(), useDiscussionsControllerCreateEventPost() (+42 more)
 
 ### Community 31 - "Discovery Search and Filtering"
 Cohesion: 0.06
-Nodes (42): discoveryControllerCategories(), DiscoveryControllerCategoriesQueryError, DiscoveryControllerCategoriesQueryResult, discoveryControllerCities(), DiscoveryControllerCitiesQueryError, DiscoveryControllerCitiesQueryResult, discoveryControllerCommunity(), DiscoveryControllerCommunityQueryError (+34 more)
+Nodes (44): discoveryControllerCategories(), DiscoveryControllerCategoriesQueryError, DiscoveryControllerCategoriesQueryResult, discoveryControllerCities(), DiscoveryControllerCitiesQueryError, DiscoveryControllerCitiesQueryResult, discoveryControllerCommunity(), DiscoveryControllerCommunityQueryError (+36 more)
 
 ### Community 32 - "Moderation API Client"
 Cohesion: 0.05
-Nodes (52): getModerationControllerDecideMutationKey(), getModerationControllerDecideMutationOptions(), getModerationControllerDecideUrl(), getModerationControllerListUrl(), getModerationControllerReportMutationKey(), getModerationControllerReportMutationOptions(), getModerationControllerReportUrl(), getModeratorAssignmentsControllerAssignMutationKey() (+44 more)
+Nodes (51): getModerationControllerDecideMutationKey(), getModerationControllerDecideMutationOptions(), getModerationControllerDecideUrl(), getModerationControllerListUrl(), getModerationControllerReportMutationKey(), getModerationControllerReportMutationOptions(), getModerationControllerReportUrl(), getModeratorAssignmentsControllerAssignMutationKey() (+43 more)
 
 ### Community 33 - "Workspace Scripts and Linting"
 Cohesion: 0.05
 Nodes (47): devDependencies, eslint@9.35.0, eslint-import-resolver-typescript@4.3.5, @eslint/js@9.35.0, eslint-plugin-import@2.32.0, eslint-plugin-jsx-a11y@6.10.2, eslint-plugin-react-hooks@5.2.0, prettier@3.6.2 (+39 more)
 
 ### Community 34 - "Live Browser Initialization"
-Cohesion: 0.07
-Nodes (47): agentStatusText(), barPaletteForTheme(), brandMarkSvg(), buildDesignHeader(), cursorForInsertAxis(), designPanelCss(), detectPageTheme(), own() (+39 more)
+Cohesion: 0.08
+Nodes (41): agentStatusText(), barPaletteForTheme(), brandMarkSvg(), buildDesignHeader(), buildParamsPanel(), cursorForInsertAxis(), designPanelCss(), detectPageTheme() (+33 more)
 
 ### Community 35 - "Live Editing Interaction State"
 Cohesion: 0.12
-Nodes (47): beginNewLiveConfiguration(), cancelEditing(), cancelEditingToPicking(), cancelInsertConfigure(), cleanupAcceptedSession(), clearAnnotations(), clearInsertPicking(), clearScrollY() (+39 more)
+Nodes (58): abortSvelteComponentInjection(), applyEditing(), beginNewLiveConfiguration(), cancelEditing(), cancelEditingToPicking(), cancelInsertConfigure(), cleanup(), cleanupAcceptedSession() (+50 more)
 
 ### Community 36 - "Launch legal, privacy and age decision register v0.2: not legally approved"
 Cohesion: 0.18
@@ -427,8 +550,8 @@ Cohesion: 0.13
 Nodes (11): AuthenticatedUser, countStatuses(), ParticipationService, assertCommunityTransition(), assertEventTransition(), CommunityStatus, communityTransitions, EventStatus (+3 more)
 
 ### Community 39 - "Users API and Mocks"
-Cohesion: 0.06
-Nodes (44): getUsersControllerCurrentUrl(), getUsersControllerPublicProfileQueryKey(), getUsersControllerPublicProfileQueryOptions(), getUsersControllerPublicProfileUrl(), getUsersControllerSearchQueryKey(), getUsersControllerSearchQueryOptions(), getUsersControllerSearchUrl(), getUsersControllerUpdateMutationKey() (+36 more)
+Cohesion: 0.07
+Nodes (43): getUsersControllerCurrentQueryOptions(), getUsersControllerCurrentUrl(), getUsersControllerPublicProfileQueryKey(), getUsersControllerPublicProfileQueryOptions(), getUsersControllerPublicProfileUrl(), getUsersControllerSearchQueryKey(), getUsersControllerSearchQueryOptions(), getUsersControllerSearchUrl() (+35 more)
 
 ### Community 40 - "Organization API Mocks"
 Cohesion: 0.08
@@ -439,12 +562,12 @@ Cohesion: 0.08
 Nodes (43): CommunityMemberDto, CommunityMemberPreviewDto, MembershipStateDto, MyActivityDto, ParticipantListItemDto, ParticipationCountsDto, ParticipationDecisionDto, RegistrationStateDto (+35 more)
 
 ### Community 42 - "Event Management Services"
-Cohesion: 0.08
-Nodes (3): slugPart(), CreateEventDto, slugPart()
+Cohesion: 0.07
+Nodes (3): EventsController, CreateEventDto, slugPart()
 
 ### Community 43 - "Inline Document Editing"
-Cohesion: 0.06
-Nodes (43): addManualContextText(), applyEditing(), buildLocatorForLeaf(), canRestoreManualEditElement(), collectEditableTextRows(), visit(), collectManualContextPieces(), walk() (+35 more)
+Cohesion: 0.07
+Nodes (36): addManualContextText(), canRestoreManualEditElement(), collectEditableTextRows(), visit(), collectManualContextPieces(), walk(), contextElementForManualEdit(), copyEditContainerContext() (+28 more)
 
 ### Community 44 - "Product Architecture and Phases"
 Cohesion: 0.07
@@ -452,10 +575,10 @@ Nodes (24): Public Communities, Public and Unlisted Events, docs/launch-decision
 
 ### Community 45 - "Communities API Client"
 Cohesion: 0.06
-Nodes (42): communitiesControllerArchive(), CommunitiesControllerArchiveMutationError, CommunitiesControllerArchiveMutationResult, CommunitiesControllerArchiveMutationVariables, communitiesControllerCreate(), CommunitiesControllerCreateMutationBody, CommunitiesControllerCreateMutationError, CommunitiesControllerCreateMutationResult (+34 more)
+Nodes (40): communitiesControllerArchive(), CommunitiesControllerArchiveMutationError, CommunitiesControllerArchiveMutationResult, CommunitiesControllerArchiveMutationVariables, communitiesControllerCreate(), CommunitiesControllerCreateMutationBody, CommunitiesControllerCreateMutationError, CommunitiesControllerCreateMutationResult (+32 more)
 
 ### Community 46 - "User Profile Domain Services"
-Cohesion: 0.11
+Cohesion: 0.10
 Nodes (3): UsersController, UpdateProfileDto, UsersService
 
 ### Community 47 - "Moderation Domain Services"
@@ -468,7 +591,7 @@ Nodes (5): directMessagePair(), providerChannelId(), providerUserId(), Messaging
 
 ### Community 49 - "Mock Service Worker Setup"
 Cohesion: 0.10
-Nodes (26): @faker-js/faker@10.6.0, msw@2.11.2, CreatedResourceDto, HealthResponseDto, ReadinessResponseDto, getEventsControllerCancelMockHandler(), getEventsControllerCancelResponseMock(), getEventsControllerCreateMockHandler() (+18 more)
+Nodes (26): @faker-js/faker@10.6.0, CreatedResourceDto, NotificationDto, ReadinessResponseDto, ReadNotificationDto, getEventsControllerCancelMockHandler(), getEventsControllerCancelResponseMock(), getEventsControllerCreateMockHandler() (+18 more)
 
 ### Community 50 - "Privacy API Mocks"
 Cohesion: 0.11
@@ -480,31 +603,31 @@ Nodes (5): DiscoveryController, listingQuery(), main(), createController(), Quer
 
 ### Community 52 - "Client Development Dependencies"
 Cohesion: 0.06
-Nodes (30): devDependencies, @chromatic-com/storybook@4.1.0, jest-axe@10.0.0, jsdom@26.1.0, orval@8.43.0, storybook@9.1.5, @storybook/addon-a11y@9.1.5, @storybook/addon-vitest@9.1.5 (+22 more)
+Nodes (31): devDependencies, @chromatic-com/storybook@4.1.0, jest-axe@10.0.0, jsdom@26.1.0, msw@2.11.2, orval@8.43.0, storybook@9.1.5, @storybook/addon-a11y@9.1.5 (+23 more)
 
 ### Community 53 - "Discussion API Mocks"
 Cohesion: 0.12
 Nodes (29): CommunityTopicDetailsDto, CommunityTopicDto, CommunityTopicPageDto, DiscussionPostDto, DiscussionPostPageDto, getCommunityDiscussionsControllerCloseMockHandler(), getCommunityDiscussionsControllerCloseResponseMock(), getCommunityDiscussionsControllerCreateMockHandler() (+21 more)
 
 ### Community 54 - "Supabase Identity and Privacy Gates"
-Cohesion: 0.06
-Nodes (24): fastify, @nestjs/core, PRIVACY_GATE_EXEMPT, PrivacyGateExempt(), AgeEligibility, PrivacyGateService, PrivacyGateState, REQUIRED_DOCUMENT_TYPES (+16 more)
+Cohesion: 0.05
+Nodes (38): class-validator, fastify, @nestjs/common, @nestjs/core, @nestjs/swagger, @nestjs/throttler, class-validator@0.14.2, AccountStatus (+30 more)
 
 ### Community 57 - "Design Search Behavior Tests"
 Cohesion: 0.10
 Nodes (6): search(), _style_search_destination(), TestDiagnosticsContracts, TestSearchDomains, read_rows(), TestStyleTaxonomy
 
-### Community 58 - "Live Session Acceptance Lifecycle"
-Cohesion: 0.11
-Nodes (28): abandonForeignSession(), abandonSupersededGo(), applyOriginalAttrsToSvelteAnchor(), commitAcceptedSvelteComponentToDom(), componentModuleCandidates(), describeMountFailure(), detectDevServerBase(), discardOrphanedSession() (+20 more)
+### Community 58 - "showToast"
+Cohesion: 0.18
+Nodes (16): abandonForeignSession(), abandonSupersededGo(), captureAndEmit(), checkpointPayload(), discardOrphanedSession(), dismissToast(), handleDiscard(), markSessionHandled() (+8 more)
 
 ### Community 59 - "Render Deployment Configuration"
 Cohesion: 0.07
 Nodes (28): fromService, key, sync, value, envVarKey, name, type, name (+20 more)
 
 ### Community 61 - "province-boundaries.ts"
-Cohesion: 0.13
-Nodes (20): CityPublicDto, Classification, classify(), classifyRing(), isPolygon(), isProvince(), isRing(), loadProvinceBoundaries() (+12 more)
+Cohesion: 0.06
+Nodes (37): CityPublicDto, Classification, classify(), classifyRing(), isPolygon(), isProvince(), isRing(), loadProvinceBoundaries() (+29 more)
 
 ### Community 62 - "Events API Client"
 Cohesion: 0.10
@@ -534,9 +657,9 @@ Nodes (24): clearStoredManualApplyState(), fetchPendingCount(), handleManualEdit
 Cohesion: 0.14
 Nodes (21): age_eligibilities_reviewer_idx, age_eligibilities_status_idx, "identity"."age_eligibilities", "legal_acceptances", legal_acceptances_document_idx, legal_acceptances_user_type_version_unique, "legal_documents", legal_documents_type_status_idx (+13 more)
 
-### Community 70 - "community-actions-http.spec.ts"
-Cohesion: 0.16
-Nodes (8): reflect-metadata, reflect-metadata@0.2.2, AppModule, HttpExceptionFilter, API_PREFIX, corsOptions, bootstrap(), events()
+### Community 70 - "OrganizationManagePage.tsx"
+Cohesion: 0.09
+Nodes (47): getOrganizationsControllerListAdminInvitationsQueryKey(), getOrganizationsControllerListAdminInvitationsQueryOptions(), getOrganizationsControllerListManagersQueryKey(), getOrganizationsControllerListManagersQueryOptions(), getOrganizationsControllerListVerificationRequestsQueryKey(), getOrganizationsControllerListVerificationRequestsQueryOptions(), getOrganizationsControllerMineQueryKey(), getOrganizationsControllerMineQueryOptions() (+39 more)
 
 ### Community 72 - "Moderation API Mocks"
 Cohesion: 0.17
@@ -555,20 +678,20 @@ Cohesion: 0.15
 Nodes (11): auth_identities_user_id_index, identity.auth_identities, identity.profiles, identity.users, profiles_city_id_idx, auth_identities_user_id_index, "organization_admins", organization_admins_user_id_idx (+3 more)
 
 ### Community 76 - "Svelte Live Injection Anchors"
-Cohesion: 0.16
-Nodes (19): buildSvelteExpressionTextMap(), buildSveltePropValuesFromLiveElement(), buildSveltePropValuesV2(), cloneWithoutElements(), collectTextNodes(), collectVisibleTexts(), cssEscapeIdent(), elementMatchesOriginalMarkup() (+11 more)
+Cohesion: 0.09
+Nodes (35): applyOriginalAttrsToSvelteAnchor(), buildSvelteExpressionTextMap(), buildSveltePropValuesFromLiveElement(), buildSveltePropValuesV2(), cloneWithoutElements(), collectTextNodes(), collectVisibleTexts(), commitAcceptedSvelteComponentToDom() (+27 more)
 
 ### Community 77 - "Release Security Integration Harness"
-Cohesion: 0.16
-Nodes (15): admin, authClient, cleanupPool, communityIds, eventIds, expectStatus(), jsonRequest(), main() (+7 more)
-
-### Community 78 - "database.module.ts"
 Cohesion: 0.08
-Nodes (17): @nestjs/platform-fastify, @nestjs/testing, DATABASE, DatabaseModule, PROVIDER_DATABASE, mocks, categories, cities (+9 more)
+Nodes (23): 3. Error handling — centralized response; improve diagnostics and safe boundaries (medium), reflect-metadata, reflect-metadata@0.2.2, AppModule, HttpExceptionFilter, API_PREFIX, corsOptions, bootstrap() (+15 more)
 
-### Community 79 - "Deletion and Messaging Workers"
-Cohesion: 0.11
-Nodes (7): CommunityDeletionService, ChannelDeletionService, MessagingSyncWorker, StreamChatAdapter, main(), connectAs(), main()
+### Community 78 - "drizzle-orm"
+Cohesion: 0.09
+Nodes (15): @nestjs/platform-fastify, @nestjs/testing, DatabaseModule, mocks, categories, cities, CategoryPublicDto, CityPublicDto (+7 more)
+
+### Community 79 - "CommunityDeletionService"
+Cohesion: 0.16
+Nodes (4): 7. Database & ORM — migrations and transactions present; integration atomicity needs attention (high), CommunityDeletionService, MessagingSyncWorker, main()
 
 ### Community 80 - "Sitemap and Crawler Generation"
 Cohesion: 0.22
@@ -576,39 +699,35 @@ Nodes (15): apiBase, distDir, loadResources(), main(), Page, buildRobotsTxt(), b
 
 ### Community 81 - "Health API Client"
 Cohesion: 0.18
-Nodes (16): getHealthControllerGetHealthQueryKey(), getHealthControllerGetHealthQueryOptions(), getHealthControllerGetHealthUrl(), getHealthControllerGetReadinessQueryKey(), getHealthControllerGetReadinessQueryOptions(), getHealthControllerGetReadinessUrl(), healthControllerGetHealth(), HealthControllerGetHealthQueryError (+8 more)
+Nodes (17): getHealthControllerGetHealthQueryKey(), getHealthControllerGetHealthQueryOptions(), getHealthControllerGetHealthUrl(), getHealthControllerGetReadinessQueryKey(), getHealthControllerGetReadinessQueryOptions(), getHealthControllerGetReadinessUrl(), healthControllerGetHealth(), HealthControllerGetHealthQueryError (+9 more)
 
-### Community 82 - "Platform Moderation Dashboard"
-Cohesion: 0.18
-Nodes (14): getModerationControllerListQueryKey(), getModerationControllerListQueryOptions(), useModerationControllerList(), withQueryKey(), getOrganizationsControllerListPendingVerificationRequestsQueryKey(), getOrganizationsControllerListPendingVerificationRequestsQueryOptions(), useOrganizationsControllerListPendingVerificationRequests(), getPrivacyAdminControllerListQueryKey() (+6 more)
+### Community 82 - "PlatformModerationPage.tsx"
+Cohesion: 0.16
+Nodes (23): getModerationControllerListQueryKey(), getModerationControllerListQueryOptions(), useModerationControllerDecide(), useModerationControllerList(), getOrganizationsControllerListPendingVerificationRequestsQueryKey(), getOrganizationsControllerListPendingVerificationRequestsQueryOptions(), useOrganizationsControllerDecideVerification(), useOrganizationsControllerListPendingVerificationRequests() (+15 more)
 
 ### Community 83 - "Notifications API Client"
-Cohesion: 0.13
-Nodes (19): isPublicRead(), resolveApiUrl(), authMocks, waslFetch(), getNotificationsControllerListUrl(), getNotificationsControllerMarkReadMutationKey(), getNotificationsControllerMarkReadMutationOptions(), getNotificationsControllerMarkReadUrl() (+11 more)
+Cohesion: 0.14
+Nodes (17): isPublicRead(), resolveApiUrl(), authMocks, waslFetch(), getNotificationsControllerListUrl(), getNotificationsControllerMarkReadMutationKey(), getNotificationsControllerMarkReadMutationOptions(), getNotificationsControllerMarkReadUrl() (+9 more)
 
 ### Community 84 - "Shared Package Configuration"
 Cohesion: 0.13
 Nodes (17): dependencies, zod@4.6.7, devDependencies, typescript@5.9.2, vitest@3.2.4, exports, typescript, vitest (+9 more)
 
 ### Community 85 - "Vite and Showcase Configuration"
-Cohesion: 0.22
-Nodes (6): @tailwindcss/vite@4.1.13, vite@7.1.5, @vitejs/plugin-react@5.0.2, @tailwindcss/vite, vite, @vitejs/plugin-react
+Cohesion: 0.12
+Nodes (12): components, missing, source, [uiArg, ...roots], uiDir, walk(), @tailwindcss/vite@4.1.13, vite@7.1.5 (+4 more)
 
 ### Community 86 - "Storybook Component Stories"
 Cohesion: 0.12
 Nodes (12): @storybook/react-vite@9.1.5, Default, meta, Story, IconActions, meta, Primary, Secondary (+4 more)
 
 ### Community 88 - "Live Agent Target Coordination"
-Cohesion: 0.29
-Nodes (17): actOnAgentTarget(), agentTargetBusyReason(), agentTargetOverlayGone(), agentTargetTaken(), claimAgentTarget(), claimAndActOnAgentTarget(), declineAgentTargetBusy(), declineAgentTargetUnresolvable() (+9 more)
-
-### Community 89 - "Health HTTP Endpoints"
-Cohesion: 0.19
-Nodes (3): HealthController, HealthResponseDto, ReadinessResponseDto
+Cohesion: 0.22
+Nodes (20): actOnAgentTarget(), agentTargetBusyReason(), agentTargetOverlayGone(), agentTargetTaken(), claimAgentTarget(), claimAndActOnAgentTarget(), declineAgentTargetBusy(), declineAgentTargetUnresolvable() (+12 more)
 
 ### Community 90 - "Notification Email Delivery"
-Cohesion: 0.20
-Nodes (3): NotificationEmailWorker, setup(), ResendEmailAdapter
+Cohesion: 0.18
+Nodes (5): @nestjs/config, NotificationEmailWorker, setup(), ResendEmailAdapter, input
 
 ### Community 92 - "Client TypeScript Configuration"
 Cohesion: 0.13
@@ -630,9 +749,9 @@ Nodes (14): compilerOptions, declaration, declarationMap, exactOptionalPropertyT
 Cohesion: 0.14
 Nodes (14): scripts, api:generate, build, build-storybook, dev, lint, preview, sitemap (+6 more)
 
-### Community 97 - "Community Topic Page"
-Cohesion: 0.24
-Nodes (13): useCommunitiesControllerMine(), getCommunityDiscussionsControllerDetailsQueryKey(), getCommunityDiscussionsControllerDetailsQueryOptions(), useCommunityDiscussionsControllerClose(), useCommunityDiscussionsControllerDetails(), useCommunityDiscussionsControllerPost(), useCommunityDiscussionsControllerRemove(), useCommunityDiscussionsControllerUpdate() (+5 more)
+### Community 97 - "Issue tracker: GitHub"
+Cohesion: 0.06
+Nodes (30): Before exploring, read these, Domain Docs, File structure, Flag ADR conflicts, Use the glossary's vocabulary, Conventions, Issue tracker: GitHub, Pull requests as a triage surface (+22 more)
 
 ### Community 98 - "Community API Mocks"
 Cohesion: 0.25
@@ -647,8 +766,8 @@ Cohesion: 0.16
 Nodes (10): Impeccable slash command, Android Material 3 platform conformance, Audit Health Score and P0-P3 findings, Five-dimension native technical audit, Five-dimension web technical audit, Craft deprecated alias, Impeccable artifact drift doctor, Confirmed comp-first or code-first workflow default (+2 more)
 
 ### Community 101 - "@playwright/test"
-Cohesion: 0.05
-Nodes (24): cities, community(), mockDiscovery(), cities, event(), LocationMode, mockDiscovery(), stubBoundaries (+16 more)
+Cohesion: 0.10
+Nodes (9): cities, mockAuth(), music, user, event, list, @playwright/test@1.55.0, port (+1 more)
 
 ### Community 102 - "Workspace Dependency Overrides"
 Cohesion: 0.15
@@ -686,9 +805,9 @@ Nodes (6): Accessible Field form composition, DESIGN.md design-system workflow, 
 Cohesion: 0.25
 Nodes (6): ColorPair(), contrast(), luminance(), toHex(), toRgb(), defaultStates
 
-### Community 111 - "Privacy Export API Client"
-Cohesion: 0.12
-Nodes (16): getPrivacyAdminControllerRetentionQueryKey(), getPrivacyAdminControllerRetentionQueryOptions(), getPrivacyAdminControllerRetentionUrl(), getPrivacyControllerExportDataQueryKey(), getPrivacyControllerExportDataQueryOptions(), getPrivacyControllerExportDataUrl(), getPrivacyControllerGetRequestQueryKey(), getPrivacyControllerGetRequestQueryOptions() (+8 more)
+### Community 111 - "teach/SKILL.md"
+Cohesion: 0.07
+Nodes (25): Learning Record Format, Numbering, Optional sections, Supersession, Template, What does _not_ qualify, When to write a learning record, MISSION.md Format (+17 more)
 
 ### Community 112 - "Accepted Session Cleanup"
 Cohesion: 0.31
@@ -775,16 +894,20 @@ Cohesion: 0.33
 Nodes (5): collection, compilerOptions, builder, $schema, sourceRoot
 
 ### Community 136 - "Homepage Discovery Enhancement"
-Cohesion: 0.13
-Nodes (14): Collection eligibility, ordering and fallback, Existing behavior and boundaries, Further Notes, Homepage Discovery Enhancement, Images, metadata and availability, Implementation Decisions, Location state and privacy, Out of Scope (+6 more)
+Cohesion: 0.12
+Nodes (15): Collection eligibility, ordering and fallback, Completion — 2026-11-02, Existing behavior and boundaries, Further Notes, Homepage Discovery Enhancement, Images, metadata and availability, Implementation Decisions, Location state and privacy (+7 more)
+
+### Community 137 - "Process"
+Cohesion: 0.07
+Nodes (25): 1. State the question, 2. Isolate the logic in a portable module, 3. Build the shareable HTML file, 4. Hand it over, 5. Capture the answer and the prototype, Anti-patterns, Logic Prototype, Process (+17 more)
 
 ### Community 141 - "Community Cover Asset Catalog"
 Cohesion: 0.40
 Nodes (4): conversation.jpg, gathering.jpg, together.jpg, Unsplash usage license
 
-### Community 142 - "Homepage final review — P2 corrections"
-Cohesion: 0.15
-Nodes (12): Checks run on the merged tree — actual outputs, Commit/integration, Focused verification — actual results, Homepage final review — P2 corrections, Independent code inspection and disposition, Independent final integration verification, Isolation and preparation, Review axes and disposition (+4 more)
+### Community 142 - "Triage"
+Cohesion: 0.07
+Nodes (25): Bad agent brief, Behavioral, not procedural, Complete acceptance criteria, Durability over precision, Examples, Explicit scope boundaries, Good agent brief (bug), Good agent brief (enhancement) (+17 more)
 
 ### Community 143 - "Wasl — Project Handoff"
 Cohesion: 0.18
@@ -802,6 +925,10 @@ Nodes (4): ./tsconfig.json, exclude, extends, include
 Cohesion: 0.60
 Nodes (4): "categories", categories_name_tr_unique, "cities", cities_name_tr_unique
 
+### Community 147 - "Codebase Design"
+Cohesion: 0.09
+Nodes (21): 1. In-process, 2. Local-substitutable, 3. Remote but owned (Ports & Adapters), 4. True external (Mock), Deepening, Dependency categories, Seam discipline, Testing strategy: replace, don't layer (+13 more)
+
 ### Community 148 - "Shared Health and Pagination Contracts"
 Cohesion: 0.40
 Nodes (4): HealthResponse, healthResponseSchema, Pagination, paginationSchema
@@ -810,21 +937,21 @@ Nodes (4): HealthResponse, healthResponseSchema, Pagination, paginationSchema
 Cohesion: 0.20
 Nodes (5): Cognitive Load Assessment, Cowan 2001 working memory limit, Nielsen usability heuristics scoring, Persona-Based Design Testing, Impeccable Finish Reviewer
 
-### Community 156 - "Privacy Retry API Client"
-Cohesion: 0.40
-Nodes (5): getPrivacyAdminControllerRetryMutationKey(), getPrivacyAdminControllerRetryMutationOptions(), getPrivacyAdminControllerRetryUrl(), privacyAdminControllerRetry(), usePrivacyAdminControllerRetry()
+### Community 156 - "During the session"
+Cohesion: 0.09
+Nodes (19): ADR Format, Numbering, Optional sections, Template, What qualifies, When to offer an ADR, GLOSSARY.md Format, Rules (+11 more)
 
 ### Community 157 - "Phase 6 native discussions, realtime chat and engagement"
 Cohesion: 0.20
 Nodes (7): Publicly readable native discussions with membership-gated posting, Phase 6 native discussions, realtime chat and engagement, Single-level replies, removed-post placeholders and universally closed threads, AAL2 platform administration and transactional scoped report review, Transaction-bound notifications and pgmq Resend delivery retries, Phase 7 notifications, moderation and privacy historical checkpoint, Tasks 147–149 blocked on approved legal and privacy inputs
 
-### Community 158 - "Privacy Cancellation API Client"
-Cohesion: 0.50
-Nodes (4): getPrivacyControllerCancelRequestMutationKey(), getPrivacyControllerCancelRequestMutationOptions(), getPrivacyControllerCancelRequestUrl(), privacyControllerCancelRequest()
+### Community 158 - "HTML Report Format"
+Cohesion: 0.10
+Nodes (18): Call-graph collapse, Candidate card, Cross-section (good for layered shallowness), Diagram patterns, Hand-built boxes-and-arrows (when Mermaid's layout fights you), Header, HTML Report Format, Mass diagram (good for "interface as wide as implementation") (+10 more)
 
-### Community 159 - "Privacy Request Creation Client"
-Cohesion: 0.50
-Nodes (4): getPrivacyControllerCreateRequestMutationKey(), getPrivacyControllerCreateRequestMutationOptions(), getPrivacyControllerCreateRequestUrl(), privacyControllerCreateRequest()
+### Community 159 - "template.sh"
+Cohesion: 0.22
+Nodes (18): ask(), ask_secret(), banner(), _clear(), _existing(), finish(), note(), open_url() (+10 more)
 
 ### Community 160 - "Public Communities and public or direct-link-only Unlisted Events"
 Cohesion: 0.22
@@ -838,9 +965,9 @@ Nodes (8): 07: Complete homepage presentation and participation prompts, Comment
 Cohesion: 0.50
 Nodes (3): "messaging_member_sync", "messaging_reports", "messaging_user_blocks"
 
-### Community 163 - "showcase-coverage.mjs"
-Cohesion: 0.25
-Nodes (6): components, missing, source, [uiArg, ...roots], uiDir, walk()
+### Community 163 - "Steps"
+Cohesion: 0.11
+Nodes (16): Files, Implementation vs Review, Reference, Steps, 1. Detect the environment, 2. Install dependency-cruiser, 3. Write the config, 4. Wire it into the checks (+8 more)
 
 ### Community 164 - "Phase 8 local hardening versus incomplete release acceptance"
 Cohesion: 0.25
@@ -866,25 +993,21 @@ Nodes (7): 03: Explicit geolocation with manual correction, Comments, Final-revi
 Cohesion: 0.33
 Nodes (5): Before exploring, Decision conflicts, Domain Docs, Layout, Vocabulary
 
-### Community 177 - "Comments"
-Cohesion: 0.33
-Nodes (5): 04: Member-ranked community discovery, Comments, Implementation and verification — ticket 04, Integration completion, Latest ticket-06 integration verification
+### Community 177 - "onAnnotDown"
+Cohesion: 0.18
+Nodes (18): beginEditPin(), buildAnnotationsForCapture(), buildPinElement(), cancelEditingPin(), clampPlaceholderSize(), finalizeEditingPin(), initAnnotOverlay(), isImeKeydown() (+10 more)
 
 ### Community 201 - "Comments"
 Cohesion: 0.33
 Nodes (5): 06: Content-backed interest browsing, Comments, Focused integration browser regression correction, Implementation and verification — ticket 06, Integration merge verification
 
-### Community 206 - "messagingControllerConversations"
-Cohesion: 0.40
-Nodes (5): getMessagingControllerConversationsQueryOptions(), getMessagingControllerConversationsUrl(), messagingControllerConversations(), useMessagingControllerConversations(), withQueryKey()
+### Community 206 - "Quick Reference"
+Cohesion: 0.12
+Nodes (16): 10. DevOps & Deployment (LOW-MEDIUM), 1. Architecture (CRITICAL), 2. Dependency Injection (CRITICAL), 3. Error Handling (HIGH), 4. Security (HIGH), 5. Performance (HIGH), 6. Testing (MEDIUM-HIGH), 7. Database & ORM (MEDIUM-HIGH) (+8 more)
 
 ### Community 217 - "messagingControllerSession"
 Cohesion: 0.40
 Nodes (5): getMessagingControllerSessionMutationKey(), getMessagingControllerSessionMutationOptions(), getMessagingControllerSessionUrl(), messagingControllerSession(), useMessagingControllerSession()
-
-### Community 218 - "getPrivacyAdminControllerDecideMutationOptions"
-Cohesion: 0.40
-Nodes (5): getPrivacyAdminControllerDecideMutationKey(), getPrivacyAdminControllerDecideMutationOptions(), getPrivacyAdminControllerDecideUrl(), privacyAdminControllerDecide(), usePrivacyAdminControllerDecide()
 
 ### Community 219 - "Issue tracker: Local Markdown"
 Cohesion: 0.40
@@ -922,6 +1045,314 @@ Nodes (4): getMessagingControllerUnblockMutationKey(), getMessagingControllerUnb
 Cohesion: 0.50
 Nodes (3): 05: Nationwide online-event discovery, Comments, Integration merge verification
 
+### Community 233 - "Ask Matt"
+Cohesion: 0.12
+Nodes (14): Phase boundaries, Primary and secondary sources, The five options, The tree, These are judgement calls, Ask Matt, Codebase health, Context hygiene (+6 more)
+
+### Community 234 - "Diagnosing Bugs"
+Cohesion: 0.13
+Nodes (14): Completion criterion: a tight loop that goes red, Diagnosing Bugs, Minimise, Non-deterministic bugs, Phase 1: Build a feedback loop, Phase 2: Reproduce + minimise, Phase 3: Hypothesise, Phase 4: Instrument (+6 more)
+
+### Community 235 - "Steps"
+Cohesion: 0.15
+Nodes (12): 1. Detect package manager, 2. Install dependencies, 3. Initialize Husky, 4. Create `.husky/pre-commit`, 5. Create `.lintstagedrc`, 6. Create `.prettierrc` (if missing), 7. Verify, 8. Commit (+4 more)
+
+### Community 236 - "Test-Driven Development"
+Cohesion: 0.15
+Nodes (10): Designing for Mockability, When to Mock, Anti-patterns, Rules of the loop, Seams: where tests go, Test-Driven Development, What a good test is, Bad Tests (+2 more)
+
+### Community 237 - "Process"
+Cohesion: 0.15
+Nodes (12): 1. Gather context, 2. Explore the codebase (optional), 3. Draft vertical slices, 4. Quiz the user, 5. Publish the tickets to the configured tracker, Acceptance criteria, Blocked by, <NN>: <Ticket title> (+4 more)
+
+### Community 238 - "writing-for-agents/SKILL.md"
+Cohesion: 0.15
+Nodes (11): Context pointers, Information hierarchy, Leading words, Invocation, Router skills, Skill mechanics, Splitting by invocation, Pruning (+3 more)
+
+### Community 239 - "Sections"
+Cohesion: 0.17
+Nodes (11): 10. DevOps & Deployment (devops), 1. Architecture (arch), 2. Dependency Injection (di), 3. Error Handling (error), 4. Security (security), 5. Performance (perf), 6. Testing (test), 7. Database & ORM (db) (+3 more)
+
+### Community 240 - "wayfinder/SKILL.md"
+Cohesion: 0.17
+Nodes (11): Chart the map, Fog of war, Invocation, Out of scope, Plan, don't do, Refer by name, The Map, The map body (+3 more)
+
+### Community 241 - "Migrate to Shoehorn"
+Cohesion: 0.20
+Nodes (9): `as Type` → `fromPartial()`, `as unknown as Type` → `fromAny()`, Install, Large objects with few needed properties, Migrate to Shoehorn, Migration patterns, When to use each, Why shoehorn? (+1 more)
+
+### Community 242 - "startVoice"
+Cohesion: 0.29
+Nodes (10): applyConfigureBarChrome(), finishVoiceSession(), isEmbeddedPreviewBrowser(), releaseVoiceEngine(), startVoice(), steerSpeechRecognitionCtor(), steerVoiceErrorMessage(), steerVoiceUnavailableMessage() (+2 more)
+
+### Community 243 - "Steps"
+Cohesion: 0.22
+Nodes (8): 1. Ask scope, 2. Copy the hook script, 3. Add hook to settings, 4. Ask about customization, 5. Verify, Setup Git Guardrails, Steps, What Gets Blocked
+
+### Community 244 - "Scaffold Exercises"
+Cohesion: 0.22
+Nodes (8): Directory naming, Example: stubbing from a plan, Exercise variants, Lint rules summary, Moving/renaming exercises, Required files, Scaffold Exercises, Workflow
+
+### Community 245 - "to-spec/SKILL.md"
+Cohesion: 0.22
+Nodes (8): Further Notes, Implementation Decisions, Out of Scope, Problem Statement, Process, Solution, Testing Decisions, User Stories
+
+### Community 246 - "home-geolocation.spec.ts"
+Cohesion: 0.25
+Nodes (5): cities, event(), LocationMode, mockDiscovery(), stubBoundaries
+
+### Community 247 - "Process"
+Cohesion: 0.25
+Nodes (7): 1. Pin the fixed point, 2. Identify the spec source, 3. Identify the standards sources, 4. Spawn both sub-agents in parallel, 5. Aggregate, Process, Why two axes
+
+### Community 248 - "<Questionnaire title>"
+Cohesion: 0.25
+Nodes (7): Anything else?, Context, Document structure, How to answer, <Questionnaire title>, <Theme heading>, What load is the system expected to handle at launch?
+
+### Community 249 - "writing-shape/SKILL.md"
+Cohesion: 0.25
+Nodes (7): Conversational feel, Format arguments to actually have, Grounding, Out of scope, Pulling from the pile, The loop, Writing rhythm
+
+### Community 250 - "chief-of-staff/SKILL.md"
+Cohesion: 0.29
+Nodes (6): Procedures, Schedules, Strategic View, Subagents, Wiki, Write history, not the present
+
+### Community 251 - "Process"
+Cohesion: 0.29
+Nodes (6): 1. Scope the procedure, 2. Map each stage's journey, 3. Author the wizard, 4. Verify and hand off, Process, Wizard
+
+### Community 252 - "interface"
+Cohesion: 0.33
+Nodes (5): interface, display_name, short_description, policy, allow_implicit_invocation
+
+### Community 253 - "interface"
+Cohesion: 0.33
+Nodes (5): interface, display_name, short_description, policy, allow_implicit_invocation
+
+### Community 254 - "interface"
+Cohesion: 0.33
+Nodes (5): interface, display_name, short_description, policy, allow_implicit_invocation
+
+### Community 255 - "interface"
+Cohesion: 0.33
+Nodes (5): interface, display_name, short_description, policy, allow_implicit_invocation
+
+### Community 256 - "interface"
+Cohesion: 0.33
+Nodes (5): interface, display_name, short_description, policy, allow_implicit_invocation
+
+### Community 257 - "interface"
+Cohesion: 0.33
+Nodes (5): interface, display_name, short_description, policy, allow_implicit_invocation
+
+### Community 258 - "interface"
+Cohesion: 0.33
+Nodes (5): interface, display_name, short_description, policy, allow_implicit_invocation
+
+### Community 259 - "interface"
+Cohesion: 0.33
+Nodes (5): interface, display_name, short_description, policy, allow_implicit_invocation
+
+### Community 260 - "interface"
+Cohesion: 0.33
+Nodes (5): interface, display_name, short_description, policy, allow_implicit_invocation
+
+### Community 261 - "interface"
+Cohesion: 0.33
+Nodes (5): interface, display_name, short_description, policy, allow_implicit_invocation
+
+### Community 262 - "Sections"
+Cohesion: 0.33
+Nodes (5): Evidence, Guidance, Merge Danger, Sections, Summary
+
+### Community 263 - "interface"
+Cohesion: 0.33
+Nodes (5): interface, display_name, short_description, policy, allow_implicit_invocation
+
+### Community 264 - "interface"
+Cohesion: 0.33
+Nodes (5): interface, display_name, short_description, policy, allow_implicit_invocation
+
+### Community 265 - "interface"
+Cohesion: 0.33
+Nodes (5): interface, display_name, short_description, policy, allow_implicit_invocation
+
+### Community 266 - "interface"
+Cohesion: 0.33
+Nodes (5): interface, display_name, short_description, policy, allow_implicit_invocation
+
+### Community 267 - "interface"
+Cohesion: 0.33
+Nodes (5): interface, display_name, short_description, policy, allow_implicit_invocation
+
+### Community 268 - "interface"
+Cohesion: 0.33
+Nodes (5): interface, display_name, short_description, policy, allow_implicit_invocation
+
+### Community 269 - "interface"
+Cohesion: 0.33
+Nodes (5): interface, display_name, short_description, policy, allow_implicit_invocation
+
+### Community 270 - "interface"
+Cohesion: 0.33
+Nodes (5): interface, display_name, short_description, policy, allow_implicit_invocation
+
+### Community 271 - "interface"
+Cohesion: 0.33
+Nodes (5): interface, display_name, short_description, policy, allow_implicit_invocation
+
+### Community 272 - "interface"
+Cohesion: 0.33
+Nodes (5): interface, display_name, short_description, policy, allow_implicit_invocation
+
+### Community 273 - "interface"
+Cohesion: 0.33
+Nodes (5): interface, display_name, short_description, policy, allow_implicit_invocation
+
+### Community 274 - "writing-beats/SKILL.md"
+Cohesion: 0.33
+Nodes (5): Ending the journey, Grounding, Pulling from the pile, What is a beat, Writing rhythm
+
+### Community 275 - "interface"
+Cohesion: 0.33
+Nodes (5): interface, display_name, short_description, policy, allow_implicit_invocation
+
+### Community 276 - "interface"
+Cohesion: 0.33
+Nodes (5): interface, display_name, short_description, policy, allow_implicit_invocation
+
+### Community 277 - "home-location.spec.ts"
+Cohesion: 0.47
+Nodes (4): cities, event(), mockDiscovery(), onlineEvents
+
+### Community 278 - "Homepage discovery — final closure"
+Cohesion: 0.33
+Nodes (5): Closure checks, Code graph refresh, Homepage discovery — final closure, Merged branches and conservative cleanup, Scope and verification evidence
+
+### Community 279 - "loop-me/SKILL.md"
+Cohesion: 0.40
+Nodes (4): Definition of done, The loop lens, The workspace, Vocabulary
+
+### Community 280 - "home-interests.spec.ts"
+Cohesion: 0.40
+Nodes (3): art, cities, music
+
+### Community 281 - "interface"
+Cohesion: 0.50
+Nodes (3): interface, display_name, short_description
+
+### Community 282 - "interface"
+Cohesion: 0.50
+Nodes (3): interface, display_name, short_description
+
+### Community 283 - "interface"
+Cohesion: 0.50
+Nodes (3): interface, display_name, short_description
+
+### Community 284 - "hitl-loop.template.sh"
+Cohesion: 0.83
+Nodes (3): capture(), hitl-loop.template.sh script, step()
+
+### Community 285 - "interface"
+Cohesion: 0.50
+Nodes (3): interface, display_name, short_description
+
+### Community 286 - "interface"
+Cohesion: 0.50
+Nodes (3): interface, display_name, short_description
+
+### Community 287 - "interface"
+Cohesion: 0.50
+Nodes (3): interface, display_name, short_description
+
+### Community 288 - "interface"
+Cohesion: 0.50
+Nodes (3): interface, display_name, short_description
+
+### Community 289 - "interface"
+Cohesion: 0.50
+Nodes (3): interface, display_name, short_description
+
+### Community 290 - "interface"
+Cohesion: 0.50
+Nodes (3): interface, display_name, short_description
+
+### Community 291 - "interface"
+Cohesion: 0.50
+Nodes (3): interface, display_name, short_description
+
+### Community 292 - "interface"
+Cohesion: 0.50
+Nodes (3): interface, display_name, short_description
+
+### Community 293 - "interface"
+Cohesion: 0.50
+Nodes (3): interface, display_name, short_description
+
+### Community 294 - "interface"
+Cohesion: 0.50
+Nodes (3): interface, display_name, short_description
+
+### Community 295 - "GLOSSARY.md Format"
+Cohesion: 0.50
+Nodes (3): GLOSSARY.md Format, Rules, Structure
+
+### Community 296 - "interface"
+Cohesion: 0.50
+Nodes (3): interface, display_name, short_description
+
+### Community 297 - "interface"
+Cohesion: 0.50
+Nodes (3): interface, display_name, short_description
+
+### Community 298 - "writing-fragments/SKILL.md"
+Cohesion: 0.50
+Nodes (3): File format, What is a fragment, Writing rhythm
+
+### Community 299 - "home-communities.spec.ts"
+Cohesion: 0.67
+Nodes (3): cities, community(), mockDiscovery()
+
+### Community 300 - "getMessagingControllerDirectMessageMutationOptions"
+Cohesion: 0.50
+Nodes (4): getMessagingControllerDirectMessageMutationKey(), getMessagingControllerDirectMessageMutationOptions(), getMessagingControllerDirectMessageUrl(), messagingControllerDirectMessage()
+
+### Community 301 - "getOrganizationsControllerAcceptAdminInvitationMutationOptions"
+Cohesion: 0.50
+Nodes (4): getOrganizationsControllerAcceptAdminInvitationMutationKey(), getOrganizationsControllerAcceptAdminInvitationMutationOptions(), getOrganizationsControllerAcceptAdminInvitationUrl(), organizationsControllerAcceptAdminInvitation()
+
+### Community 302 - "getOrganizationsControllerCreateAdminInvitationMutationOptions"
+Cohesion: 0.50
+Nodes (4): getOrganizationsControllerCreateAdminInvitationMutationKey(), getOrganizationsControllerCreateAdminInvitationMutationOptions(), getOrganizationsControllerCreateAdminInvitationUrl(), organizationsControllerCreateAdminInvitation()
+
+### Community 303 - "getOrganizationsControllerCreateMutationOptions"
+Cohesion: 0.50
+Nodes (4): getOrganizationsControllerCreateMutationKey(), getOrganizationsControllerCreateMutationOptions(), getOrganizationsControllerCreateUrl(), organizationsControllerCreate()
+
+### Community 304 - "getOrganizationsControllerDecideVerificationMutationOptions"
+Cohesion: 0.50
+Nodes (4): getOrganizationsControllerDecideVerificationMutationKey(), getOrganizationsControllerDecideVerificationMutationOptions(), getOrganizationsControllerDecideVerificationUrl(), organizationsControllerDecideVerification()
+
+### Community 305 - "getOrganizationsControllerRemoveAdminMutationOptions"
+Cohesion: 0.50
+Nodes (4): getOrganizationsControllerRemoveAdminMutationKey(), getOrganizationsControllerRemoveAdminMutationOptions(), getOrganizationsControllerRemoveAdminUrl(), organizationsControllerRemoveAdmin()
+
+### Community 306 - "getOrganizationsControllerRequestVerificationMutationOptions"
+Cohesion: 0.50
+Nodes (4): getOrganizationsControllerRequestVerificationMutationKey(), getOrganizationsControllerRequestVerificationMutationOptions(), getOrganizationsControllerRequestVerificationUrl(), organizationsControllerRequestVerification()
+
+### Community 307 - "getOrganizationsControllerRevokeAdminInvitationMutationOptions"
+Cohesion: 0.50
+Nodes (4): getOrganizationsControllerRevokeAdminInvitationMutationKey(), getOrganizationsControllerRevokeAdminInvitationMutationOptions(), getOrganizationsControllerRevokeAdminInvitationUrl(), organizationsControllerRevokeAdminInvitation()
+
+### Community 308 - "getOrganizationsControllerTransferOwnershipMutationOptions"
+Cohesion: 0.50
+Nodes (4): getOrganizationsControllerTransferOwnershipMutationKey(), getOrganizationsControllerTransferOwnershipMutationOptions(), getOrganizationsControllerTransferOwnershipUrl(), organizationsControllerTransferOwnership()
+
+### Community 309 - "getOrganizationsControllerUpdateMutationOptions"
+Cohesion: 0.50
+Nodes (4): getOrganizationsControllerUpdateMutationKey(), getOrganizationsControllerUpdateMutationOptions(), getOrganizationsControllerUpdateUrl(), organizationsControllerUpdate()
+
 ## Ambiguous Edges - Review These
 - `Tasks 147–149 blocked on approved legal and privacy inputs` → `18+ declaration, legal acceptance, privacy export and provider-deletion retry foundations`  [AMBIGUOUS]
   docs/project_handoff.md · relation: conceptually_related_to
@@ -932,22 +1363,22 @@ Nodes (3): 05: Nationwide online-event discovery, Comments, Integration merge ve
 
 ## Knowledge Gaps
 - **102 isolated node(s):** `../tsconfig.base.json`, `../tsconfig.base.json`, `community`, `event`, `./tsconfig.json` (+97 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1360 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **70 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1901 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **126 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `@tanstack/react-query` connect `Client Routing and Localization` to `Moderation API Client`, `Resource Pages and Participation`, `React Forms and Controls`, `Participation API Client`, `Organizations API Client`, `Community Topic Page`, `Users API and Mocks`, `Discussions API Client`, `Communities API Client`, `Health API Client`, `Messaging API Client`, `Notifications API Client`, `Conversations and Confirmation Dialogs`, `Client Runtime Dependencies`, `Privacy Review API Client`, `Events API Client`, `Discovery Search and Filtering`?**
-  _High betweenness centrality (0.046) - this node is a cross-community bridge._
+- **Why does `@tanstack/react-query` connect `Client Routing and Localization` to `Moderation API Client`, `Resource Pages and Participation`, `React Forms and Controls`, `Participation API Client`, `Organizations API Client`, `OrganizationManagePage.tsx`, `Users API and Mocks`, `Discussions API Client`, `Communities API Client`, `Health API Client`, `PlatformModerationPage.tsx`, `Messaging API Client`, `Notifications API Client`, `Conversations and Confirmation Dialogs`, `Client Runtime Dependencies`, `Privacy Review API Client`, `Events API Client`, `Discovery Search and Filtering`?**
+  _High betweenness centrality (0.035) - this node is a cross-community bridge._
 - **What connects `../tsconfig.base.json`, `../tsconfig.base.json`, `community` to the rest of the system?**
   _102 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Live Browser Design Canvas` be split into smaller, more focused modules?**
-  _Cohesion score 0.02856298630946518 - nodes in this community are weakly interconnected._
-- **Why does `events()` connect `community-actions-http.spec.ts` to `database.module.ts`, `Wasl — Project Handoff`?**
-  _High betweenness centrality (0.027) - this node is a cross-community bridge._
+  _Cohesion score 0.03136507936507937 - nodes in this community are weakly interconnected._
+- **Why does `waslFetch()` connect `Notifications API Client` to `React Forms and Controls`, `Participation API Client`, `Organizations API Client`, `Client Routing and Localization`, `Discussions API Client`, `Messaging API Client`, `Privacy Review API Client`, `Discovery Search and Filtering`, `Moderation API Client`, `Users API and Mocks`, `getMessagingControllerDirectMessageMutationOptions`, `Communities API Client`, `getOrganizationsControllerAcceptAdminInvitationMutationOptions`, `getOrganizationsControllerCreateMutationOptions`, `getOrganizationsControllerCreateAdminInvitationMutationOptions`, `getOrganizationsControllerDecideVerificationMutationOptions`, `getOrganizationsControllerRemoveAdminMutationOptions`, `getOrganizationsControllerRequestVerificationMutationOptions`, `getOrganizationsControllerRevokeAdminInvitationMutationOptions`, `getOrganizationsControllerTransferOwnershipMutationOptions`, `getOrganizationsControllerUpdateMutationOptions`, `Events API Client`, `Health API Client`, `messagingControllerSession`, `getMessagingControllerBlockMutationOptions`, `getMessagingControllerCommunityMutationOptions`, `getMessagingControllerEventMutationOptions`, `getMessagingControllerReportMutationOptions`, `getMessagingControllerUnblockMutationOptions`?**
+  _High betweenness centrality (0.024) - this node is a cross-community bridge._
 - **Should `Resource Pages and Participation` be split into smaller, more focused modules?**
-  _Cohesion score 0.06142728093947606 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.06615240766713418 - nodes in this community are weakly interconnected._
 
 ### Low-confidence Hints
 _AMBIGUOUS edges — the extractor was unsure. Verify before acting on these._
