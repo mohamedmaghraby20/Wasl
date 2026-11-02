@@ -148,6 +148,7 @@ function mockDiscoveryApi(
   const fetchMock = vi.fn((input: RequestInfo | URL) => {
     const url = new URL(
       typeof input === 'string' ? input : input instanceof URL ? input.href : input.url,
+      'http://localhost:3000',
     );
     urls.push(url);
     let data: unknown = [];

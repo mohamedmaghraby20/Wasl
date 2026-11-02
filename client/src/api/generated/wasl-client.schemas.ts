@@ -1484,6 +1484,10 @@ export const OrganizationsControllerPublicProfileLang = {
 } as const;
 
 export type DiscoveryControllerListEventsParams = {
+nonCancelled?: boolean;
+upcoming?: boolean;
+cityScope?: DiscoveryControllerListEventsCityScope;
+modality?: DiscoveryControllerListEventsModality;
 communityId?: string;
 to?: string;
 from?: string;
@@ -1494,6 +1498,22 @@ lang?: DiscoveryControllerListEventsLang;
 page?: number;
 pageSize?: number;
 };
+
+export type DiscoveryControllerListEventsCityScope = typeof DiscoveryControllerListEventsCityScope[keyof typeof DiscoveryControllerListEventsCityScope];
+
+
+export const DiscoveryControllerListEventsCityScope = {
+  strict: 'strict',
+  'include-online': 'include-online',
+} as const;
+
+export type DiscoveryControllerListEventsModality = typeof DiscoveryControllerListEventsModality[keyof typeof DiscoveryControllerListEventsModality];
+
+
+export const DiscoveryControllerListEventsModality = {
+  online: 'online',
+  'in-person': 'in-person',
+} as const;
 
 export type DiscoveryControllerListEventsLang = typeof DiscoveryControllerListEventsLang[keyof typeof DiscoveryControllerListEventsLang];
 
