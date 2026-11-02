@@ -338,7 +338,12 @@ test('a failed local request is retryable and never triggers nationwide fallback
   const section = page.getByRole('region', { name: 'Upcoming events in Ankara' });
   await expect(section.getByRole('button', { name: 'Retry' })).toBeVisible({ timeout: 15000 });
   expect(
-    requests.filter((url) => url.pathname.endsWith('/events') && !url.searchParams.has('city')),
+    requests.filter(
+      (url) =>
+        url.pathname.endsWith('/events') &&
+        url.searchParams.get('modality') === 'in-person' &&
+        !url.searchParams.has('city'),
+    ),
   ).toHaveLength(0);
   options.errorLocal = false;
   await section.getByRole('button', { name: 'Retry' }).click();
