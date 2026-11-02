@@ -19,6 +19,7 @@ import {
   communityCategories,
   events,
   eventCategories,
+  eventRegistrations,
   organizations,
 } from '../../db/schema';
 import { ReferenceDataRepository } from './reference-data.repository';
@@ -30,6 +31,12 @@ import {
   EventPageDto,
   EventPublicDto,
 } from './discovery.dto';
+
+const acceptedRegistrationCount = sql<number>`(
+  select count(*)::int from ${eventRegistrations}
+  where ${eventRegistrations.eventId} = ${events.id}
+    and ${eventRegistrations.status} = 'ACCEPTED'
+)`;
 
 const listingQuery = () =>
   applyDecorators(
@@ -158,6 +165,7 @@ export class DiscoveryController {
           endsAt: events.endsAt,
           cancelled: events.cancelled,
           capacity: events.capacity,
+          acceptedRegistrationCount,
           admissionMode: events.admissionMode,
           cityId: cities.id,
           cityName: this.cityName(query.lang),
@@ -246,6 +254,7 @@ export class DiscoveryController {
         endsAt: events.endsAt,
         cancelled: events.cancelled,
         capacity: events.capacity,
+        acceptedRegistrationCount,
         admissionMode: events.admissionMode,
         cityId: cities.id,
         cityName: this.cityName(query.lang),

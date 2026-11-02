@@ -76,6 +76,7 @@ export function DiscoverySection({
                 className="grid gap-4 rounded-(--shape-radius-card) border border-border bg-card p-5"
                 key={index}
               >
+                <Skeleton className="-mx-5 -mt-5 aspect-video rounded-b-none rounded-t-(--shape-radius-card)" />
                 <div className="flex items-center justify-between">
                   <Skeleton className="size-11 rounded-lg" />
                   <Skeleton className="h-5 w-20 rounded-full" />

@@ -52,6 +52,7 @@ export function HomeSection({
                 className="grid gap-4 rounded-(--shape-radius-card) border border-border bg-card p-5"
                 key={index}
               >
+                <Skeleton className="-mx-5 -mt-5 aspect-video rounded-b-none rounded-t-(--shape-radius-card)" />
                 <Skeleton className="h-5 w-24" />
                 <Skeleton className="h-5 w-3/4" />
                 <Skeleton className="h-4 w-full" />
