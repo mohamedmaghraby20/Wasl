@@ -59,4 +59,6 @@ All browser commands used `$env:PLAYWRIGHT_PORT='4347'`, Chromium, one worker fo
 
 ## Commit/integration
 
-Integration result is recorded after committing the fix and running the requested latest-branch `--no-ff` merge check.
+- Fix/evidence commit: `47ea3057110c059682028bc00bafd9b167aa7084` (`fix: recover homepage location retries and validate remembered cities`).
+- Ran `git merge --no-ff feat/homepage-discovery -m "merge: preserve latest homepage discovery integration in review fixes"` after committing: **Already up to date**. Latest integration was still `c61ca17230f1460804cb5e37cc56c1b5af8a691b`, already an ancestor. No synthetic merge, conflicts, reset or runtime changes; no impacted checks to rerun.
+- `git diff --name-only -- server client/src/api shared pnpm-lock.yaml` returned no files before commit. Tracked worktree clean after commit/merge; only preserved untracked `graphify-out/cache/` remained. This final update records integration evidence only.
