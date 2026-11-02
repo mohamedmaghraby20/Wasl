@@ -4,19 +4,19 @@
 
 **Blocked by:** 02 — City-aware upcoming event discovery.
 
-**Status:** in-progress
+**Status:** done
 
-**Labels:** implemented, verification-in-progress
+**Labels:** implemented, verified
 
-- [ ] Show up to four non-archived communities for the active city, or nationwide when none is selected, ranked by active member count descending and creation time descending for ties.
-- [ ] Match existing detail count semantics: active memberships plus an individual owner only when that owner is not already represented by an active membership. Listing, card and detail counts agree; organization ownership does not fabricate an extra member.
-- [ ] Expose public aggregate member counts and supported listing ordering through server contracts, regenerate affected clients/mocks and render counts on community cards throughout the app. Do not expose private membership records or query the database from the browser.
-- [ ] Community cards retain name, short description, organizer, city and category. This slice remains functional with existing card presentation; ticket 01 independently supplies app-wide imagery.
-- [ ] If a selected city successfully has no eligible communities, show nationwide results with an accurate heading. Do not top up nonempty local collections, change the active dropdown or let event fallback determine community scope.
-- [ ] Community “View all” preserves effective geographic scope and member-count ordering without changing unrelated default listings unnecessarily.
-- [ ] Provide independent loading, retryable error and nationwide empty states. A failed local request must not masquerade as an empty result or trigger nationwide fallback.
-- [ ] API tests cover owner-inclusive counts, membership statuses, archived exclusion and ranking ties. Browser/component journeys cover city changes, independent fallback, count rendering, destination filters and errors.
-- [ ] Provide Arabic/English count/section copy and verify RTL/LTR and responsive behavior. Final horizontal-row presentation belongs to ticket 07.
+- [x] Show up to four non-archived communities for the active city, or nationwide when none is selected, ranked by active member count descending and creation time descending for ties.
+- [x] Match existing detail count semantics: active memberships plus an individual owner only when that owner is not already represented by an active membership. Listing, card and detail counts agree; organization ownership does not fabricate an extra member.
+- [x] Expose public aggregate member counts and supported listing ordering through server contracts, regenerate affected clients/mocks and render counts on community cards throughout the app. Do not expose private membership records or query the database from the browser.
+- [x] Community cards retain name, short description, organizer, city and category. This slice remains functional with existing card presentation; ticket 01 independently supplies app-wide imagery.
+- [x] If a selected city successfully has no eligible communities, show nationwide results with an accurate heading. Do not top up nonempty local collections, change the active dropdown or let event fallback determine community scope.
+- [x] Community “View all” preserves effective geographic scope and member-count ordering without changing unrelated default listings unnecessarily.
+- [x] Provide independent loading, retryable error and nationwide empty states. A failed local request must not masquerade as an empty result or trigger nationwide fallback.
+- [x] API tests cover owner-inclusive counts, membership statuses, archived exclusion and ranking ties. Browser/component journeys cover city changes, independent fallback, count rendering, destination filters and errors.
+- [x] Provide Arabic/English count/section copy and verify RTL/LTR and responsive behavior. Final horizontal-row presentation belongs to ticket 07.
 
 ## Comments
 
@@ -32,3 +32,11 @@
 - `PLAYWRIGHT_PORT=4184 corepack pnpm --filter @wasl/web exec playwright test e2e/home-communities.spec.ts --reporter=line` — **10 passed**. Covers four-card requests, count rendering on homepage/destination, effective local/nationwide View-all filters and API order, no top-ups, error versus empty, fallback retry, rapid city changes and clearing, Arabic/English keyboard focus and no horizontal overflow at 375px/1440px. Strengthened inverse-fallback evidence with successful local events: `-g 'empty local|readable'` — **5 passed**. Screenshots captured for all four language/width combinations and visually reviewed (covers, count copy, metadata, focus ring, RTL/LTR); final mobile rows remain ticket 07.
 - Initial `corepack pnpm typecheck` passed shared/server but identified one outdated overview test fixture missing required memberCount; fixed it. `corepack pnpm --filter @wasl/web typecheck` — passed. Vite production build — passed with existing third-party PURE-annotation/large-chunk warnings. Focused ESLint initially flagged untyped HTTP test JSON access only; typed those responses and the failed file passed. Formatting check exposed existing and new formatting differences; formatted changed test/home/state files without unrelated refactors. UI skill search succeeded via `py -3` after the Windows `python` alias was unavailable.
 - Latest integration now includes ticket 05 (`b39cc33`); merge and impacted verification remain before completion.
+
+### Integration completion
+
+- Implementation committed as `22ae95d`; merged ticket-05 integration `b39cc33` in `d11ccac`, preserving all online functionality/tests and combining the overlapping homepage test fixtures. Regenerated contracts again with `corepack pnpm api:generate` — passed, no additional contract changes. Merged latest integration `017437c` (ticket-05 verification documentation only) in `5cb8f6b`; no further code conflict or runtime change.
+- Post-merge focused client command above — **38 passed** (11 homepage, 13 cards, 13 discovery, 1 overview accessibility). Post-merge focused server command above with the local database — **21 passed** (10 PostgreSQL HTTP, 8 discovery controller, 3 module controller). `corepack pnpm typecheck` — **passed in all three packages**. Focused ESLint on ticket handwritten TypeScript files — **passed, zero warnings**.
+- Post-merge `corepack pnpm --filter @wasl/web exec vite build` — **passed**, same existing third-party annotation/large-chunk warnings. `PLAYWRIGHT_PORT=4184 corepack pnpm --filter @wasl/web exec playwright test e2e/home-communities.spec.ts e2e/home-location.spec.ts --reporter=line` — **24 passed, 1 failed**. The inherited local-event-error test incorrectly counted the separate nationwide online query as an in-person fallback. Corrected its observable request predicate to require `modality=in-person` (not a relaxed runtime rule). Reran only the failed journey: `... playwright test e2e/home-location.spec.ts -g 'a failed local request' --reporter=line` — **1 passed**. Focused ESLint on that browser file — **passed**. Thus all 25 selected browser journeys pass across the main run and focused fix rerun.
+- Visually reviewed desktop card screenshots and re-reviewed final post-merge mobile English/Arabic full-page screenshots with an unobscured community heading: readable metadata/counts, four desktop columns, RTL order/alignment, visible keyboard focus, cropped covers, no page overflow. Browser capture matrix covers 375px/1440px in both languages and reduced motion. Captures are test-run artifacts, not bundled product assets. Browser fixtures are deterministic; authoritative aggregate correctness was tested against local PostgreSQL, not a mocked aggregate calculation.
+- Completed all ticket-04 criteria. No production/remote database changes or deployment claim. Horizontal carousels/final hero styling remain explicitly assigned to ticket 07; existing build warnings are unchanged.
