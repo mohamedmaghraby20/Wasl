@@ -1325,6 +1325,11 @@ export interface EventPublicDto {
   /** @nullable */
   endsAt?: string | null;
   cancelled: boolean;
+  /**
+     * Accepted registration rows only; excludes pending requests, waitlists and unregistered hosts.
+     * @minimum 0
+     */
+  acceptedRegistrationCount: number;
   /** @nullable */
   capacity?: number | null;
   admissionMode: string;

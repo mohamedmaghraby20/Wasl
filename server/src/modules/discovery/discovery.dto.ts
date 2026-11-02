@@ -41,6 +41,11 @@ export class EventPublicDto {
   @ApiProperty() startsAt!: string;
   @ApiPropertyOptional({ type: String, nullable: true }) endsAt!: string | null;
   @ApiProperty() cancelled!: boolean;
+  @ApiProperty({
+    type: 'integer',
+    minimum: 0,
+    description: 'Accepted registration rows only; excludes pending requests, waitlists and unregistered hosts.',
+  }) acceptedRegistrationCount!: number;
   @ApiPropertyOptional({ type: Number, nullable: true }) capacity!: number | null;
   @ApiProperty() admissionMode!: string;
   @ApiPropertyOptional({ type: String, nullable: true }) cityId!: string | null;
