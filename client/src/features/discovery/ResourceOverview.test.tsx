@@ -10,7 +10,7 @@ describe('ResourceOverview', () => {
     render(<main><I18nextProvider i18n={i18n}><ResourceOverview item={{
       id: 'community-1', slug: 'sample', name: 'Sample community', description: 'A public community.',
       admissionMode: 'open', hostName: 'Host', ownerType: 'user', ownerId: 'user-1',
-      cityId: 'city-1', cityName: 'Ankara', categories: [],
+      cityId: 'city-1', cityName: 'Ankara', categories: [], memberCount: 1,
     }} admissionLabel="admissionOpen" /></I18nextProvider></main>);
     expect((await axe(document.body)).violations).toHaveLength(0);
   });

@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createHead, UnheadProvider } from '@unhead/react/client';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { I18nextProvider } from 'react-i18next';
 import { createMemoryRouter, RouterProvider, useLocation } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -13,7 +14,14 @@ function SearchLocation(): React.JSX.Element {
 }
 
 function renderHome(
-  options: { citiesError?: boolean; eventsEmpty?: boolean; eventsLoading?: boolean } = {},
+  options: {
+    citiesError?: boolean;
+    eventsEmpty?: boolean;
+    eventsLoading?: boolean;
+    communitiesLoading?: boolean;
+    communitiesEmpty?: boolean;
+    communitiesError?: boolean;
+  } = {},
 ): void {
   vi.stubEnv('VITE_API_URL', 'http://localhost:3000');
   vi.stubGlobal(
@@ -34,6 +42,14 @@ function renderHome(
         } as Response);
       if (url.pathname.endsWith('/events') && options.eventsLoading)
         return new Promise<Response>(() => {});
+      if (url.pathname.endsWith('/communities') && options.communitiesLoading)
+        return new Promise<Response>(() => {});
+      if (url.pathname.endsWith('/communities') && options.communitiesError)
+        return Promise.resolve({
+          ok: false,
+          status: 503,
+          json: () => Promise.resolve({}),
+        } as Response);
       const items = url.pathname.endsWith('/communities')
         ? [
             {
@@ -42,6 +58,7 @@ function renderHome(
               name: 'Arab students in Ankara',
               description: 'A public student community.',
               admissionMode: 'open',
+              memberCount: 12,
               capacity: null,
               hostName: 'Wasl Student Group',
               cityId: 'ankara',
@@ -75,7 +92,11 @@ function renderHome(
         status: 200,
         json: () =>
           Promise.resolve({
-            items: url.pathname.endsWith('/events') && options.eventsEmpty ? [] : items,
+            items:
+              (url.pathname.endsWith('/events') && options.eventsEmpty) ||
+              (url.pathname.endsWith('/communities') && options.communitiesEmpty)
+                ? []
+                : items,
             page: 1,
             pageSize: 4,
           }),
@@ -136,5 +157,32 @@ describe('HomePage', () => {
     expect(await screen.findByText('Nothing here yet')).toBeVisible();
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     expect(screen.queryByRole('status')).not.toBeInTheDocument();
+  });
+
+  it('keeps successful events visible while communities load independently', async () => {
+    renderHome({ communitiesLoading: true });
+    expect(await screen.findByRole('link', { name: 'Arabic music night' })).toBeVisible();
+    const section = screen.getByRole('region', { name: 'Communities across Türkiye' });
+    expect(within(section).getByRole('status')).toHaveTextContent('Loading');
+    expect(within(section).queryByText('Nothing here yet')).not.toBeInTheDocument();
+  });
+
+  it('shows a nationwide community empty state independently of successful events', async () => {
+    renderHome({ communitiesEmpty: true });
+    const section = screen.getByRole('region', { name: 'Communities across Türkiye' });
+    expect(await within(section).findByText('Nothing here yet')).toBeVisible();
+    expect(within(section).queryByRole('alert')).not.toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: 'Arabic music night' })).toBeVisible();
+  });
+
+  it('retries a community error without blocking events and renders the recovered aggregate', async () => {
+    const options = { communitiesError: true };
+    renderHome(options);
+    const section = screen.getByRole('region', { name: 'Communities across Türkiye' });
+    expect(await within(section).findByRole('alert')).toBeVisible();
+    expect(screen.getByRole('link', { name: 'Arabic music night' })).toBeVisible();
+    options.communitiesError = false;
+    await userEvent.click(within(section).getByRole('button', { name: 'Retry' }));
+    expect(await within(section).findByText('12 members')).toBeVisible();
   });
 });

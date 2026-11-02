@@ -4,9 +4,9 @@
 
 **Blocked by:** 02 — City-aware upcoming event discovery.
 
-**Status:** ready-for-agent
+**Status:** in-progress
 
-**Labels:** ready-for-agent
+**Labels:** implemented, verification-in-progress
 
 - [ ] Show up to four non-archived communities for the active city, or nationwide when none is selected, ranked by active member count descending and creation time descending for ties.
 - [ ] Match existing detail count semantics: active memberships plus an individual owner only when that owner is not already represented by an active membership. Listing, card and detail counts agree; organization ownership does not fabricate an extra member.
@@ -17,3 +17,18 @@
 - [ ] Provide independent loading, retryable error and nationwide empty states. A failed local request must not masquerade as an empty result or trigger nationwide fallback.
 - [ ] API tests cover owner-inclusive counts, membership statuses, archived exclusion and ranking ties. Browser/component journeys cover city changes, independent fallback, count rendering, destination filters and errors.
 - [ ] Provide Arabic/English count/section copy and verify RTL/LTR and responsive behavior. Final horizontal-row presentation belongs to ticket 07.
+
+## Comments
+
+### Implementation and verification — ticket 04
+
+- Worktree `C:/Users/seif/AppData/Local/Temp/opencode/wasl-homepage-04-communities`, branch `feat/homepage-04-communities`, starting HEAD `4312e83`. Preserved and completed the prior agent's sole partial change (PostgreSQL fixtures). Queried the worktree graph first. Read AGENTS, spec, ticket, original installed TDD instructions and references, and relevant installed frontend/PostgreSQL guidance. The original dirty checkout was not modified or used as a source copy.
+- Independent `corepack pnpm install --frozen-lockfile` succeeded with no lockfile change. No schema migration or remote database operation.
+- Public community listing now exposes the same owner-inclusive aggregate as detail. `order=member-count` explicitly sorts by aggregate descending then creation descending; omitted ordering retains newest-first behavior. `order=newest` is supported and invalid ordering returns 400. Required integer aggregate contracts and mocks regenerated with `corepack pnpm api:generate` (passed).
+- Homepage requests four ranked communities in the selected city, independently falls back only on successful local emptiness, retains the selected city, and supplies effective scope plus ordering to View all. Shared cards show translated counts on homepage and discovery; audited client card consumers (organization profile uses compact resource links, not community cards). Four community loading placeholders match the cap. No ticket-07 carousel work added.
+- TDD red/green: real PostgreSQL HTTP tracer first failed on absent counts/wrong ranking, then passed. Shared-card Arabic/English tracers first failed on missing counts, then passed. Browser tracer first failed on absent nationwide community section, then passed including destination API ordering. Initial browser launch required a Vite build (missing `dist`), not a product failure.
+- Local database only: `DISCOVERY_TEST_DATABASE_URL=postgresql://postgres@127.0.0.1:55432/wasl_homepage_02`. Fixture transaction rolls back. `corepack pnpm --filter @wasl/server exec vitest run --config vitest.config.ts test/discovery-postgres.integration.spec.ts test/discovery.controller.spec.ts src/modules/discovery/discovery.controller.spec.ts` — **19 passed**. Covers active/pending/waitlisted/rejected/removed membership status, individual owner inclusion/deduplication, organization zero/no bonus, archived exclusion, rank ties, public/detail consistency, invalid order and existing event eligibility. Expanded the aggregate tracer with pending-owner and ranked page-two assertions: focused `-t 'ranks public communities'` — **1 passed, 8 skipped**.
+- `corepack pnpm --filter @wasl/web exec vitest run --config vitest.config.ts src/features/home/HomePage.test.tsx src/features/resources/ResourceCard.test.tsx src/features/discovery/discovery-page.test.tsx src/features/discovery/ResourceOverview.test.tsx` — **33 passed**. Added pagination/order/clear regression afterward: focused discovery `-t 'retains explicit member ordering'` — **1 passed, 12 skipped**. Community loading/error/retry/empty states remain independent of events.
+- `PLAYWRIGHT_PORT=4184 corepack pnpm --filter @wasl/web exec playwright test e2e/home-communities.spec.ts --reporter=line` — **10 passed**. Covers four-card requests, count rendering on homepage/destination, effective local/nationwide View-all filters and API order, no top-ups, error versus empty, fallback retry, rapid city changes and clearing, Arabic/English keyboard focus and no horizontal overflow at 375px/1440px. Strengthened inverse-fallback evidence with successful local events: `-g 'empty local|readable'` — **5 passed**. Screenshots captured for all four language/width combinations and visually reviewed (covers, count copy, metadata, focus ring, RTL/LTR); final mobile rows remain ticket 07.
+- Initial `corepack pnpm typecheck` passed shared/server but identified one outdated overview test fixture missing required memberCount; fixed it. `corepack pnpm --filter @wasl/web typecheck` — passed. Vite production build — passed with existing third-party PURE-annotation/large-chunk warnings. Focused ESLint initially flagged untyped HTTP test JSON access only; typed those responses and the failed file passed. Formatting check exposed existing and new formatting differences; formatted changed test/home/state files without unrelated refactors. UI skill search succeeded via `py -3` after the Windows `python` alias was unavailable.
+- Latest integration now includes ticket 05 (`b39cc33`); merge and impacted verification remain before completion.

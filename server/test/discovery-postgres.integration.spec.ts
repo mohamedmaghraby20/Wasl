@@ -18,6 +18,9 @@ describe.skipIf(!connectionString)('public discovery scope (PostgreSQL HTTP)', (
   const prefix = randomUUID();
   const city = `${prefix}-local`;
   const otherCity = `${prefix}-other`;
+  const communityPrefix = `${prefix}-members`;
+  const organizationId = randomUUID();
+  const members = Array.from({ length: 6 }, () => randomUUID());
   const now = new Date('2026-11-02T12:00:00Z');
 
   beforeAll(async () => {
@@ -68,12 +71,23 @@ describe.skipIf(!connectionString)('public discovery scope (PostgreSQL HTTP)', (
         id: `${prefix}-${fixture.id}`,
       })),
     );
-    await db.insert(schema.users).values({ id: prefix, normalizedEmail: `${prefix}@example.test` });
+    await db
+      .insert(schema.users)
+      .values([prefix, ...members].map((id) => ({ id, normalizedEmail: `${id}@example.test` })));
     await db
       .insert(schema.eventRegistrations)
       .values({ eventId: `${prefix}-full`, userId: prefix, status: 'ACCEPTED' });
-    await db.insert(schema.communities).values(
-      [city, otherCity].map((cityId) => ({
+    await db.insert(schema.organizations).values({
+      id: organizationId,
+      ownerUserId: prefix,
+      slug: `${prefix}-organization`,
+      name: `${prefix} organization`,
+      description: 'Community fixture organization',
+      type: 'community',
+      cityId: city,
+    });
+    await db.insert(schema.communities).values([
+      ...[city, otherCity].map((cityId) => ({
         id: `${cityId}-community`,
         slug: `${cityId}-community`,
         name: prefix,
@@ -83,8 +97,99 @@ describe.skipIf(!connectionString)('public discovery scope (PostgreSQL HTTP)', (
         ownerId: prefix,
         hostName: 'Host',
         admissionMode: 'open',
+        createdAt: new Date('2026-09-30T12:00:00Z'),
       })),
-    );
+      {
+        id: `${communityPrefix}-external`,
+        slug: `${communityPrefix}-external`,
+        name: `${communityPrefix} external`,
+        description: 'Owner has a pending membership and still counts once.',
+        cityId: city,
+        ownerType: 'user',
+        ownerId: prefix,
+        hostName: 'Host',
+        admissionMode: 'open',
+        createdAt: new Date('2026-10-04T12:00:00Z'),
+      },
+      {
+        id: `${communityPrefix}-owner-active`,
+        slug: `${communityPrefix}-owner-active`,
+        name: `${communityPrefix} owner active`,
+        description: 'Owner and another active member.',
+        cityId: city,
+        ownerType: 'user',
+        ownerId: prefix,
+        hostName: 'Host',
+        admissionMode: 'open',
+        createdAt: new Date('2026-10-03T12:00:00Z'),
+      },
+      {
+        id: `${communityPrefix}-organization`,
+        slug: `${communityPrefix}-organization`,
+        name: `${communityPrefix} organization`,
+        description: 'Organization ownership does not add a member.',
+        cityId: city,
+        ownerType: 'organization',
+        ownerId: organizationId,
+        hostName: 'Organization',
+        admissionMode: 'open',
+        createdAt: new Date('2026-10-02T12:00:00Z'),
+      },
+      {
+        id: `${communityPrefix}-organization-empty`,
+        slug: `${communityPrefix}-organization-empty`,
+        name: `${communityPrefix} organization empty`,
+        description: 'Organization-owned community without memberships.',
+        cityId: city,
+        ownerType: 'organization',
+        ownerId: organizationId,
+        hostName: 'Organization',
+        admissionMode: 'open',
+        createdAt: new Date('2026-10-06T12:00:00Z'),
+      },
+      {
+        id: `${communityPrefix}-late`,
+        slug: `${communityPrefix}-late`,
+        name: `${communityPrefix} late`,
+        description: 'Owner-only community created before the ranking ties.',
+        cityId: city,
+        ownerType: 'user',
+        ownerId: prefix,
+        hostName: 'Host',
+        admissionMode: 'open',
+        createdAt: new Date('2026-10-01T12:00:00Z'),
+      },
+      {
+        id: `${communityPrefix}-archived`,
+        slug: `${communityPrefix}-archived`,
+        name: `${communityPrefix} archived`,
+        description: 'Archived communities never qualify for discovery.',
+        cityId: city,
+        ownerType: 'user',
+        ownerId: prefix,
+        hostName: 'Host',
+        admissionMode: 'open',
+        archived: true,
+        createdAt: new Date('2026-10-07T12:00:00Z'),
+      },
+    ]);
+    await db.insert(schema.communityMemberships).values([
+      { communityId: `${communityPrefix}-external`, userId: prefix, status: 'PENDING' },
+      { communityId: `${communityPrefix}-external`, userId: members[0]!, status: 'ACTIVE' },
+      { communityId: `${communityPrefix}-external`, userId: members[1]!, status: 'WAITLISTED' },
+      { communityId: `${communityPrefix}-owner-active`, userId: prefix, status: 'ACTIVE' },
+      { communityId: `${communityPrefix}-owner-active`, userId: members[0]!, status: 'ACTIVE' },
+      { communityId: `${communityPrefix}-owner-active`, userId: members[2]!, status: 'PENDING' },
+      { communityId: `${communityPrefix}-owner-active`, userId: members[3]!, status: 'WAITLISTED' },
+      { communityId: `${communityPrefix}-owner-active`, userId: members[4]!, status: 'REJECTED' },
+      { communityId: `${communityPrefix}-owner-active`, userId: members[5]!, status: 'REMOVED' },
+      { communityId: `${communityPrefix}-organization`, userId: members[0]!, status: 'ACTIVE' },
+      ...members.slice(0, 4).map((userId) => ({
+        communityId: `${communityPrefix}-archived`,
+        userId,
+        status: 'ACTIVE' as const,
+      })),
+    ]);
     const module = await Test.createTestingModule({
       controllers: [DiscoveryController],
       providers: [
@@ -152,9 +257,61 @@ describe.skipIf(!connectionString)('public discovery scope (PostgreSQL HTTP)', (
       url: `/communities?${new URLSearchParams({ q: prefix, city, cityScope: 'include-online' })}`,
     });
     expect(communities.statusCode).toBe(200);
-    expect(communities.json<{ items: { id: string }[] }>().items.map((item) => item.id)).toEqual([
-      `${city}-community`,
+    expect(
+      communities
+        .json<{ items: { cityId: string }[] }>()
+        .items.every((item) => item.cityId === city),
+    ).toBe(true);
+  });
+
+  it('ranks public communities by owner-inclusive active members then newest creation, matching detail counts', async () => {
+    const response = await app.inject({
+      method: 'GET',
+      url: `/communities?${new URLSearchParams({ q: communityPrefix, city, order: 'member-count', pageSize: '4' })}`,
+    });
+    expect(response.statusCode).toBe(200);
+    const result = response.json<{
+      items: { id: string; memberCount: number }[];
+      total: number;
+      hasMore: boolean;
+    }>();
+    expect(result.items.map(({ id, memberCount }) => [id, memberCount])).toEqual([
+      [`${communityPrefix}-external`, 2],
+      [`${communityPrefix}-owner-active`, 2],
+      [`${communityPrefix}-organization`, 1],
+      [`${communityPrefix}-late`, 1],
     ]);
+    expect(result.total).toBe(5);
+    expect(result.hasMore).toBe(true);
+    for (const item of result.items) {
+      const detail = await app.inject({ method: 'GET', url: `/communities/${item.id}` });
+      expect(detail.json<{ memberCount: number }>().memberCount).toBe(item.memberCount);
+      expect(item).not.toHaveProperty('memberships');
+    }
+    const emptyOrganization = await app.inject({
+      method: 'GET',
+      url: `/communities/${communityPrefix}-organization-empty`,
+    });
+    expect(emptyOrganization.json<{ memberCount: number }>().memberCount).toBe(0);
+    const defaultOrder = await app.inject({
+      method: 'GET',
+      url: `/communities?q=${communityPrefix}`,
+    });
+    const newest = defaultOrder.json<{ items: { id: string; memberCount: number }[] }>().items[0];
+    expect(newest?.id).toBe(`${communityPrefix}-organization-empty`);
+    expect(newest?.memberCount).toBe(0);
+    const nextPage = await app.inject({
+      method: 'GET',
+      url: `/communities?${new URLSearchParams({ q: communityPrefix, order: 'member-count', pageSize: '4', page: '2' })}`,
+    });
+    expect(
+      nextPage
+        .json<{ items: { id: string; memberCount: number }[] }>()
+        .items.map(({ id, memberCount }: { id: string; memberCount: number }) => [id, memberCount]),
+    ).toEqual([[`${communityPrefix}-organization-empty`, 0]]);
+    expect(
+      (await app.inject({ method: 'GET', url: '/communities?order=invalid' })).statusCode,
+    ).toBe(400);
   });
 
   it('supports nationwide online-only results, capped pagination and inclusive date/category behavior', async () => {

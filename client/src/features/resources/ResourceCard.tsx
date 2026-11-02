@@ -100,6 +100,11 @@ export function ResourceCard({
         <p className="line-clamp-2 text-sm leading-relaxed text-text-muted">{item.description}</p>
       </div>
 
+      {kind === 'communities' && 'memberCount' in item ? (
+        <p className="text-sm text-text-muted">
+          {t('communityMemberCount', { count: item.memberCount })}
+        </p>
+      ) : null}
       {event ? (
         <div className="mt-auto grid gap-1.5 text-sm">
           <p className="text-text-muted">

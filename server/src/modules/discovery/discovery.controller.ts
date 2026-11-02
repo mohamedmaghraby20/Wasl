@@ -38,6 +38,8 @@ const acceptedRegistrationCount = sql<number>`(
     and ${eventRegistrations.status} = 'ACCEPTED'
 )`;
 
+const memberCount = sql<number>`(select count(*)::int from community_memberships m where m.community_id = ${communities.id} and m.status = 'ACTIVE') + case when ${communities.ownerType} = 'user' and not exists (select 1 from community_memberships m where m.community_id = ${communities.id} and m.status = 'ACTIVE' and m.user_id::text = ${communities.ownerId}) then 1 else 0 end`;
+
 const listingQuery = () =>
   applyDecorators(
     ApiQuery({ name: 'q', required: false, type: String }),
@@ -66,9 +68,12 @@ export class DiscoveryController {
 
   @Get('communities')
   @listingQuery()
+  @ApiQuery({ name: 'order', required: false, enum: ['newest', 'member-count'] })
   @ApiOkResponse({ type: CommunityPageDto })
   async listCommunities(@Query() query: Record<string, string | undefined>) {
     const { page, pageSize, filters } = this.parse(query, 'community');
+    if (query.order && !['newest', 'member-count'].includes(query.order))
+      throw new BadRequestException('Invalid community ordering.');
     const db = this.database();
     if (filters.category)
       filters.conditions.push(
@@ -94,6 +99,7 @@ export class DiscoveryController {
           hostName: sql<string>`COALESCE(${organizations.name}, ${communities.hostName})`,
           ownerType: communities.ownerType,
           ownerId: communities.ownerId,
+          memberCount,
           organizationSlug: organizations.slug,
           cityId: cities.id,
           cityName: this.cityName(query.lang),
@@ -105,7 +111,7 @@ export class DiscoveryController {
           sql`${organizations.id}::text = ${communities.ownerId} and ${communities.ownerType} = 'organization'`,
         )
         .where(where)
-        .orderBy(desc(communities.createdAt))
+        .orderBy(...(query.order === 'member-count' ? [desc(memberCount)] : []), desc(communities.createdAt))
         .limit(pageSize)
         .offset((page - 1) * pageSize),
       db
@@ -227,7 +233,7 @@ export class DiscoveryController {
         hostName: sql<string>`COALESCE(${organizations.name}, ${communities.hostName})`,
         ownerType: communities.ownerType,
         ownerId: communities.ownerId,
-        memberCount: sql<number>`(select count(*)::int from community_memberships m where m.community_id = ${communities.id} and m.status = 'ACTIVE') + case when ${communities.ownerType} = 'user' and not exists (select 1 from community_memberships m where m.community_id = ${communities.id} and m.status = 'ACTIVE' and m.user_id::text = ${communities.ownerId}) then 1 else 0 end`,
+        memberCount,
         organizationSlug: organizations.slug,
         cityId: cities.id,
         cityName: this.cityName(query.lang),

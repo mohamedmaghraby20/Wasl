@@ -23,7 +23,22 @@ export function HomePage(): React.JSX.Element {
   const cities = useDiscoveryControllerCities();
   const { cityId, setCityId, selectedCity } = useHomeCity(cities.data);
   const cityName = selectedCity ? localizedName(selectedCity, i18n.language) : cityId;
-  const communities = useDiscoveryControllerListCommunities({ pageSize: 3, lang });
+  const communityFilters = { pageSize: 4, lang, order: 'member-count' as const };
+  const localCommunities = useDiscoveryControllerListCommunities({
+    ...communityFilters,
+    ...(cityId ? { city: cityId } : {}),
+  });
+  const communityFallback = Boolean(
+    cityId && localCommunities.isSuccess && localCommunities.data.items.length === 0,
+  );
+  const nationwideCommunities = useDiscoveryControllerListCommunities(communityFilters, {
+    query: { enabled: communityFallback },
+  });
+  const communities = communityFallback ? nationwideCommunities : localCommunities;
+  const communityDestination = new URLSearchParams({
+    order: 'member-count',
+    ...(!communityFallback && cityId ? { city: cityId } : {}),
+  });
   const eventFilters = {
     pageSize: 4,
     lang,
@@ -156,13 +171,18 @@ export function HomePage(): React.JSX.Element {
         viewAll={`/events?${eventDestination}`}
       />
       <HomeSection
-        title={t('communities')}
+        title={
+          cityId && !communityFallback
+            ? t('communitiesInCity', { city: cityName })
+            : t('communitiesNationwide')
+        }
         kind="communities"
         language={i18n.language}
         items={communities.data?.items}
         isPending={communities.isPending}
         isError={communities.isError}
         onRetry={() => void communities.refetch()}
+        viewAll={`/communities?${communityDestination}`}
       />
     </div>
   );
