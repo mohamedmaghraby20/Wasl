@@ -115,12 +115,13 @@ function classify(
     const outerResult = classifyRing(outer, longitude, latitude);
     if (outerResult === 'boundary') return 'boundary';
     if (outerResult === 'outside') continue;
+    let inHole = false;
     for (const hole of rings.slice(1)) {
       const holeResult = classifyRing(hole, longitude, latitude);
       if (holeResult === 'boundary') return 'boundary';
-      if (holeResult === 'inside') return 'outside';
+      if (holeResult === 'inside') inHole = true;
     }
-    inside = true;
+    if (!inHole) inside = true;
   }
   return inside ? 'inside' : 'outside';
 }

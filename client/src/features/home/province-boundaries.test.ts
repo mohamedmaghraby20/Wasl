@@ -127,4 +127,15 @@ describe('province geometry resolution', () => {
       ),
     ).toBeNull();
   });
+
+  it('still includes an island polygon within another polygon’s hole', () => {
+    const provinces = [boundary('islands', {
+      type: 'MultiPolygon',
+      coordinates: [
+        [square(30, 38, 34, 42), square(31, 39, 33, 41)],
+        [square(31.2, 39.2, 32.8, 40.8)],
+      ],
+    })];
+    expect(resolveProvinceCity(provinces, 32, 40)).toBe('islands');
+  });
 });

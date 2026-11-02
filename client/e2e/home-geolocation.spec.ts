@@ -80,6 +80,9 @@ async function mockDiscovery(page: Page, boundaries: 'stub' | 'real' | 'error' =
     if (url.pathname.endsWith('/reference/cities')) return route.fulfill({ json: cities });
     if (url.pathname.endsWith('/reference/categories')) return route.fulfill({ json: [] });
     if (url.pathname.endsWith('/events')) {
+      if (url.searchParams.get('modality') === 'online') {
+        return route.fulfill({ json: { items: [], page: 1, pageSize: 4, total: 0, hasMore: false } });
+      }
       const city = url.searchParams.get('city');
       const items = [event(city ? `${city} gathering` : 'Nationwide gathering', city ?? 'istanbul')];
       return route.fulfill({
