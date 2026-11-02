@@ -7,6 +7,7 @@ import { createMemoryRouter, RouterProvider, useLocation } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { i18n } from '@/lib/i18n';
 import { HomePage } from './HomePage';
+import { AuthProvider } from '@/features/auth/AuthProvider';
 
 function SearchLocation(): React.JSX.Element {
   const location = useLocation();
@@ -162,7 +163,9 @@ function renderHome(
     <I18nextProvider i18n={i18n}>
       <UnheadProvider head={createHead()}>
         <QueryClientProvider client={queryClient}>
-          <RouterProvider router={router} />
+          <AuthProvider>
+            <RouterProvider router={router} />
+          </AuthProvider>
         </QueryClientProvider>
       </UnheadProvider>
     </I18nextProvider>,

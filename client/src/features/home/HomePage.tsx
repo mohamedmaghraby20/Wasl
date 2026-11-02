@@ -1,4 +1,4 @@
-import { ArrowRight, Eye, LocateFixed } from 'lucide-react';
+import { LocateFixed } from 'lucide-react';
 import { useState } from 'react';
 import { Form, Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
@@ -9,6 +9,7 @@ import { SearchInput } from '@/components/ui/SearchInput';
 import { SearchableSelect } from '@/components/ui/SearchableSelect';
 import { QueryError } from '@/components/feedback/QueryError';
 import { localizedName } from '@/features/resources/resource-utils';
+import { useAuth } from '@/features/auth/AuthProvider';
 import { HomeSection } from './HomeSection';
 import { HomeInterests } from './HomeInterests';
 import { useHomeCity } from './useHomeCity';
@@ -32,6 +33,7 @@ const locationErrorKeys: Record<LocationError, string> = {
 
 export function HomePage(): React.JSX.Element {
   const { t, i18n } = useTranslation();
+  const { user, loading: authLoading } = useAuth();
   const [query, setQuery] = useState('');
   const lang: 'ar' | 'en' = i18n.language.startsWith('ar') ? 'ar' : 'en';
   const cities = useDiscoveryControllerCities();
@@ -98,59 +100,44 @@ export function HomePage(): React.JSX.Element {
     ogType: 'website',
   });
   return (
-    <div className="grid gap-12">
-      <section className="relative overflow-hidden rounded-[1.6rem] border border-primary/20 bg-primary-soft">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -end-28 -top-28 size-80 rounded-full border border-primary/20"
-        />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -end-6 top-16 size-48 rounded-full border border-primary/25"
-        />
-        <div className="relative grid items-center gap-8 p-6 sm:p-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14 lg:p-12">
-          <div className="grid content-center gap-5">
-            <h1 className="max-w-[16ch] font-heading text-[length:var(--font-size-display)] font-extrabold rtl:max-w-[24ch]">
+    <div className="grid min-w-0 gap-8 sm:gap-10">
+      <section
+        aria-labelledby="home-hero-heading"
+        className="rounded-(--shape-radius-xl) border border-primary/20 bg-primary-soft"
+      >
+        <div className="grid items-center gap-5 p-5 sm:p-6 lg:grid-cols-[0.8fr_1.2fr] lg:gap-8 lg:p-8">
+          <div className="grid content-center gap-3">
+            <h1
+              id="home-hero-heading"
+              className="max-w-[20ch] font-heading text-2xl font-extrabold sm:text-3xl rtl:max-w-[26ch]"
+            >
               {t('welcome')}
             </h1>
             <p className="max-w-(--container-reading) text-base leading-relaxed text-text-muted">
               {t('starter')}
-            </p>
-            <div className="grid gap-2 sm:flex sm:flex-wrap sm:items-center sm:gap-3">
-              <Button asChild>
-                <Link to="/communities">
-                  {t('browseCommunities')}
-                  <ArrowRight aria-hidden="true" className="rtl:rotate-180" />
-                </Link>
-              </Button>
-              <Button asChild variant="secondary">
-                <Link to="/events">{t('browseEvents')}</Link>
-              </Button>
-            </div>
-            <p className="inline-flex items-center gap-2 text-xs font-medium text-text-subtle">
-              <Eye aria-hidden="true" className="size-4" />
-              {t('browseWithoutSignIn')}
             </p>
           </div>
 
           <Form
             action="/discover"
             aria-label={t('homeSearchLabel')}
-            className="grid gap-3 rounded-(--shape-radius-xl) border border-border bg-card p-5 shadow-md sm:p-6"
+            className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-3"
             method="get"
             role="search"
           >
-            <label className="text-sm font-semibold text-text" htmlFor="home-search">
+            <label className="col-span-2 text-sm font-semibold text-text" htmlFor="home-search">
               {t('homeSearchLabel')}
             </label>
-            <SearchInput
-              aria-label={t('homeSearchLabel')}
-              id="home-search"
-              name="q"
-              onValueChange={setQuery}
-              placeholder={t('exploreByName')}
-              value={query}
-            />
+            <div className="col-span-2">
+              <SearchInput
+                aria-label={t('homeSearchLabel')}
+                id="home-search"
+                name="q"
+                onValueChange={setQuery}
+                placeholder={t('exploreByName')}
+                value={query}
+              />
+            </div>
             <input type="hidden" name="upcoming" value="true" />
             <input type="hidden" name="nonCancelled" value="true" />
             <input type="hidden" name="cityScope" value="include-online" />
@@ -175,10 +162,7 @@ export function HomePage(): React.JSX.Element {
               searchPlaceholder={t('searchCities')}
               value={cityId}
             />
-            {cities.isError ? (
-              <QueryError message={t('homeCitiesError')} onRetry={() => void cities.refetch()} />
-            ) : null}
-            <div className="grid gap-2">
+            <div className="flex items-center">
               <IconButton
                 aria-describedby="home-location-privacy"
                 disabled={!cities.data}
@@ -188,6 +172,11 @@ export function HomePage(): React.JSX.Element {
                 type="button"
                 variant="secondary"
               />
+            </div>
+            <div className="col-span-2 grid gap-1">
+              {cities.isError ? (
+                <QueryError message={t('homeCitiesError')} onRetry={() => void cities.refetch()} />
+              ) : null}
               {locationBusy ? (
                 <p className="text-xs font-medium text-text-muted" role="status">
                   {t('locatingCity')}
@@ -211,7 +200,7 @@ export function HomePage(): React.JSX.Element {
                 {t('locationAttribution')}
               </a>
             </div>
-            <Button block type="submit">
+            <Button block className="col-span-2" type="submit">
               {t('search')}
             </Button>
           </Form>
@@ -260,6 +249,41 @@ export function HomePage(): React.JSX.Element {
         />
       )}
       <HomeInterests cityId={cityId} />
+      {!authLoading && !user ? (
+        <section
+          aria-labelledby="home-signup-heading"
+          className="flex flex-wrap items-center justify-between gap-4 rounded-(--shape-radius-xl) bg-primary-soft p-5 sm:p-6"
+        >
+          <div className="grid gap-2">
+            <h2 id="home-signup-heading" className="text-xl font-bold sm:text-2xl">
+              {t('homeSignupTitle')}
+            </h2>
+            <p className="max-w-prose text-sm text-text-muted">{t('homeSignupDescription')}</p>
+          </div>
+          <Button asChild>
+            <Link to="/sign-up?returnTo=%2F">{t('authCreateAccount')}</Link>
+          </Button>
+        </section>
+      ) : null}
+      <section
+        aria-labelledby="home-create-heading"
+        className="flex flex-wrap items-center justify-between gap-4 border-t border-border pt-6"
+      >
+        <div className="grid gap-2">
+          <h2 id="home-create-heading" className="text-xl font-bold sm:text-2xl">
+            {t('homeCreateTitle')}
+          </h2>
+          <p className="max-w-prose text-sm text-text-muted">{t('homeCreateDescription')}</p>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <Button asChild variant="secondary">
+            <Link to="/create/event">{t('createEventTitle')}</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link to="/create/community">{t('createCommunityTitle')}</Link>
+          </Button>
+        </div>
+      </section>
     </div>
   );
 }
