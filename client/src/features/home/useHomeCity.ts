@@ -32,12 +32,14 @@ function rememberedCity(): string {
 
 // Manual selection and explicit location resolution commit through the same setter.
 export function useHomeCity(cities: CityPublicDto[] | undefined) {
-  const [cityId, setCity] = useState(rememberedCity);
+  const [candidate, setCandidate] = useState(rememberedCity);
+  const [cityId, setCity] = useState('');
   const [location, setLocation] = useState<LocationState>({ status: 'idle' });
   const generation = useRef(0);
 
   const setCityId = useCallback((value: string): void => {
     generation.current += 1;
+    setCandidate('');
     setLocation({ status: 'idle' });
     setCity(value);
     try {
@@ -103,8 +105,12 @@ export function useHomeCity(cities: CityPublicDto[] | undefined) {
   }, [cities, setCityId]);
 
   useEffect(() => {
+    if (cities && candidate) {
+      setCityId(cities.some((city) => city.id === candidate) ? candidate : '');
+      return;
+    }
     if (cities && cityId && !cities.some((city) => city.id === cityId)) setCityId('');
-  }, [cities, cityId, setCityId]);
+  }, [cities, candidate, cityId, setCityId]);
 
   useEffect(
     () => () => {

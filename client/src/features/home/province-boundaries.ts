@@ -7,27 +7,47 @@ export type ProvinceBoundary = {
   geometry: ProvinceGeometry;
 };
 
-type BoundaryData = { provinces: ProvinceBoundary[] };
-
 const endpoint = `${import.meta.env.BASE_URL}geo/tr-provinces.json`;
 const epsilon = 1e-12;
 let pending: Promise<ProvinceBoundary[]> | undefined;
+
+function isRing(value: unknown): value is number[][] {
+  if (!Array.isArray(value) || value.length < 4) return false;
+  if (!value.every((point: unknown) =>
+    Array.isArray(point) && point.length >= 2 && point.every(Number.isFinite) &&
+    Math.abs(point[0] as number) <= 180 && Math.abs(point[1] as number) <= 90,
+  )) return false;
+  const first = value[0] as number[];
+  const last = value[value.length - 1] as number[];
+  return first[0] === last[0] && first[1] === last[1];
+}
+
+function isPolygon(value: unknown): value is number[][][] {
+  return Array.isArray(value) && value.length > 0 && value.every(isRing);
+}
+
+function isProvince(value: unknown): value is ProvinceBoundary {
+  if (typeof value !== 'object' || value === null || !('id' in value) ||
+    typeof value.id !== 'string' || !value.id || !('geometry' in value)) return false;
+  const geometry = value.geometry;
+  if (typeof geometry !== 'object' || geometry === null ||
+    !('type' in geometry) || !('coordinates' in geometry)) return false;
+  return geometry.type === 'Polygon'
+    ? isPolygon(geometry.coordinates)
+    : geometry.type === 'MultiPolygon' && Array.isArray(geometry.coordinates) &&
+      geometry.coordinates.length > 0 && geometry.coordinates.every(isPolygon);
+}
 
 export function loadProvinceBoundaries(): Promise<ProvinceBoundary[]> {
   pending ??= fetch(endpoint, { credentials: 'same-origin' })
     .then(async (response) => {
       if (!response.ok) throw new Error('Province boundaries are unavailable.');
-      const data = (await response.json()) as BoundaryData;
+      const data: unknown = await response.json();
       if (
+        typeof data !== 'object' || data === null || !('provinces' in data) ||
         !Array.isArray(data.provinces) ||
         data.provinces.length === 0 ||
-        data.provinces.some(
-          (province) =>
-            typeof province.id !== 'string' ||
-            typeof province.geometry !== 'object' ||
-            province.geometry === null ||
-            !['Polygon', 'MultiPolygon'].includes(province.geometry.type),
-        )
+        !data.provinces.every(isProvince)
       ) {
         throw new Error('Province boundaries are malformed.');
       }

@@ -460,6 +460,30 @@ for (const failure of ['network', 'json', 'geometry', 'unsupported-city'] as con
   });
 }
 
+test('malformed geometry can be retried with a corrected asset without reloading', async ({ page }) => {
+  await mockDiscovery(page, 'real');
+  let downloads = 0;
+  await page.route('**/geo/tr-provinces.json', (route) => {
+    downloads += 1;
+    return route.fulfill({ json: downloads === 1
+      ? { provinces: [{ id: 'ankara', geometry: { type: 'Polygon', coordinates: null } }] }
+      : stubBoundaries });
+  });
+  await mockLocation(page, { kind: 'success', longitude: 32, latitude: 39 });
+  await page.goto('/');
+  await selectCity(page, 'Istanbul');
+  await page.getByRole('button', { name: 'Use my location' }).click();
+  await expect(page.getByRole('alert')).toContainText('City boundaries could not load');
+  await expect(page.locator('#home-city')).toContainText('Istanbul');
+  await page.getByRole('button', { name: 'Use my location' }).click();
+  await expect(page.locator('#home-city')).toContainText('Ankara');
+  await expect(page.getByRole('heading', { name: 'Upcoming events in Ankara' })).toBeVisible();
+  await expect(page.getByRole('alert')).toHaveCount(0);
+  expect(downloads).toBe(2);
+  expect(await locationCalls(page)).toBe(2);
+  expect(await page.evaluate(() => localStorage.getItem('wasl-city'))).toBe('ankara');
+});
+
 test('a delayed polygon download cannot replace a manual city or block search', async ({ page }) => {
   await mockDiscovery(page, 'real');
   let release!: () => void;

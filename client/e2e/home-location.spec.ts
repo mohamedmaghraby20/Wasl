@@ -331,12 +331,16 @@ test('keeps a failed online collection retryable without hiding other results', 
 test('a failed local request is retryable and never triggers nationwide fallback', async ({
   page,
 }) => {
-  await page.addInitScript(() => localStorage.setItem('wasl-city', 'ankara'));
   const options = { errorLocal: true };
   const requests = await mockDiscovery(page, options);
   await page.goto('/');
+  await expect(page.getByRole('link', { name: 'Nationwide gathering', exact: true })).toBeVisible();
+  requests.length = 0;
+  await selectCity(page, 'Ankara');
   const section = page.getByRole('region', { name: 'Upcoming events in Ankara' });
   await expect(section.getByRole('button', { name: 'Retry' })).toBeVisible({ timeout: 15000 });
+  await expect(page.getByRole('heading', { name: 'Upcoming events across Türkiye' })).toHaveCount(0);
+  await expect(section.getByRole('link', { name: 'Nationwide gathering', exact: true })).toHaveCount(0);
   expect(
     requests.filter(
       (url) =>
@@ -384,6 +388,96 @@ test('invalid remembered city and unavailable storage leave discovery usable', a
   });
   await selectCity(page, 'Ankara');
   await expect(page.getByRole('heading', { name: 'Upcoming events in Ankara' })).toBeVisible();
+});
+
+test('an invalid remembered city with failed references keeps nationwide search and reset usable', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('wasl-city', 'removed-city'));
+  const requests = await mockDiscovery(page);
+  await page.route('**/reference/cities', (route) =>
+    route.fulfill({ status: 503, json: { message: 'Unavailable' } }),
+  );
+  await page.goto('/');
+  await expect(page.getByRole('alert')).toContainText('Cities could not load');
+  await expect(page.getByRole('heading', { name: 'Upcoming events across Türkiye' })).toBeVisible();
+  await expect(page.locator('#home-city')).toContainText('Across Türkiye');
+  expect(requests.filter((url) => url.searchParams.has('city'))).toEqual([]);
+  await page.getByRole('searchbox', { name: 'Search communities and events' }).fill('music');
+  await page.getByRole('button', { name: 'Search', exact: true }).click();
+  await expect(page).toHaveURL(/\/discover\?/);
+  expect(new URL(page.url()).searchParams.get('city')).toBeNull();
+  expect(new URL(page.url()).searchParams.get('q')).toBe('music');
+  await page.goBack();
+  await expect(page.getByRole('alert')).toContainText('Cities could not load');
+  await page.locator('#home-city').focus();
+  await page.keyboard.press('Enter');
+  await expect(page.getByRole('option', { name: 'Across Türkiye', exact: true })).toBeVisible();
+  await page.screenshot({ path: test.info().outputPath('reference-error-nationwide-reset.png') });
+  await page.getByRole('option', { name: 'Across Türkiye', exact: true }).click();
+  expect(await page.evaluate(() => localStorage.getItem('wasl-city'))).toBeNull();
+  await expect(page.locator('#home-city')).toContainText('Across Türkiye');
+});
+
+test('a valid remembered city waits for references before becoming active', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('wasl-city', 'ankara'));
+  const requests = await mockDiscovery(page);
+  let release!: () => void;
+  const held = new Promise<void>((resolve) => { release = resolve; });
+  await page.route('**/reference/cities', async (route) => {
+    await held;
+    await route.fulfill({ json: cities });
+  });
+  await page.goto('/');
+  await expect(page.getByRole('link', { name: 'Nationwide gathering', exact: true })).toBeVisible();
+  expect(requests.filter((url) => url.searchParams.has('city'))).toEqual([]);
+  release();
+  await expect(page.locator('#home-city')).toContainText('Ankara');
+  await expect(page.getByRole('heading', { name: 'Upcoming events in Ankara' })).toBeVisible();
+  expect(await page.evaluate(() => localStorage.getItem('wasl-city'))).toBe('ankara');
+});
+
+test('clearing while references load prevents a remembered city restoring later', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('wasl-city', 'ankara'));
+  await mockDiscovery(page);
+  let release!: () => void;
+  const held = new Promise<void>((resolve) => { release = resolve; });
+  await page.route('**/reference/cities', async (route) => {
+    await held;
+    await route.fulfill({ json: cities });
+  });
+  await page.goto('/');
+  await selectCity(page, 'Across Türkiye');
+  const response = page.waitForResponse('**/reference/cities');
+  release();
+  await response;
+  await expect(page.locator('#home-city')).toHaveAttribute('aria-busy', 'false');
+  await expect(page.locator('#home-city')).toContainText('Across Türkiye');
+  expect(await page.evaluate(() => localStorage.getItem('wasl-city'))).toBeNull();
+});
+
+test('a validated city survives a later reference failure and can still be cleared', async ({ page }) => {
+  await page.clock.install({ time: new Date('2030-01-01T12:00:00Z') });
+  await page.addInitScript(() => localStorage.setItem('wasl-city', 'ankara'));
+  await mockDiscovery(page);
+  await page.goto('/');
+  await expect(page.locator('#home-city')).toContainText('Ankara');
+  await selectCity(page, 'Istanbul');
+  await page.route('**/reference/cities', (route) =>
+    route.fulfill({ status: 503, json: { message: 'Unavailable' } }),
+  );
+  await page.clock.fastForward(60_000);
+  await page.evaluate(() => window.dispatchEvent(new Event('visibilitychange')));
+  await expect(page.getByRole('alert')).toContainText('Cities could not load');
+  await expect(page.locator('#home-city')).toContainText('Istanbul');
+  await expect(page.getByRole('heading', { name: 'Upcoming events in Istanbul' })).toBeVisible();
+  expect(await page.evaluate(() => localStorage.getItem('wasl-city'))).toBe('istanbul');
+  await page.getByRole('searchbox', { name: 'Search communities and events' }).fill('music');
+  await page.getByRole('button', { name: 'Search', exact: true }).click();
+  await expect(page).toHaveURL(/city=istanbul/);
+  await page.goBack();
+  await expect(page.getByRole('alert')).toContainText('Cities could not load');
+  await selectCity(page, 'Across Türkiye');
+  await expect(page.getByRole('heading', { name: 'Upcoming events across Türkiye' })).toBeVisible();
+  expect(await page.evaluate(() => localStorage.getItem('wasl-city'))).toBeNull();
 });
 
 test('mobile Arabic picker is keyboard accessible without horizontal overflow', async ({

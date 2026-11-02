@@ -21,6 +21,11 @@
 
 ## Comments
 
+### Final-review Specification P2 correction — 2026-11-02
+
+- Remembered candidate no longer becomes active until city references validate it. Pending/failed reference data uses safe nationwide discovery/search, while the existing picker retains a usable nationwide reset. Clear/manual/location commits consume the candidate; later failed refetches preserve an already validated city.
+- Combined invalid remembered city plus cities 503 regression failed before the fix and passes afterward. Delayed valid restore, clear-before-reference-response and valid-city retention on later refetch failure also pass. Full exact evidence is in `.scratch/homepage-discovery-enhancement/review.md`.
+
 ### Implementation and verification — ticket 02
 
 - Worktree: `C:/Users/seif/AppData/Local/Temp/opencode/wasl-homepage-02`; branch: `feat/homepage-02-location`. Clean initial HEAD and integration merge-base both `858177be0b44002b079424cbb52d4f295656fe16`. No resets or original-root source copies.
