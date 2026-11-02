@@ -54,6 +54,8 @@ void i18n.use(initReactI18next).init({
           'Supported cities could not load, so location was not applied. Choose a city from the list.',
         locationAttribution:
           'Province boundaries: SimpleMaps, CC BY 4.0 (adapted to Wasl cities)',
+        homeInterests: 'Browse by interest',
+        homeInterestsError: 'Interests could not load. Try again or use search.',
         discover: 'Discover',
         discoveryTitle: 'Discover',
         resourceTypesNavigation: 'Browse resource types',
@@ -761,6 +763,8 @@ void i18n.use(initReactI18next).init({
         locationBoundariesError: 'تعذر تحميل حدود المدن. لم يتغير اختيارك؛ حاول مجدداً أو اختر مدينة من القائمة.',
         locationCitiesError: 'تعذر تحميل المدن المدعومة ولم يُطبق الموقع. اختر مدينة من القائمة.',
         locationAttribution: 'حدود المحافظات: SimpleMaps، رخصة CC BY 4.0؛ مُكيّفة لمعرّفات مدن وصل.',
+        homeInterests: 'تصفح حسب الاهتمام',
+        homeInterestsError: 'تعذر تحميل الاهتمامات. أعد المحاولة أو استخدم البحث.',
         discover: 'اكتشف',
         discoveryTitle: 'اكتشف',
         resourceTypesNavigation: 'تصفح أنواع الموارد',

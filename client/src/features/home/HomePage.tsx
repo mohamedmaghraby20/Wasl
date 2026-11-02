@@ -10,6 +10,7 @@ import { SearchableSelect } from '@/components/ui/SearchableSelect';
 import { QueryError } from '@/components/feedback/QueryError';
 import { localizedName } from '@/features/resources/resource-utils';
 import { HomeSection } from './HomeSection';
+import { HomeInterests } from './HomeInterests';
 import { useHomeCity } from './useHomeCity';
 import type { LocationError } from './useHomeCity';
 import {
@@ -238,6 +239,7 @@ export function HomePage(): React.JSX.Element {
           viewAll={`/events?${onlineDestination}`}
         />
       )}
+      <HomeInterests cityId={cityId} />
     </div>
   );
 }

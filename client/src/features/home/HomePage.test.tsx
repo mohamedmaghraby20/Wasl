@@ -87,6 +87,8 @@ function renderHome(
         typeof input === 'string' ? input : input instanceof URL ? input.href : input.url,
         'http://localhost:3000',
       );
+      if (url.pathname.endsWith('/discovery/categories'))
+        return Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve([]) } as Response);
       if (url.pathname.endsWith('/reference/cities'))
         return Promise.resolve({
           ok: !options.citiesError,
