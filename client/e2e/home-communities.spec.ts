@@ -39,6 +39,7 @@ async function mockDiscovery(
     requests.push(url);
     if (url.pathname.endsWith('/reference/cities')) return route.fulfill({ json: cities });
     if (url.pathname.endsWith('/reference/categories')) return route.fulfill({ json: [] });
+    if (url.pathname.endsWith('/discovery/categories')) return route.fulfill({ json: [] });
     if (
       url.pathname.endsWith('/events') &&
       url.searchParams.get('modality') !== 'online' &&
