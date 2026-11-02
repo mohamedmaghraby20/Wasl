@@ -18,6 +18,7 @@ import type {
   PrivacyRequestDtoStatus,
 } from '@/api/generated/wasl-client.schemas';
 import { QueryError } from '@/components/feedback/QueryError';
+import { LoadingSkeleton } from '@/components/feedback/LoadingSkeleton';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { IconButton } from '@/components/ui/IconButton';
@@ -81,9 +82,7 @@ export function PrivacyDataPage(): React.JSX.Element {
   if (!loading && !user) return <Navigate replace to="/sign-in?returnTo=%2Fprivacy" />;
   if (status.isPending || requests.isPending)
     return (
-      <p className="text-sm text-text-muted" role="status">
-        {t('privacyLoading')}
-      </p>
+      <LoadingSkeleton layout="form" message={t('privacyLoading')} rows={4} />
     );
   if (status.isError) {
     return <QueryError message={t('privacyLoadError')} onRetry={() => void status.refetch()} />;
@@ -415,6 +414,7 @@ export function PrivacyDataPage(): React.JSX.Element {
                 id="privacy-request-note"
                 maxLength={2000}
                 onChange={(event) => setNote(event.target.value)}
+                placeholder={t('privacyNotePlaceholder')}
                 value={note}
               />
             </Field>

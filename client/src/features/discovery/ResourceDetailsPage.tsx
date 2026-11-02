@@ -40,6 +40,7 @@ import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { useDeleteConfirmation } from '@/components/ui/DeleteDialog';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { QueryError } from '@/components/feedback/QueryError';
+import { LoadingSkeleton } from '@/components/feedback/LoadingSkeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
 import {
   languageCode,
@@ -241,6 +242,13 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
         ? communityItem.ownerId === currentUser.data.id
         : communityItem?.ownerType === 'organization' && managesOrganization(communityItem.ownerId)
     : false;
+  const managerCheckPending = Boolean(
+    user &&
+      eventItem &&
+      (currentUser.isPending ||
+        (eventItem.hostType === 'community' && managedCommunities.isPending) ||
+        (eventItem.hostType === 'organization' && managedOrganizations.isPending)),
+  );
   const hostPath = eventItem
     ? eventItem.hostType === 'user'
       ? `/users/${eventItem.hostId}`
@@ -583,39 +591,37 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
             targetType={kind === 'events' ? 'event' : 'community'}
             targetId={item.id}
           />
+          {isManager && eventItem ? (
+            <>
+              {!eventItem.cancelled ? (
+                <>
+                  <Button asChild aria-label={t('editEvent')} title={t('editEvent')} size="icon-sm" variant="outline">
+                    <Link to={`/events/${item.id}/edit`}><Pencil aria-hidden="true" /></Link>
+                  </Button>
+                  <IconButton icon={CalendarX} label={t('cancelEventAction')} intent="danger" disabled={cancelEvent.isPending} onClick={() => void cancel()} variant="outline" />
+                </>
+              ) : null}
+              <Button asChild aria-label={t('reviewRequests')} title={t('reviewRequests')} size="icon-sm" variant="outline">
+                <Link to={`/events/${item.id}/participants?status=PENDING`}><ClipboardList aria-hidden="true" /></Link>
+              </Button>
+            </>
+          ) : null}
         </div>
       </div>
 
       <ResourceOverview item={item} hostPath={hostPath} admissionLabel={admissionLabel} />
       {eventItem &&
-      currentUser.isSuccess &&
-      (isManager || ['ACCEPTED', 'ATTENDED', 'NO_SHOW'].includes(participationStatus ?? '')) ? (
-        <EventAttendeePreview eventId={eventItem.id} />
-      ) : null}
-      {isManager && eventItem ? (
+        currentUser.isSuccess &&
+        (isManager || ['ACCEPTED', 'ATTENDED', 'NO_SHOW'].includes(participationStatus ?? '')) ? (
+          <EventAttendeePreview eventId={eventItem.id} />
+        ) : null}
+      {eventItem && user && managerCheckPending ? (
         <section className="grid gap-4 rounded-(--shape-radius-card) border border-border bg-card p-5">
-          <div className="flex flex-wrap gap-3">
-            {!eventItem.cancelled ? (
-              <>
-                <Button asChild aria-label={t('editEvent')} title={t('editEvent')} size="icon-sm" variant="outline">
-                  <Link to={`/events/${item.id}/edit`}><Pencil aria-hidden="true" /></Link>
-                </Button>
-                <IconButton
-                  icon={CalendarX}
-                  label={t('cancelEventAction')}
-                  intent="danger"
-                  disabled={cancelEvent.isPending}
-                  onClick={() => void cancel()}
-                  variant="outline"
-                />
-              </>
-            ) : null}
-            <Button asChild aria-label={t('reviewRequests')} title={t('reviewRequests')} size="icon-sm" variant="outline">
-              <Link to={`/events/${item.id}/participants?status=PENDING`}>
-                <ClipboardList aria-hidden="true" />
-              </Link>
-            </Button>
-          </div>
+          <h2 className="font-heading text-xl font-bold">{t('manageRegistrations')}</h2>
+          <LoadingSkeleton message={t('loadingParticipants')} rows={3} />
+        </section>
+      ) : isManager && eventItem ? (
+        <section className="grid gap-4 rounded-(--shape-radius-card) border border-border bg-card p-5">
           <OrganizerParticipationPanel
             kind={kind}
             resourceId={item.id}

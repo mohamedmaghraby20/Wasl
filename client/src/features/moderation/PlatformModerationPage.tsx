@@ -122,6 +122,7 @@ function SecondFactor({ onSuccess }: { onSuccess: () => void }): React.JSX.Eleme
               minLength={6}
               onChange={(event) => setCode(event.target.value)}
               pattern="[0-9]{6}"
+              placeholder={t('mfaCodePlaceholder')}
               required
               value={code}
             />

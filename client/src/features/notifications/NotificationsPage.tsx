@@ -11,6 +11,7 @@ import {
 import { IconButton } from '@/components/ui/IconButton';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { QueryError } from '@/components/feedback/QueryError';
+import { LoadingSkeleton } from '@/components/feedback/LoadingSkeleton';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { usePageMetadata } from '@/features/discovery/usePageMetadata';
 
@@ -34,7 +35,7 @@ export function NotificationsPage(): React.JSX.Element {
   usePageMetadata(t('notifications'), t('notificationsDescription'), { noindex: true });
 
   if (!loading && !user) return <Navigate replace to="/sign-in?returnTo=%2Fnotifications" />;
-  if (notifications.isPending) return <p role="status">{t('loadingNotifications')}</p>;
+  if (notifications.isPending) return <LoadingSkeleton layout="list" message={t('loadingNotifications')} rows={5} />;
   if (notifications.isError)
     return (
       <QueryError

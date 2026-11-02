@@ -22,6 +22,14 @@ export function localizedName(
   return value.nameEn;
 }
 
+/** Google Maps search URL for a free-text place or address; null when empty. */
+export function googleMapsUrl(query: string | null | undefined): string | null {
+  const text = query?.trim();
+  return text
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(text)}`
+    : null;
+}
+
 export function formatTurkeyDateTime(
   value: string,
   language: string,

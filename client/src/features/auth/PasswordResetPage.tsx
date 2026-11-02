@@ -71,12 +71,12 @@ export function PasswordResetPage(): React.JSX.Element {
         <form className="mt-7 grid gap-5" onSubmit={(event) => void submit(event)}>
           {requiresReauth ? (
             <Field id="current-password" label={t('authCurrentPassword')}>
-              <Input autoComplete="current-password" id="current-password" onChange={(event) => setCurrentPassword(event.currentTarget.value)} required type="password" value={currentPassword} />
+              <Input autoComplete="current-password" id="current-password" onChange={(event) => setCurrentPassword(event.currentTarget.value)} placeholder={t('passwordPlaceholder')} required type="password" value={currentPassword} />
             </Field>
           ) : null}
           {updating ? (
             <Field id="reset-password" label={t('authNewPassword')}>
-                <Input autoComplete="new-password" id="reset-password" minLength={8} onChange={(event) => setPassword(event.currentTarget.value)} required type="password" value={password} />
+                <Input autoComplete="new-password" id="reset-password" minLength={8} onChange={(event) => setPassword(event.currentTarget.value)} placeholder={t('newPasswordPlaceholder')} required type="password" value={password} />
             </Field>
           ) : (
             <Field id="reset-email" label={t('authEmail')}>
@@ -84,6 +84,7 @@ export function PasswordResetPage(): React.JSX.Element {
                 autoComplete="email"
                 id="reset-email"
                 onChange={(event) => setEmail(event.currentTarget.value)}
+                placeholder={t('emailPlaceholder')}
                 required
                 type="email"
                 value={email}

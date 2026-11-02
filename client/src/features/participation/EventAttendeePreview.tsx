@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { useParticipationControllerEventAttendeePreview } from '@/api/generated/participation/participation';
 import { QueryError } from '@/components/feedback/QueryError';
+import { LoadingSkeleton } from '@/components/feedback/LoadingSkeleton';
 import { Avatar } from './ParticipantAvatar';
 
 export function EventAttendeePreview({ eventId }: { eventId: string }): React.JSX.Element {
@@ -42,9 +43,7 @@ export function EventAttendeePreview({ eventId }: { eventId: string }): React.JS
         ) : null}
       </div>
       {members.isPending ? (
-        <p className="text-sm text-text-muted" role="status">
-          {t('loadingParticipation')}
-        </p>
+        <LoadingSkeleton layout="list" message={t('loadingParticipation')} rows={2} />
       ) : members.isError ? (
         <QueryError message={t('loadEventAttendeesError')} onRetry={() => void members.refetch()} />
       ) : people.length ? (

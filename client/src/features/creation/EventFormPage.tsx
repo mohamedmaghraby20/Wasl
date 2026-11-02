@@ -121,6 +121,7 @@ export function EventFormPage(): React.JSX.Element {
       admissionMode: event.admissionMode as FormValues['admissionMode'],
       capacity: event.capacity === null ? '' : String(event.capacity),
       communityId: event.hostType === 'community' ? event.hostId : '',
+      organizationId: '',
     });
   }, [existing.data, form]);
 
@@ -145,6 +146,21 @@ export function EventFormPage(): React.JSX.Element {
   const online = form.watch('online');
   const errors = form.formState.errors;
   const startsAt = form.watch('startsAt');
+  const invalidFieldLabels = Object.keys(errors)
+    .map((field): string | undefined => {
+      const labels: Record<string, string> = {
+        title: t('eventName'),
+        description: t('description'),
+        categoryIds: t('categoriesLabel'),
+        startsAt: t('eventStartsAt'),
+        endsAt: t('eventEndsAt'),
+        cityId: t('profileCity'),
+        locationName: t('eventLocation'),
+        capacity: t('capacityOptional'),
+      };
+      return labels[field];
+    })
+    .filter((label): label is string => Boolean(label));
 
   const save = async (values: FormValues): Promise<void> => {
     setFormError('');
@@ -218,6 +234,11 @@ export function EventFormPage(): React.JSX.Element {
               role="alert"
             >
               {t('formValidationError')}
+              {invalidFieldLabels.length > 0 ? (
+                <span className="block font-normal">
+                  {t('formValidationFields', { fields: invalidFieldLabels.join(', ') })}
+                </span>
+              ) : null}
             </p>
           ) : null}
 
@@ -233,6 +254,7 @@ export function EventFormPage(): React.JSX.Element {
                 aria-invalid={Boolean(errors.title)}
                 id="event-title"
                 maxLength={160}
+                placeholder={t('eventNamePlaceholder')}
                 required
                 {...form.register('title')}
               />
@@ -249,6 +271,7 @@ export function EventFormPage(): React.JSX.Element {
                 inputMode="numeric"
                 max="10000"
                 min="1"
+                placeholder={t('capacityPlaceholder')}
                 type="number"
                 {...form.register('capacity')}
               />
@@ -266,6 +289,7 @@ export function EventFormPage(): React.JSX.Element {
               aria-invalid={Boolean(errors.description)}
               id="event-description"
               maxLength={5000}
+              placeholder={t('descriptionPlaceholder')}
               required
               {...form.register('description')}
             />
@@ -420,9 +444,12 @@ export function EventFormPage(): React.JSX.Element {
             <Checkbox
               checked={online}
               id="event-online"
-              onCheckedChange={(checked) =>
-                form.setValue('online', checked === true, { shouldDirty: true })
-              }
+              onCheckedChange={(checked) => {
+                const nextOnline = checked === true;
+                form.setValue('online', nextOnline, { shouldDirty: true });
+                // The city and venue inputs unmount when online, so their errors never revalidate.
+                if (nextOnline) form.clearErrors(['cityId', 'locationName']);
+              }}
             />
             <Label className="cursor-pointer font-medium" htmlFor="event-online">
               {t('eventOnline')}
@@ -465,9 +492,10 @@ export function EventFormPage(): React.JSX.Element {
                 <Input
                   aria-describedby={errors.locationName ? 'event-location-error' : undefined}
                   aria-invalid={Boolean(errors.locationName)}
-                  id="event-location"
-                  maxLength={200}
-                  required
+                id="event-location"
+                maxLength={200}
+                placeholder={t('locationPlaceholder')}
+                required
                   {...form.register('locationName')}
                 />
               </Field>

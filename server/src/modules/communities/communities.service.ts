@@ -90,7 +90,7 @@ export class CommunitiesService {
         createdByUserId: user.id,
         hostName: organization?.name ?? profile!.displayName,
         admissionMode: input.admissionMode,
-        capacity: input.capacity ?? null,
+        capacity: null,
       });
       await tx
         .insert(communityCategories)
@@ -114,21 +114,6 @@ export class CommunitiesService {
         .for('update')
         .limit(1);
       if (!locked) throw new NotFoundException('Community not found.');
-      const [active] = await tx
-        .select({ value: count() })
-        .from(communityMemberships)
-        .where(
-          and(eq(communityMemberships.communityId, id), eq(communityMemberships.status, 'ACTIVE')),
-        );
-      if (
-        input.capacity !== undefined &&
-        input.capacity !== null &&
-        Number(active?.value ?? 0) > input.capacity
-      ) {
-        throw new BadRequestException(
-          'Capacity cannot be lower than the current active membership.',
-        );
-      }
       await tx
         .update(communities)
         .set({
@@ -136,7 +121,7 @@ export class CommunitiesService {
           description: values.description,
           cityId: input.cityId,
           admissionMode: input.admissionMode,
-          capacity: input.capacity ?? null,
+           capacity: null,
         })
         .where(eq(communities.id, id));
       await tx.delete(communityCategories).where(eq(communityCategories.communityId, id));

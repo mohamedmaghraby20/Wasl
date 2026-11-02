@@ -224,6 +224,7 @@ export function ProfileEditPage(): React.JSX.Element {
                 aria-invalid={Boolean(form.formState.errors.displayName)}
                 id="profile-display-name"
                 maxLength={80}
+                placeholder={t('namePlaceholder')}
                 {...form.register('displayName')}
               />
             </Field>
@@ -259,6 +260,7 @@ export function ProfileEditPage(): React.JSX.Element {
               aria-invalid={Boolean(form.formState.errors.bio)}
               id="profile-bio"
               maxLength={500}
+              placeholder={t('bioPlaceholder')}
               {...form.register('bio')}
             />
           </Field>

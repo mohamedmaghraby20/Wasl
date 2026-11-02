@@ -56,12 +56,14 @@ export function Field({
   children: ReactNode;
   className?: string | undefined;
 }): React.JSX.Element {
+  // content-start keeps label+control positions fixed when the grid row
+  // stretches to the tallest sibling (e.g. uneven hint lengths between columns).
   return (
-    <div className={cn('grid gap-2', className)}>
+    <div className={cn('grid content-start gap-2', className)}>
       <div className="flex items-baseline gap-0.5">
         <Label htmlFor={id}>{label}</Label>
         {required ? (
-          <span aria-hidden="true" className="text-sm font-medium text-danger">
+          <span aria-hidden="true" className="text-sm font-medium leading-none text-danger">
             *
           </span>
         ) : null}

@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { useParticipationControllerCommunityMemberPreview } from '@/api/generated/participation/participation';
 import { QueryError } from '@/components/feedback/QueryError';
+import { LoadingSkeleton } from '@/components/feedback/LoadingSkeleton';
 import { Avatar } from './ParticipantAvatar';
 import { useUsersControllerPublicProfile } from '@/api/generated/users/users';
 import type { CommunityPublicDto } from '@/api/generated/wasl-client.schemas';
@@ -24,7 +25,7 @@ export function CommunityMemberPreview({
   const organizer = useUsersControllerPublicProfile(community?.ownerId ?? '', undefined, {
     query: { enabled: !canViewMembers && community?.ownerType === 'user' },
   });
-  if (canViewMembers && query.isPending) return <p role="status">{t('loadingParticipation')}</p>;
+  if (canViewMembers && query.isPending) return <LoadingSkeleton layout="list" message={t('loadingParticipation')} rows={2} />;
   if (canViewMembers && query.isError)
     return (
       <QueryError message={t('loadCommunityMembersError')} onRetry={() => void query.refetch()} />

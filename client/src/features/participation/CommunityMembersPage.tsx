@@ -12,6 +12,7 @@ import {
 } from '@/api/generated/discovery/discovery';
 import { ApiError } from '@/api/fetcher';
 import { QueryError } from '@/components/feedback/QueryError';
+import { LoadingSkeleton } from '@/components/feedback/LoadingSkeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Field } from '@/components/ui/Field';
 import { SearchInput } from '@/components/ui/SearchInput';
@@ -63,9 +64,7 @@ export function CommunityMembersPage({
 
   if (members.isPending) {
     return (
-      <p className="mx-auto max-w-(--container-reading) text-sm text-text-muted" role="status">
-        {t('loadingParticipation')}
-      </p>
+      <LoadingSkeleton className="mx-auto w-full max-w-(--container-reading)" layout="list" message={t('loadingParticipation')} rows={5} />
     );
   }
   if (members.isError) {

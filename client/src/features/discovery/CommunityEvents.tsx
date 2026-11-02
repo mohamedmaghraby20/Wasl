@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { useDiscoveryControllerListEvents } from '@/api/generated/discovery/discovery';
 import { QueryError } from '@/components/feedback/QueryError';
+import { LoadingSkeleton } from '@/components/feedback/LoadingSkeleton';
 import { Button } from '@/components/ui/Button';
 import { IconButton } from '@/components/ui/IconButton';
 import { ResourceCard } from '@/features/resources/ResourceCard';
@@ -39,7 +40,7 @@ export function CommunityEvents({
         ) : null}
       </div>
       {query.isPending ? (
-        <p role="status">{t('loadingDetails')}</p>
+        <LoadingSkeleton layout="grid" message={t('loadingDetails')} rows={4} />
       ) : query.isError ? (
         <QueryError
           message={t('loadError', { resource: t('events') })}

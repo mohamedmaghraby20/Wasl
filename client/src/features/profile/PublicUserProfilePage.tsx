@@ -7,6 +7,7 @@ import {
   useUsersControllerPublicProfile,
 } from '@/api/generated/users/users';
 import { QueryError } from '@/components/feedback/QueryError';
+import { LoadingSkeleton } from '@/components/feedback/LoadingSkeleton';
 import { languageCode } from '@/features/resources/resource-utils';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { Badge } from '@/components/ui/Badge';
@@ -32,9 +33,7 @@ export function PublicUserProfilePage(): React.JSX.Element {
 
   if (profile.isPending)
     return (
-      <p className="text-sm text-text-muted" role="status">
-        {t('loadingProfile')}
-      </p>
+      <LoadingSkeleton className="mx-auto w-full max-w-(--container-reading)" layout="profile" message={t('loadingProfile')} />
     );
   if (profile.isError) {
     return <QueryError message={t('profileLoadError')} onRetry={() => void profile.refetch()} />;

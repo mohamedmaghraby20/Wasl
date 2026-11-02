@@ -233,7 +233,7 @@ export function CommunityDetailsLayout({
                   {item.description}
                 </p>
               </section>
-              <dl className="grid gap-5 border-t border-border pt-6 sm:grid-cols-2">
+              <dl className="grid gap-5 border-t border-border pt-6">
                 <div className="grid gap-1">
                   <dt className="text-xs font-semibold text-text-muted">{t('detailAdmission')}</dt>
                   <dd className="text-sm font-medium">
@@ -244,14 +244,6 @@ export function CommunityDetailsLayout({
                           ? 'admissionAutomatic'
                           : 'admissionOpen',
                     )}
-                  </dd>
-                </div>
-                <div className="grid gap-1">
-                  <dt className="text-xs font-semibold text-text-muted">{t('capacityLabel')}</dt>
-                  <dd className="text-sm font-medium">
-                    {item.capacity == null
-                      ? t('unlimited')
-                      : t('capacityValue', { capacity: item.capacity })}
                   </dd>
                 </div>
               </dl>

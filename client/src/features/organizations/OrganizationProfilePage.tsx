@@ -8,11 +8,12 @@ import {
 } from '@/api/generated/organizations/organizations';
 import { ApiError } from '@/api/fetcher';
 import { QueryError } from '@/components/feedback/QueryError';
+import { LoadingSkeleton } from '@/components/feedback/LoadingSkeleton';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { ReportAction } from '@/features/moderation/ReportAction';
-import { languageCode } from '@/features/resources/resource-utils';
+import { googleMapsUrl, languageCode } from '@/features/resources/resource-utils';
 
 function safeExternalUrl(value: string | null | undefined): string | undefined {
   if (!value) return undefined;
@@ -46,9 +47,7 @@ export function OrganizationProfilePage(): React.JSX.Element {
 
   if (profile.isPending)
     return (
-      <p className="text-sm text-text-muted" role="status">
-        {t('loadingOrganization')}
-      </p>
+      <LoadingSkeleton className="mx-auto w-full max-w-(--container-reading)" layout="profile" message={t('loadingOrganization')} />
     );
   if (profile.isError) {
     if (profile.error instanceof ApiError && profile.error.status === 404) {
@@ -107,10 +106,19 @@ export function OrganizationProfilePage(): React.JSX.Element {
             </Badge>
           </div>
           {location ? (
-            <p className="mt-2 inline-flex items-center gap-1.5 text-sm text-text-muted">
+            <a
+              className="group mt-2 inline-flex items-center gap-1.5 text-sm text-text-muted transition-colors hover:text-text"
+              href={googleMapsUrl(location) ?? '#'}
+              rel="noreferrer"
+              target="_blank"
+            >
               <MapPin aria-hidden="true" className="size-4" />
               {location}
-            </p>
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-primary-soft-text underline decoration-primary/40 decoration-2 underline-offset-4 transition-colors group-hover:decoration-primary">
+                {t('viewOnGoogleMaps')}
+                <ExternalLink aria-hidden="true" className="size-3.5" />
+              </span>
+            </a>
           ) : null}
         </div>
         {canManage ? (

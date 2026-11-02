@@ -6,6 +6,7 @@ import {
   useDiscoveryControllerEvent,
 } from '@/api/generated/discovery/discovery';
 import { QueryError } from '@/components/feedback/QueryError';
+import { LoadingSkeleton } from '@/components/feedback/LoadingSkeleton';
 import { languageCode, localizedResourceTitle } from '@/features/resources/resource-utils';
 import { usePageMetadata } from '@/features/discovery/usePageMetadata';
 import { OrganizerParticipationPanel } from './OrganizerParticipationPanel';
@@ -54,7 +55,7 @@ export function ParticipationReviewPage({
         {name ? <p className="text-text-muted">{name}</p> : null}
       </header>
       {resource.isPending ? (
-        <p role="status">{t('loadingDetails')}</p>
+        <LoadingSkeleton layout="list" message={t('loadingDetails')} rows={4} />
       ) : resource.isError ? (
         <QueryError
           message={t('loadError', { resource: t(kind) })}

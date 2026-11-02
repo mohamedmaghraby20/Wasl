@@ -43,6 +43,63 @@ function mockSelect(responses: unknown[][]) {
 }
 
 describe('messaging token boundary', () => {
+  it('queues a single member grant for the background worker', async () => {
+    const updates: { desiredMember: boolean; lastCheckedAt: Date }[] = [];
+    const set = vi.fn((value: { desiredMember: boolean; lastCheckedAt: Date }) => {
+      updates.push(value);
+      return { where: () => ({ returning: () => Promise.resolve([{ userId: user.id }]) }) };
+    });
+    const db = {
+      select: mockSelect([[{ id: 'conversation-1' }]]),
+      update: vi.fn(() => ({ set })),
+    } as unknown as Database;
+    const service = new MessagingService(
+      db,
+      { get: () => 'true' } as unknown as ConfigService,
+      {} as StreamChatAdapter,
+      undefined!,
+      undefined!,
+    );
+
+    await expect(
+      service.reconcileResourceMemberAccess('community', 'community-1', user.id, true),
+    ).resolves.toBe(true);
+    expect(updates[0]?.desiredMember).toBe(true);
+    expect(updates[0]?.lastCheckedAt).toBeInstanceOf(Date);
+  });
+
+  it('returns before the provider finishes revoking a removed member', async () => {
+    const updates: { desiredMember: boolean; lastCheckedAt: Date }[] = [];
+    const set = vi.fn((value: { desiredMember: boolean; lastCheckedAt: Date }) => {
+      updates.push(value);
+      return { where: () => ({ returning: () => Promise.resolve([{ userId: user.id }]) }) };
+    });
+    const db = {
+      select: mockSelect([[{ id: 'conversation-1' }]]),
+      update: vi.fn(() => ({ set })),
+    } as unknown as Database;
+    const service = new MessagingService(
+      db,
+      { get: () => 'true' } as unknown as ConfigService,
+      {} as StreamChatAdapter,
+      undefined!,
+      undefined!,
+    );
+    let finishReconciliation!: (pending: boolean) => void;
+    const reconciliation = new Promise<boolean>((resolve) => {
+      finishReconciliation = resolve;
+    });
+    const reconcile = vi.spyOn(service, 'reconcileResourceAccess').mockReturnValue(reconciliation);
+
+    await expect(
+      service.reconcileResourceMemberAccess('community', 'community-1', user.id, false),
+    ).resolves.toBe(true);
+    expect(updates[0]?.desiredMember).toBe(false);
+    expect(updates[0]?.lastCheckedAt).toBeInstanceOf(Date);
+    expect(reconcile).toHaveBeenCalledWith('community', 'community-1', user.id);
+    finishReconciliation(false);
+  });
+
   it('fails closed until channel permissions have been checked', async () => {
     const config = { get: () => 'false' } as unknown as ConfigService;
     const stream = { upsertUser: vi.fn(), token: vi.fn() };

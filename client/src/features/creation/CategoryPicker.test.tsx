@@ -18,8 +18,8 @@ const categories = ['education', 'sports', 'music', 'food'].map((id) => ({
   nameTr: id,
 }));
 
-function renderPicker(value: string[], onChange = vi.fn()): void {
-  render(
+function renderPicker(value: string[], onChange = vi.fn()) {
+  return render(
     <I18nextProvider i18n={i18n}>
       <CategoryPicker idPrefix="test" max={3} onChange={onChange} value={value} />
     </I18nextProvider>,
@@ -42,10 +42,22 @@ describe('CategoryPicker', () => {
     expect(onChange).toHaveBeenCalledWith(['education', 'sports']);
   });
 
-  it('disables unselected categories once the limit is reached', () => {
-    renderPicker(['education', 'sports', 'music']);
+  it('allows replacing a category while enforcing the three-category limit', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    const view = renderPicker(['education', 'sports', 'music'], onChange);
 
     expect(screen.getByLabelText('education')).toBeEnabled();
     expect(screen.getByLabelText('food')).toBeDisabled();
+    await user.click(screen.getByLabelText('education'));
+    expect(onChange).toHaveBeenCalledWith(['sports', 'music']);
+
+    view.rerender(
+      <I18nextProvider i18n={i18n}>
+        <CategoryPicker idPrefix="test" max={3} onChange={onChange} value={['sports', 'music']} />
+      </I18nextProvider>,
+    );
+    await user.click(screen.getByLabelText('food'));
+    expect(onChange).toHaveBeenLastCalledWith(['sports', 'music', 'food']);
   });
 });

@@ -1,6 +1,6 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+﻿import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createHead, UnheadProvider } from '@unhead/react/client';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { I18nextProvider } from 'react-i18next';
 import { MemoryRouter, Route, Routes } from 'react-router';
@@ -57,7 +57,10 @@ describe('EventFormPage organization host choice', () => {
     vi.clearAllMocks();
     await i18n.changeLanguage('en');
     mocks.auth.mockReturnValue({ user: { id: 'user-1' }, loading: false });
-    mocks.categories.mockReturnValue({ data: [], isError: false });
+    mocks.categories.mockReturnValue({
+      data: [{ id: 'social', nameEn: 'Social', nameAr: 'اجتماعي', nameTr: 'Sosyal' }],
+      isError: false,
+    });
     mocks.cities.mockReturnValue({ data: [], isError: false });
     mocks.communities.mockReturnValue({
       data: [{ id: 'community-1', name: 'My community' }],
@@ -100,4 +103,24 @@ describe('EventFormPage organization host choice', () => {
     expect(screen.getByLabelText('Host this event as')).toHaveTextContent('My community');
     expect(screen.getByLabelText('Organization (optional)')).toHaveTextContent('No organization');
   });
+
+  it('clears the validation banner after switching to an online event', async () => {
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.type(screen.getByLabelText('Event name'), 'Sunset hike');
+    await user.type(screen.getByLabelText('Description'), 'A relaxed evening hike.');
+    await user.click(screen.getByLabelText('Social'));
+    await user.click(screen.getByRole('button', { name: 'Starts' }));
+    await user.click(await screen.findByRole('button', { name: 'Today' }));
+
+    fireEvent.submit(screen.getByLabelText('Event name').closest('form')!);
+    expect(await screen.findByText(/Review the highlighted fields/)).toHaveTextContent(
+      'Fields to check: City, Venue or location.',
+    );
+
+    await user.click(screen.getByRole('checkbox', { name: 'This event is online' }));
+
+    expect(screen.queryByText(/Review the highlighted fields/)).not.toBeInTheDocument();
+  }, 20_000);
 });

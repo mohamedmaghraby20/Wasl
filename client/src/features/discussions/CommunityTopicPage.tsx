@@ -23,6 +23,7 @@ import { useDeleteConfirmation } from '@/components/ui/DeleteDialog';
 import { Field } from '@/components/ui/Field';
 import { Textarea } from '@/components/ui/Textarea';
 import { QueryError } from '@/components/feedback/QueryError';
+import { LoadingSkeleton } from '@/components/feedback/LoadingSkeleton';
 import { usePageMetadata } from '@/features/discovery/usePageMetadata';
 
 export function CommunityTopicPage(): React.JSX.Element {
@@ -131,9 +132,7 @@ export function CommunityTopicPage(): React.JSX.Element {
 
   if (query.isPending)
     return (
-      <p className="text-sm text-text-muted" role="status">
-        {t('loadingTopics')}
-      </p>
+      <LoadingSkeleton layout="article" message={t('loadingTopics')} rows={4} />
     );
   if (query.isError) {
     if (query.error instanceof ApiError && query.error.status === 404)
@@ -214,6 +213,7 @@ export function CommunityTopicPage(): React.JSX.Element {
                         id={`edit-topic-post-${post.id}`}
                         maxLength={5000}
                         onChange={(event) => setEditing({ id: post.id, body: event.target.value })}
+                        placeholder={t('commentPlaceholder')}
                         value={editing.body}
                       />
                     </Field>
@@ -298,6 +298,7 @@ export function CommunityTopicPage(): React.JSX.Element {
               id="topic-comment"
               maxLength={5000}
               onChange={(event) => setBody(event.target.value)}
+              placeholder={replyTo ? t('replyPlaceholder') : t('commentPlaceholder')}
               required
               value={body}
             />

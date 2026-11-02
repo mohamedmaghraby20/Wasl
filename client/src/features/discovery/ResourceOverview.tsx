@@ -1,9 +1,9 @@
-import { CalendarDays, MapPin, Ticket, UsersRound, Video } from 'lucide-react';
+import { CalendarDays, ExternalLink, MapPin, Ticket, UsersRound, Video } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import type { CommunityPublicDto, EventPublicDto } from '@/api/generated/wasl-client.schemas';
 import { Badge } from '@/components/ui/Badge';
-import { formatTurkeyDateTime, localizedName, localizedResourceTitle } from '@/features/resources/resource-utils';
+import { googleMapsUrl, formatTurkeyDateTime, localizedName, localizedResourceTitle } from '@/features/resources/resource-utils';
 
 export function ResourceOverview({
   item, hostPath, admissionLabel,
@@ -14,6 +14,8 @@ export function ResourceOverview({
 }): React.JSX.Element {
   const { t, i18n } = useTranslation();
   const event = 'startsAt' in item ? item : undefined;
+  const mapsQuery = event?.online ? null : event?.locationName ? `${event.locationName}, ${item.cityName ?? ''}`.replace(/, $/, '') : item.cityName;
+  const mapsHref = googleMapsUrl(mapsQuery);
   return <>
     <header className="grid gap-5 rounded-(--shape-radius-card) border border-border bg-card p-6 shadow-sm sm:p-8">
       <div className="grid gap-3">
@@ -37,7 +39,14 @@ export function ResourceOverview({
     <section className="grid gap-3 sm:grid-cols-3">
       <div className="grid content-start gap-1 rounded-(--shape-radius-card) border border-border bg-card p-4">
         <p className="inline-flex items-center gap-1.5 text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-text-subtle">{event?.online ? <Video aria-hidden="true" className="size-3.5 shrink-0" /> : <MapPin aria-hidden="true" className="size-3.5 shrink-0" />}{event ? t('detailLocation') : t('detailCity')}</p>
-        <p className="text-sm font-medium text-text">{event?.online ? t('online') : event?.locationName ? `${event.locationName}, ${item.cityName ?? ''}`.replace(/, $/, '') : item.cityName}</p>
+        {mapsHref ? (
+          <a className="group inline-grid justify-items-start gap-1" href={mapsHref} rel="noreferrer" target="_blank">
+            <span className="text-sm font-medium text-text transition-colors group-hover:text-primary-soft-text">{mapsQuery}</span>
+            <span className="inline-flex items-center gap-1 text-xs font-medium text-primary-soft-text underline decoration-primary/40 decoration-2 underline-offset-4 transition-colors hover:decoration-primary"><ExternalLink aria-hidden="true" className="size-3.5 shrink-0" />{t('viewOnGoogleMaps')}</span>
+          </a>
+        ) : (
+          <p className="text-sm font-medium text-text">{event?.online ? t('online') : mapsQuery || item.cityName}</p>
+        )}
       </div>
       {!event?.cancelled ? <div className="grid content-start gap-1 rounded-(--shape-radius-card) border border-border bg-card p-4"><p className="inline-flex items-center gap-1.5 text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-text-subtle"><Ticket aria-hidden="true" className="size-3.5 shrink-0" />{t('detailAdmission')}</p><p className="text-sm font-medium text-text">{t(admissionLabel)}</p></div> : null}
       {item.capacity !== undefined && item.capacity !== null ? <div className="grid content-start gap-1 rounded-(--shape-radius-card) border border-border bg-card p-4"><p className="inline-flex items-center gap-1.5 text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-text-subtle"><UsersRound aria-hidden="true" className="size-3.5 shrink-0" />{t('capacityLabel')}</p><p className="text-sm font-medium text-text">{t('capacityValue', { capacity: item.capacity })}</p></div> : null}

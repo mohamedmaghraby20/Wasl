@@ -40,6 +40,7 @@ export function EmailValidationForm(): React.JSX.Element {
         aria-invalid={Boolean(errors.email)}
         autoComplete="email"
         id={emailId}
+        placeholder={t('emailPlaceholder')}
         type="email"
         {...register('email', { onChange: () => setIsValid(false) })}
       />

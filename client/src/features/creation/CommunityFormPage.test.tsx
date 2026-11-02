@@ -33,14 +33,16 @@ vi.mock('@/api/generated/discovery/discovery', () => ({
   useDiscoveryControllerCommunity: mocks.community,
 }));
 
-function renderPage(): void {
+function renderPage(initialEntry = '/create/community'): void {
   render(
     <I18nextProvider i18n={i18n}>
       <UnheadProvider head={createHead()}>
         <QueryClientProvider client={new QueryClient()}>
-          <MemoryRouter initialEntries={['/create/community']}>
+          <MemoryRouter initialEntries={[initialEntry]}>
             <Routes>
               <Route path="/create/community" element={<CommunityFormPage />} />
+              <Route path="/communities/:id/edit" element={<CommunityFormPage />} />
+              <Route path="/communities/:slug" element={<p>saved</p>} />
             </Routes>
           </MemoryRouter>
         </QueryClientProvider>
@@ -78,5 +80,51 @@ describe('CommunityFormPage organization host choice', () => {
     expect(await screen.findByRole('option', { name: 'Owner Group (Owner)' })).toBeInTheDocument();
     expect(screen.getByRole('option', { name: 'Admin Group (Admin)' })).toBeInTheDocument();
     expect(screen.queryByRole('option', { name: /Unrelated/ })).not.toBeInTheDocument();
+  });
+
+  it('lets an editor replace a category while keeping the three-category limit', async () => {
+    const user = userEvent.setup();
+    const mutateAsync = vi
+      .fn<(args: { id: string; data: { categoryIds: string[] } }) => Promise<{ slug: string }>>()
+      .mockResolvedValue({ slug: 'hiking-club' });
+    mocks.categories.mockReturnValue({
+      data: ['education', 'sports', 'music', 'food'].map((id) => ({
+        id,
+        nameEn: id,
+        nameAr: id,
+        nameTr: id,
+      })),
+      isError: false,
+    });
+    mocks.community.mockReturnValue({
+      data: {
+        id: 'community-1',
+        slug: 'hiking-club',
+        name: 'Hiking Club',
+        description: 'Weekly hikes.',
+        cityId: 'istanbul',
+        categories: ['education', 'sports', 'music'].map((id) => ({ id })),
+        admissionMode: 'open',
+        capacity: null,
+      },
+      isPending: false,
+      isError: false,
+    });
+    mocks.update.mockReturnValue({ mutateAsync, isPending: false });
+
+    renderPage('/communities/community-1/edit');
+    expect(screen.getByLabelText('food')).toBeDisabled();
+    await user.click(screen.getByLabelText('education'));
+    await user.click(screen.getByLabelText('food'));
+    expect(screen.getByLabelText('food')).toHaveAttribute('aria-checked', 'true');
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+
+    expect(mutateAsync.mock.calls[0]?.[0].id).toBe('community-1');
+    expect(mutateAsync.mock.calls[0]?.[0].data.categoryIds).toEqual([
+      'sports',
+      'music',
+      'food',
+    ]);
   });
 });

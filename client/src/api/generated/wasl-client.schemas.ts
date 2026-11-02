@@ -85,7 +85,7 @@ export interface CreateCommunityDto {
   cityId: string;
   /**
      * @minItems 1
-     * @maxItems 5
+     * @maxItems 3
      */
   categoryIds: string[];
   admissionMode: CreateCommunityDtoAdmissionMode;
@@ -127,7 +127,7 @@ export interface UpdateCommunityDto {
   cityId: string;
   /**
      * @minItems 1
-     * @maxItems 5
+     * @maxItems 3
      */
   categoryIds: string[];
   admissionMode: UpdateCommunityDtoAdmissionMode;
@@ -536,7 +536,7 @@ export interface CreateEventDto {
   visibility?: CreateEventDtoVisibility;
   /**
      * @minItems 1
-     * @maxItems 5
+     * @maxItems 3
      */
   categoryIds: string[];
   startsAt: string;
@@ -594,7 +594,7 @@ export interface UpdateEventDto {
   visibility?: UpdateEventDtoVisibility;
   /**
      * @minItems 1
-     * @maxItems 5
+     * @maxItems 3
      */
   categoryIds: string[];
   startsAt: string;
@@ -1274,14 +1274,6 @@ export interface CategoryPublicDto {
   nameEn: string;
   nameAr: string;
   nameTr: string;
-}
-
-export interface CreateCategoryDto {
-  /**
-     * @minLength 2
-     * @maxLength 40
-     */
-  name: string;
 }
 
 export interface CommunityPublicDto {

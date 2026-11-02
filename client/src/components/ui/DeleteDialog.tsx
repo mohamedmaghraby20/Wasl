@@ -98,6 +98,7 @@ export function DeleteDialog({
                   disabled={state === 'pending'}
                   id={id}
                   onChange={(event) => setTyped(event.target.value)}
+                  placeholder={options.confirmationText}
                   spellCheck={false}
                   value={typed}
                 />

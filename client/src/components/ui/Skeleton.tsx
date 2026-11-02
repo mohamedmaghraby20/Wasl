@@ -4,7 +4,7 @@ export function Skeleton({ className }: { className?: string }): React.JSX.Eleme
   return (
     <div
       aria-hidden="true"
-      className={cn('animate-pulse rounded-md bg-surface-soft', className)}
+      className={cn('animate-pulse rounded-md bg-surface-soft motion-reduce:animate-none', className)}
     />
   );
 }

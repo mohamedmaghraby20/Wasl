@@ -50,7 +50,6 @@ export class ParticipationService {
         .select({
           id: communities.id,
           admissionMode: communities.admissionMode,
-          capacity: communities.capacity,
           archived: communities.archived,
         })
         .from(communities)
@@ -73,22 +72,7 @@ export class ParticipationService {
       if (existing && ['PENDING', 'WAITLISTED', 'ACTIVE'].includes(existing.status)) {
         return { status: existing.status };
       }
-      const activeCount = await tx
-        .select({ value: count() })
-        .from(communityMemberships)
-        .where(
-          and(
-            eq(communityMemberships.communityId, communityId),
-            eq(communityMemberships.status, 'ACTIVE'),
-          ),
-        );
-      const full =
-        community.capacity !== null && Number(activeCount[0]?.value ?? 0) >= community.capacity;
-      const status: CommunityStatus = full
-        ? 'WAITLISTED'
-        : community.admissionMode === 'approval'
-          ? 'PENDING'
-          : 'ACTIVE';
+      const status: CommunityStatus = community.admissionMode === 'approval' ? 'PENDING' : 'ACTIVE';
 
       if (existing && sameStatus(existing.status, status)) return { status };
       assertCommunityTransition(existing?.status ?? null, status);
@@ -129,9 +113,11 @@ export class ParticipationService {
         );
       return { status };
     });
-    const messagingSyncPending = await this.messaging?.reconcileResourceAccess(
+    const messagingSyncPending = await this.messaging?.reconcileResourceMemberAccess(
       'community',
       communityId,
+      user.id,
+      result.status === 'ACTIVE',
     );
     return { ...result, messagingSyncPending: messagingSyncPending ?? false };
   }
@@ -142,7 +128,6 @@ export class ParticipationService {
       const [community] = await tx
         .select({
           id: communities.id,
-          capacity: communities.capacity,
           admissionMode: communities.admissionMode,
         })
         .from(communities)
@@ -162,7 +147,7 @@ export class ParticipationService {
         .for('update')
         .limit(1);
       if (!membership) throw new NotFoundException('Membership not found.');
-      if (membership.status === 'LEFT') return { status: membership.status };
+      if (membership.status === 'LEFT') return { status: membership.status, promotedUserIds: [] };
       assertCommunityTransition(membership.status, 'LEFT');
       await tx
         .update(communityMemberships)
@@ -174,15 +159,22 @@ export class ParticipationService {
         toStatus: 'LEFT',
         actorUserId: user.id,
       });
-      if (community.admissionMode !== 'approval')
-        await this.promoteCommunityWaitlist(tx, communityId, community.capacity);
-      return { status: 'LEFT' as const };
+      const promotedUserIds =
+        community.admissionMode !== 'approval'
+          ? await this.promoteCommunityWaitlist(tx, communityId)
+          : [];
+      return { status: 'LEFT' as const, promotedUserIds };
     });
-    const messagingSyncPending = await this.messaging?.reconcileResourceAccess(
-      'community',
-      communityId,
-    );
-    return { ...result, messagingSyncPending: messagingSyncPending ?? false };
+    const syncResults = await Promise.all([
+      this.messaging?.reconcileResourceMemberAccess('community', communityId, user.id, false),
+      ...result.promotedUserIds.map((userId) =>
+        this.messaging?.reconcileResourceMemberAccess('community', communityId, userId, true),
+      ),
+    ]);
+    return {
+      status: result.status,
+      messagingSyncPending: syncResults.some(Boolean),
+    };
   }
 
   async registerForEvent(user: AuthenticatedUser, eventId: string) {
@@ -267,7 +259,12 @@ export class ParticipationService {
         );
       return { status };
     });
-    const messagingSyncPending = await this.messaging?.reconcileResourceAccess('event', eventId);
+    const messagingSyncPending = await this.messaging?.reconcileResourceMemberAccess(
+      'event',
+      eventId,
+      user.id,
+      result.status === 'ACCEPTED',
+    );
     return { ...result, messagingSyncPending: messagingSyncPending ?? false };
   }
 
@@ -294,7 +291,8 @@ export class ParticipationService {
         .for('update')
         .limit(1);
       if (!registration) throw new NotFoundException('Registration not found.');
-      if (registration.status === 'CANCELLED_BY_USER') return { status: registration.status };
+      if (registration.status === 'CANCELLED_BY_USER')
+        return { status: registration.status, promotedUserIds: [] };
       assertEventTransition(registration.status, 'CANCELLED_BY_USER');
       await tx
         .update(eventRegistrations)
@@ -306,13 +304,19 @@ export class ParticipationService {
         toStatus: 'CANCELLED_BY_USER',
         actorUserId: user.id,
       });
-      if (event.admissionMode !== 'approval' && !event.cancelled && event.startsAt > new Date()) {
-        await this.promoteEventWaitlist(tx, eventId, event.capacity);
-      }
-      return { status: 'CANCELLED_BY_USER' as const };
+      const promotedUserIds =
+        event.admissionMode !== 'approval' && !event.cancelled && event.startsAt > new Date()
+          ? await this.promoteEventWaitlist(tx, eventId, event.capacity)
+          : [];
+      return { status: 'CANCELLED_BY_USER' as const, promotedUserIds };
     });
-    const messagingSyncPending = await this.messaging?.reconcileResourceAccess('event', eventId);
-    return { ...result, messagingSyncPending: messagingSyncPending ?? false };
+    const syncResults = await Promise.all([
+      this.messaging?.reconcileResourceMemberAccess('event', eventId, user.id, false),
+      ...result.promotedUserIds.map((userId) =>
+        this.messaging?.reconcileResourceMemberAccess('event', eventId, userId, true),
+      ),
+    ]);
+    return { status: result.status, messagingSyncPending: syncResults.some(Boolean) };
   }
 
   async myCommunityStatus(user: AuthenticatedUser, communityId: string) {
@@ -416,7 +420,7 @@ export class ParticipationService {
   async communityCounts(user: AuthenticatedUser, communityId: string) {
     await this.communitiesService.assertCanManage(user.id, communityId);
     const [community] = await this.database()
-      .select({ capacity: communities.capacity, admissionMode: communities.admissionMode })
+      .select({ admissionMode: communities.admissionMode })
       .from(communities)
       .where(eq(communities.id, communityId))
       .limit(1);
@@ -427,7 +431,7 @@ export class ParticipationService {
       .where(eq(communityMemberships.communityId, communityId))
       .groupBy(communityMemberships.status);
     return {
-      capacity: community.capacity === null ? 'unlimited' : String(community.capacity),
+      capacity: 'unlimited',
       admissionMode: community.admissionMode,
       ...countStatuses(counts),
     };
@@ -716,7 +720,6 @@ export class ParticipationService {
       const [community] = await tx
         .select({
           id: communities.id,
-          capacity: communities.capacity,
           admissionMode: communities.admissionMode,
         })
         .from(communities)
@@ -761,11 +764,7 @@ export class ParticipationService {
             'Only manual waitlist entries can be promoted by an organizer.',
           );
         }
-        status = (await this.communityHasCapacity(tx, communityId, community.capacity))
-          ? 'ACTIVE'
-          : 'WAITLISTED';
-        if (action === 'promote' && status !== 'ACTIVE')
-          throw new BadRequestException('No community capacity is currently available.');
+        status = 'ACTIVE';
       }
       await this.updateMembershipState(
         tx,
@@ -776,19 +775,29 @@ export class ParticipationService {
         communityId,
         membership.userId,
       );
-      if (
+      const promotedUserIds =
         (action === 'remove' || (action === 'reject' && membership.status === 'WAITLISTED')) &&
         community.admissionMode !== 'approval'
-      ) {
-        await this.promoteCommunityWaitlist(tx, communityId, community.capacity);
-      }
-      return { participantId: membershipId, status };
+          ? await this.promoteCommunityWaitlist(tx, communityId)
+          : [];
+      return { participantId: membershipId, status, userId: membership.userId, promotedUserIds };
     });
-    const messagingSyncPending = await this.messaging?.reconcileResourceAccess(
-      'community',
-      communityId,
-    );
-    return { ...result, messagingSyncPending: messagingSyncPending ?? false };
+    const syncResults = await Promise.all([
+      this.messaging?.reconcileResourceMemberAccess(
+        'community',
+        communityId,
+        result.userId,
+        result.status === 'ACTIVE',
+      ),
+      ...result.promotedUserIds.map((userId) =>
+        this.messaging?.reconcileResourceMemberAccess('community', communityId, userId, true),
+      ),
+    ]);
+    return {
+      participantId: result.participantId,
+      status: result.status,
+      messagingSyncPending: syncResults.some(Boolean),
+    };
   }
 
   async decideEvent(
@@ -874,36 +883,36 @@ export class ParticipationService {
         eventId,
         registration.userId,
       );
-      if (
+      const promotedUserIds =
         (action === 'remove' || (action === 'reject' && registration.status === 'WAITLISTED')) &&
         event.admissionMode !== 'approval' &&
         !event.cancelled &&
         event.startsAt > new Date()
-      ) {
-        await this.promoteEventWaitlist(tx, eventId, event.capacity);
-      }
-      return { participantId: registrationId, status };
+          ? await this.promoteEventWaitlist(tx, eventId, event.capacity)
+          : [];
+      return {
+        participantId: registrationId,
+        status,
+        userId: registration.userId,
+        promotedUserIds,
+      };
     });
-    const messagingSyncPending = await this.messaging?.reconcileResourceAccess('event', eventId);
-    return { ...result, messagingSyncPending: messagingSyncPending ?? false };
-  }
-
-  private async communityHasCapacity(
-    tx: Transaction,
-    communityId: string,
-    capacity: number | null,
-  ): Promise<boolean> {
-    if (capacity === null) return true;
-    const [active] = await tx
-      .select({ value: count() })
-      .from(communityMemberships)
-      .where(
-        and(
-          eq(communityMemberships.communityId, communityId),
-          eq(communityMemberships.status, 'ACTIVE'),
-        ),
-      );
-    return Number(active?.value ?? 0) < capacity;
+    const syncResults = await Promise.all([
+      this.messaging?.reconcileResourceMemberAccess(
+        'event',
+        eventId,
+        result.userId,
+        ['ACCEPTED', 'ATTENDED', 'NO_SHOW'].includes(result.status),
+      ),
+      ...result.promotedUserIds.map((userId) =>
+        this.messaging?.reconcileResourceMemberAccess('event', eventId, userId, true),
+      ),
+    ]);
+    return {
+      participantId: result.participantId,
+      status: result.status,
+      messagingSyncPending: syncResults.some(Boolean),
+    };
   }
 
   private async eventHasCapacity(
@@ -984,12 +993,9 @@ export class ParticipationService {
       );
   }
 
-  private async promoteCommunityWaitlist(
-    tx: Transaction,
-    communityId: string,
-    capacity: number | null,
-  ) {
-    while (await this.communityHasCapacity(tx, communityId, capacity)) {
+  private async promoteCommunityWaitlist(tx: Transaction, communityId: string): Promise<string[]> {
+    const promotedUserIds: string[] = [];
+    while (true) {
       const [next] = await tx
         .select({
           id: communityMemberships.id,
@@ -1006,7 +1012,7 @@ export class ParticipationService {
         .orderBy(asc(communityMemberships.requestedAt), asc(communityMemberships.id))
         .for('update')
         .limit(1);
-      if (!next) return;
+      if (!next) return promotedUserIds;
       await this.updateMembershipState(
         tx,
         next.id,
@@ -1016,10 +1022,16 @@ export class ParticipationService {
         communityId,
         next.userId,
       );
+      promotedUserIds.push(next.userId);
     }
   }
 
-  private async promoteEventWaitlist(tx: Transaction, eventId: string, capacity: number | null) {
+  private async promoteEventWaitlist(
+    tx: Transaction,
+    eventId: string,
+    capacity: number | null,
+  ): Promise<string[]> {
+    const promotedUserIds: string[] = [];
     while (await this.eventHasCapacity(tx, eventId, capacity)) {
       const [next] = await tx
         .select({
@@ -1034,7 +1046,7 @@ export class ParticipationService {
         .orderBy(asc(eventRegistrations.requestedAt), asc(eventRegistrations.id))
         .for('update')
         .limit(1);
-      if (!next) return;
+      if (!next) return promotedUserIds;
       await this.updateRegistrationState(
         tx,
         next.id,
@@ -1044,7 +1056,9 @@ export class ParticipationService {
         eventId,
         next.userId,
       );
+      promotedUserIds.push(next.userId);
     }
+    return promotedUserIds;
   }
 
   private async notifyParticipation(

@@ -33,11 +33,6 @@ const formSchema = z.object({
   cityId: z.string().min(1),
   categoryIds: z.array(z.string()).min(1).max(3),
   admissionMode: z.enum(['open', 'approval', 'automatic']),
-  capacity: z
-    .string()
-    .refine(
-      (value) => !value || (/^\d+$/.test(value) && Number(value) > 0 && Number(value) <= 10000),
-    ),
   organizationId: z.string(),
 });
 
@@ -68,7 +63,6 @@ export function CommunityFormPage(): React.JSX.Element {
       cityId: '',
       categoryIds: [],
       admissionMode: 'open',
-      capacity: '',
       organizationId: '',
     },
   });
@@ -83,7 +77,7 @@ export function CommunityFormPage(): React.JSX.Element {
       cityId: community.cityId,
       categoryIds: community.categories.map((category) => category.id),
       admissionMode: community.admissionMode as FormValues['admissionMode'],
-      capacity: community.capacity === null ? '' : String(community.capacity),
+      organizationId: '',
     });
   }, [existing.data, form]);
 
@@ -106,6 +100,17 @@ export function CommunityFormPage(): React.JSX.Element {
 
   const categoryIds = form.watch('categoryIds');
   const errors = form.formState.errors;
+  const invalidFieldLabels = Object.keys(errors)
+    .map((field): string | undefined => {
+      const labels: Record<string, string> = {
+        name: t('communityName'),
+        description: t('description'),
+        cityId: t('profileCity'),
+        categoryIds: t('categoriesLabel'),
+      };
+      return labels[field];
+    })
+    .filter((label): label is string => Boolean(label));
 
   const save = async (values: FormValues): Promise<void> => {
     setFormError('');
@@ -115,7 +120,6 @@ export function CommunityFormPage(): React.JSX.Element {
       cityId: values.cityId,
       categoryIds: values.categoryIds,
       admissionMode: values.admissionMode,
-      capacity: values.capacity ? Number(values.capacity) : null,
       organizationId: editing ? null : values.organizationId || null,
     };
     try {
@@ -161,6 +165,11 @@ export function CommunityFormPage(): React.JSX.Element {
               role="alert"
             >
               {t('formValidationError')}
+              {invalidFieldLabels.length > 0 ? (
+                <span className="block font-normal">
+                  {t('formValidationFields', { fields: invalidFieldLabels.join(', ') })}
+                </span>
+              ) : null}
             </p>
           ) : null}
 
@@ -197,31 +206,16 @@ export function CommunityFormPage(): React.JSX.Element {
             </Field>
           ) : null}
 
-          <div className="grid gap-5 sm:grid-cols-2">
+          <div className="grid gap-5">
             <Field error={errors.name ? t('formFieldInvalid') : undefined} id="community-name" label={t('communityName')} required>
               <Input
                 aria-describedby={errors.name ? 'community-name-error' : undefined}
                 aria-invalid={Boolean(errors.name)}
                 id="community-name"
                 maxLength={100}
+                placeholder={t('communityNamePlaceholder')}
                 required
                 {...form.register('name')}
-              />
-            </Field>
-            <Field
-              error={errors.capacity ? t('formFieldInvalid') : undefined}
-              id="community-capacity"
-              label={t('capacityOptional')}
-            >
-              <Input
-                aria-describedby={errors.capacity ? 'community-capacity-error' : undefined}
-                aria-invalid={Boolean(errors.capacity)}
-                id="community-capacity"
-                inputMode="numeric"
-                max="10000"
-                min="1"
-                type="number"
-                {...form.register('capacity')}
               />
             </Field>
           </div>
@@ -237,6 +231,7 @@ export function CommunityFormPage(): React.JSX.Element {
               aria-invalid={Boolean(errors.description)}
               id="community-description"
               maxLength={5000}
+              placeholder={t('descriptionPlaceholder')}
               required
               {...form.register('description')}
             />

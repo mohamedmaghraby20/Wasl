@@ -250,7 +250,11 @@ export class MessagingService {
     };
   }
 
-  async reconcileResourceAccess(kind: 'community' | 'event', resourceId: string): Promise<boolean> {
+  async reconcileResourceAccess(
+    kind: 'community' | 'event',
+    resourceId: string,
+    userId?: string,
+  ): Promise<boolean> {
     const [conversation] = await this.database()
       .select({
         id: messagingConversations.id,
@@ -270,7 +274,14 @@ export class MessagingService {
         providerMember: messagingMemberSync.providerMember,
       })
       .from(messagingMemberSync)
-      .where(eq(messagingMemberSync.conversationId, conversation.id));
+      .where(
+        userId
+          ? and(
+              eq(messagingMemberSync.conversationId, conversation.id),
+              eq(messagingMemberSync.userId, userId),
+            )
+          : eq(messagingMemberSync.conversationId, conversation.id),
+      );
     let syncPending = false;
     for (const member of members) {
       let desired = false;
@@ -363,6 +374,41 @@ export class MessagingService {
       }
     }
     return syncPending;
+  }
+
+  async reconcileResourceMemberAccess(
+    kind: 'community' | 'event',
+    resourceId: string,
+    userId: string,
+    desiredMember: boolean,
+  ): Promise<boolean> {
+    if (this.config.get<string>('STREAM_PERMISSIONS_VERIFIED') !== 'true')
+      return this.reconcileResourceAccess(kind, resourceId, userId);
+    const [conversation] = await this.database()
+      .select({ id: messagingConversations.id })
+      .from(messagingConversations)
+      .where(
+        kind === 'community'
+          ? eq(messagingConversations.communityId, resourceId)
+          : eq(messagingConversations.eventId, resourceId),
+      )
+      .limit(1);
+    if (!conversation) return false;
+    const affected = await this.database()
+      .update(messagingMemberSync)
+      .set({ desiredMember, lastCheckedAt: new Date() })
+      .where(
+        and(
+          eq(messagingMemberSync.conversationId, conversation.id),
+          eq(messagingMemberSync.userId, userId),
+        ),
+      )
+      .returning({ userId: messagingMemberSync.userId });
+    if (affected.length === 0) return false;
+    void this.reconcileResourceAccess(kind, resourceId, userId).catch(() => {
+      this.logger.warn('A resource chat membership sync remains queued for retry.');
+    });
+    return true;
   }
 
   async reconcilePendingMemberships(): Promise<void> {

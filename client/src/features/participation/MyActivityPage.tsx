@@ -13,6 +13,7 @@ import { IconButton } from '@/components/ui/IconButton';
 import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { QueryError } from '@/components/feedback/QueryError';
+import { LoadingSkeleton } from '@/components/feedback/LoadingSkeleton';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { usePageMetadata } from '@/features/discovery/usePageMetadata';
 import { formatTurkeyDateTime } from '@/features/resources/resource-utils';
@@ -37,9 +38,7 @@ export function MyActivityPage(): React.JSX.Element {
   if (!loading && !user) return <Navigate replace to="/sign-in?returnTo=%2Factivity" />;
   if (activity.isPending)
     return (
-      <p className="text-sm text-text-muted" role="status">
-        {t('loadingMyActivity')}
-      </p>
+      <LoadingSkeleton layout="list" message={t('loadingMyActivity')} rows={5} />
     );
   if (activity.isError) {
     return (

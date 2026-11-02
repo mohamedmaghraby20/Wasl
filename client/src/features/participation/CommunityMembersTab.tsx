@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { useParticipationControllerCommunityMembers } from '@/api/generated/participation/participation';
 import { QueryError } from '@/components/feedback/QueryError';
+import { LoadingSkeleton } from '@/components/feedback/LoadingSkeleton';
 import { SearchInput } from '@/components/ui/SearchInput';
 import { Field } from '@/components/ui/Field';
 import { Avatar } from './ParticipantAvatar';
@@ -17,7 +18,7 @@ export function CommunityMembersTab({
   const { t, i18n } = useTranslation();
   const [search, setSearch] = useState('');
   const query = useParticipationControllerCommunityMembers(communityId);
-  if (query.isPending) return <p role="status">{t('loadingParticipation')}</p>;
+  if (query.isPending) return <LoadingSkeleton layout="list" message={t('loadingParticipation')} rows={3} />;
   if (query.isError)
     return (
       <QueryError message={t('loadCommunityMembersError')} onRetry={() => void query.refetch()} />

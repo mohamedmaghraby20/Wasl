@@ -4,6 +4,7 @@ import { Link, Navigate, useLocation } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useUsersControllerCurrent } from '@/api/generated/users/users';
 import { QueryError } from '@/components/feedback/QueryError';
+import { LoadingSkeleton } from '@/components/feedback/LoadingSkeleton';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -23,9 +24,7 @@ export function ProfilePage(): React.JSX.Element {
   }
   if (loading || profile.isPending)
     return (
-      <p className="text-sm text-text-muted" role="status">
-        {t('loadingProfile')}
-      </p>
+      <LoadingSkeleton className="mx-auto w-full max-w-(--container-reading)" layout="profile" message={t('loadingProfile')} />
     );
   if (profile.isError) {
     return <QueryError message={t('profileLoadError')} onRetry={() => void profile.refetch()} />;

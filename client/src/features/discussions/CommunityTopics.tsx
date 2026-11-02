@@ -112,6 +112,7 @@ export function CommunityTopics({
               id="topic-title"
               maxLength={160}
               onChange={(event) => setTitle(event.target.value)}
+              placeholder={t('topicTitlePlaceholder')}
               required
               value={title}
             />
@@ -121,6 +122,7 @@ export function CommunityTopics({
               id="topic-body"
               maxLength={5000}
               onChange={(event) => setBody(event.target.value)}
+              placeholder={t('descriptionPlaceholder')}
               required
               value={body}
             />

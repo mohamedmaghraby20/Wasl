@@ -192,6 +192,7 @@ export function EventDiscussion({
                         id={`edit-post-${post.id}`}
                         maxLength={5000}
                         onChange={(event) => setEditing({ id: post.id, body: event.target.value })}
+                        placeholder={t('commentPlaceholder')}
                         value={editing.body}
                       />
                     </Field>
@@ -288,6 +289,7 @@ export function EventDiscussion({
               id="event-comment"
               maxLength={5000}
               onChange={(event) => setBody(event.target.value)}
+              placeholder={replyTo ? t('replyPlaceholder') : t('commentPlaceholder')}
               required
               value={body}
             />

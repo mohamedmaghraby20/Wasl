@@ -125,6 +125,7 @@ export function OrganizationCreatePage(): React.JSX.Element {
                 aria-invalid={Boolean(errors.name)}
                 id="organization-name"
                 maxLength={160}
+                placeholder={t('organizationNamePlaceholder')}
                 required
                 {...form.register('name')}
               />
@@ -140,6 +141,7 @@ export function OrganizationCreatePage(): React.JSX.Element {
                 aria-invalid={Boolean(errors.type)}
                 id="organization-type"
                 maxLength={80}
+                placeholder={t('organizationTypePlaceholder')}
                 required
                 {...form.register('type')}
               />
@@ -159,6 +161,7 @@ export function OrganizationCreatePage(): React.JSX.Element {
               aria-invalid={Boolean(errors.description)}
               id="organization-description"
               maxLength={5000}
+              placeholder={t('descriptionPlaceholder')}
               required
               {...form.register('description')}
             />
@@ -205,6 +208,7 @@ export function OrganizationCreatePage(): React.JSX.Element {
                 aria-invalid={Boolean(errors.locationName)}
                 id="organization-location"
                 maxLength={160}
+                placeholder={t('locationPlaceholder')}
                 {...form.register('locationName')}
               />
             </Field>

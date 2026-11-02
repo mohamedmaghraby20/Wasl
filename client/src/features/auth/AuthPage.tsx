@@ -150,6 +150,7 @@ export function AuthPage(): React.JSX.Element {
                   maxLength={80}
                   minLength={1}
                   onChange={(event) => setDisplayName(event.currentTarget.value)}
+                  placeholder={t('namePlaceholder')}
                   required
                   type="text"
                   value={displayName}
@@ -161,6 +162,7 @@ export function AuthPage(): React.JSX.Element {
                 autoComplete="email"
                 id="auth-email"
                 onChange={(event) => setEmail(event.currentTarget.value)}
+                placeholder={t('emailPlaceholder')}
                 required
                 type="email"
                 value={email}
@@ -172,6 +174,7 @@ export function AuthPage(): React.JSX.Element {
                 id="auth-password"
                 minLength={isSignUp ? 8 : undefined}
                 onChange={(event) => setPassword(event.currentTarget.value)}
+                placeholder={t(isSignUp ? 'newPasswordPlaceholder' : 'passwordPlaceholder')}
                 required
                 type="password"
                 value={password}

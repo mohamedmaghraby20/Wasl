@@ -57,7 +57,7 @@ export function CategoryPicker({
             >
               <Checkbox
                 checked={checked}
-                className="size-3.5 rounded-xs [&_svg]:size-2.5"
+                className="size-3.5 [&_svg]:size-2.5"
                 disabled={atLimit}
                 id={`${idPrefix}-category-${category.id}`}
                 onCheckedChange={(next) => {

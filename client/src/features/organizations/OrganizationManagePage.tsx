@@ -373,6 +373,7 @@ export function OrganizationManagePage(): React.JSX.Element {
                     id="organization-verification-note"
                     maxLength={2000}
                     onChange={(event) => setVerificationNote(event.currentTarget.value)}
+                    placeholder={t('verificationNotePlaceholder')}
                     value={verificationNote}
                   />
                 </Field>
@@ -517,6 +518,7 @@ export function OrganizationManagePage(): React.JSX.Element {
                   id="organization-invite-email"
                   maxLength={320}
                   onChange={(event) => setEmail(event.currentTarget.value)}
+                  placeholder={t('emailPlaceholder')}
                   required
                   type="email"
                   value={email}

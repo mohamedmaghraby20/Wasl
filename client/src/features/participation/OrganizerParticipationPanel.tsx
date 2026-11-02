@@ -26,6 +26,7 @@ import { Button } from '@/components/ui/Button';
 import { IconButton } from '@/components/ui/IconButton';
 import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { QueryError } from '@/components/feedback/QueryError';
+import { LoadingSkeleton } from '@/components/feedback/LoadingSkeleton';
 import { ApiError } from '@/api/fetcher';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Field } from '@/components/ui/Field';
@@ -73,7 +74,7 @@ export function OrganizerParticipationPanel({
   });
   const counts = kind === 'communities' ? communityCounts : eventCounts;
   const needsParticipants =
-    mode !== 'requests' || Boolean(counts.data && counts.data.PENDING + counts.data.WAITLISTED > 0);
+    mode !== 'requests' || !counts.data || counts.data.PENDING + counts.data.WAITLISTED > 0;
   const communityParticipants = useParticipationControllerCommunityParticipants(resourceId, {
     query: { enabled: kind === 'communities' && needsParticipants },
   });
@@ -227,7 +228,7 @@ export function OrganizerParticipationPanel({
         </div>
       ) : null}
       {isPending ? (
-        <p role="status">{t('loadingParticipants')}</p>
+        <LoadingSkeleton className="gap-0" layout="list" message={t('loadingParticipants')} rows={3} />
       ) : isError ? (
         <QueryError
           message={t('loadOrganizerParticipationError')}
@@ -256,10 +257,14 @@ export function OrganizerParticipationPanel({
                 label={kind === 'communities' ? t('countActive') : t('countAccepted')}
                 value={kind === 'communities' ? counts.data.ACTIVE : counts.data.ACCEPTED}
               />
-              <Count
-                label={t('capacityLabel')}
-                value={counts.data.capacity === 'unlimited' ? t('unlimited') : counts.data.capacity}
-              />
+              {kind === 'events' ? (
+                <Count
+                  label={t('capacityLabel')}
+                  value={
+                    counts.data.capacity === 'unlimited' ? t('unlimited') : counts.data.capacity
+                  }
+                />
+              ) : null}
             </dl>
           ) : null}
           {atCapacity && counts.data.WAITLISTED > 0 && counts.data.admissionMode === 'approval' ? (

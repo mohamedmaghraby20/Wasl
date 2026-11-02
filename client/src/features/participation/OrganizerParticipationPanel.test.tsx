@@ -84,7 +84,7 @@ describe('OrganizerParticipationPanel', () => {
     expect(screen.getByAltText('')).toHaveAttribute('src', 'https://example.test/avatar.png');
     expect(screen.getByText('Pending')).toBeVisible();
     expect(screen.getByText('3')).toBeVisible();
-    expect(screen.getByText('10')).toBeVisible();
+    expect(screen.queryByText('10')).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Approve' })).toHaveClass(
       'size-9',
       'hover:text-success',
@@ -123,6 +123,15 @@ describe('OrganizerParticipationPanel', () => {
     expect(container).toBeEmptyDOMElement();
     expect(mocks.participants).toHaveBeenNthCalledWith(1, 'community-1', {
       query: { enabled: false },
+    });
+  });
+
+  it('loads request rows in parallel with counts instead of waiting for counts first', () => {
+    mocks.counts.mockReturnValue({ data: undefined, isPending: true, isError: false });
+    mocks.participants.mockReturnValue({ data: undefined, isPending: true, isError: false });
+    renderPanel('requests');
+    expect(mocks.participants).toHaveBeenCalledWith('community-1', {
+      query: { enabled: true },
     });
   });
 

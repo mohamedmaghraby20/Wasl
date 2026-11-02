@@ -238,11 +238,10 @@ describe('ParticipationService', () => {
 
   it('promotes the oldest waitlisted community member after an active member leaves', async () => {
     const rows = [
-      [{ id: 'community', capacity: 1, admissionMode: 'automatic' }],
+      [{ id: 'community', admissionMode: 'automatic' }],
       [{ id: 'leaving-member', status: 'ACTIVE' }],
-      [{ value: 0 }],
       [{ id: 'oldest-waitlisted', status: 'WAITLISTED' }],
-      [{ value: 1 }],
+      [],
     ];
     const changes: unknown[] = [];
     const transitions: unknown[] = [];
