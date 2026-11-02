@@ -9,6 +9,7 @@ import { SearchableSelect } from '@/components/ui/SearchableSelect';
 import { QueryError } from '@/components/feedback/QueryError';
 import { localizedName } from '@/features/resources/resource-utils';
 import { HomeSection } from './HomeSection';
+import { HomeInterests } from './HomeInterests';
 import { useHomeCity } from './useHomeCity';
 import {
   useDiscoveryControllerListCommunities,
@@ -164,6 +165,7 @@ export function HomePage(): React.JSX.Element {
         isError={communities.isError}
         onRetry={() => void communities.refetch()}
       />
+      <HomeInterests cityId={cityId} />
     </div>
   );
 }

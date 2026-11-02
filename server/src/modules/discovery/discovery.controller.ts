@@ -9,7 +9,21 @@ import {
   applyDecorators,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiQuery } from '@nestjs/swagger';
-import { and, asc, desc, eq, ilike, inArray, or, gt, gte, lt, sql, type SQL } from 'drizzle-orm';
+import {
+  and,
+  asc,
+  desc,
+  eq,
+  exists,
+  gt,
+  gte,
+  ilike,
+  inArray,
+  lt,
+  or,
+  sql,
+  type SQL,
+} from 'drizzle-orm';
 import { DATABASE, type Database } from '../../db/database.module';
 import { Inject } from '@nestjs/common';
 import {
@@ -62,6 +76,58 @@ export class DiscoveryController {
   @ApiOkResponse({ type: CategoryPublicDto, isArray: true })
   categories() {
     return this.reference.listCategories();
+  }
+
+  @Get('discovery/categories')
+  @ApiQuery({ name: 'city', required: false, type: String })
+  @ApiOkResponse({ type: CategoryPublicDto, isArray: true })
+  async discoveryCategories(@Query() query: Record<string, string | undefined>) {
+    const db = this.database();
+    const city = query.city?.trim();
+    // Evaluated over all eligible content, independently of any four-card collection.
+    const hasEligibleContent = or(
+      exists(
+        db
+          .select({ selected: sql`1` })
+          .from(communityCategories)
+          .innerJoin(communities, eq(communityCategories.communityId, communities.id))
+          .where(
+            and(
+              eq(communityCategories.categoryId, categories.id),
+              eq(communities.archived, false),
+              city ? eq(communities.cityId, city) : undefined,
+            ),
+          ),
+      ),
+      exists(
+        db
+          .select({ selected: sql`1` })
+          .from(eventCategories)
+          .innerJoin(events, eq(eventCategories.eventId, events.id))
+          .where(
+            and(
+              eq(eventCategories.categoryId, categories.id),
+              eq(events.visibility, 'public'),
+              eq(events.cancelled, false),
+              gt(events.startsAt, new Date()),
+              city
+                ? or(and(eq(events.online, false), eq(events.cityId, city)), eq(events.online, true))
+                : undefined,
+            ),
+          ),
+      ),
+    );
+    return db
+      .select({
+        id: categories.id,
+        nameEn: categories.nameEn,
+        nameAr: categories.nameAr,
+        nameTr: categories.nameTr,
+      })
+      .from(categories)
+      .where(hasEligibleContent)
+      .orderBy(asc(categories.nameTr))
+      .limit(6);
   }
 
   @Get('communities')
