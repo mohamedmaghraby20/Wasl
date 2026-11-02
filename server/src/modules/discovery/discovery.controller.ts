@@ -309,14 +309,12 @@ export class DiscoveryController {
           : or(ilike(events.title, `%${keyword}%`), ilike(events.description, `%${keyword}%`));
       if (condition) conditions.push(condition);
     }
-    if (query.city)
-      conditions.push(
-        resource === 'community'
-          ? eq(communities.cityId, query.city)
-           : query.cityScope === 'include-online'
-             ? or(eq(events.cityId, query.city), eq(events.online, true))!
-             : eq(events.cityId, query.city),
-      );
+    if (query.city) {
+      if (resource === 'community') conditions.push(eq(communities.cityId, query.city));
+      else if (query.cityScope === 'include-online')
+        conditions.push(or(eq(events.cityId, query.city), eq(events.online, true))!);
+      else conditions.push(eq(events.cityId, query.city));
+    }
     return { page, pageSize, filters: { conditions, category: query.category } };
   }
   private date(value: string, endOfSelectedDate = false) {
