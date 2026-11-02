@@ -1291,7 +1291,11 @@ export interface CommunityPublicDto {
   hostName: string;
   ownerType: string;
   ownerId: string;
-  memberCount?: number;
+  /**
+     * Active memberships plus an individual owner not already active; organization ownership adds no member.
+     * @minimum 0
+     */
+  memberCount: number;
   /** @nullable */
   organizationSlug?: string | null;
   cityId: string;
@@ -1427,6 +1431,7 @@ export const UsersControllerPublicProfileLang = {
 } as const;
 
 export type DiscoveryControllerListCommunitiesParams = {
+order?: DiscoveryControllerListCommunitiesOrder;
 q?: string;
 city?: string;
 category?: string;
@@ -1434,6 +1439,14 @@ lang?: DiscoveryControllerListCommunitiesLang;
 page?: number;
 pageSize?: number;
 };
+
+export type DiscoveryControllerListCommunitiesOrder = typeof DiscoveryControllerListCommunitiesOrder[keyof typeof DiscoveryControllerListCommunitiesOrder];
+
+
+export const DiscoveryControllerListCommunitiesOrder = {
+  newest: 'newest',
+  'member-count': 'member-count',
+} as const;
 
 export type DiscoveryControllerListCommunitiesLang = typeof DiscoveryControllerListCommunitiesLang[keyof typeof DiscoveryControllerListCommunitiesLang];
 

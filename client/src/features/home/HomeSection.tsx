@@ -50,8 +50,8 @@ export function HomeSection({
           <p className="sr-only" role="status">
             {t('loading', { resource })}
           </p>
-          <div aria-hidden="true" className={`grid gap-4 sm:grid-cols-2 ${kind === 'events' ? 'xl:grid-cols-4' : 'xl:grid-cols-3'}`}>
-            {Array.from({ length: kind === 'events' ? 4 : 3 }, (_, index) => (
+          <div aria-hidden="true" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {Array.from({ length: 4 }, (_, index) => (
               <div
                 className="grid gap-4 rounded-(--shape-radius-card) border border-border bg-card p-5"
                 key={index}
@@ -74,7 +74,7 @@ export function HomeSection({
           title={t('noHomeResultsTitle')}
         />
       ) : (
-        <div className={`grid gap-4 sm:grid-cols-2 ${kind === 'events' ? 'xl:grid-cols-4' : 'xl:grid-cols-3'}`}>
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {items.map((item) => (
             <ResourceCard key={item.id} item={item} kind={kind} />
           ))}

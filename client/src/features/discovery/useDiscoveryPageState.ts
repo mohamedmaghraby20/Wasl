@@ -28,7 +28,7 @@ export function useDiscoveryPageState(language: string) {
   const page = Number.isInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
   const filterKeys =
     kind === 'communities'
-      ? ['q', 'city', 'category']
+      ? ['q', 'city', 'category', 'order']
       : [
           'q',
           'city',
@@ -39,6 +39,7 @@ export function useDiscoveryPageState(language: string) {
           'cityScope',
           'upcoming',
           'nonCancelled',
+          ...(kind === 'all' ? ['order'] : []),
         ];
   const hasFilters = filterKeys.some((key) => params.has(key));
   const lang = languageCode(language);
@@ -63,9 +64,17 @@ export function useDiscoveryPageState(language: string) {
     ...(params.has('upcoming') ? { upcoming: params.get('upcoming') === 'true' } : {}),
     ...(params.has('nonCancelled') ? { nonCancelled: params.get('nonCancelled') === 'true' } : {}),
   };
-  const communities = useDiscoveryControllerListCommunities(communityParams, {
-    query: { enabled: kind !== 'events' },
-  });
+  const communities = useDiscoveryControllerListCommunities(
+    {
+      ...communityParams,
+      ...(params.get('order') === 'member-count' || params.get('order') === 'newest'
+        ? { order: params.get('order') as 'member-count' | 'newest' }
+        : {}),
+    },
+    {
+      query: { enabled: kind !== 'events' },
+    },
+  );
   const events = useDiscoveryControllerListEvents(eventParams, {
     query: { enabled: kind !== 'communities' },
   });
@@ -100,6 +109,7 @@ export function useDiscoveryPageState(language: string) {
       'upcoming',
       'nonCancelled',
       'page',
+      'order',
     ])
       next.delete(key);
     setParams(next, { preventScrollReset: true });
@@ -121,7 +131,10 @@ export function useDiscoveryPageState(language: string) {
   const communityQuery = communityPathParams.toString();
   const allPath = `/discover${listingQuery ? `?${listingQuery}` : ''}`;
   const communityPath = `/communities${communityQuery ? `?${communityQuery}` : ''}`;
-  const eventPath = `/events${listingQuery ? `?${listingQuery}` : ''}`;
+  const eventPathParams = new URLSearchParams(listingParams);
+  eventPathParams.delete('order');
+  const eventQuery = eventPathParams.toString();
+  const eventPath = `/events${eventQuery ? `?${eventQuery}` : ''}`;
 
   return {
     kind,

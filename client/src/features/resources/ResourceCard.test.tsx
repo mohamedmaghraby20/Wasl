@@ -16,6 +16,7 @@ const community: CommunityPublicDto = {
   hostName: 'Readers',
   ownerType: 'user',
   ownerId: 'host',
+  memberCount: 12,
   cityId: 'ankara',
   cityName: 'Ankara',
   categories: [{ id: 'culture', nameEn: 'Culture', nameAr: 'ثقافة', nameTr: 'Kültür' }],
@@ -58,6 +59,14 @@ beforeEach(async () => {
 });
 
 describe('image-led resource cards', () => {
+  it.each(['en', 'ar'])(
+    'shows the public member aggregate on community cards in %s',
+    async (language) => {
+      await i18n.changeLanguage(language);
+      show(community, 'communities');
+      expect(screen.getByText(language === 'en' ? '12 members' : '12 عضوًا')).toBeVisible();
+    },
+  );
   it('uses a stable cover for a resource regardless of its title', () => {
     const first = show(event, 'events');
     const source = screen.getByAltText('').getAttribute('src');
