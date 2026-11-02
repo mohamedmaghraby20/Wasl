@@ -1,16 +1,23 @@
-# Graph Report - Wasl  (2026-11-02)
+# Graph Report - wasl-homepage-01  (2026-11-02)
 
 ## Corpus Check
-- Large corpus: 608 files · ~657,444 words. Semantic extraction will be expensive (many Claude tokens). Consider running on a subfolder.
+- 566 files · ~643,901 words
+- Verdict: corpus is large enough that graph structure adds value.
+- Unclassified: 1052 file(s) not represented in the graph (top: (none) 989, .csv 37, .css 8)
 
 ## Summary
-- 4893 nodes · 13011 edges · 217 communities (146 shown, 71 thin omitted)
-- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 405 edges (avg confidence: 0.86)
-- Token cost: unavailable — host subagent results did not expose usage; no Gemini API calls were made.
+- 4879 nodes · 12994 edges · 227 communities (152 shown, 75 thin omitted)
+- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 388 edges (avg confidence: 0.86)
+- Token cost: 0 input · 0 output
+
+## Graph Freshness
+- Built from commit: `858177be`
+- Run `git rev-parse HEAD` and compare to check if the graph is stale.
+- Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - Live Browser Design Canvas
-- Resource Pages and Participation
+- lucide-react
 - React Forms and Controls
 - Participation API Client
 - Organizations API Client
@@ -22,7 +29,7 @@
 - Schema and Data Workflows
 - Discussions API Client
 - Discovery Contracts and Mocks
-- Authenticated Profiles and Navigation
+- OrganizationManagePage.tsx
 - Server Bootstrap and Dependencies
 - Design Catalog Validation
 - Shared Client Interaction Controls
@@ -39,19 +46,19 @@
 - NestJS Application Modules
 - Live Configuration Toolbar
 - Live Voice and Chat
-- Conversations and Confirmation Dialogs
+- Button
 - Discovery Search and Filtering
 - Moderation API Client
 - Workspace Scripts and Linting
 - Live Browser Initialization
 - Live Editing Interaction State
-- Launch Decisions and Readiness
+- Launch legal, privacy and age decision register v0.2: not legally approved
 - Design Stack Data Contracts
 - Participation Rules and Transitions
 - Users API and Mocks
 - Organization API Mocks
 - Participation API Mocks
-- Event Management Services
+- CreateEventDto
 - Inline Document Editing
 - Product Architecture and Phases
 - Communities API Client
@@ -60,7 +67,7 @@
 - Messaging Membership Reconciliation
 - Mock Service Worker Setup
 - Privacy API Mocks
-- Public Discovery Services
+- discovery.msw.ts
 - Client Development Dependencies
 - Discussion API Mocks
 - Supabase Identity and Privacy Gates
@@ -70,9 +77,9 @@
 - Live Session Acceptance Lifecycle
 - Render Deployment Configuration
 - Participation HTTP Controller
-- NestJS Best Practice References
+- .assertCanManage
 - Events API Client
-- Design Documentation and Platform Craft
+- Design system documentation flow
 - Messaging API Mocks
 - Community Management Services
 - BM25 Retrieval and Tokenization
@@ -91,12 +98,12 @@
 - Deletion and Messaging Workers
 - Sitemap and Crawler Generation
 - Health API Client
-- Platform Moderation Dashboard
+- OrganizerParticipationPanel.tsx
 - Notifications API Client
 - Shared Package Configuration
 - Vite and Showcase Configuration
 - Storybook Component Stories
-- Backend Review and Development Setup
+- Local development setup
 - Live Agent Target Coordination
 - Health HTTP Endpoints
 - Notification Email Delivery
@@ -106,7 +113,7 @@
 - Messaging Request Response Contracts
 - Shared TypeScript Compiler Options
 - Client Package Scripts
-- Community Topic Page
+- CommunityTopicPage.tsx
 - Community API Mocks
 - Discussion Storage Schema
 - Interface Audits and Adaptation
@@ -129,7 +136,7 @@
 - Supabase Security Reference Workflows
 - Postgres Queue and Upsert Patterns
 - Postgres Query Performance Diagnosis
-- Participation PostgreSQL Integration Tests
+- Homepage Discovery Enhancement
 - Retrieval Threshold Gate Tests
 - Skill Script Path Validation
 - Wasl Design Tokens and Typography
@@ -137,16 +144,16 @@
 - Organization Verification Schema
 - Resource Moderator Schema
 - Shared TypeScript Build Configuration
-- Async Errors and Microservice Patterns
+- .update
 - Design System Showcase Composition
 - UI UX Design Guidance
 - Skill Agent Presentation Metadata
 - Organization Admin Invitation Schema
 - NestJS CLI Configuration
 - Frontend Design Principles
-- Dependency Injection Contract Testing
-- HTTP Validation and Sanitization
-- NestJS Service Testing Guidance
+- Live variant editing
+- Wasl — Project Handoff
+- Dual-assessment design critique
 - Design Search CLI Flag Tests
 - Retrieval Metric Mathematics
 - Community Cover Asset Catalog
@@ -157,7 +164,7 @@
 - Reference Category City Schema
 - Database Connection Lifecycle
 - Shared Health and Pagination Contracts
-- Health and Lifecycle Patterns
+- Phase 6 native discussions, realtime chat and engagement
 - Postgres Search and Index Guidance
 - Postgres Connection Pool Management
 - Postgres Pagination and Composite Indexes
@@ -171,7 +178,8 @@
 - Age Declaration API Client
 - Privacy Status API Client
 - Messaging Sync and Block Schema
-- Interface Segregation and Tokens
+- verify-cards.cjs
+- Public Communities and public or direct-link-only Unlisted Events
 - Accessible Field State Composition
 - Supabase Scoped Access Tokens
 - Postgres Primary Key Strategies
@@ -182,7 +190,9 @@
 - Client TypeScript Project References
 - Organization Ownership Product Rules
 - Notification Delivery Storage Schema
-- Request Context and Provider Scopes
+- Phase 8 local hardening versus incomplete release acceptance
+- showcase-coverage.mjs
+- AppProviders.tsx
 - Shadcn Small Logo
 - Chat Tool Output Presentation
 - Postgres Security Guidance History
@@ -203,36 +213,46 @@
 - Accessibility Test Type Declarations
 - Development Sample Data Seeding
 - Moderation Report Storage
-- Best Practice Rule Template
+- Domain Docs
 - Shadcn Logo Asset
 - Component Object Icon Passing
 - Web Interface Guidelines Review
-- Graphify Command Reference
+- waslFetch
 - Public Crawler Exclusions
+- Issue tracker: Local Markdown
+- Approved technology baseline, not proof of installed dependencies
+- orval
+- 01-image-led-resource-cards-and-event-availability.md
+- 02-city-aware-upcoming-event-discovery.md
+- 03-explicit-geolocation-with-manual-correction.md
+- 04-member-ranked-community-discovery.md
+- 05-nationwide-online-event-discovery.md
+- 06-content-backed-interest-browsing.md
+- 07-homepage-presentation-and-participation-prompts.md
 
 ## God Nodes (most connected - your core abstractions)
 1. `waslFetch()` - 113 edges
-2. `react-i18next` - 97 edges
+2. `react-i18next` - 98 edges
 3. `getAuthenticatedUser()` - 89 edges
-4. `@nestjs/common` - 78 edges
-5. `Database` - 78 edges
-6. `AuthenticatedUser` - 78 edges
-7. `react-router` - 77 edges
+4. `react-router` - 78 edges
+5. `@nestjs/common` - 78 edges
+6. `Database` - 78 edges
+7. `AuthenticatedUser` - 78 edges
 8. `Button()` - 72 edges
-9. `cn()` - 62 edges
-10. `lucide-react` - 61 edges
+9. `react` - 62 edges
+10. `lucide-react` - 60 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `Wasl bilingual community and event platform` --references--> `Wasl Design System Preview v1`  [EXTRACTED]
+  README.md → docs/design/README.md
 - `Wasl browser document shell` --conceptually_related_to--> `Wasl bilingual community and event platform`  [INFERRED]
   client/index.html → README.md
-- `TestEndToEndCoherence` --uses--> `DesignSystemGenerator`  [INFERRED]
-  .agents/skills/ui-ux-pro-max/scripts/tests/test_design_system_mode.py → .agents/skills/ui-ux-pro-max/scripts/design_system.py
-- `TestLightResultOutputCoherence` --uses--> `DesignSystemGenerator`  [INFERRED]
-  .agents/skills/ui-ux-pro-max/scripts/tests/test_design_system_mode.py → .agents/skills/ui-ux-pro-max/scripts/design_system.py
-- `enableInlineEdit()` --indirect_call--> `own()`  [INFERRED]
-  .opencode/skills/impeccable/scripts/live-browser.js → .opencode/skills/impeccable/scripts/live-browser-dom.js
-- `"messaging_user_mappings"` --references--> `identity.users`  [EXTRACTED]
-  server/drizzle/0015_sad_vin_gonzales.sql → server/drizzle/0004_dapper_masque.sql
+- `Desired-versus-observed Stream membership with 30-second revocation reconciliation` --semantically_similar_to--> `Authenticated privacy requests, secure export and audited provider cleanup`  [INFERRED] [semantically similar]
+  docs/phases/phase-6.md → docs/launch-decisions.md
+- `18+ declaration, legal acceptance, privacy export and provider-deletion retry foundations` --conceptually_related_to--> `Tasks 147–149 blocked on approved legal and privacy inputs`  [AMBIGUOUS]
+  docs/project_handoff.md → docs/phases/phase-7.md
+- `Rotate exposed database password immediately after launch` --conceptually_related_to--> `Rotate exposed development database password before continued use`  [AMBIGUOUS]
+  docs/production-handoff.md → docs/phases/phase-9-production.md
 
 ## Import Cycles
 - None detected.
@@ -246,51 +266,51 @@
 - **Comp-led asset production, human calibration and independent fidelity review** — _opencode_skills_impeccable_reference_component_review_component_review, _opencode_skills_impeccable_reference_component_review_first_viewport_review, _opencode_skills_impeccable_reference_degraded_asset_producer_asset_producer, _opencode_skills_impeccable_reference_degraded_finish_reviewer_finish_reviewer [INFERRED 0.95]
 - **Product capacity rules, authoritative server transaction and row-lock verification form participation correctness** — docs_context_01_product_admission_invariants, docs_context_02_architecture_authoritative_participation, docs_phases_phase_4_capacity_locking [INFERRED 0.95]
 
-## Communities (217 total, 71 thin omitted)
+## Communities (227 total, 75 thin omitted)
 
 ### Community 0 - "Live Browser Design Canvas"
 Cohesion: 0.03
 Nodes (137): applyGlobalBarLabelState(), applyLiveBarPreference(), applyPlaceholderDimensions(), applyPlaceholderSizingStyles(), averageRgb01(), beginEditPin(), bindEditBadgeProxy(), bufferToBase64() (+129 more)
 
-### Community 1 - "Resource Pages and Participation"
-Cohesion: 0.06
-Nodes (85): getCommunitiesControllerMineQueryKey(), useCommunitiesControllerArchive(), useCommunitiesControllerRemove(), getDiscoveryControllerCommunityQueryKey(), getDiscoveryControllerEventQueryKey(), getDiscoveryControllerListCommunitiesQueryKey(), getDiscoveryControllerListEventsQueryKey(), useDiscoveryControllerCommunity() (+77 more)
+### Community 1 - "lucide-react"
+Cohesion: 0.07
+Nodes (69): getModerationControllerListQueryKey(), getModerationControllerListQueryOptions(), useModerationControllerDecide(), useModerationControllerList(), getNotificationsControllerListQueryKey(), getNotificationsControllerListQueryOptions(), useNotificationsControllerList(), useNotificationsControllerMarkRead() (+61 more)
 
 ### Community 2 - "React Forms and Controls"
-Cohesion: 0.05
-Nodes (81): useCommunitiesControllerCreate(), useCommunitiesControllerUpdate(), getCommunityDiscussionsControllerListQueryKey(), getCommunityDiscussionsControllerListQueryOptions(), useCommunityDiscussionsControllerCreate(), useCommunityDiscussionsControllerList(), useEventsControllerCreate(), useEventsControllerUpdate() (+73 more)
+Cohesion: 0.08
+Nodes (55): useCommunitiesControllerCreate(), useCommunitiesControllerUpdate(), useDiscoveryControllerCities(), useEventsControllerCreate(), useEventsControllerUpdate(), useOrganizationsControllerCreate(), useOrganizationsControllerUpdate(), getUsersControllerCurrentQueryKey() (+47 more)
 
 ### Community 3 - "Participation API Client"
 Cohesion: 0.03
-Nodes (107): isPublicRead(), resolveApiUrl(), authMocks, waslFetch(), getParticipationControllerCancelEventRegistrationMutationKey(), getParticipationControllerCancelEventRegistrationMutationOptions(), getParticipationControllerCancelEventRegistrationUrl(), getParticipationControllerCommunityCountsQueryKey() (+99 more)
+Nodes (103): getParticipationControllerCancelEventRegistrationMutationKey(), getParticipationControllerCancelEventRegistrationMutationOptions(), getParticipationControllerCancelEventRegistrationUrl(), getParticipationControllerCommunityCountsQueryKey(), getParticipationControllerCommunityCountsQueryOptions(), getParticipationControllerCommunityCountsUrl(), getParticipationControllerCommunityDecisionMutationKey(), getParticipationControllerCommunityDecisionMutationOptions() (+95 more)
 
 ### Community 4 - "Organizations API Client"
 Cohesion: 0.03
 Nodes (104): getOrganizationsControllerAcceptAdminInvitationMutationKey(), getOrganizationsControllerAcceptAdminInvitationMutationOptions(), getOrganizationsControllerAcceptAdminInvitationUrl(), getOrganizationsControllerCreateAdminInvitationMutationKey(), getOrganizationsControllerCreateAdminInvitationMutationOptions(), getOrganizationsControllerCreateAdminInvitationUrl(), getOrganizationsControllerCreateMutationKey(), getOrganizationsControllerCreateMutationOptions() (+96 more)
 
 ### Community 5 - "Client Routing and Localization"
-Cohesion: 0.07
-Nodes (48): ApiError, mocks, mocks, mocks, auth, communityResponse, eventResponse, HistoryControls() (+40 more)
+Cohesion: 0.06
+Nodes (57): ApiError, AuthPage(), safeReturnPath(), authMocks, LocationOutput(), renderPage(), authErrorMessage(), mocks (+49 more)
 
 ### Community 6 - "Organization Domain Services"
 Cohesion: 0.06
-Nodes (29): OrganizationsController, AcceptedOrganizationAdminInvitationDto, AcceptOrganizationAdminInvitationDto, CreatedOrganizationAdminInvitationDto, CreateOrganizationAdminInvitationDto, CreateOrganizationDto, DecidedOrganizationVerificationDto, DecideOrganizationVerificationDto (+21 more)
+Nodes (28): OrganizationsController, AcceptedOrganizationAdminInvitationDto, AcceptOrganizationAdminInvitationDto, CreatedOrganizationAdminInvitationDto, CreateOrganizationAdminInvitationDto, CreateOrganizationDto, DecidedOrganizationVerificationDto, DecideOrganizationVerificationDto (+20 more)
 
 ### Community 7 - "Privacy Requests and Providers"
-Cohesion: 0.05
+Cohesion: 0.06
 Nodes (28): PrivacyAdminController, PrivacyController, ACCEPTABLE_DOCUMENT_TYPES, AcceptDocumentDto, AcceptedDocumentDto, AdminAgeEligibilityDto, AdminPrivacyRequestDto, CreatePrivacyRequestDto (+20 more)
 
 ### Community 8 - "Database Access and Domains"
-Cohesion: 0.07
-Nodes (29): dotenv, drizzle-orm, @nestjs/config, pg, DATABASE, Database, PROVIDER_DATABASE, mocks (+21 more)
+Cohesion: 0.06
+Nodes (33): dotenv, drizzle-orm, pg, DATABASE, Database, PROVIDER_DATABASE, categories, communityMemberships (+25 more)
 
 ### Community 9 - "Live Session Recovery"
 Cohesion: 0.06
 Nodes (90): abortSvelteComponentInjection(), applyParamDefaults(), applyParamValue(), applySavedSessionMeta(), buildParamsPanel(), captureAndEmit(), checkpointPayload(), cleanup() (+82 more)
 
 ### Community 10 - "Schema and Data Workflows"
-Cohesion: 0.06
-Nodes (71): buildDevelopmentSeed(), capacities, communityHistory(), eventHistory(), places, sampleOwnerEmail, sampleOwnerId, seedId() (+63 more)
+Cohesion: 0.05
+Nodes (72): buildDevelopmentSeed(), capacities, communityHistory(), eventHistory(), places, sampleOwnerEmail, sampleOwnerId, seedId() (+64 more)
 
 ### Community 11 - "Discussions API Client"
 Cohesion: 0.03
@@ -298,27 +318,27 @@ Nodes (87): communityDiscussionsControllerClose(), CommunityDiscussionsControlle
 
 ### Community 12 - "Discovery Contracts and Mocks"
 Cohesion: 0.03
-Nodes (80): AcceptDocumentDtoDocumentType, AcceptedDocumentDto, AcceptedOrganizationAdminInvitationDtoRole, AdminAgeEligibilityDtoStatus, AdminPrivacyRequestDtoRequestType, AdminPrivacyRequestDtoStatus, CategoryPublicDto, CityPublicDto (+72 more)
+Nodes (63): AcceptDocumentDtoDocumentType, AcceptedDocumentDto, AcceptedOrganizationAdminInvitationDtoRole, AdminAgeEligibilityDtoStatus, AdminPrivacyRequestDtoRequestType, AdminPrivacyRequestDtoStatus, CommunityActivityItemDto, CommunityActivityItemDtoStatus (+55 more)
 
-### Community 13 - "Authenticated Profiles and Navigation"
-Cohesion: 0.07
-Nodes (62): useModerationControllerReport(), getOrganizationsControllerListAdminInvitationsQueryKey(), getOrganizationsControllerListAdminInvitationsQueryOptions(), getOrganizationsControllerListManagersQueryKey(), getOrganizationsControllerListManagersQueryOptions(), getOrganizationsControllerListVerificationRequestsQueryKey(), getOrganizationsControllerListVerificationRequestsQueryOptions(), getOrganizationsControllerMineQueryKey() (+54 more)
+### Community 13 - "OrganizationManagePage.tsx"
+Cohesion: 0.14
+Nodes (27): getOrganizationsControllerListAdminInvitationsQueryKey(), getOrganizationsControllerListAdminInvitationsQueryOptions(), getOrganizationsControllerListManagersQueryKey(), getOrganizationsControllerListManagersQueryOptions(), getOrganizationsControllerListVerificationRequestsQueryKey(), getOrganizationsControllerListVerificationRequestsQueryOptions(), getOrganizationsControllerMineQueryKey(), getOrganizationsControllerMineQueryOptions() (+19 more)
 
 ### Community 14 - "Server Bootstrap and Dependencies"
 Cohesion: 0.04
-Nodes (60): class-transformer, drizzle-kit, @fastify/helmet, @nestjs/cli, @nestjs/core, @nestjs/platform-fastify, @nestjs/terminus, @nestjs/testing (+52 more)
+Nodes (58): class-transformer, drizzle-kit, @fastify/helmet, @nestjs/cli, @nestjs/platform-fastify, @nestjs/terminus, @nestjs/throttler, reflect-metadata (+50 more)
 
 ### Community 15 - "Design Catalog Validation"
 Cohesion: 0.06
 Nodes (44): read_rows(), TestAccessibilityGuidance, TestChartsTypographyAndIcons, TestCurrentReactGuidance, TestSemanticColors, TestGeneratedCatalogContract, _catalog_date(), _check_app_interface_contract() (+36 more)
 
 ### Community 16 - "Shared Client Interaction Controls"
-Cohesion: 0.08
-Nodes (54): authenticatedRoutePaths, requiresAuthentication(), accountLinks, Brand(), navItemClass(), primaryLinks, RootLayout(), AppFooter() (+46 more)
+Cohesion: 0.07
+Nodes (56): useParticipationControllerCommunityMembers(), authenticatedRoutePaths, requiresAuthentication(), accountLinks, Brand(), navItemClass(), primaryLinks, RootLayout() (+48 more)
 
 ### Community 17 - "Discussion Domain Services"
-Cohesion: 0.09
-Nodes (15): CommunityDiscussionsController, DiscussionsController, CommunityTopicDetailsDto, CommunityTopicDto, CommunityTopicPageDto, CreateCommunityTopicDto, CreateDiscussionPostDto, DiscussionPostDto (+7 more)
+Cohesion: 0.05
+Nodes (20): DiscoveryController, listingQuery(), CommunityDiscussionsController, DiscussionsController, CommunityTopicDetailsDto, CommunityTopicDto, CommunityTopicPageDto, CreateCommunityTopicDto (+12 more)
 
 ### Community 18 - "Design Reasoning Contracts"
 Cohesion: 0.06
@@ -337,8 +357,8 @@ Cohesion: 0.05
 Nodes (26): _contains_phrase(), detect_domain(), _domain_keywords(), _exact_match_diagnostic(), _exact_row_identity(), _exact_stack_identifier(), _file_signature(), _legacy_successor_guidance() (+18 more)
 
 ### Community 22 - "HTTP Authentication Boundary"
-Cohesion: 0.07
-Nodes (22): fastify, @nestjs/swagger, AccountStatus, fastify, FastifyRequest, PlatformAdminGuard, guardFor(), PRIVACY_GATE_EXEMPT (+14 more)
+Cohesion: 0.11
+Nodes (10): @nestjs/swagger, CreateCommunityDto, CreatedResourceDto, DeleteCommunityDto, DeletedCommunityDto, ManagedCommunityDto, UpdateCommunityDto, UpdateEventDto (+2 more)
 
 ### Community 23 - "Screenshot Capture Runtime"
 Cohesion: 0.09
@@ -357,8 +377,8 @@ Cohesion: 0.06
 Nodes (11): _detect_page_type(), format_page_override_md(), generate_design_system(), _generate_intelligent_overrides(), persist_design_system(), safe_slug(), _write_persisted_file(), format_output() (+3 more)
 
 ### Community 27 - "NestJS Application Modules"
-Cohesion: 0.10
-Nodes (21): @nestjs/common, HealthModule, Environment, environmentSchema, optionalText, validateEnvironment(), DatabaseModule, AuthModule (+13 more)
+Cohesion: 0.11
+Nodes (19): @nestjs/common, HealthModule, Environment, environmentSchema, optionalText, validateEnvironment(), AuthModule, CommunitiesModule (+11 more)
 
 ### Community 28 - "Live Configuration Toolbar"
 Cohesion: 0.08
@@ -368,13 +388,13 @@ Nodes (54): actionLabel(), applyConfigureBarChrome(), bindConfigureCountPillTool
 Cohesion: 0.08
 Nodes (54): agentHasWorkInFlight(), armPageChatForTyping(), attachSteerFocusDebug(), attachSteerFocusGuard(), buildSteerProcessingDots(), buildSteerQueueHint(), clearSteerAwaitTimer(), clearSteerFocusRecoverTimer() (+46 more)
 
-### Community 30 - "Conversations and Confirmation Dialogs"
-Cohesion: 0.08
-Nodes (44): getDiscussionsControllerListEventPostsQueryKey(), getDiscussionsControllerListEventPostsQueryOptions(), useDiscussionsControllerClose(), useDiscussionsControllerCreateEventPost(), useDiscussionsControllerListEventPosts(), useDiscussionsControllerRemove(), useDiscussionsControllerUpdate(), withQueryKey() (+36 more)
+### Community 30 - "Button"
+Cohesion: 0.07
+Nodes (50): getCommunityDiscussionsControllerListQueryKey(), getCommunityDiscussionsControllerListQueryOptions(), useCommunityDiscussionsControllerCreate(), useCommunityDiscussionsControllerList(), getMessagingControllerBlockedUsersQueryKey(), getMessagingControllerBlockedUsersQueryOptions(), getMessagingControllerConversationsQueryKey(), useMessagingControllerBlock() (+42 more)
 
 ### Community 31 - "Discovery Search and Filtering"
-Cohesion: 0.07
-Nodes (48): discoveryControllerCategories(), DiscoveryControllerCategoriesQueryError, DiscoveryControllerCategoriesQueryResult, discoveryControllerCities(), DiscoveryControllerCitiesQueryError, DiscoveryControllerCitiesQueryResult, discoveryControllerCommunity(), DiscoveryControllerCommunityQueryError (+40 more)
+Cohesion: 0.05
+Nodes (76): getCommunitiesControllerMineQueryKey(), getCommunitiesControllerMineQueryOptions(), useCommunitiesControllerArchive(), useCommunitiesControllerMine(), useCommunitiesControllerRemove(), discoveryControllerCategories(), DiscoveryControllerCategoriesQueryError, DiscoveryControllerCategoriesQueryResult (+68 more)
 
 ### Community 32 - "Moderation API Client"
 Cohesion: 0.05
@@ -392,17 +412,17 @@ Nodes (47): agentStatusText(), barPaletteForTheme(), brandMarkSvg(), buildDesign
 Cohesion: 0.12
 Nodes (47): beginNewLiveConfiguration(), cancelEditing(), cancelEditingToPicking(), cancelInsertConfigure(), cleanupAcceptedSession(), clearAnnotations(), clearInsertPicking(), clearScrollY() (+39 more)
 
-### Community 36 - "Launch Decisions and Readiness"
-Cohesion: 0.05
-Nodes (33): Publicly readable native discussions with membership-gated posting, Discover → Evaluate → Join/Register → Admission → Participate → Manage → Communicate, Public Communities and public or direct-link-only Unlisted Events, Wasl nationwide community and event platform for Arabs in Türkiye, Server-authoritative Join Event transaction and concurrency control, Approved technology baseline, not proof of installed dependencies, Supabase, Stream, Resend, Render and GitHub Actions provider baseline, Nest OpenAPI → Orval typed clients and MSW mocks (+25 more)
+### Community 36 - "Launch legal, privacy and age decision register v0.2: not legally approved"
+Cohesion: 0.18
+Nodes (9): Counsel-reviewed processor and cross-border transfer map, Launch legal, privacy and age decision register v0.2: not legally approved, Authenticated privacy requests, secure export and audited provider cleanup, Rotate exposed database password immediately after launch, Production handoff dated 2026-10-28, Render blueprint deploy with API readiness and generated sitemap, Verified Resend domain, SPF/DKIM/DMARC and Supabase SMTP setup, 18+ declaration, legal acceptance, privacy export and provider-deletion retry foundations (+1 more)
 
 ### Community 37 - "Design Stack Data Contracts"
 Cohesion: 0.07
 Nodes (8): search_stack(), _rows(), TestNativeDesktopStackFreshness, read_rows(), TestTextLayoutDataContracts, TestTextLayoutRetrieval, _rows(), TestWebStackFreshness
 
 ### Community 38 - "Participation Rules and Transitions"
-Cohesion: 0.14
-Nodes (11): AuthenticatedUser, countStatuses(), ParticipationService, assertCommunityTransition(), assertEventTransition(), CommunityStatus, communityTransitions, EventStatus (+3 more)
+Cohesion: 0.11
+Nodes (16): AuthenticatedUser, countStatuses(), ParticipationService, assertCommunityTransition(), assertEventTransition(), CommunityStatus, communityTransitions, EventStatus (+8 more)
 
 ### Community 39 - "Users API and Mocks"
 Cohesion: 0.07
@@ -415,10 +435,6 @@ Nodes (43): AcceptedOrganizationAdminInvitationDto, CreatedOrganizationAdminInvi
 ### Community 41 - "Participation API Mocks"
 Cohesion: 0.08
 Nodes (43): CommunityMemberDto, CommunityMemberPreviewDto, MembershipStateDto, MyActivityDto, ParticipantListItemDto, ParticipationCountsDto, ParticipationDecisionDto, RegistrationStateDto (+35 more)
-
-### Community 42 - "Event Management Services"
-Cohesion: 0.07
-Nodes (3): EventsController, CreateEventDto, slugPart()
 
 ### Community 43 - "Inline Document Editing"
 Cohesion: 0.06
@@ -446,31 +462,27 @@ Nodes (5): directMessagePair(), providerChannelId(), providerUserId(), Messaging
 
 ### Community 49 - "Mock Service Worker Setup"
 Cohesion: 0.10
-Nodes (27): @faker-js/faker@10.6.0, msw@2.11.2, CreatedResourceDto, HealthResponseDto, ReadinessResponseDto, ReadNotificationDto, getEventsControllerCancelMockHandler(), getEventsControllerCancelResponseMock() (+19 more)
+Nodes (25): @faker-js/faker@10.6.0, msw@2.11.2, HealthResponseDto, ReadinessResponseDto, getEventsControllerCancelMockHandler(), getEventsControllerCancelResponseMock(), getEventsControllerCreateMockHandler(), getEventsControllerCreateResponseMock() (+17 more)
 
 ### Community 50 - "Privacy API Mocks"
 Cohesion: 0.11
 Nodes (33): AdminAgeEligibilityDto, AdminPrivacyRequestDto, PrivacyControllerExportData200, PrivacyRequestDto, PrivacyStatusDto, RetentionPreviewDto, getPrivacyAdminControllerDecideMockHandler(), getPrivacyAdminControllerDecideResponseMock() (+25 more)
 
-### Community 51 - "Public Discovery Services"
-Cohesion: 0.14
-Nodes (5): DiscoveryController, listingQuery(), main(), createController(), QueryStub
+### Community 51 - "discovery.msw.ts"
+Cohesion: 0.19
+Nodes (17): CategoryPublicDto, CityPublicDto, CommunityPageDto, EventPageDto, getDiscoveryControllerCategoriesMockHandler(), getDiscoveryControllerCategoriesResponseMock(), getDiscoveryControllerCitiesMockHandler(), getDiscoveryControllerCitiesResponseMock() (+9 more)
 
 ### Community 52 - "Client Development Dependencies"
-Cohesion: 0.06
-Nodes (30): devDependencies, @chromatic-com/storybook@4.1.0, jest-axe@10.0.0, jsdom@26.1.0, orval@8.43.0, storybook@9.1.5, @storybook/addon-a11y@9.1.5, @storybook/addon-vitest@9.1.5 (+22 more)
+Cohesion: 0.07
+Nodes (28): devDependencies, @chromatic-com/storybook@4.1.0, jest-axe@10.0.0, jsdom@26.1.0, storybook@9.1.5, @storybook/addon-a11y@9.1.5, @storybook/addon-vitest@9.1.5, tailwindcss@4.1.13 (+20 more)
 
 ### Community 53 - "Discussion API Mocks"
 Cohesion: 0.12
 Nodes (29): CommunityTopicDetailsDto, CommunityTopicDto, CommunityTopicPageDto, DiscussionPostDto, DiscussionPostPageDto, getCommunityDiscussionsControllerCloseMockHandler(), getCommunityDiscussionsControllerCloseResponseMock(), getCommunityDiscussionsControllerCreateMockHandler() (+21 more)
 
 ### Community 54 - "Supabase Identity and Privacy Gates"
-Cohesion: 0.10
-Nodes (10): PrivacyGateService, eligibleGate, notExempt, displayNameFrom(), authUser, serviceWith(), SUPABASE_AUTH_CLIENT, SupabaseAuthService (+2 more)
-
-### Community 56 - "Interface Design Delivery Workflows"
-Cohesion: 0.08
-Nodes (3): New visual work workflow, Core Web Vitals, Direction comps and asset production
+Cohesion: 0.07
+Nodes (20): fastify, @nestjs/core, PlatformAdminGuard, guardFor(), PRIVACY_GATE_EXEMPT, PrivacyGateExempt(), PrivacyGateService, eligibleGate (+12 more)
 
 ### Community 57 - "Design Search Behavior Tests"
 Cohesion: 0.10
@@ -484,17 +496,13 @@ Nodes (28): abandonForeignSession(), abandonSupersededGo(), applyOriginalAttrsTo
 Cohesion: 0.07
 Nodes (28): fromService, key, sync, value, envVarKey, name, type, name (+20 more)
 
-### Community 61 - "NestJS Best Practice References"
-Cohesion: 0.09
-Nodes (10): NestJS rule categories and priorities, ClassSerializerInterceptor, ValidationPipe, DeprecationInterceptor, OrderCreatedEvent, DataLoader batching, Shutdown-aware readiness, ConfigModule (+2 more)
-
 ### Community 62 - "Events API Client"
 Cohesion: 0.10
-Nodes (26): eventsControllerCancel(), EventsControllerCancelMutationError, EventsControllerCancelMutationResult, EventsControllerCancelMutationVariables, eventsControllerCreate(), EventsControllerCreateMutationBody, EventsControllerCreateMutationError, EventsControllerCreateMutationResult (+18 more)
+Nodes (27): eventsControllerCancel(), EventsControllerCancelMutationError, EventsControllerCancelMutationResult, EventsControllerCancelMutationVariables, eventsControllerCreate(), EventsControllerCreateMutationBody, EventsControllerCreateMutationError, EventsControllerCreateMutationResult (+19 more)
 
-### Community 63 - "Design Documentation and Platform Craft"
-Cohesion: 0.09
-Nodes (15): Craft deprecated alias, Cognitive Load Assessment, Cowan 2001 working memory limit, Nielsen usability heuristics scoring, Persona-Based Design Testing, Impeccable Documenter, Impeccable Finish Reviewer, Impeccable artifact drift doctor (+7 more)
+### Community 63 - "Design system documentation flow"
+Cohesion: 0.20
+Nodes (6): Impeccable Documenter, Design sidecar schema version 2, Design system documentation flow, Live variant generation fast lane, Design detector hook management, One-time live-mode setup
 
 ### Community 64 - "Messaging API Mocks"
 Cohesion: 0.13
@@ -517,8 +525,8 @@ Cohesion: 0.14
 Nodes (21): age_eligibilities_reviewer_idx, age_eligibilities_status_idx, "identity"."age_eligibilities", "legal_acceptances", legal_acceptances_document_idx, legal_acceptances_user_type_version_unique, "legal_documents", legal_documents_type_status_idx (+13 more)
 
 ### Community 70 - "Moderation Contracts and Validation"
-Cohesion: 0.20
-Nodes (10): class-validator, ModerationKind, community, event, CreatedReportDto, CreateReportDto, DecideReportDto, ModerationPermissionsDto (+2 more)
+Cohesion: 0.17
+Nodes (12): class-validator, moderationReports, resourceModerators, ModerationKind, community, event, CreatedReportDto, CreateReportDto (+4 more)
 
 ### Community 72 - "Moderation API Mocks"
 Cohesion: 0.17
@@ -545,8 +553,8 @@ Cohesion: 0.16
 Nodes (15): admin, authClient, cleanupPool, communityIds, eventIds, expectStatus(), jsonRequest(), main() (+7 more)
 
 ### Community 78 - "Discovery Reference Data Contracts"
-Cohesion: 0.18
-Nodes (8): cities, CategoryPublicDto, CityPublicDto, CommunityPageDto, CommunityPublicDto, EventPageDto, EventPublicDto, ReferenceDataRepository
+Cohesion: 0.45
+Nodes (6): CategoryPublicDto, CityPublicDto, CommunityPageDto, CommunityPublicDto, EventPageDto, EventPublicDto
 
 ### Community 79 - "Deletion and Messaging Workers"
 Cohesion: 0.14
@@ -560,41 +568,37 @@ Nodes (15): apiBase, distDir, loadResources(), main(), Page, buildRobotsTxt(), b
 Cohesion: 0.18
 Nodes (16): getHealthControllerGetHealthQueryKey(), getHealthControllerGetHealthQueryOptions(), getHealthControllerGetHealthUrl(), getHealthControllerGetReadinessQueryKey(), getHealthControllerGetReadinessQueryOptions(), getHealthControllerGetReadinessUrl(), healthControllerGetHealth(), HealthControllerGetHealthQueryError (+8 more)
 
-### Community 82 - "Platform Moderation Dashboard"
-Cohesion: 0.20
-Nodes (17): getModerationControllerListQueryKey(), getModerationControllerListQueryOptions(), useModerationControllerDecide(), useModerationControllerList(), withQueryKey(), getOrganizationsControllerListPendingVerificationRequestsQueryKey(), getOrganizationsControllerListPendingVerificationRequestsQueryOptions(), useOrganizationsControllerDecideVerification() (+9 more)
+### Community 82 - "OrganizerParticipationPanel.tsx"
+Cohesion: 0.13
+Nodes (24): useModeratorAssignmentsControllerAssign(), useModeratorAssignmentsControllerList(), useModeratorAssignmentsControllerRemove(), withQueryKey(), useParticipationControllerCommunityCounts(), useParticipationControllerCommunityDecision(), useParticipationControllerCommunityMemberPreview(), useParticipationControllerCommunityParticipants() (+16 more)
 
 ### Community 83 - "Notifications API Client"
 Cohesion: 0.16
-Nodes (17): getNotificationsControllerListQueryKey(), getNotificationsControllerListQueryOptions(), getNotificationsControllerListUrl(), getNotificationsControllerMarkReadMutationKey(), getNotificationsControllerMarkReadMutationOptions(), getNotificationsControllerMarkReadUrl(), notificationsControllerList(), NotificationsControllerListQueryError (+9 more)
+Nodes (15): getNotificationsControllerListUrl(), getNotificationsControllerMarkReadMutationKey(), getNotificationsControllerMarkReadMutationOptions(), getNotificationsControllerMarkReadUrl(), notificationsControllerList(), NotificationsControllerListQueryError, NotificationsControllerListQueryResult, notificationsControllerMarkRead() (+7 more)
 
 ### Community 84 - "Shared Package Configuration"
 Cohesion: 0.13
 Nodes (17): dependencies, zod@4.6.7, devDependencies, typescript@5.9.2, vitest@3.2.4, exports, typescript, vitest (+9 more)
 
 ### Community 85 - "Vite and Showcase Configuration"
-Cohesion: 0.12
-Nodes (12): components, missing, source, [uiArg, ...roots], uiDir, walk(), @tailwindcss/vite@4.1.13, vite@7.1.5 (+4 more)
+Cohesion: 0.22
+Nodes (6): @tailwindcss/vite@4.1.13, vite@7.1.5, @vitejs/plugin-react@5.0.2, @tailwindcss/vite, vite, @vitejs/plugin-react
 
 ### Community 86 - "Storybook Component Stories"
 Cohesion: 0.12
 Nodes (12): @storybook/react-vite@9.1.5, Default, meta, Story, IconActions, meta, Primary, Secondary (+4 more)
-
-### Community 87 - "Backend Review and Development Setup"
-Cohesion: 0.13
-Nodes (3): Backend NestJS best-practices review, Local development setup, Local quality verification commands
 
 ### Community 88 - "Live Agent Target Coordination"
 Cohesion: 0.29
 Nodes (17): actOnAgentTarget(), agentTargetBusyReason(), agentTargetOverlayGone(), agentTargetTaken(), claimAgentTarget(), claimAndActOnAgentTarget(), declineAgentTargetBusy(), declineAgentTargetUnresolvable() (+9 more)
 
 ### Community 89 - "Health HTTP Endpoints"
-Cohesion: 0.17
-Nodes (3): HealthController, HealthResponseDto, ReadinessResponseDto
+Cohesion: 0.11
+Nodes (6): @nestjs/testing, HealthController, HealthResponseDto, ReadinessResponseDto, DatabaseModule, mocks
 
 ### Community 90 - "Notification Email Delivery"
-Cohesion: 0.16
-Nodes (4): NotificationEmailWorker, setup(), ResendEmailAdapter, input
+Cohesion: 0.18
+Nodes (5): @nestjs/config, NotificationEmailWorker, setup(), ResendEmailAdapter, input
 
 ### Community 92 - "Client TypeScript Configuration"
 Cohesion: 0.13
@@ -616,21 +620,21 @@ Nodes (14): compilerOptions, declaration, declarationMap, exactOptionalPropertyT
 Cohesion: 0.14
 Nodes (14): scripts, api:generate, build, build-storybook, dev, lint, preview, sitemap (+6 more)
 
-### Community 97 - "Community Topic Page"
-Cohesion: 0.24
-Nodes (13): getCommunitiesControllerMineQueryOptions(), useCommunitiesControllerMine(), getCommunityDiscussionsControllerDetailsQueryKey(), getCommunityDiscussionsControllerDetailsQueryOptions(), useCommunityDiscussionsControllerClose(), useCommunityDiscussionsControllerDetails(), useCommunityDiscussionsControllerPost(), useCommunityDiscussionsControllerRemove() (+5 more)
+### Community 97 - "CommunityTopicPage.tsx"
+Cohesion: 0.11
+Nodes (36): getCommunityDiscussionsControllerDetailsQueryKey(), getCommunityDiscussionsControllerDetailsQueryOptions(), getDiscussionsControllerListEventPostsQueryKey(), getDiscussionsControllerListEventPostsQueryOptions(), useCommunityDiscussionsControllerClose(), useCommunityDiscussionsControllerDetails(), useCommunityDiscussionsControllerPost(), useCommunityDiscussionsControllerRemove() (+28 more)
 
 ### Community 98 - "Community API Mocks"
-Cohesion: 0.25
-Nodes (13): DeletedCommunityDto, ManagedCommunityDto, getCommunitiesControllerArchiveMockHandler(), getCommunitiesControllerArchiveResponseMock(), getCommunitiesControllerCreateMockHandler(), getCommunitiesControllerCreateResponseMock(), getCommunitiesControllerMineMockHandler(), getCommunitiesControllerMineResponseMock() (+5 more)
+Cohesion: 0.23
+Nodes (14): CreatedResourceDto, DeletedCommunityDto, ManagedCommunityDto, getCommunitiesControllerArchiveMockHandler(), getCommunitiesControllerArchiveResponseMock(), getCommunitiesControllerCreateMockHandler(), getCommunitiesControllerCreateResponseMock(), getCommunitiesControllerMineMockHandler() (+6 more)
 
 ### Community 99 - "Discussion Storage Schema"
 Cohesion: 0.22
 Nodes (10): "discussion_posts", discussion_posts_author_idx, discussion_posts_deleted_by_idx, discussion_posts_parent_created_idx, discussion_posts_thread_created_idx, "discussion_threads", discussion_threads_author_idx, discussion_threads_community_created_idx (+2 more)
 
 ### Community 100 - "Interface Audits and Adaptation"
-Cohesion: 0.18
-Nodes (6): Impeccable slash command, Android Material 3 platform conformance, Audit Health Score and P0-P3 findings, Five-dimension native technical audit, Five-dimension web technical audit, Impeccable design skill
+Cohesion: 0.16
+Nodes (10): Impeccable slash command, Android Material 3 platform conformance, Audit Health Score and P0-P3 findings, Five-dimension native technical audit, Five-dimension web technical audit, Craft deprecated alias, Impeccable artifact drift doctor, Confirmed comp-first or code-first workflow default (+2 more)
 
 ### Community 101 - "Browser End To End Tests"
 Cohesion: 0.15
@@ -649,7 +653,7 @@ Cohesion: 0.37
 Nodes (10): CommunityActivityItemDto, CommunityMemberDto, CommunityMemberPreviewDto, EventActivityItemDto, MembershipStateDto, MyActivityDto, ParticipantListItemDto, ParticipationCountsDto (+2 more)
 
 ### Community 105 - "Wasl Project Operating Context"
-Cohesion: 0.18
+Cohesion: 0.17
 Nodes (8): Wasl agent operating instructions, Claude agent instruction reference, Manrope and Tajawal font delivery, Wasl browser document shell, Gemini agent instruction reference, Wasl provider integrations, Remaining launch approval and verification gaps, Wasl bilingual community and event platform
 
 ### Community 106 - "Design Color Mode Resolution"
@@ -708,9 +712,9 @@ Nodes (4): PostgreSQL INSERT ON CONFLICT documentation, PostgreSQL Advisory Lock
 Cohesion: 0.25
 Nodes (4): Supabase EXPLAIN and database inspection documentation, Supabase pg_stat_statements documentation, Supabase VACUUM operations documentation, Supabase Query Optimization documentation
 
-### Community 120 - "Participation PostgreSQL Integration Tests"
-Cohesion: 0.46
-Nodes (7): createTestTables(), identityIds, main(), makeUsers(), quoteIdentifier(), seedResources(), setupPool
+### Community 120 - "Homepage Discovery Enhancement"
+Cohesion: 0.13
+Nodes (14): Collection eligibility, ordering and fallback, Existing behavior and boundaries, Further Notes, Homepage Discovery Enhancement, Images, metadata and availability, Implementation Decisions, Location state and privacy, Out of Scope (+6 more)
 
 ### Community 122 - "Skill Script Path Validation"
 Cohesion: 0.38
@@ -736,10 +740,6 @@ Nodes (6): "resource_moderators", resource_moderators_assigner_idx, resource_mod
 Cohesion: 0.29
 Nodes (6): compilerOptions, outDir, rootDir, extends, include, ../tsconfig.base.json
 
-### Community 129 - "Async Errors and Microservice Patterns"
-Cohesion: 0.33
-Nodes (3): EventPattern fire-and-forget, MessagePattern request-response, BullMQ
-
 ### Community 130 - "Design System Showcase Composition"
 Cohesion: 0.33
 Nodes (3): DESIGN.md token and recipe mapping, ColorPair contrast measurement, Design system showcase page
@@ -760,9 +760,13 @@ Nodes (5): "organization_admin_invitations", organization_admin_invitations_invi
 Cohesion: 0.33
 Nodes (5): collection, compilerOptions, builder, $schema, sourceRoot
 
-### Community 138 - "NestJS Service Testing Guidance"
-Cohesion: 0.40
-Nodes (3): Mocked repository dependencies, NestJS Testing documentation, RolesGuard execution-context testing
+### Community 137 - "Wasl — Project Handoff"
+Cohesion: 0.18
+Nodes (11): Build history — all planned phases are closed, How it works, Known gaps, Local commands, Providers and data, Repository state, Stack and layout, Verified state (2026-10-28, `main`) (+3 more)
+
+### Community 138 - "Dual-assessment design critique"
+Cohesion: 0.20
+Nodes (5): Cognitive Load Assessment, Cowan 2001 working memory limit, Nielsen usability heuristics scoring, Persona-Based Design Testing, Impeccable Finish Reviewer
 
 ### Community 141 - "Community Cover Asset Catalog"
 Cohesion: 0.40
@@ -792,6 +796,10 @@ Nodes (4): "categories", categories_name_tr_unique, "cities", cities_name_tr_uni
 Cohesion: 0.40
 Nodes (4): HealthResponse, healthResponseSchema, Pagination, paginationSchema
 
+### Community 149 - "Phase 6 native discussions, realtime chat and engagement"
+Cohesion: 0.20
+Nodes (7): Publicly readable native discussions with membership-gated posting, Phase 6 native discussions, realtime chat and engagement, Single-level replies, removed-post placeholders and universally closed threads, AAL2 platform administration and transactional scoped report review, Transaction-bound notifications and pgmq Resend delivery retries, Phase 7 notifications, moderation and privacy historical checkpoint, Tasks 147–149 blocked on approved legal and privacy inputs
+
 ### Community 156 - "Privacy Retry API Client"
 Cohesion: 0.50
 Nodes (4): getPrivacyAdminControllerRetryMutationKey(), getPrivacyAdminControllerRetryMutationOptions(), getPrivacyAdminControllerRetryUrl(), privacyAdminControllerRetry()
@@ -820,6 +828,14 @@ Nodes (4): getPrivacyControllerStatusQueryKey(), getPrivacyControllerStatusQuery
 Cohesion: 0.50
 Nodes (3): "messaging_member_sync", "messaging_reports", "messaging_user_blocks"
 
+### Community 163 - "verify-cards.cjs"
+Cohesion: 0.20
+Nodes (8): base, category, { chromium, expect }, community, events, fs, out, path
+
+### Community 164 - "Public Communities and public or direct-link-only Unlisted Events"
+Cohesion: 0.22
+Nodes (8): Discover → Evaluate → Join/Register → Admission → Participate → Manage → Communicate, Public Communities and public or direct-link-only Unlisted Events, Wasl nationwide community and event platform for Arabs in Türkiye, Server-authoritative Join Event transaction and concurrency control, Phase 3 Supabase Auth, stable Wasl identity, profiles and content creation, Browser Storage upload with server ownership, signature and size validation, Row-locked admission, unique participation and FIFO promotion, Phase 4 participation, approvals and capacity correctness
+
 ### Community 168 - "Wasl SVG Favicon"
 Cohesion: 0.67
 Nodes (3): White crossing line mark with horizontal ends, rounded caps and joins, and 5-unit stroke, SVG favicon: teal rounded square with white crossing strokes, 64-by-64 teal background (#136f63) with 16-unit rounded corners
@@ -832,53 +848,65 @@ Nodes (3): Gathering community cover photograph, Group togetherness, Scenic wate
 Cohesion: 0.67
 Nodes (3): Group together at sunset, Outdoor gathering in a hillside landscape, Social connection and togetherness
 
+### Community 175 - "Phase 8 local hardening versus incomplete release acceptance"
+Cohesion: 0.25
+Nodes (5): Patched production dependency audit with zero reported vulnerabilities, Phase 8 local hardening versus incomplete release acceptance, Rotate exposed development database password before continued use, Phase 9 production plan Tasks 165–171, no deployment authorized, Guest-only E2E, unexecuted CI/Render and unpublished legal documents
+
+### Community 176 - "showcase-coverage.mjs"
+Cohesion: 0.29
+Nodes (6): components, missing, source, [uiArg, ...roots], uiDir, walk()
+
+### Community 177 - "AppProviders.tsx"
+Cohesion: 0.38
+Nodes (5): AppProviders(), head, AuthProvider(), rootElement, sonner
+
+### Community 201 - "Domain Docs"
+Cohesion: 0.33
+Nodes (5): Before exploring, Decision conflicts, Domain Docs, Layout, Vocabulary
+
+### Community 206 - "waslFetch"
+Cohesion: 0.50
+Nodes (4): isPublicRead(), resolveApiUrl(), authMocks, waslFetch()
+
+### Community 217 - "Issue tracker: Local Markdown"
+Cohesion: 0.40
+Nodes (4): Conventions, Fetching tickets, Issue tracker: Local Markdown, Publishing
+
+### Community 218 - "Approved technology baseline, not proof of installed dependencies"
+Cohesion: 0.40
+Nodes (4): Approved technology baseline, not proof of installed dependencies, Supabase, Stream, Resend, Render and GitHub Actions provider baseline, Nest OpenAPI → Orval typed clients and MSW mocks, Phase 2 public discovery with URL-backed filters and unlisted noindex
+
 ## Ambiguous Edges - Review These
 - `Tasks 147–149 blocked on approved legal and privacy inputs` → `18+ declaration, legal acceptance, privacy export and provider-deletion retry foundations`  [AMBIGUOUS]
   docs/project_handoff.md · relation: conceptually_related_to
-- `Separate production providers, no sample data and manual owner-approved release` → `Reuse current Supabase, Stream and Resend with public MVP sample data`  [AMBIGUOUS]
-  docs/production-handoff.md · relation: conceptually_related_to
 - `Rotate exposed development database password before continued use` → `Rotate exposed database password immediately after launch`  [AMBIGUOUS]
+  docs/production-handoff.md · relation: conceptually_related_to
+- `Separate production providers, no sample data and manual owner-approved release` → `Reuse current Supabase, Stream and Resend with public MVP sample data`  [AMBIGUOUS]
   docs/production-handoff.md · relation: conceptually_related_to
 
 ## Knowledge Gaps
-- **126 isolated node(s):** `../tsconfig.base.json`, `../tsconfig.base.json`, `community`, `event`, `./tsconfig.json` (+121 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1298 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **71 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **102 isolated node(s):** `../tsconfig.base.json`, `../tsconfig.base.json`, `community`, `event`, `./tsconfig.json` (+97 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1308 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **75 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `@tanstack/react-query` connect `Client Routing and Localization` to `Resource Pages and Participation`, `React Forms and Controls`, `Participation API Client`, `Organizations API Client`, `Discussions API Client`, `Authenticated Profiles and Navigation`, `Messaging API Client`, `Client Runtime Dependencies`, `Privacy Review API Client`, `Conversations and Confirmation Dialogs`, `Discovery Search and Filtering`, `Moderation API Client`, `Users API and Mocks`, `Communities API Client`, `Events API Client`, `Health API Client`, `Platform Moderation Dashboard`, `Notifications API Client`, `Community Topic Page`?**
-  _High betweenness centrality (0.042) - this node is a cross-community bridge._
+- **Why does `@tanstack/react-query` connect `Client Routing and Localization` to `lucide-react`, `React Forms and Controls`, `Participation API Client`, `Organizations API Client`, `Discussions API Client`, `OrganizationManagePage.tsx`, `Messaging API Client`, `Client Runtime Dependencies`, `Privacy Review API Client`, `Button`, `Discovery Search and Filtering`, `Moderation API Client`, `Users API and Mocks`, `Communities API Client`, `AppProviders.tsx`, `Events API Client`, `Health API Client`, `OrganizerParticipationPanel.tsx`, `Notifications API Client`, `CommunityTopicPage.tsx`?**
+  _High betweenness centrality (0.043) - this node is a cross-community bridge._
 - **What connects `../tsconfig.base.json`, `../tsconfig.base.json`, `community` to the rest of the system?**
-  _126 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _102 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Live Browser Design Canvas` be split into smaller, more focused modules?**
   _Cohesion score 0.02856298630946518 - nodes in this community are weakly interconnected._
-- **Why does `@nestjs/common` connect `NestJS Application Modules` to `Moderation Contracts and Validation`, `Organization Domain Services`, `Database Access and Domains`, `Participation Request Response Contracts`, `Schema and Data Workflows`, `Server Bootstrap and Dependencies`, `Discovery Reference Data Contracts`, `Deletion and Messaging Workers`, `Discussion Domain Services`, `HTTP Authentication Boundary`, `Supabase Identity and Privacy Gates`, `Health HTTP Endpoints`, `Notification Email Delivery`, `Messaging Request Response Contracts`?**
-  _High betweenness centrality (0.014) - this node is a cross-community bridge._
-- **Should `Resource Pages and Participation` be split into smaller, more focused modules?**
-  _Cohesion score 0.062407862407862405 - nodes in this community are weakly interconnected._
+- **Why does `waslFetch()` connect `waslFetch` to `React Forms and Controls`, `Participation API Client`, `Organizations API Client`, `Client Routing and Localization`, `Discussions API Client`, `Retention Preview API Client`, `Age Review API Client`, `Messaging API Client`, `Privacy Review API Client`, `Privacy Retry API Client`, `Legal Acceptance API Client`, `Privacy Cancellation API Client`, `Privacy Request Creation Client`, `Moderation API Client`, `Discovery Search and Filtering`, `Age Declaration API Client`, `Privacy Status API Client`, `Users API and Mocks`, `Communities API Client`, `Events API Client`, `Health API Client`, `Notifications API Client`, `Privacy Export API Client`?**
+  _High betweenness centrality (0.016) - this node is a cross-community bridge._
+- **Should `lucide-react` be split into smaller, more focused modules?**
+  _Cohesion score 0.07381748686096512 - nodes in this community are weakly interconnected._
 
 ### Low-confidence Hints
 _AMBIGUOUS edges — the extractor was unsure. Verify before acting on these._
 
 - **What is the exact relationship between `Tasks 147–149 blocked on approved legal and privacy inputs` and `18+ declaration, legal acceptance, privacy export and provider-deletion retry foundations`?**
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
-- **What is the exact relationship between `Separate production providers, no sample data and manual owner-approved release` and `Reuse current Supabase, Stream and Resend with public MVP sample data`?**
+- **What is the exact relationship between `Rotate exposed development database password before continued use` and `Rotate exposed database password immediately after launch`?**
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
-
-## Token Accounting
-
-Host-agent token usage is unavailable in the tool results. Internal zero placeholders are not a measurement of session usage; no Gemini API was used.
-
-## Coverage Limitations
-
-Detection skipped four sensitive-flagged files: `.npmrc`, `client/src/styles/tokens.css`, `docs/design/tokens.css`, and `docs/design/tokens.json`. The AST extractor reported 37 code files with no modeled symbols. Semantic extraction covers the full 184-file document/image corpus, including installed skills; these are reference material, not evidence that the application implements their recommendations.
-
-The AST metadata additionally marks 43 structured-data files as intentionally skipped and one failed source: `.opencode/skills/impeccable/scripts/data/font-index.json`. The failed file's manifest hashes are left blank so a future update retries it rather than treating it as successfully indexed.
-
-## Graph Health
-
-WARNING: 170 dangling-endpoint edges; 11 self-loop edges; 742 collapsed directed edges; 751 collapsed undirected edges. Graph is usable, but these issues limit relationship completeness.
-
-`graphify-out/` was written into the working tree and is not ignored; commit only the outputs the team should share. See https://docs.graphify.com/guides/team-workflows.
