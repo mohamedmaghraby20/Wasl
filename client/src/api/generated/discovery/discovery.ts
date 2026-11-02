@@ -5,20 +5,16 @@
  * OpenAPI spec version: v1
  */
 import {
-  useMutation,
   useQuery
 } from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
   DefinedUseQueryResult,
-  MutationFunction,
   QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
-  UseMutationOptions,
-  UseMutationResult,
   UseQueryOptions,
   UseQueryResult
 } from '@tanstack/react-query';
@@ -28,7 +24,6 @@ import type {
   CityPublicDto,
   CommunityPageDto,
   CommunityPublicDto,
-  CreateCategoryDto,
   DiscoveryControllerCommunityParams,
   DiscoveryControllerEventParams,
   DiscoveryControllerListCommunitiesParams,
@@ -667,84 +662,3 @@ export function useDiscoveryControllerCategories<TData = Awaited<ReturnType<type
 
 
 
-export const getDiscoveryControllerCreateCategoryUrl = () => {
-
-
-
-
-  return `/api/v1/reference/categories`
-}
-
-export const discoveryControllerCreateCategory = async (createCategoryDto: CreateCategoryDto, options?: Parameters<typeof waslFetch>[1]): Promise<CategoryPublicDto> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Symbol.iterator in h) {
-      return Object.fromEntries(
-        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
-      );
-    }
-    const headers: Record<string, string | readonly string[]> = {};
-    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
-      if (value !== undefined) headers[name] = value;
-    }
-    return headers;
-  };
-return waslFetch<CategoryPublicDto>(getDiscoveryControllerCreateCategoryUrl(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(createCategoryDto)
-  }
-);}
-
-
-
-
-
-export const getDiscoveryControllerCreateCategoryMutationKey = () => ['discoveryControllerCreateCategory'] as const;
-
-export const getDiscoveryControllerCreateCategoryMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof discoveryControllerCreateCategory>>, TError,DiscoveryControllerCreateCategoryMutationVariables, TContext>, request?: SecondParameter<typeof waslFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof discoveryControllerCreateCategory>>, TError,DiscoveryControllerCreateCategoryMutationVariables, TContext> => {
-
-const mutationKey = getDiscoveryControllerCreateCategoryMutationKey();
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof discoveryControllerCreateCategory>>, DiscoveryControllerCreateCategoryMutationVariables> = (props) => {
-          const {data} = props ?? {};
-
-          return  discoveryControllerCreateCategory(data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type DiscoveryControllerCreateCategoryMutationResult = NonNullable<Awaited<ReturnType<typeof discoveryControllerCreateCategory>>>
-    export type DiscoveryControllerCreateCategoryMutationBody = CreateCategoryDto
-    export type DiscoveryControllerCreateCategoryMutationError = unknown
-    export type DiscoveryControllerCreateCategoryMutationVariables = {data: CreateCategoryDto}
-
-    export const useDiscoveryControllerCreateCategory = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof discoveryControllerCreateCategory>>, TError,DiscoveryControllerCreateCategoryMutationVariables, TContext>, request?: SecondParameter<typeof waslFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof discoveryControllerCreateCategory>>,
-        TError,
-        DiscoveryControllerCreateCategoryMutationVariables,
-        TContext
-      > => {
-      return useMutation(getDiscoveryControllerCreateCategoryMutationOptions(options), queryClient);
-    }

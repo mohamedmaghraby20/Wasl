@@ -85,7 +85,7 @@ export interface CreateCommunityDto {
   cityId: string;
   /**
      * @minItems 1
-     * @maxItems 5
+     * @maxItems 3
      */
   categoryIds: string[];
   admissionMode: CreateCommunityDtoAdmissionMode;
@@ -127,7 +127,7 @@ export interface UpdateCommunityDto {
   cityId: string;
   /**
      * @minItems 1
-     * @maxItems 5
+     * @maxItems 3
      */
   categoryIds: string[];
   admissionMode: UpdateCommunityDtoAdmissionMode;
@@ -536,7 +536,7 @@ export interface CreateEventDto {
   visibility?: CreateEventDtoVisibility;
   /**
      * @minItems 1
-     * @maxItems 5
+     * @maxItems 3
      */
   categoryIds: string[];
   startsAt: string;
@@ -594,7 +594,7 @@ export interface UpdateEventDto {
   visibility?: UpdateEventDtoVisibility;
   /**
      * @minItems 1
-     * @maxItems 5
+     * @maxItems 3
      */
   categoryIds: string[];
   startsAt: string;
@@ -899,6 +899,10 @@ export const CreateReportDtoTargetType = {
 
 export interface CreateReportDto {
   targetType: CreateReportDtoTargetType;
+  /**
+     * @minLength 1
+     * @maxLength 80
+     */
   targetId: string;
   /**
      * @minLength 1
@@ -1276,14 +1280,6 @@ export interface CategoryPublicDto {
   nameTr: string;
 }
 
-export interface CreateCategoryDto {
-  /**
-     * @minLength 2
-     * @maxLength 40
-     */
-  name: string;
-}
-
 export interface CommunityPublicDto {
   id: string;
   slug: string;
@@ -1329,6 +1325,11 @@ export interface EventPublicDto {
   /** @nullable */
   endsAt?: string | null;
   cancelled: boolean;
+  /**
+     * Accepted registration rows only; excludes pending requests, waitlists and unregistered hosts.
+     * @minimum 0
+     */
+  acceptedRegistrationCount: number;
   /** @nullable */
   capacity?: number | null;
   admissionMode: string;

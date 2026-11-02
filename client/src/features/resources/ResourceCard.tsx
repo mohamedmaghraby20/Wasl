@@ -1,10 +1,12 @@
-import { MapPin, UsersRound, Video } from 'lucide-react';
+import { CalendarDays, MapPin, UsersRound, Video } from 'lucide-react';
+import { useState } from 'react';
 import { Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import type { CommunityPublicDto, EventPublicDto } from '@/api/generated/wasl-client.schemas';
 import { Badge } from '@/components/ui/Badge';
 import {
   localizedName,
+  defaultResourceCover,
   localizedResourceTitle,
   turkeyDateParts,
   type ResourceKind,
@@ -21,9 +23,33 @@ export function ResourceCard({
   const event = kind === 'events' && 'startsAt' in item ? item : undefined;
   const date = event ? turkeyDateParts(event.startsAt, i18n.language) : undefined;
   const [firstCategory, ...otherCategories] = item.categories;
+  const cover = defaultResourceCover(item.id, kind);
+  const [failedCover, setFailedCover] = useState<string>();
+  const CoverIcon = event ? CalendarDays : UsersRound;
+  const remaining =
+    event?.capacity == null ? null : Math.max(0, event.capacity - event.acceptedRegistrationCount);
 
   return (
-    <article className="group relative flex flex-col gap-4 rounded-(--shape-radius-card) border border-border bg-card p-5 shadow-xs transition-[box-shadow,translate,border-color] duration-(--motion-duration-base) ease-(--motion-ease-standard) hover:-translate-y-0.5 hover:border-border-strong hover:shadow-md has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-ring has-[a:focus-visible]:ring-offset-2 has-[a:focus-visible]:ring-offset-background">
+    <article className="group relative flex min-w-0 flex-col gap-4 rounded-(--shape-radius-card) border border-border bg-card p-5 shadow-xs transition-[box-shadow,translate,border-color] duration-(--motion-duration-base) ease-(--motion-ease-standard) hover:-translate-y-0.5 hover:border-border-strong hover:shadow-md motion-reduce:transform-none motion-reduce:transition-none has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-ring has-[a:focus-visible]:ring-offset-2 has-[a:focus-visible]:ring-offset-background">
+      <div
+        aria-hidden="true"
+        className="-mx-5 -mt-5 grid aspect-video place-items-center overflow-hidden rounded-t-(--shape-radius-card) bg-primary-soft text-primary-soft-text"
+      >
+        {failedCover === cover ? (
+          <CoverIcon className="size-10" strokeWidth={1.75} />
+        ) : (
+          <img
+            alt=""
+            className="aspect-video h-full w-full object-cover"
+            decoding="async"
+            height={675}
+            loading="lazy"
+            onError={() => setFailedCover(cover)}
+            src={cover}
+            width={1200}
+          />
+        )}
+      </div>
       {(event && date) || firstCategory ? (
         <div className="flex items-start justify-between gap-3">
           {event && date ? (
@@ -74,6 +100,29 @@ export function ResourceCard({
         <p className="line-clamp-2 text-sm leading-relaxed text-text-muted">{item.description}</p>
       </div>
 
+      {event ? (
+        <div className="mt-auto grid gap-1.5 text-sm">
+          <p className="text-text-muted">
+            {t('eventRegisteredCount', { count: event.acceptedRegistrationCount })}
+          </p>
+          {!event.cancelled ? (
+            <>
+              <p
+                className={`font-medium ${remaining === 0 ? 'text-warning' : 'text-primary-soft-text'}`}
+              >
+                {remaining === null
+                  ? t('eventUnlimitedCapacity')
+                  : remaining === 0
+                    ? t('eventFullWaitlist')
+                    : t('eventPlacesLeft', { count: remaining })}
+              </p>
+              {event.admissionMode === 'approval' ? (
+                <p className="text-text-muted">{t('eventApprovalRequired')}</p>
+              ) : null}
+            </>
+          ) : null}
+        </div>
+      ) : null}
       <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-border pt-3 text-xs text-text-subtle">
         <span className="inline-flex min-w-0 items-center gap-1.5">
           <UsersRound aria-hidden="true" className="size-3.5 shrink-0" />
