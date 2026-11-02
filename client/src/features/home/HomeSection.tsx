@@ -1,9 +1,11 @@
-import { ArrowRight, SearchX } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight, SearchX } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import type { CommunityPublicDto, EventPublicDto } from '@/api/generated/wasl-client.schemas';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { IconButton } from '@/components/ui/IconButton';
 import { ResourceCard } from '@/features/resources/ResourceCard';
 import { QueryError } from '@/components/feedback/QueryError';
 import type { ResourceKind } from '@/features/resources/resource-utils';
@@ -16,6 +18,8 @@ export function HomeSection({
   isPending,
   isError,
   onRetry,
+  viewAll,
+  sectionId = kind,
 }: {
   title: string;
   kind: ResourceKind;
@@ -24,34 +28,89 @@ export function HomeSection({
   isPending: boolean;
   isError: boolean;
   onRetry: () => void;
+  viewAll?: string;
+  sectionId?: string;
 }): React.JSX.Element {
   const { t } = useTranslation();
   const resource = title.toLocaleLowerCase(language);
+  const row = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState({ overflow: false, start: true, end: false });
+  const rtl = language.startsWith('ar');
+  useEffect(() => {
+    const element = row.current;
+    if (!element) return;
+    const measure = (): void => {
+      const offset = Math.abs(element.scrollLeft);
+      const maximum = element.scrollWidth - element.clientWidth;
+      setPosition({ overflow: maximum > 1, start: offset < 1, end: offset >= maximum - 1 });
+    };
+    measure();
+    const observer =
+      typeof ResizeObserver === 'undefined' ? undefined : new ResizeObserver(measure);
+    observer?.observe(element);
+    window.addEventListener('resize', measure);
+    element.addEventListener('scroll', measure, { passive: true });
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener('resize', measure);
+      element.removeEventListener('scroll', measure);
+    };
+  }, [items, isPending, isError, language]);
+  const move = (forward: boolean): void => {
+    const element = row.current;
+    if (!element) return;
+    element.scrollBy({ left: element.clientWidth * (forward ? 1 : -1) * (rtl ? -1 : 1) });
+  };
+  const rowClass =
+    'grid min-w-0 grid-flow-col auto-cols-[85%] gap-4 overflow-x-auto overscroll-x-contain p-1 -m-1 sm:auto-cols-[calc((100%-1rem)/2)] xl:auto-cols-[calc((100%-3rem)/4)]';
   return (
-    <section className="grid gap-4" aria-labelledby={`${kind}-heading`}>
-      <div className="flex items-end justify-between gap-4">
-        <h2 className="text-xl font-bold sm:text-2xl" id={`${kind}-heading`}>
+    <section className="grid gap-4" aria-labelledby={`${sectionId}-heading`}>
+      <div className="grid gap-1 sm:flex sm:items-end sm:justify-between sm:gap-3">
+        <h2 className="text-xl font-bold sm:text-2xl" id={`${sectionId}-heading`}>
           {title}
         </h2>
-        <Link
-          className="inline-flex items-center gap-1 text-sm font-semibold text-primary-soft-text hover:underline"
-          to={`/${kind}`}
-        >
-          {t('exploreAll')}
-          <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />
-        </Link>
+        <div className="flex items-center justify-end gap-2">
+          {position.overflow && !isPending && !isError && items?.length ? (
+            <div className="flex gap-2">
+              <IconButton
+                aria-controls={`${sectionId}-cards`}
+                disabled={position.start}
+                icon={rtl ? ChevronRight : ChevronLeft}
+                label={t('homePreviousCards')}
+                onClick={() => move(false)}
+                variant="secondary"
+              />
+              <IconButton
+                aria-controls={`${sectionId}-cards`}
+                disabled={position.end}
+                icon={rtl ? ChevronLeft : ChevronRight}
+                label={t('homeNextCards')}
+                onClick={() => move(true)}
+                variant="secondary"
+              />
+            </div>
+          ) : null}
+          <Link
+            className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-sm text-sm font-semibold text-primary-soft-text hover:underline"
+            to={viewAll ?? `/${kind}`}
+          >
+            {t('exploreAll')}
+            <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />
+          </Link>
+        </div>
       </div>
       {isPending ? (
         <>
           <p className="sr-only" role="status">
             {t('loading', { resource })}
           </p>
-          <div aria-hidden="true" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {Array.from({ length: 3 }, (_, index) => (
+          <div aria-hidden="true" className={rowClass}>
+            {Array.from({ length: 4 }, (_, index) => (
               <div
-                className="grid gap-4 rounded-(--shape-radius-card) border border-border bg-card p-5"
+                className={`flex flex-col gap-4 rounded-(--shape-radius-card) border border-border bg-card p-5 ${kind === 'events' ? 'min-h-[31rem]' : 'min-h-[26rem]'}`}
                 key={index}
               >
+                <Skeleton className="-mx-5 -mt-5 aspect-video rounded-b-none rounded-t-(--shape-radius-card)" />
                 <Skeleton className="h-5 w-24" />
                 <Skeleton className="h-5 w-3/4" />
                 <Skeleton className="h-4 w-full" />
@@ -69,11 +128,37 @@ export function HomeSection({
           title={t('noHomeResultsTitle')}
         />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {items.map((item) => (
-            <ResourceCard key={item.id} item={item} kind={kind} />
+        /* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex -- A named scroll container needs keyboard focus and scrolling keys; its children remain ordinary links. */
+        <div
+          aria-label={t('homeBrowseCards', { resource: title })}
+          className={`${rowClass} rounded-sm focus-visible:outline-2 focus-visible:outline-ring focus-visible:-outline-offset-2`}
+          id={`${sectionId}-cards`}
+          ref={row}
+          role="group"
+          tabIndex={0}
+          onKeyDown={(event) => {
+            if (event.target !== event.currentTarget) return;
+            if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+              event.preventDefault();
+              move(event.key === (rtl ? 'ArrowLeft' : 'ArrowRight'));
+            } else if (event.key === 'Home' || event.key === 'End') {
+              event.preventDefault();
+              event.currentTarget.scrollTo({
+                left: event.key === 'Home' ? 0 : event.currentTarget.scrollWidth * (rtl ? -1 : 1),
+              });
+            }
+          }}
+        >
+          {items.slice(0, 4).map((item) => (
+            <div
+              className={`min-w-0 [&>article]:h-full ${kind === 'events' ? 'min-h-[31rem]' : 'min-h-[26rem]'}`}
+              key={item.id}
+            >
+              <ResourceCard item={item} kind={kind} />
+            </div>
           ))}
         </div>
+        /* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex */
       )}
     </section>
   );

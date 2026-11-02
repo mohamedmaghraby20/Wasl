@@ -20,7 +20,7 @@ import { Badge } from '@/components/ui/Badge';
 import { CommunityMemberPreview } from '@/features/participation/CommunityMemberPreview';
 import { CommunityMembersTab } from '@/features/participation/CommunityMembersTab';
 import { CommunityTopics } from '@/features/discussions/CommunityTopics';
-import { localizedName } from '@/features/resources/resource-utils';
+import { defaultResourceCover, localizedName } from '@/features/resources/resource-utils';
 import { CommunityEvents } from './CommunityEvents';
 import { ParticipationQueueLinks } from '@/features/participation/ParticipationQueueLinks';
 
@@ -32,12 +32,7 @@ const sections = [
 ] as const;
 
 export function defaultCommunityCover(id: string): string {
-  const covers = ['gathering', 'together', 'conversation'];
-  const hash = Array.from(id).reduce(
-    (value, character) => (value * 31 + character.charCodeAt(0)) >>> 0,
-    0,
-  );
-  return `/images/community-covers/${covers[hash % covers.length]}.jpg`;
+  return defaultResourceCover(id, 'communities');
 }
 
 export function CommunityDetailsLayout({

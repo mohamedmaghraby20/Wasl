@@ -25,6 +25,7 @@ import type {
   CommunityPageDto,
   CommunityPublicDto,
   DiscoveryControllerCommunityParams,
+  DiscoveryControllerDiscoveryCategoriesParams,
   DiscoveryControllerEventParams,
   DiscoveryControllerListCommunitiesParams,
   DiscoveryControllerListEventsParams,
@@ -651,6 +652,107 @@ export function useDiscoveryControllerCategories<TData = Awaited<ReturnType<type
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getDiscoveryControllerCategoriesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+export const getDiscoveryControllerDiscoveryCategoriesUrl = (params?: DiscoveryControllerDiscoveryCategoriesParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/discovery/categories?${stringifiedParams}` : `/api/v1/discovery/categories`
+}
+
+export const discoveryControllerDiscoveryCategories = async (params?: DiscoveryControllerDiscoveryCategoriesParams, options?: Parameters<typeof waslFetch>[1]): Promise<CategoryPublicDto[]> => {
+
+  return waslFetch<CategoryPublicDto[]>(getDiscoveryControllerDiscoveryCategoriesUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getDiscoveryControllerDiscoveryCategoriesQueryKey = (params?: DiscoveryControllerDiscoveryCategoriesParams,) => {
+    return [
+    `/api/v1/discovery/categories`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getDiscoveryControllerDiscoveryCategoriesQueryOptions = <TData = Awaited<ReturnType<typeof discoveryControllerDiscoveryCategories>>, TError = unknown>(params?: DiscoveryControllerDiscoveryCategoriesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof discoveryControllerDiscoveryCategories>>, TError, TData>>, request?: SecondParameter<typeof waslFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDiscoveryControllerDiscoveryCategoriesQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof discoveryControllerDiscoveryCategories>>> = ({ signal }) => discoveryControllerDiscoveryCategories(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof discoveryControllerDiscoveryCategories>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DiscoveryControllerDiscoveryCategoriesQueryResult = NonNullable<Awaited<ReturnType<typeof discoveryControllerDiscoveryCategories>>>
+export type DiscoveryControllerDiscoveryCategoriesQueryError = unknown
+
+
+export function useDiscoveryControllerDiscoveryCategories<TData = Awaited<ReturnType<typeof discoveryControllerDiscoveryCategories>>, TError = unknown>(
+ params: undefined |  DiscoveryControllerDiscoveryCategoriesParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof discoveryControllerDiscoveryCategories>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof discoveryControllerDiscoveryCategories>>,
+          TError,
+          Awaited<ReturnType<typeof discoveryControllerDiscoveryCategories>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof waslFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDiscoveryControllerDiscoveryCategories<TData = Awaited<ReturnType<typeof discoveryControllerDiscoveryCategories>>, TError = unknown>(
+ params?: DiscoveryControllerDiscoveryCategoriesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof discoveryControllerDiscoveryCategories>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof discoveryControllerDiscoveryCategories>>,
+          TError,
+          Awaited<ReturnType<typeof discoveryControllerDiscoveryCategories>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof waslFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDiscoveryControllerDiscoveryCategories<TData = Awaited<ReturnType<typeof discoveryControllerDiscoveryCategories>>, TError = unknown>(
+ params?: DiscoveryControllerDiscoveryCategoriesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof discoveryControllerDiscoveryCategories>>, TError, TData>>, request?: SecondParameter<typeof waslFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useDiscoveryControllerDiscoveryCategories<TData = Awaited<ReturnType<typeof discoveryControllerDiscoveryCategories>>, TError = unknown>(
+ params?: DiscoveryControllerDiscoveryCategoriesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof discoveryControllerDiscoveryCategories>>, TError, TData>>, request?: SecondParameter<typeof waslFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDiscoveryControllerDiscoveryCategoriesQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

@@ -19,7 +19,12 @@ export class CommunityPublicDto {
   @ApiProperty() hostName!: string;
   @ApiProperty() ownerType!: string;
   @ApiProperty() ownerId!: string;
-  @ApiPropertyOptional() memberCount?: number;
+  @ApiProperty({
+    type: 'integer',
+    minimum: 0,
+    description:
+      'Active memberships plus an individual owner not already active; organization ownership adds no member.',
+  }) memberCount!: number;
   @ApiPropertyOptional({ type: String, nullable: true }) organizationSlug!: string | null;
   @ApiProperty() cityId!: string;
   @ApiProperty() cityName!: string;
@@ -41,6 +46,11 @@ export class EventPublicDto {
   @ApiProperty() startsAt!: string;
   @ApiPropertyOptional({ type: String, nullable: true }) endsAt!: string | null;
   @ApiProperty() cancelled!: boolean;
+  @ApiProperty({
+    type: 'integer',
+    minimum: 0,
+    description: 'Accepted registration rows only; excludes pending requests, waitlists and unregistered hosts.',
+  }) acceptedRegistrationCount!: number;
   @ApiPropertyOptional({ type: Number, nullable: true }) capacity!: number | null;
   @ApiProperty() admissionMode!: string;
   @ApiPropertyOptional({ type: String, nullable: true }) cityId!: string | null;

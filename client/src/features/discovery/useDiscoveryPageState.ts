@@ -27,7 +27,20 @@ export function useDiscoveryPageState(language: string) {
   const requestedPage = Number(params.get('page') ?? 1);
   const page = Number.isInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
   const filterKeys =
-    kind === 'communities' ? ['q', 'city', 'category'] : ['q', 'city', 'category', 'from', 'to'];
+    kind === 'communities'
+      ? ['q', 'city', 'category', 'order']
+      : [
+          'q',
+          'city',
+          'category',
+          'from',
+          'to',
+          'modality',
+          'cityScope',
+          'upcoming',
+          'nonCancelled',
+          ...(kind === 'all' ? ['order'] : []),
+        ];
   const hasFilters = filterKeys.some((key) => params.has(key));
   const lang = languageCode(language);
   const communityParams = {
@@ -42,10 +55,26 @@ export function useDiscoveryPageState(language: string) {
     ...communityParams,
     ...(params.get('from') ? { from: params.get('from')! } : {}),
     ...(params.get('to') ? { to: params.get('to')! } : {}),
+    ...(params.get('modality') === 'online' || params.get('modality') === 'in-person'
+      ? { modality: params.get('modality') as 'online' | 'in-person' }
+      : {}),
+    ...(params.get('cityScope') === 'include-online' || params.get('cityScope') === 'strict'
+      ? { cityScope: params.get('cityScope') as 'include-online' | 'strict' }
+      : {}),
+    ...(params.has('upcoming') ? { upcoming: params.get('upcoming') === 'true' } : {}),
+    ...(params.has('nonCancelled') ? { nonCancelled: params.get('nonCancelled') === 'true' } : {}),
   };
-  const communities = useDiscoveryControllerListCommunities(communityParams, {
-    query: { enabled: kind !== 'events' },
-  });
+  const communities = useDiscoveryControllerListCommunities(
+    {
+      ...communityParams,
+      ...(params.get('order') === 'member-count' || params.get('order') === 'newest'
+        ? { order: params.get('order') as 'member-count' | 'newest' }
+        : {}),
+    },
+    {
+      query: { enabled: kind !== 'events' },
+    },
+  );
   const events = useDiscoveryControllerListEvents(eventParams, {
     query: { enabled: kind !== 'communities' },
   });
@@ -69,7 +98,20 @@ export function useDiscoveryPageState(language: string) {
 
   const clearFilters = (): void => {
     const next = new URLSearchParams(params);
-    for (const key of ['q', 'city', 'category', 'from', 'to', 'page']) next.delete(key);
+    for (const key of [
+      'q',
+      'city',
+      'category',
+      'from',
+      'to',
+      'modality',
+      'cityScope',
+      'upcoming',
+      'nonCancelled',
+      'page',
+      'order',
+    ])
+      next.delete(key);
     setParams(next, { preventScrollReset: true });
   };
 
@@ -77,15 +119,22 @@ export function useDiscoveryPageState(language: string) {
   if (kind === 'communities') {
     listingParams.delete('from');
     listingParams.delete('to');
+    for (const key of ['modality', 'cityScope', 'upcoming', 'nonCancelled'])
+      listingParams.delete(key);
   }
   const listingQuery = listingParams.toString();
   const communityPathParams = new URLSearchParams(listingParams);
   communityPathParams.delete('from');
   communityPathParams.delete('to');
+  for (const key of ['modality', 'cityScope', 'upcoming', 'nonCancelled'])
+    communityPathParams.delete(key);
   const communityQuery = communityPathParams.toString();
   const allPath = `/discover${listingQuery ? `?${listingQuery}` : ''}`;
   const communityPath = `/communities${communityQuery ? `?${communityQuery}` : ''}`;
-  const eventPath = `/events${listingQuery ? `?${listingQuery}` : ''}`;
+  const eventPathParams = new URLSearchParams(listingParams);
+  eventPathParams.delete('order');
+  const eventQuery = eventPathParams.toString();
+  const eventPath = `/events${eventQuery ? `?${eventQuery}` : ''}`;
 
   return {
     kind,

@@ -899,6 +899,10 @@ export const CreateReportDtoTargetType = {
 
 export interface CreateReportDto {
   targetType: CreateReportDtoTargetType;
+  /**
+     * @minLength 1
+     * @maxLength 80
+     */
   targetId: string;
   /**
      * @minLength 1
@@ -1287,7 +1291,11 @@ export interface CommunityPublicDto {
   hostName: string;
   ownerType: string;
   ownerId: string;
-  memberCount?: number;
+  /**
+     * Active memberships plus an individual owner not already active; organization ownership adds no member.
+     * @minimum 0
+     */
+  memberCount: number;
   /** @nullable */
   organizationSlug?: string | null;
   cityId: string;
@@ -1321,6 +1329,11 @@ export interface EventPublicDto {
   /** @nullable */
   endsAt?: string | null;
   cancelled: boolean;
+  /**
+     * Accepted registration rows only; excludes pending requests, waitlists and unregistered hosts.
+     * @minimum 0
+     */
+  acceptedRegistrationCount: number;
   /** @nullable */
   capacity?: number | null;
   admissionMode: string;
@@ -1418,6 +1431,7 @@ export const UsersControllerPublicProfileLang = {
 } as const;
 
 export type DiscoveryControllerListCommunitiesParams = {
+order?: DiscoveryControllerListCommunitiesOrder;
 q?: string;
 city?: string;
 category?: string;
@@ -1425,6 +1439,14 @@ lang?: DiscoveryControllerListCommunitiesLang;
 page?: number;
 pageSize?: number;
 };
+
+export type DiscoveryControllerListCommunitiesOrder = typeof DiscoveryControllerListCommunitiesOrder[keyof typeof DiscoveryControllerListCommunitiesOrder];
+
+
+export const DiscoveryControllerListCommunitiesOrder = {
+  newest: 'newest',
+  'member-count': 'member-count',
+} as const;
 
 export type DiscoveryControllerListCommunitiesLang = typeof DiscoveryControllerListCommunitiesLang[keyof typeof DiscoveryControllerListCommunitiesLang];
 
@@ -1475,6 +1497,10 @@ export const OrganizationsControllerPublicProfileLang = {
 } as const;
 
 export type DiscoveryControllerListEventsParams = {
+nonCancelled?: boolean;
+upcoming?: boolean;
+cityScope?: DiscoveryControllerListEventsCityScope;
+modality?: DiscoveryControllerListEventsModality;
 communityId?: string;
 to?: string;
 from?: string;
@@ -1485,6 +1511,22 @@ lang?: DiscoveryControllerListEventsLang;
 page?: number;
 pageSize?: number;
 };
+
+export type DiscoveryControllerListEventsCityScope = typeof DiscoveryControllerListEventsCityScope[keyof typeof DiscoveryControllerListEventsCityScope];
+
+
+export const DiscoveryControllerListEventsCityScope = {
+  strict: 'strict',
+  'include-online': 'include-online',
+} as const;
+
+export type DiscoveryControllerListEventsModality = typeof DiscoveryControllerListEventsModality[keyof typeof DiscoveryControllerListEventsModality];
+
+
+export const DiscoveryControllerListEventsModality = {
+  online: 'online',
+  'in-person': 'in-person',
+} as const;
 
 export type DiscoveryControllerListEventsLang = typeof DiscoveryControllerListEventsLang[keyof typeof DiscoveryControllerListEventsLang];
 
@@ -1538,4 +1580,8 @@ export const PrivacyAdminControllerListStatus = {
   REJECTED: 'REJECTED',
   CANCELLED: 'CANCELLED',
 } as const;
+
+export type DiscoveryControllerDiscoveryCategoriesParams = {
+city?: string;
+};
 

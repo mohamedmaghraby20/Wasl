@@ -3,6 +3,19 @@ import type { CommunityPublicDto, EventPublicDto } from '@/api/generated/wasl-cl
 export type ResourceKind = 'communities' | 'events';
 export type LanguageCode = 'en' | 'ar' | 'tr';
 
+/** Bundled illustrations, not photographs of the actual resource. */
+export function defaultResourceCover(id: string, kind: ResourceKind): string {
+  const covers =
+    kind === 'events'
+      ? ['conversation', 'gathering', 'together']
+      : ['gathering', 'together', 'conversation'];
+  const hash = Array.from(id).reduce(
+    (value, character) => (value * 31 + character.charCodeAt(0)) >>> 0,
+    0,
+  );
+  return `/images/community-covers/${covers[hash % covers.length]}.jpg`;
+}
+
 export function languageCode(language: string): LanguageCode {
   if (language.startsWith('ar')) return 'ar';
   if (language.startsWith('tr')) return 'tr';

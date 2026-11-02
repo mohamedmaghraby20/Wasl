@@ -9,7 +9,21 @@ import {
   applyDecorators,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiQuery } from '@nestjs/swagger';
-import { and, asc, desc, eq, ilike, inArray, or, gte, lt, sql, type SQL } from 'drizzle-orm';
+import {
+  and,
+  asc,
+  desc,
+  eq,
+  exists,
+  gt,
+  gte,
+  ilike,
+  inArray,
+  lt,
+  or,
+  sql,
+  type SQL,
+} from 'drizzle-orm';
 import { DATABASE, type Database } from '../../db/database.module';
 import { Inject } from '@nestjs/common';
 import {
@@ -19,6 +33,7 @@ import {
   communityCategories,
   events,
   eventCategories,
+  eventRegistrations,
   organizations,
 } from '../../db/schema';
 import { ReferenceDataRepository } from './reference-data.repository';
@@ -30,6 +45,14 @@ import {
   EventPageDto,
   EventPublicDto,
 } from './discovery.dto';
+
+const acceptedRegistrationCount = sql<number>`(
+  select count(*)::int from ${eventRegistrations}
+  where ${eventRegistrations.eventId} = ${events.id}
+    and ${eventRegistrations.status} = 'ACCEPTED'
+)`;
+
+const memberCount = sql<number>`(select count(*)::int from community_memberships m where m.community_id = ${communities.id} and m.status = 'ACTIVE') + case when ${communities.ownerType} = 'user' and not exists (select 1 from community_memberships m where m.community_id = ${communities.id} and m.status = 'ACTIVE' and m.user_id::text = ${communities.ownerId}) then 1 else 0 end`;
 
 const listingQuery = () =>
   applyDecorators(
@@ -57,11 +80,66 @@ export class DiscoveryController {
     return this.reference.listCategories();
   }
 
+  @Get('discovery/categories')
+  @ApiQuery({ name: 'city', required: false, type: String })
+  @ApiOkResponse({ type: CategoryPublicDto, isArray: true })
+  async discoveryCategories(@Query() query: Record<string, string | undefined>) {
+    const db = this.database();
+    const city = query.city?.trim();
+    // Evaluated over all eligible content, independently of any four-card collection.
+    const hasEligibleContent = or(
+      exists(
+        db
+          .select({ selected: sql`1` })
+          .from(communityCategories)
+          .innerJoin(communities, eq(communityCategories.communityId, communities.id))
+          .where(
+            and(
+              eq(communityCategories.categoryId, categories.id),
+              eq(communities.archived, false),
+              city ? eq(communities.cityId, city) : undefined,
+            ),
+          ),
+      ),
+      exists(
+        db
+          .select({ selected: sql`1` })
+          .from(eventCategories)
+          .innerJoin(events, eq(eventCategories.eventId, events.id))
+          .where(
+            and(
+              eq(eventCategories.categoryId, categories.id),
+              eq(events.visibility, 'public'),
+              eq(events.cancelled, false),
+              gt(events.startsAt, new Date()),
+              city
+                ? or(and(eq(events.online, false), eq(events.cityId, city)), eq(events.online, true))
+                : undefined,
+            ),
+          ),
+      ),
+    );
+    return db
+      .select({
+        id: categories.id,
+        nameEn: categories.nameEn,
+        nameAr: categories.nameAr,
+        nameTr: categories.nameTr,
+      })
+      .from(categories)
+      .where(hasEligibleContent)
+      .orderBy(asc(categories.nameTr))
+      .limit(6);
+  }
+
   @Get('communities')
   @listingQuery()
+  @ApiQuery({ name: 'order', required: false, enum: ['newest', 'member-count'] })
   @ApiOkResponse({ type: CommunityPageDto })
   async listCommunities(@Query() query: Record<string, string | undefined>) {
     const { page, pageSize, filters } = this.parse(query, 'community');
+    if (query.order && !['newest', 'member-count'].includes(query.order))
+      throw new BadRequestException('Invalid community ordering.');
     const db = this.database();
     if (filters.category)
       filters.conditions.push(
@@ -87,6 +165,7 @@ export class DiscoveryController {
           hostName: sql<string>`COALESCE(${organizations.name}, ${communities.hostName})`,
           ownerType: communities.ownerType,
           ownerId: communities.ownerId,
+          memberCount,
           organizationSlug: organizations.slug,
           cityId: cities.id,
           cityName: this.cityName(query.lang),
@@ -98,7 +177,10 @@ export class DiscoveryController {
           sql`${organizations.id}::text = ${communities.ownerId} and ${communities.ownerType} = 'organization'`,
         )
         .where(where)
-        .orderBy(desc(communities.createdAt))
+        .orderBy(
+          ...(query.order === 'member-count' ? [desc(memberCount)] : []),
+          desc(communities.createdAt),
+        )
         .limit(pageSize)
         .offset((page - 1) * pageSize),
       db
@@ -121,6 +203,10 @@ export class DiscoveryController {
   @ApiQuery({ name: 'from', required: false, type: String })
   @ApiQuery({ name: 'to', required: false, type: String })
   @ApiQuery({ name: 'communityId', required: false, type: String })
+  @ApiQuery({ name: 'modality', required: false, enum: ['online', 'in-person'] })
+  @ApiQuery({ name: 'cityScope', required: false, enum: ['strict', 'include-online'] })
+  @ApiQuery({ name: 'upcoming', required: false, type: Boolean })
+  @ApiQuery({ name: 'nonCancelled', required: false, type: Boolean })
   @ApiOkResponse({ type: EventPageDto })
   async listEvents(@Query() query: Record<string, string | undefined>) {
     const { page, pageSize, filters } = this.parse(query, 'event');
@@ -138,6 +224,17 @@ export class DiscoveryController {
     if (query.from) filters.conditions.push(gte(events.startsAt, this.date(query.from)));
     if (query.to) filters.conditions.push(lt(events.startsAt, this.date(query.to, true)));
     if (query.communityId) filters.conditions.push(eq(events.communityId, query.communityId));
+    if (query.modality && !['online', 'in-person'].includes(query.modality))
+      throw new BadRequestException('Invalid event modality.');
+    if (query.cityScope && !['strict', 'include-online'].includes(query.cityScope))
+      throw new BadRequestException('Invalid event city scope.');
+    for (const key of ['upcoming', 'nonCancelled']) {
+      if (query[key] !== undefined && !['true', 'false'].includes(query[key]))
+        throw new BadRequestException('Invalid event eligibility filter.');
+    }
+    if (query.modality) filters.conditions.push(eq(events.online, query.modality === 'online'));
+    if (query.upcoming === 'true') filters.conditions.push(gt(events.startsAt, new Date()));
+    if (query.nonCancelled === 'true') filters.conditions.push(eq(events.cancelled, false));
     const where = and(eq(events.visibility, 'public'), ...filters.conditions);
     const [rows, countRows] = await Promise.all([
       db
@@ -158,6 +255,7 @@ export class DiscoveryController {
           endsAt: events.endsAt,
           cancelled: events.cancelled,
           capacity: events.capacity,
+          acceptedRegistrationCount,
           admissionMode: events.admissionMode,
           cityId: cities.id,
           cityName: this.cityName(query.lang),
@@ -204,7 +302,7 @@ export class DiscoveryController {
         hostName: sql<string>`COALESCE(${organizations.name}, ${communities.hostName})`,
         ownerType: communities.ownerType,
         ownerId: communities.ownerId,
-        memberCount: sql<number>`(select count(*)::int from community_memberships m where m.community_id = ${communities.id} and m.status = 'ACTIVE') + case when ${communities.ownerType} = 'user' and not exists (select 1 from community_memberships m where m.community_id = ${communities.id} and m.status = 'ACTIVE' and m.user_id::text = ${communities.ownerId}) then 1 else 0 end`,
+        memberCount,
         organizationSlug: organizations.slug,
         cityId: cities.id,
         cityName: this.cityName(query.lang),
@@ -246,6 +344,7 @@ export class DiscoveryController {
         endsAt: events.endsAt,
         cancelled: events.cancelled,
         capacity: events.capacity,
+        acceptedRegistrationCount,
         admissionMode: events.admissionMode,
         cityId: cities.id,
         cityName: this.cityName(query.lang),
@@ -285,12 +384,12 @@ export class DiscoveryController {
           : or(ilike(events.title, `%${keyword}%`), ilike(events.description, `%${keyword}%`));
       if (condition) conditions.push(condition);
     }
-    if (query.city)
-      conditions.push(
-        resource === 'community'
-          ? eq(communities.cityId, query.city)
-          : eq(events.cityId, query.city),
-      );
+    if (query.city) {
+      if (resource === 'community') conditions.push(eq(communities.cityId, query.city));
+      else if (query.cityScope === 'include-online')
+        conditions.push(or(eq(events.cityId, query.city), eq(events.online, true))!);
+      else conditions.push(eq(events.cityId, query.city));
+    }
     return { page, pageSize, filters: { conditions, category: query.category } };
   }
   private date(value: string, endOfSelectedDate = false) {

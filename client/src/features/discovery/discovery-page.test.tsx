@@ -38,6 +38,7 @@ const communityResponse = {
       description: 'A public student community.',
       admissionMode: 'open',
       capacity: null,
+      memberCount: 12,
       hostName: 'Wasl Student Group',
       cityId: 'ankara',
       cityName: 'Ankara',
@@ -148,6 +149,7 @@ function mockDiscoveryApi(
   const fetchMock = vi.fn((input: RequestInfo | URL) => {
     const url = new URL(
       typeof input === 'string' ? input : input instanceof URL ? input.href : input.url,
+      'http://localhost:3000',
     );
     urls.push(url);
     let data: unknown = [];
@@ -175,6 +177,18 @@ describe('DiscoveryPage', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
     vi.unstubAllEnvs();
+  });
+
+  it('retains explicit member ordering through pagination and filters, but clearing restores default discovery', async () => {
+    const { urls } = mockDiscoveryApi(false, true);
+    renderPage('/communities?city=ankara&order=member-count');
+    expect(await screen.findByText('12 members')).toBeVisible();
+    expect(urls.some((url) => url.pathname.endsWith('/communities') && url.searchParams.get('order') === 'member-count' && url.searchParams.get('city') === 'ankara')).toBe(true);
+    await userEvent.click(screen.getByRole('button', { name: 'Next page' }));
+    await waitFor(() => expect(urls.some((url) => url.searchParams.get('page') === '2' && url.searchParams.get('order') === 'member-count')).toBe(true));
+    await userEvent.click(screen.getByRole('button', { name: 'Clear filters' }));
+    await waitFor(() => expect(screen.getByLabelText('Current URL')).toHaveTextContent(/^\/communities$/));
+    expect(urls.at(-1)?.searchParams.has('order')).toBe(false);
   });
 
   it('shows both public resource types on the unified discovery route', async () => {
