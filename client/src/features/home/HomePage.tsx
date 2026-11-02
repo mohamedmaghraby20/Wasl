@@ -1,28 +1,43 @@
-import { ArrowRight, Eye } from 'lucide-react';
+import { ArrowRight, Eye, LocateFixed } from 'lucide-react';
 import { useState } from 'react';
 import { Form, Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useSeoMeta } from '@unhead/react';
 import { Button } from '@/components/ui/Button';
+import { IconButton } from '@/components/ui/IconButton';
 import { SearchInput } from '@/components/ui/SearchInput';
 import { SearchableSelect } from '@/components/ui/SearchableSelect';
 import { QueryError } from '@/components/feedback/QueryError';
 import { localizedName } from '@/features/resources/resource-utils';
 import { HomeSection } from './HomeSection';
 import { useHomeCity } from './useHomeCity';
+import type { LocationError } from './useHomeCity';
 import {
   useDiscoveryControllerListCommunities,
   useDiscoveryControllerListEvents,
   useDiscoveryControllerCities,
 } from '@/api/generated/discovery/discovery';
 
+const locationErrorKeys: Record<LocationError, string> = {
+  unsupported: 'locationUnsupported',
+  insecure: 'locationInsecure',
+  denied: 'locationDenied',
+  unavailable: 'locationUnavailable',
+  timeout: 'locationTimeout',
+  unmatched: 'locationUnmatched',
+  boundaries: 'locationBoundariesError',
+  cities: 'locationCitiesError',
+};
+
 export function HomePage(): React.JSX.Element {
   const { t, i18n } = useTranslation();
   const [query, setQuery] = useState('');
   const lang: 'ar' | 'en' = i18n.language.startsWith('ar') ? 'ar' : 'en';
   const cities = useDiscoveryControllerCities();
-  const { cityId, setCityId, selectedCity } = useHomeCity(cities.data);
+  const { cityId, setCityId, selectedCity, location, requestLocation } = useHomeCity(cities.data);
   const cityName = selectedCity ? localizedName(selectedCity, i18n.language) : cityId;
+  const locationBusy = location.status === 'locating' || location.status === 'resolving';
+  const locationError = location.status === 'error' ? locationErrorKeys[location.error] : undefined;
   const communities = useDiscoveryControllerListCommunities({ pageSize: 3, lang });
   const eventFilters = {
     pageSize: 4,
@@ -134,6 +149,39 @@ export function HomePage(): React.JSX.Element {
             {cities.isError ? (
               <QueryError message={t('homeCitiesError')} onRetry={() => void cities.refetch()} />
             ) : null}
+            <div className="grid gap-2">
+              <IconButton
+                aria-describedby="home-location-privacy"
+                disabled={!cities.data}
+                icon={LocateFixed}
+                label={t('useMyLocation')}
+                onClick={requestLocation}
+                type="button"
+                variant="secondary"
+              />
+              {locationBusy ? (
+                <p className="text-xs font-medium text-text-muted" role="status">
+                  {t('locatingCity')}
+                </p>
+              ) : location.status === 'success' ? (
+                <p className="text-xs font-medium text-success" role="status">
+                  {t('locationSuccess', { city: cityName })}
+                </p>
+              ) : locationError ? (
+                <p className="text-xs font-medium text-danger" role="alert">
+                  {t(locationError)}
+                </p>
+              ) : null}
+              <p id="home-location-privacy" className="text-xs text-text-muted">
+                {t('locationPrivacy')}
+              </p>
+              <a
+                className="w-fit text-[0.6875rem] text-text-subtle underline decoration-border underline-offset-2 hover:text-primary-soft-text focus-visible:text-primary-soft-text"
+                href="https://creativecommons.org/licenses/by/4.0/"
+              >
+                {t('locationAttribution')}
+              </a>
+            </div>
             <Button block type="submit">
               {t('search')}
             </Button>
