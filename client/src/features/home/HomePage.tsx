@@ -61,6 +61,19 @@ export function HomePage(): React.JSX.Element {
     nonCancelled: 'true',
     ...(!fallback && cityId ? { city: cityId } : {}),
   });
+  const onlineEvents = useDiscoveryControllerListEvents({
+    pageSize: 4,
+    lang,
+    modality: 'online',
+    upcoming: true,
+    nonCancelled: true,
+  });
+  const onlineDestination = new URLSearchParams({
+    modality: 'online',
+    upcoming: 'true',
+    nonCancelled: 'true',
+  });
+  const onlineEmpty = onlineEvents.isSuccess && onlineEvents.data.items.length === 0;
   useSeoMeta({
     title: t('welcome'),
     description: t('starter'),
@@ -184,6 +197,19 @@ export function HomePage(): React.JSX.Element {
         onRetry={() => void communities.refetch()}
         viewAll={`/communities?${communityDestination}`}
       />
+      {!onlineEmpty && (
+        <HomeSection
+          title={t('upcomingOnlineEvents')}
+          kind="events"
+          sectionId="online-events"
+          language={i18n.language}
+          items={onlineEvents.data?.items}
+          isPending={onlineEvents.isPending}
+          isError={onlineEvents.isError}
+          onRetry={() => void onlineEvents.refetch()}
+          viewAll={`/events?${onlineDestination}`}
+        />
+      )}
     </div>
   );
 }

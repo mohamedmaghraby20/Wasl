@@ -6,29 +6,41 @@ const cities = [
   { id: 'ankara', nameEn: 'Ankara', nameAr: 'أنقرة', nameTr: 'Ankara' },
   { id: 'istanbul', nameEn: 'Istanbul', nameAr: 'إسطنبول', nameTr: 'İstanbul' },
 ];
-const event = (id: string, cityId = 'ankara') => ({
+const event = (id: string, cityId: string | null = 'ankara', online = false) => ({
   id,
   slug: id,
   title: id,
   description: 'Public event',
   hostName: 'Host',
   hostType: 'user',
-  online: false,
-  locationName: 'Hall',
+  online,
+  locationName: online ? null : 'Hall',
   startsAt: '2099-11-03T12:00:00Z',
   endsAt: null,
   visibility: 'public',
   cancelled: false,
   admissionMode: 'instant',
   capacity: null,
+  acceptedRegistrationCount: 0,
   cityId,
   cityName: cityId,
   categories: [],
 });
 
+const onlineEvents = Array.from({ length: 13 }, (_, index) =>
+  event(`online ${index + 1}`, index % 2 === 0 ? null : 'istanbul', true),
+);
+
 async function mockDiscovery(
   page: Page,
-  options: { emptyLocal?: boolean; errorLocal?: boolean; slowAnkara?: boolean } = {},
+  options: {
+    emptyLocal?: boolean;
+    errorLocal?: boolean;
+    slowAnkara?: boolean;
+    emptyOnline?: boolean;
+    errorOnline?: boolean;
+    delayOnline?: boolean;
+  } = {},
 ) {
   const requests: URL[] = [];
   await page.route('**/api/v1/**', async (route) => {
@@ -37,6 +49,23 @@ async function mockDiscovery(
     if (url.pathname.endsWith('/reference/cities')) return route.fulfill({ json: cities });
     if (url.pathname.endsWith('/reference/categories')) return route.fulfill({ json: [] });
     if (url.pathname.endsWith('/events')) {
+      if (url.searchParams.get('modality') === 'online') {
+        if (options.errorOnline)
+          return route.fulfill({ status: 503, json: { message: 'Unavailable' } });
+        if (options.delayOnline) await new Promise((resolve) => setTimeout(resolve, 1500));
+        const page = Number(url.searchParams.get('page') ?? 1);
+        const pageSize = Number(url.searchParams.get('pageSize') ?? 12);
+        const all = options.emptyOnline ? [] : onlineEvents;
+        return route.fulfill({
+          json: {
+            items: all.slice((page - 1) * pageSize, page * pageSize),
+            page,
+            pageSize,
+            total: all.length,
+            hasMore: page * pageSize < all.length,
+          },
+        });
+      }
       const city = url.searchParams.get('city');
       if (city && options.errorLocal)
         return route.fulfill({ status: 503, json: { message: 'Unavailable' } });
@@ -146,6 +175,158 @@ test('local empty results fall back honestly without changing selection or searc
     .toBe(true);
 });
 
+test('keeps online discovery nationwide, capped at four, with filters preserved through view all, pagination and history', async ({
+  page,
+}) => {
+  const requests = await mockDiscovery(page);
+  await page.goto('/');
+  const section = page.getByRole('region', { name: 'Upcoming online events' });
+  await expect(section.getByRole('link', { name: 'online 1', exact: true })).toBeVisible();
+  await expect(section.locator('article')).toHaveCount(4);
+  await selectCity(page, 'Ankara');
+  await expect(page.locator('#home-city')).toContainText('Ankara');
+  await expect(section.getByRole('link', { name: 'online 1', exact: true })).toBeVisible();
+  await expect(section.getByRole('link', { name: 'online 2', exact: true })).toBeVisible();
+  const collectionRequest = requests
+    .filter(
+      (url) => url.pathname.endsWith('/events') && url.searchParams.get('modality') === 'online',
+    )
+    .at(-1);
+  if (!collectionRequest) throw new Error('The homepage must request online events.');
+  expect(collectionRequest.searchParams.get('pageSize')).toBe('4');
+  expect(collectionRequest.searchParams.get('upcoming')).toBe('true');
+  expect(collectionRequest.searchParams.get('nonCancelled')).toBe('true');
+  expect(collectionRequest.searchParams.has('city')).toBe(false);
+
+  const destination = section.getByRole('link', { name: 'Explore all', exact: true });
+  await expect(destination).toHaveAttribute(
+    'href',
+    '/events?modality=online&upcoming=true&nonCancelled=true',
+  );
+  await destination.click();
+  await expect(page).toHaveURL(/\/events\?modality=online&upcoming=true&nonCancelled=true$/);
+  await expect
+    .poll(() =>
+      requests.some(
+        (url) =>
+          url.pathname.endsWith('/events') &&
+          url.searchParams.get('modality') === 'online' &&
+          url.searchParams.get('pageSize') === '12' &&
+          url.searchParams.get('upcoming') === 'true' &&
+          url.searchParams.get('nonCancelled') === 'true',
+      ),
+    )
+    .toBe(true);
+
+  await page.getByRole('button', { name: 'Next page' }).click();
+  await expect(page).toHaveURL(/page=2/);
+  await expect
+    .poll(() =>
+      requests.some(
+        (url) =>
+          url.searchParams.get('page') === '2' &&
+          url.searchParams.get('modality') === 'online' &&
+          url.searchParams.get('nonCancelled') === 'true',
+      ),
+    )
+    .toBe(true);
+
+  await page.goBack();
+  await expect(page).toHaveURL(/\/events\?modality=online&upcoming=true&nonCancelled=true$/);
+  await page.goBack();
+  await expect(page).toHaveURL(/\/$/);
+  await page.goForward();
+  await expect(page).toHaveURL(/\/events\?modality=online&upcoming=true&nonCancelled=true$/);
+  await page.goForward();
+  await expect(page).toHaveURL(/page=2/);
+});
+
+test('hides only a successfully empty online collection', async ({ page }) => {
+  const requests = await mockDiscovery(page, { emptyOnline: true });
+  await page.goto('/');
+  await expect
+    .poll(() =>
+      requests.some(
+        (url) => url.pathname.endsWith('/events') && url.searchParams.get('modality') === 'online',
+      ),
+    )
+    .toBe(true);
+  await expect(page.getByRole('region', { name: 'Upcoming online events' })).toHaveCount(0);
+  await expect(
+    page
+      .getByRole('region', { name: 'Upcoming events across Türkiye' })
+      .getByRole('link', { name: 'Nationwide gathering', exact: true }),
+  ).toBeVisible();
+  await expect(page.getByRole('alert')).toHaveCount(0);
+});
+
+for (const language of ['en', 'ar']) {
+  for (const width of [375, 1440]) {
+    test(`online collection remains readable and keyboard navigable: ${language} at ${width}px`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await page.addInitScript((lang) => localStorage.setItem('wasl-language', lang), language);
+      await mockDiscovery(page);
+      await page.goto('/');
+      await expect(page.locator('html')).toHaveAttribute('dir', language === 'ar' ? 'rtl' : 'ltr');
+      const section = page.getByRole('region', {
+        name: language === 'ar' ? 'فعاليات قادمة عبر الإنترنت' : 'Upcoming online events',
+      });
+      await expect(section.locator('article')).toHaveCount(4);
+      const destination = section.getByRole('link', {
+        name: language === 'ar' ? 'استكشف الكل' : 'Explore all',
+        exact: true,
+      });
+      await destination.focus();
+      await expect(destination).toBeFocused();
+      await section.scrollIntoViewIfNeeded();
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+        true,
+      );
+      await page.evaluate(() => window.scrollTo(0, 0));
+      await page.screenshot({
+        path: test.info().outputPath(`online-${language}-${width}.png`),
+        fullPage: true,
+      });
+      await page.keyboard.press('Enter');
+      await expect(page).toHaveURL(/\/events\?modality=online&upcoming=true&nonCancelled=true$/);
+    });
+  }
+}
+
+test('shows an independent online loading state', async ({ page }) => {
+  await mockDiscovery(page, { delayOnline: true });
+  await page.goto('/');
+  const section = page.getByRole('region', { name: 'Upcoming online events' });
+  await expect(section.getByRole('status')).toContainText('Loading upcoming online events');
+  await expect(
+    page
+      .getByRole('region', { name: 'Upcoming events across Türkiye' })
+      .getByRole('link', { name: 'Nationwide gathering', exact: true }),
+  ).toBeVisible();
+});
+
+test('keeps a failed online collection retryable without hiding other results', async ({
+  page,
+}) => {
+  const options = { errorOnline: true };
+  await mockDiscovery(page, options);
+  await page.goto('/');
+  const section = page.getByRole('region', { name: 'Upcoming online events' });
+  await expect(section.getByRole('alert')).toContainText('Could not load upcoming online events');
+  await expect(
+    page
+      .getByRole('region', { name: 'Upcoming events across Türkiye' })
+      .getByRole('link', { name: 'Nationwide gathering', exact: true }),
+  ).toBeVisible();
+
+  options.errorOnline = false;
+  await section.getByRole('button', { name: 'Retry' }).click();
+  await expect(section.getByRole('link', { name: 'online 1', exact: true })).toBeVisible();
+});
+
 test('a failed local request is retryable and never triggers nationwide fallback', async ({
   page,
 }) => {
@@ -156,7 +337,12 @@ test('a failed local request is retryable and never triggers nationwide fallback
   const section = page.getByRole('region', { name: 'Upcoming events in Ankara' });
   await expect(section.getByRole('button', { name: 'Retry' })).toBeVisible({ timeout: 15000 });
   expect(
-    requests.filter((url) => url.pathname.endsWith('/events') && !url.searchParams.has('city')),
+    requests.filter(
+      (url) =>
+        url.pathname.endsWith('/events') &&
+        url.searchParams.get('modality') === 'in-person' &&
+        !url.searchParams.has('city'),
+    ),
   ).toHaveLength(0);
   options.errorLocal = false;
   await section.getByRole('button', { name: 'Retry' }).click();
@@ -213,6 +399,7 @@ test('mobile Arabic picker is keyboard accessible without horizontal overflow', 
   await page.keyboard.press('Enter');
   await expect(page.locator('#home-city')).toContainText('أنقرة');
   await expect(page.getByRole('heading', { name: 'فعاليات قادمة في أنقرة' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'فعاليات قادمة عبر الإنترنت' })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.screenshot({
     path: test.info().outputPath('home-city-mobile-rtl.png'),

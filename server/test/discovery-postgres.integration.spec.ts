@@ -50,6 +50,52 @@ describe.skipIf(!connectionString)('public discovery scope (PostgreSQL HTTP)', (
       { id: 'cancelled', cancelled: true },
       { id: 'unlisted', visibility: 'unlisted' },
       { id: 'online', online: true, cityId: otherCity },
+      {
+        id: 'online-no-city',
+        online: true,
+        cityId: null,
+        startsAt: new Date('2026-11-03T10:00:00Z'),
+      },
+      {
+        id: 'online-past',
+        online: true,
+        cityId: null,
+        startsAt: new Date('2026-11-01T12:00:00Z'),
+      },
+      { id: 'online-starting', online: true, cityId: null, startsAt: now },
+      {
+        id: 'online-ongoing',
+        online: true,
+        cityId: null,
+        startsAt: new Date('2026-11-02T11:00:00Z'),
+        endsAt: new Date('2026-11-02T13:00:00Z'),
+      },
+      { id: 'online-cancelled', online: true, cityId: null, cancelled: true },
+      { id: 'online-unlisted', online: true, cityId: null, visibility: 'unlisted' },
+      {
+        id: 'online-later',
+        online: true,
+        cityId: null,
+        startsAt: new Date('2026-11-05T12:00:00Z'),
+      },
+      {
+        id: 'online-fifth',
+        online: true,
+        cityId: otherCity,
+        startsAt: new Date('2026-11-06T12:00:00Z'),
+      },
+      {
+        id: 'online-sixth',
+        online: true,
+        cityId: city,
+        startsAt: new Date('2026-11-07T12:00:00Z'),
+      },
+      {
+        id: 'online-seventh',
+        online: true,
+        cityId: null,
+        startsAt: new Date('2026-11-08T12:00:00Z'),
+      },
       { id: 'remote', cityId: otherCity },
       { id: 'later', startsAt: new Date('2026-11-04T12:00:00Z') },
       { id: 'full', capacity: 1 },
@@ -250,7 +296,19 @@ describe.skipIf(!connectionString)('public discovery scope (PostgreSQL HTTP)', (
       nonCancelled: 'true',
     });
     expect(result.items.map((item) => item.id).sort()).toEqual(
-      ['approval', 'full', 'later', 'online'].map((id) => `${prefix}-${id}`).sort(),
+      [
+        'approval',
+        'full',
+        'later',
+        'online',
+        'online-no-city',
+        'online-later',
+        'online-fifth',
+        'online-sixth',
+        'online-seventh',
+      ]
+        .map((id) => `${prefix}-${id}`)
+        .sort(),
     );
     const communities = await app.inject({
       method: 'GET',
@@ -314,9 +372,24 @@ describe.skipIf(!connectionString)('public discovery scope (PostgreSQL HTTP)', (
     ).toBe(400);
   });
 
-  it('supports nationwide online-only results, capped pagination and inclusive date/category behavior', async () => {
-    const online = await events({ modality: 'online', upcoming: 'true', nonCancelled: 'true' });
-    expect(online.items.map((item) => item.id)).toEqual([`${prefix}-online`]);
+  it('returns only future public non-cancelled online events regardless of city, soonest first with a four-item cap', async () => {
+    const online = await events({
+      modality: 'online',
+      upcoming: 'true',
+      nonCancelled: 'true',
+      pageSize: '4',
+    });
+    expect(online.items.map((item) => item.id)).toEqual(
+      ['online-no-city', 'online', 'online-later', 'online-fifth'].map((id) => `${prefix}-${id}`),
+    );
+    expect(online.total).toBe(6);
+    expect(online.hasMore).toBe(true);
+    expect(online.items.map((item) => item.startsAt)).toEqual(
+      [...online.items.map((item) => item.startsAt)].sort(),
+    );
+  });
+
+  it('supports capped pagination and inclusive date/category behavior', async () => {
     const nationwide = await events({
       modality: 'in-person',
       upcoming: 'true',
@@ -343,7 +416,7 @@ describe.skipIf(!connectionString)('public discovery scope (PostgreSQL HTTP)', (
   it('keeps historical and cancelled browsing intact without explicit eligibility filters', async () => {
     const result = await events({ city });
     expect(result.items.map((item) => item.id).sort()).toEqual(
-      ['past', 'starting', 'ongoing', 'cancelled', 'later', 'full', 'approval']
+      ['past', 'starting', 'ongoing', 'cancelled', 'later', 'full', 'approval', 'online-sixth']
         .map((id) => `${prefix}-${id}`)
         .sort(),
     );

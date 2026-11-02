@@ -17,6 +17,7 @@ export function HomeSection({
   isError,
   onRetry,
   viewAll,
+  sectionId = kind,
 }: {
   title: string;
   kind: ResourceKind;
@@ -26,13 +27,14 @@ export function HomeSection({
   isError: boolean;
   onRetry: () => void;
   viewAll?: string;
+  sectionId?: string;
 }): React.JSX.Element {
   const { t } = useTranslation();
   const resource = title.toLocaleLowerCase(language);
   return (
-    <section className="grid gap-4" aria-labelledby={`${kind}-heading`}>
+    <section className="grid gap-4" aria-labelledby={`${sectionId}-heading`}>
       <div className="flex items-end justify-between gap-4">
-        <h2 className="text-xl font-bold sm:text-2xl" id={`${kind}-heading`}>
+        <h2 className="text-xl font-bold sm:text-2xl" id={`${sectionId}-heading`}>
           {title}
         </h2>
         <Link

@@ -111,7 +111,10 @@ export class DiscoveryController {
           sql`${organizations.id}::text = ${communities.ownerId} and ${communities.ownerType} = 'organization'`,
         )
         .where(where)
-        .orderBy(...(query.order === 'member-count' ? [desc(memberCount)] : []), desc(communities.createdAt))
+        .orderBy(
+          ...(query.order === 'member-count' ? [desc(memberCount)] : []),
+          desc(communities.createdAt),
+        )
         .limit(pageSize)
         .offset((page - 1) * pageSize),
       db
