@@ -1568,3 +1568,7 @@ export const PrivacyAdminControllerListStatus = {
   CANCELLED: 'CANCELLED',
 } as const;
 
+export type DiscoveryControllerDiscoveryCategoriesParams = {
+city?: string;
+};
+
