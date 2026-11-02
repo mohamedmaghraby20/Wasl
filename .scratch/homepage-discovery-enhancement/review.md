@@ -62,3 +62,26 @@ All browser commands used `$env:PLAYWRIGHT_PORT='4347'`, Chromium, one worker fo
 - Fix/evidence commit: `47ea3057110c059682028bc00bafd9b167aa7084` (`fix: recover homepage location retries and validate remembered cities`).
 - Ran `git merge --no-ff feat/homepage-discovery -m "merge: preserve latest homepage discovery integration in review fixes"` after committing: **Already up to date**. Latest integration was still `c61ca17230f1460804cb5e37cc56c1b5af8a691b`, already an ancestor. No synthetic merge, conflicts, reset or runtime changes; no impacted checks to rerun.
 - `git diff --name-only -- server client/src/api shared pnpm-lock.yaml` returned no files before commit. Tracked worktree clean after commit/merge; only preserved untracked `graphify-out/cache/` remained. This final update records integration evidence only.
+
+## Independent final integration verification
+
+Date: 2026-11-02. Integration worktree only: `C:/Users/seif/AppData/Local/Temp/opencode/wasl-homepage-integration`, branch `feat/homepage-discovery`.
+
+- Starting integration: `c61ca17230f1460804cb5e37cc56c1b5af8a691b`. Inspected producer fix `47ea3057110c059682028bc00bafd9b167aa7084` and evidence HEAD `45133b24ed98274dbb3bb5d558759b404cf2fe12`, including the actual source/test diff and complete review evidence.
+- `git merge --no-ff 45133b24ed98274dbb3bb5d558759b404cf2fe12 -m "merge: integrate homepage review fixes for location recovery and city validation"` succeeded without conflicts. Merge: `e10ffc92b5d760f66a76536c375e64bb4e9723ff`.
+- All existing tickets/history were preserved; only producer comment additions to tickets 02/03/07 and the new review file changed in feature documentation. The spec was not changed or closed. No other worktree, remote database, generated API, lockfile or graph asset was changed; existing untracked `graphify-out/cache/` remains unstaged. No subagents or worktree removal.
+
+### Checks run on the merged tree — actual outputs
+
+- With loopback fixture values `VITE_API_URL=http://127.0.0.1:3000`, `VITE_SUPABASE_URL=http://127.0.0.1:54329`, `VITE_SUPABASE_PUBLISHABLE_KEY=local-browser-fixture`: `corepack pnpm --filter @wasl/web exec vite build` — **passed**, 4058 modules, 16.62 s. Existing third-party Zod annotation and >500 kB messaging-chunk warnings only.
+- `corepack pnpm --filter @wasl/web exec vitest run --config vitest.config.ts src/features/home/province-boundaries.test.ts src/features/home/HomePage.test.tsx src/features/home/HomeInterests.test.tsx --reporter=dot` — **35 passed, 3 files**, 7.85 s.
+- `corepack pnpm typecheck` — **passed shared/server/client**.
+- `corepack pnpm exec eslint client/src/features/home/HomePage.tsx client/src/features/home/useHomeCity.ts client/src/features/home/province-boundaries.ts client/src/features/home/province-boundaries.test.ts client/e2e/home-geolocation.spec.ts client/e2e/home-location.spec.ts --max-warnings=0` — **passed**, no diagnostics.
+- With `PLAYWRIGHT_PORT=4351`: `corepack pnpm --filter @wasl/web exec playwright test e2e/home-geolocation.spec.ts e2e/home-location.spec.ts -g 'malformed geometry can be retried|invalid remembered city with failed references|valid remembered city waits|clearing while references load|validated city survives|failed local request' --reporter=line --workers=1 --output=test-results/review-final-merge` — **6 passed**, 17.5 s; no retries/failures. No already-passing checks were rerun after this verification.
+- `git diff --check` — **passed**. Opened and visually inspected `client/test-results/review-final-merge/home-location-an-invalid-r-51e84-ide-search-and-reset-usable-chromium/reference-error-nationwide-reset.png`: incumbent picker enabled, nationwide option visible, internal focus visible, compact hero/search intact. Popover overlays error text; the browser assertions independently verify the error feedback.
+
+### Independent code inspection and disposition
+
+- Geometry validation rejects malformed coordinates inside the cached promise chain, before resolution; the catch clears `pending`. Thirteen malformed-loader cases and the browser corrected-asset retry verify recovery without reload and preservation of the previous city on failure.
+- Storage initializes only `candidate`; active `cityId` starts nationwide, so unknown storage is absent from homepage query parameters and submitted search while references fail. A reference-validated candidate commits through the shared setter; explicit clear consumes it and prevents late restore. Retained reference data keeps an already chosen valid city active on refetch failure, with city-scoped search and usable nationwide clear. The six browser regressions verify these outcomes, including the no-local-error-fallback contract.
+- **Both original P2 concerns resolved; no remaining actual findings in this scoped independent inspection.** This is not a fresh full-feature review or a new claim about remote/provider behavior, production data, other browsers or physical GPS. Server/database suites were not rerun because the fix changes client code only; producer server evidence remains above.
