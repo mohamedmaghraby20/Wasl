@@ -34,3 +34,17 @@ Verification (commands run from this ticket's isolated worktree):
 - `git diff --check` — passed.
 
 Local database note: PostgreSQL 18 was started solely for these tests at loopback port 55405 using a new disposable cluster. The standard migration command encountered the existing Supabase-specific `storage.buckets` dependency; the current repository schema was materialized locally instead. Drizzle push then reported its existing identity-schema drop issue after creating the tables; the HTTP tests ran successfully against those actual tables. This is discovery behavior verification, not a migration/Supabase deployment claim. No remote database, original dirty repository, dependency source or production data was accessed or copied. No new schema or contract changes were required. Initial red evidence for the inherited UI implementation is unavailable; this continuation does not claim to have recreated that history.
+
+### Integration merge verification
+
+Merged producer `502b6d45229db2f6d4443d1847d55adb44f7b542` into `feat/homepage-discovery` with conflict-free `--no-ff` merge `b39cc33ccdf4aa1d6b68aa9f8b4b3413a07fe2b8`. The tracked integration tree was clean before merging; pre-existing untracked `graphify-out/cache/` was left untouched. No original repository or producer/other ticket worktree was modified.
+
+Fresh checks run in the integration worktree:
+
+- `corepack pnpm --filter @wasl/web exec vitest run --config vitest.config.ts src/features/home/HomePage.test.tsx` — 8 passed.
+- `corepack pnpm --filter @wasl/server exec vitest run --config vitest.config.ts test/discovery-postgres.integration.spec.ts test/discovery.controller.spec.ts` — 8 controller tests passed; 9 PostgreSQL tests skipped because `DISCOVERY_TEST_DATABASE_URL` was not configured. No fresh database or migration verification is claimed.
+- `corepack pnpm typecheck` — shared, server and client passed.
+- `corepack pnpm exec eslint client/e2e/home-location.spec.ts client/src/features/home/HomePage.test.tsx client/src/features/home/HomePage.tsx client/src/features/home/HomeSection.tsx client/src/lib/i18n.ts server/test/discovery-postgres.integration.spec.ts server/test/discovery.controller.spec.ts --max-warnings=0` — passed.
+- `corepack pnpm build` — passed, including contract/mock regeneration with no content diff. Existing dependency annotation and large messaging chunk warnings remain. Generated files' line-ending-only status was normalized in the index; no generated changes were staged.
+- PowerShell environment `PLAYWRIGHT_PORT=4196`, `CI=1`; `corepack pnpm --filter @wasl/web exec playwright test e2e/home-location.spec.ts --grep 'online|mobile Arabic' --workers=2` — 9 passed (one worker used by CI configuration), including all four responsive screenshot cases. Freshly inspected `client/test-results/home-location-online-colle-*/online-{en,ar}-{375,1440}.png`: translated section headings, readable cards/online metadata, RTL/LTR layout and destination focus visible; no page overflow asserted by browser checks. Existing grid preserved for ticket 07.
+- `git diff --check` — passed.
