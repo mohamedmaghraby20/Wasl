@@ -29,6 +29,10 @@ void i18n.use(initReactI18next).init({
       translation: {
         brand: 'Wasl',
         home: 'Home',
+        nationwide: 'Across Türkiye',
+        upcomingEventsNationwide: 'Upcoming events across Türkiye',
+        upcomingEventsInCity: 'Upcoming events in {{city}}',
+        homeCitiesError: 'Cities could not load. Search and event discovery are still available.',
         discover: 'Discover',
         discoveryTitle: 'Discover',
         resourceTypesNavigation: 'Browse resource types',
@@ -711,6 +715,10 @@ void i18n.use(initReactI18next).init({
       translation: {
         brand: 'وصل',
         home: 'الرئيسية',
+        nationwide: 'في جميع أنحاء تركيا',
+        upcomingEventsNationwide: 'فعاليات قادمة في جميع أنحاء تركيا',
+        upcomingEventsInCity: 'فعاليات قادمة في {{city}}',
+        homeCitiesError: 'تعذر تحميل المدن. لا يزال البحث واستكشاف الفعاليات متاحين.',
         discover: 'اكتشف',
         discoveryTitle: 'اكتشف',
         resourceTypesNavigation: 'تصفح أنواع الموارد',

@@ -12,14 +12,28 @@ function SearchLocation(): React.JSX.Element {
   return <output aria-label="Current URL">{location.pathname + location.search}</output>;
 }
 
-function renderHome(): void {
+function renderHome(
+  options: { citiesError?: boolean; eventsEmpty?: boolean; eventsLoading?: boolean } = {},
+): void {
   vi.stubEnv('VITE_API_URL', 'http://localhost:3000');
   vi.stubGlobal(
     'fetch',
     vi.fn((input: RequestInfo | URL) => {
       const url = new URL(
         typeof input === 'string' ? input : input instanceof URL ? input.href : input.url,
+        'http://localhost:3000',
       );
+      if (url.pathname.endsWith('/reference/cities'))
+        return Promise.resolve({
+          ok: !options.citiesError,
+          status: options.citiesError ? 503 : 200,
+          json: () =>
+            Promise.resolve([
+              { id: 'ankara', nameEn: 'Ankara', nameAr: 'أنقرة', nameTr: 'Ankara' },
+            ]),
+        } as Response);
+      if (url.pathname.endsWith('/events') && options.eventsLoading)
+        return new Promise<Response>(() => {});
       const items = url.pathname.endsWith('/communities')
         ? [
             {
@@ -59,7 +73,12 @@ function renderHome(): void {
       return Promise.resolve({
         ok: true,
         status: 200,
-        json: () => Promise.resolve({ items, page: 1, pageSize: 3 }),
+        json: () =>
+          Promise.resolve({
+            items: url.pathname.endsWith('/events') && options.eventsEmpty ? [] : items,
+            page: 1,
+            pageSize: 4,
+          }),
       } as Response);
     }),
   );
@@ -81,6 +100,7 @@ function renderHome(): void {
 
 describe('HomePage', () => {
   afterEach(() => {
+    localStorage.removeItem('wasl-city');
     vi.unstubAllGlobals();
     vi.unstubAllEnvs();
   });
@@ -96,5 +116,25 @@ describe('HomePage', () => {
     expect(form).toHaveAttribute('method', 'get');
     expect(new URL(form.action).pathname).toBe('/discover');
     expect(search).toHaveAttribute('name', 'q');
+  });
+
+  it('keeps search and successful discovery usable when city reference loading fails', async () => {
+    renderHome({ citiesError: true });
+    expect(await screen.findByRole('alert')).toHaveTextContent('Cities could not load');
+    expect(screen.getByRole('searchbox', { name: 'Search communities and events' })).toBeEnabled();
+    expect(await screen.findByRole('link', { name: 'Arabic music night' })).toBeVisible();
+  });
+
+  it('keeps communities visible while the event section loads', async () => {
+    renderHome({ eventsLoading: true });
+    expect(await screen.findByRole('link', { name: 'Arab students in Ankara' })).toBeVisible();
+    expect(screen.getByRole('status')).toBeInTheDocument();
+  });
+
+  it('distinguishes a successfully empty nationwide collection from a loading or error state', async () => {
+    renderHome({ eventsEmpty: true });
+    expect(await screen.findByText('Nothing here yet')).toBeVisible();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
   });
 });

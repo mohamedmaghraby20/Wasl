@@ -16,6 +16,7 @@ export function HomeSection({
   isPending,
   isError,
   onRetry,
+  viewAll,
 }: {
   title: string;
   kind: ResourceKind;
@@ -24,6 +25,7 @@ export function HomeSection({
   isPending: boolean;
   isError: boolean;
   onRetry: () => void;
+  viewAll?: string;
 }): React.JSX.Element {
   const { t } = useTranslation();
   const resource = title.toLocaleLowerCase(language);
@@ -35,7 +37,7 @@ export function HomeSection({
         </h2>
         <Link
           className="inline-flex items-center gap-1 text-sm font-semibold text-primary-soft-text hover:underline"
-          to={`/${kind}`}
+          to={viewAll ?? `/${kind}`}
         >
           {t('exploreAll')}
           <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />
@@ -46,8 +48,8 @@ export function HomeSection({
           <p className="sr-only" role="status">
             {t('loading', { resource })}
           </p>
-          <div aria-hidden="true" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {Array.from({ length: 3 }, (_, index) => (
+          <div aria-hidden="true" className={`grid gap-4 sm:grid-cols-2 ${kind === 'events' ? 'xl:grid-cols-4' : 'xl:grid-cols-3'}`}>
+            {Array.from({ length: kind === 'events' ? 4 : 3 }, (_, index) => (
               <div
                 className="grid gap-4 rounded-(--shape-radius-card) border border-border bg-card p-5"
                 key={index}
@@ -69,7 +71,7 @@ export function HomeSection({
           title={t('noHomeResultsTitle')}
         />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div className={`grid gap-4 sm:grid-cols-2 ${kind === 'events' ? 'xl:grid-cols-4' : 'xl:grid-cols-3'}`}>
           {items.map((item) => (
             <ResourceCard key={item.id} item={item} kind={kind} />
           ))}

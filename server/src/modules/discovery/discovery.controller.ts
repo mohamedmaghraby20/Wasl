@@ -9,7 +9,7 @@ import {
   applyDecorators,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiQuery } from '@nestjs/swagger';
-import { and, asc, desc, eq, ilike, inArray, or, gte, lt, sql, type SQL } from 'drizzle-orm';
+import { and, asc, desc, eq, ilike, inArray, or, gt, gte, lt, sql, type SQL } from 'drizzle-orm';
 import { DATABASE, type Database } from '../../db/database.module';
 import { Inject } from '@nestjs/common';
 import {
@@ -121,6 +121,10 @@ export class DiscoveryController {
   @ApiQuery({ name: 'from', required: false, type: String })
   @ApiQuery({ name: 'to', required: false, type: String })
   @ApiQuery({ name: 'communityId', required: false, type: String })
+  @ApiQuery({ name: 'modality', required: false, enum: ['online', 'in-person'] })
+  @ApiQuery({ name: 'cityScope', required: false, enum: ['strict', 'include-online'] })
+  @ApiQuery({ name: 'upcoming', required: false, type: Boolean })
+  @ApiQuery({ name: 'nonCancelled', required: false, type: Boolean })
   @ApiOkResponse({ type: EventPageDto })
   async listEvents(@Query() query: Record<string, string | undefined>) {
     const { page, pageSize, filters } = this.parse(query, 'event');
@@ -138,6 +142,17 @@ export class DiscoveryController {
     if (query.from) filters.conditions.push(gte(events.startsAt, this.date(query.from)));
     if (query.to) filters.conditions.push(lt(events.startsAt, this.date(query.to, true)));
     if (query.communityId) filters.conditions.push(eq(events.communityId, query.communityId));
+    if (query.modality && !['online', 'in-person'].includes(query.modality))
+      throw new BadRequestException('Invalid event modality.');
+    if (query.cityScope && !['strict', 'include-online'].includes(query.cityScope))
+      throw new BadRequestException('Invalid event city scope.');
+    for (const key of ['upcoming', 'nonCancelled']) {
+      if (query[key] !== undefined && !['true', 'false'].includes(query[key]))
+        throw new BadRequestException('Invalid event eligibility filter.');
+    }
+    if (query.modality) filters.conditions.push(eq(events.online, query.modality === 'online'));
+    if (query.upcoming === 'true') filters.conditions.push(gt(events.startsAt, new Date()));
+    if (query.nonCancelled === 'true') filters.conditions.push(eq(events.cancelled, false));
     const where = and(eq(events.visibility, 'public'), ...filters.conditions);
     const [rows, countRows] = await Promise.all([
       db
@@ -289,7 +304,9 @@ export class DiscoveryController {
       conditions.push(
         resource === 'community'
           ? eq(communities.cityId, query.city)
-          : eq(events.cityId, query.city),
+           : query.cityScope === 'include-online'
+             ? or(eq(events.cityId, query.city), eq(events.online, true))!
+             : eq(events.cityId, query.city),
       );
     return { page, pageSize, filters: { conditions, category: query.category } };
   }

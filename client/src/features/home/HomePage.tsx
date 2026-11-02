@@ -5,18 +5,47 @@ import { useTranslation } from 'react-i18next';
 import { useSeoMeta } from '@unhead/react';
 import { Button } from '@/components/ui/Button';
 import { SearchInput } from '@/components/ui/SearchInput';
+import { SearchableSelect } from '@/components/ui/SearchableSelect';
+import { QueryError } from '@/components/feedback/QueryError';
+import { localizedName } from '@/features/resources/resource-utils';
 import { HomeSection } from './HomeSection';
+import { useHomeCity } from './useHomeCity';
 import {
   useDiscoveryControllerListCommunities,
   useDiscoveryControllerListEvents,
+  useDiscoveryControllerCities,
 } from '@/api/generated/discovery/discovery';
 
 export function HomePage(): React.JSX.Element {
   const { t, i18n } = useTranslation();
   const [query, setQuery] = useState('');
-  const lang = i18n.language.startsWith('ar') ? 'ar' : 'en';
+  const lang: 'ar' | 'en' = i18n.language.startsWith('ar') ? 'ar' : 'en';
+  const cities = useDiscoveryControllerCities();
+  const { cityId, setCityId, selectedCity } = useHomeCity(cities.data);
+  const cityName = selectedCity ? localizedName(selectedCity, i18n.language) : cityId;
   const communities = useDiscoveryControllerListCommunities({ pageSize: 3, lang });
-  const events = useDiscoveryControllerListEvents({ pageSize: 3, lang });
+  const eventFilters = {
+    pageSize: 4,
+    lang,
+    modality: 'in-person' as const,
+    upcoming: true,
+    nonCancelled: true,
+  };
+  const localEvents = useDiscoveryControllerListEvents({
+    ...eventFilters,
+    ...(cityId ? { city: cityId } : {}),
+  });
+  const fallback = Boolean(cityId && localEvents.isSuccess && localEvents.data.items.length === 0);
+  const nationwideEvents = useDiscoveryControllerListEvents(eventFilters, {
+    query: { enabled: fallback },
+  });
+  const events = fallback ? nationwideEvents : localEvents;
+  const eventDestination = new URLSearchParams({
+    modality: 'in-person',
+    upcoming: 'true',
+    nonCancelled: 'true',
+    ...(!fallback && cityId ? { city: cityId } : {}),
+  });
   useSeoMeta({
     title: t('welcome'),
     description: t('starter'),
@@ -78,6 +107,33 @@ export function HomePage(): React.JSX.Element {
               placeholder={t('exploreByName')}
               value={query}
             />
+            <input type="hidden" name="upcoming" value="true" />
+            <input type="hidden" name="nonCancelled" value="true" />
+            <input type="hidden" name="cityScope" value="include-online" />
+            {cityId ? <input type="hidden" name="city" value={cityId} /> : null}
+            <SearchableSelect
+              aria-label={cityId ? `${t('cityFilter')}: ${cityName}` : t('nationwide')}
+              aria-busy={cities.isPending}
+              disabled={cities.isPending || cities.isError || !cities.data}
+              emptyMessage={t('noCitiesFound')}
+              id="home-city"
+              onValueChange={setCityId}
+              options={[
+                { value: '', label: t('nationwide') },
+                ...(cities.data ?? []).map((city) => ({
+                  value: city.id,
+                  label: localizedName(city, i18n.language),
+                })),
+              ]}
+              placeholder={
+                cities.isPending ? t('loadingCities') : cityId ? cityName : t('nationwide')
+              }
+              searchPlaceholder={t('searchCities')}
+              value={cityId}
+            />
+            {cities.isError ? (
+              <QueryError message={t('homeCitiesError')} onRetry={() => void cities.refetch()} />
+            ) : null}
             <Button block type="submit">
               {t('search')}
             </Button>
@@ -86,6 +142,20 @@ export function HomePage(): React.JSX.Element {
       </section>
 
       <HomeSection
+        title={
+          cityId && !fallback
+            ? t('upcomingEventsInCity', { city: cityName })
+            : t('upcomingEventsNationwide')
+        }
+        kind="events"
+        language={i18n.language}
+        items={events.data?.items}
+        isPending={events.isPending}
+        isError={events.isError}
+        onRetry={() => void events.refetch()}
+        viewAll={`/events?${eventDestination}`}
+      />
+      <HomeSection
         title={t('communities')}
         kind="communities"
         language={i18n.language}
@@ -93,15 +163,6 @@ export function HomePage(): React.JSX.Element {
         isPending={communities.isPending}
         isError={communities.isError}
         onRetry={() => void communities.refetch()}
-      />
-      <HomeSection
-        title={t('events')}
-        kind="events"
-        language={i18n.language}
-        items={events.data?.items}
-        isPending={events.isPending}
-        isError={events.isError}
-        onRetry={() => void events.refetch()}
       />
     </div>
   );

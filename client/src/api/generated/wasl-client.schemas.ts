@@ -85,7 +85,7 @@ export interface CreateCommunityDto {
   cityId: string;
   /**
      * @minItems 1
-     * @maxItems 5
+     * @maxItems 3
      */
   categoryIds: string[];
   admissionMode: CreateCommunityDtoAdmissionMode;
@@ -127,7 +127,7 @@ export interface UpdateCommunityDto {
   cityId: string;
   /**
      * @minItems 1
-     * @maxItems 5
+     * @maxItems 3
      */
   categoryIds: string[];
   admissionMode: UpdateCommunityDtoAdmissionMode;
@@ -536,7 +536,7 @@ export interface CreateEventDto {
   visibility?: CreateEventDtoVisibility;
   /**
      * @minItems 1
-     * @maxItems 5
+     * @maxItems 3
      */
   categoryIds: string[];
   startsAt: string;
@@ -594,7 +594,7 @@ export interface UpdateEventDto {
   visibility?: UpdateEventDtoVisibility;
   /**
      * @minItems 1
-     * @maxItems 5
+     * @maxItems 3
      */
   categoryIds: string[];
   startsAt: string;
@@ -899,6 +899,10 @@ export const CreateReportDtoTargetType = {
 
 export interface CreateReportDto {
   targetType: CreateReportDtoTargetType;
+  /**
+     * @minLength 1
+     * @maxLength 80
+     */
   targetId: string;
   /**
      * @minLength 1
@@ -1276,14 +1280,6 @@ export interface CategoryPublicDto {
   nameTr: string;
 }
 
-export interface CreateCategoryDto {
-  /**
-     * @minLength 2
-     * @maxLength 40
-     */
-  name: string;
-}
-
 export interface CommunityPublicDto {
   id: string;
   slug: string;
@@ -1483,6 +1479,10 @@ export const OrganizationsControllerPublicProfileLang = {
 } as const;
 
 export type DiscoveryControllerListEventsParams = {
+nonCancelled?: boolean;
+upcoming?: boolean;
+cityScope?: DiscoveryControllerListEventsCityScope;
+modality?: DiscoveryControllerListEventsModality;
 communityId?: string;
 to?: string;
 from?: string;
@@ -1493,6 +1493,22 @@ lang?: DiscoveryControllerListEventsLang;
 page?: number;
 pageSize?: number;
 };
+
+export type DiscoveryControllerListEventsCityScope = typeof DiscoveryControllerListEventsCityScope[keyof typeof DiscoveryControllerListEventsCityScope];
+
+
+export const DiscoveryControllerListEventsCityScope = {
+  strict: 'strict',
+  'include-online': 'include-online',
+} as const;
+
+export type DiscoveryControllerListEventsModality = typeof DiscoveryControllerListEventsModality[keyof typeof DiscoveryControllerListEventsModality];
+
+
+export const DiscoveryControllerListEventsModality = {
+  online: 'online',
+  'in-person': 'in-person',
+} as const;
 
 export type DiscoveryControllerListEventsLang = typeof DiscoveryControllerListEventsLang[keyof typeof DiscoveryControllerListEventsLang];
 

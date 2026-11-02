@@ -38,8 +38,6 @@ export const getDiscoveryControllerCitiesResponseMock = (): CityPublicDto[] => (
 
 export const getDiscoveryControllerCategoriesResponseMock = (): CategoryPublicDto[] => (Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.alpha({length: {min: 10, max: 20}}), nameEn: faker.string.alpha({length: {min: 10, max: 20}}), nameAr: faker.string.alpha({length: {min: 10, max: 20}}), nameTr: faker.string.alpha({length: {min: 10, max: 20}})})))
 
-export const getDiscoveryControllerCreateCategoryResponseMock = (overrideResponse: Partial<Extract<CategoryPublicDto, object>> = {}): CategoryPublicDto => ({id: faker.string.alpha({length: {min: 10, max: 20}}), nameEn: faker.string.alpha({length: {min: 10, max: 20}}), nameAr: faker.string.alpha({length: {min: 10, max: 20}}), nameTr: faker.string.alpha({length: {min: 10, max: 20}}), ...overrideResponse})
-
 
 export const getDiscoveryControllerListCommunitiesMockHandler = (overrideResponse?: CommunityPageDto | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<CommunityPageDto> | CommunityPageDto), options?: RequestHandlerOptions) => {
   return http.get('*/api/v1/communities', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
@@ -112,24 +110,11 @@ export const getDiscoveryControllerCategoriesMockHandler = (overrideResponse?: C
       })
   }, options)
 }
-
-export const getDiscoveryControllerCreateCategoryMockHandler = (overrideResponse?: CategoryPublicDto | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<CategoryPublicDto> | CategoryPublicDto), options?: RequestHandlerOptions) => {
-  return http.post('*/api/v1/reference/categories', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getDiscoveryControllerCreateCategoryResponseMock(),
-      { status: 201
-      })
-  }, options)
-}
 export const getDiscoveryMock = () => [
   getDiscoveryControllerListCommunitiesMockHandler(),
   getDiscoveryControllerCommunityMockHandler(),
   getDiscoveryControllerListEventsMockHandler(),
   getDiscoveryControllerEventMockHandler(),
   getDiscoveryControllerCitiesMockHandler(),
-  getDiscoveryControllerCategoriesMockHandler(),
-  getDiscoveryControllerCreateCategoryMockHandler()
+  getDiscoveryControllerCategoriesMockHandler()
 ]
