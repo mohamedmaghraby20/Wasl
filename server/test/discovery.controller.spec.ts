@@ -124,6 +124,19 @@ describe('DiscoveryController pagination validation', () => {
     expect(query.params).toContain('education');
   });
 
+  it('keeps online recommendations nationwide with explicit modality and eligibility filters', async () => {
+    const { controller, conditions } = createController();
+    await controller.listEvents({ modality: 'online', upcoming: 'true', nonCancelled: 'true' });
+
+    const query = renderedConditions(conditions);
+    expect(query.text).toContain('"events"."visibility" =');
+    expect(query.text).toContain('"events"."online" =');
+    expect(query.text).toContain('"events"."starts_at" >');
+    expect(query.text).toContain('"events"."cancelled" =');
+    expect(query.text).not.toContain('"events"."city_id"');
+    expect(query.params).toEqual(expect.arrayContaining(['public', true, false]));
+  });
+
   it('limits event listings to public records and applies city and inclusive date filters', async () => {
     const { controller, conditions } = createController();
     await controller.listEvents({
