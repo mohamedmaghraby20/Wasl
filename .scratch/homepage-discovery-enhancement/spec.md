@@ -1,7 +1,7 @@
 # Homepage Discovery Enhancement
 
-Status: ready-for-agent
-Labels: ready-for-agent
+Status: done
+Labels: implemented, verified
 
 ## Problem Statement
 
@@ -173,3 +173,9 @@ Image-bearing event and community cards are required throughout the app, not onl
 - No relevant glossary or ADR files were present during inspection. Use existing domain terms: event, community, organization, city, category, accepted registration and active membership.
 - Existing development samples span multiple cities and include useful edge cases, but live database contents, provider credentials, deployment geolocation readiness and deployed authentication allowlists were not verified.
 - Shared image cards intentionally broaden the original homepage-only scope; changes to supporting discovery filters and destinations are limited to making the agreed homepage journeys work consistently.
+
+## Completion — 2026-11-02
+
+- Tickets 01–07 are done with every scope checkbox checked. Implementation, acceptance text and historical evidence above remain unchanged; the initial readiness notes describe the planning baseline, not the current state.
+- Both supplied P2 findings were fixed, merged and independently verified with no remaining scoped findings. See `review.md` for exact producer/integration checks and `closure.md` for final tracker, graph and cleanup disposition. Closure starts from integration `e79612ae2be2dace100bd23c97986f0e74154e27`; no product code changes or passed-suite reruns were needed.
+- Verification limits remain: global lint has four pre-existing privacy-test errors; builds retain existing dependency/chunk warnings. Browser evidence is Chromium with deterministic API/auth boundaries, not real auth/email, physical-device/GPS or production HTTPS/policy verification. These are verification limits, not unchecked implementation scope.
