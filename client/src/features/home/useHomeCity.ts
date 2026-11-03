@@ -97,7 +97,7 @@ export function useHomeCity(cities: CityPublicDto[] | undefined) {
           else if (positionError.code === 3) fail('timeout');
           else fail('unavailable');
         },
-        { enableHighAccuracy: false, maximumAge: 0, timeout: geolocationTimeout },
+        { enableHighAccuracy: true, maximumAge: 0, timeout: geolocationTimeout },
       );
     } catch {
       fail('unavailable');

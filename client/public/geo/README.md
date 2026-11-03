@@ -14,7 +14,7 @@ browser location to a supported Wasl city. It is loaded lazily after the visitor
   places (about 0.11 m); the result is 220,290 bytes (78,957 bytes gzip).
 - Bundled snapshot SHA-256: `492f5cc5b2c290628e61ea89417774138dd7dc48b6f6c2532e43029cd60b7024`.
 
-Attribution is also shown next to the homepage location action. The boundaries are a generalized
+Attribution is also shown in the site footer. The boundaries are a generalized
 province-selection aid, not survey-grade or authoritative boundary identification. Points on a
 boundary, in the sea, or outside the mapped polygons resolve to no city so the visitor can choose
 manually instead of receiving a nearest-city guess.

@@ -192,6 +192,24 @@ describe('HomePage', () => {
     expect(search).toHaveAttribute('name', 'q');
   });
 
+  it('asks for location on arrival without accessing it before consent and allows declining', async () => {
+    const getCurrentPosition = vi.fn();
+    vi.stubGlobal('navigator', { geolocation: { getCurrentPosition } });
+    renderHome();
+
+    expect(await screen.findByText('Allow Wasl to use your location to find communities and events near you?')).toBeVisible();
+    expect(getCurrentPosition).not.toHaveBeenCalled();
+    expect(screen.queryByText(/Coordinates are matched/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Province boundaries/)).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Not now' }));
+
+    expect(screen.queryByRole('button', { name: 'Use my location' })).not.toBeInTheDocument();
+    expect(getCurrentPosition).not.toHaveBeenCalled();
+    await userEvent.click(screen.getByRole('button', { name: 'Across Türkiye' }));
+    await userEvent.click(screen.getByRole('option', { name: 'Ankara' }));
+    expect(await screen.findByRole('heading', { name: 'Upcoming events in Ankara' })).toBeVisible();
+  });
+
   it('keeps search and successful discovery usable when city reference loading fails', async () => {
     renderHome({ citiesError: true });
     expect(await screen.findByRole('alert')).toHaveTextContent('Cities could not load');

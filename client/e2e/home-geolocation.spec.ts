@@ -198,6 +198,13 @@ test('requests location only on the explicit action and applies the mapped city'
   await expect(page.getByRole('heading', { name: 'Upcoming events across Türkiye' })).toBeVisible();
   expect(await locationCalls(page)).toBe(0);
   expect(page.url()).not.toContain('?');
+  await expect(page.getByText('Allow Wasl to use your location to find communities and events near you?')).toBeVisible();
+  await expect(page.locator('form').getByText(/Coordinates are matched|Province boundaries/)).toHaveCount(0);
+  await page.screenshot({ path: test.info().outputPath('home-location-consent-desktop.png'), fullPage: true });
+  await page.setViewportSize({ width: 375, height: 812 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.screenshot({ path: test.info().outputPath('home-location-consent-mobile.png'), fullPage: true });
+  await page.setViewportSize({ width: 1280, height: 720 });
 
   await page.getByRole('button', { name: 'Use my location' }).click();
 
@@ -217,6 +224,18 @@ test('requests location only on the explicit action and applies the mapped city'
   ).toBe(true);
   expect(consoleMessages.join(' ')).not.toMatch(/\b(32|39)\.\d{3,}/);
   expect(consoleMessages.join(' ')).not.toMatch(/latitude|longitude|coords/i);
+});
+
+test('declining location keeps manual city selection and search usable without requesting permission', async ({ page }) => {
+  await mockDiscovery(page);
+  await mockLocation(page, { kind: 'success', longitude: 32, latitude: 39 });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Not now' }).click();
+  expect(await locationCalls(page)).toBe(0);
+  await expect(page.getByRole('button', { name: 'Use my location' })).toHaveCount(0);
+  await selectCity(page, 'Istanbul');
+  await page.getByRole('button', { name: 'Search', exact: true }).click();
+  await expect(page).toHaveURL(/city=istanbul/);
 });
 
 test('a return visit uses only the remembered city and never prompts automatically', async ({

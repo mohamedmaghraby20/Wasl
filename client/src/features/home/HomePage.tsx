@@ -1,10 +1,8 @@
-import { LocateFixed } from 'lucide-react';
 import { useState } from 'react';
 import { Form, Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useSeoMeta } from '@unhead/react';
 import { Button } from '@/components/ui/Button';
-import { IconButton } from '@/components/ui/IconButton';
 import { SearchInput } from '@/components/ui/SearchInput';
 import { SearchableSelect } from '@/components/ui/SearchableSelect';
 import { QueryError } from '@/components/feedback/QueryError';
@@ -35,6 +33,7 @@ export function HomePage(): React.JSX.Element {
   const { t, i18n } = useTranslation();
   const { user, loading: authLoading } = useAuth();
   const [query, setQuery] = useState('');
+  const [locationDismissed, setLocationDismissed] = useState(false);
   const lang: 'ar' | 'en' = i18n.language.startsWith('ar') ? 'ar' : 'en';
   const cities = useDiscoveryControllerCities();
   const { cityId, restoringCity, setCityId, selectedCity, location, requestLocation } = useHomeCity(
@@ -148,6 +147,7 @@ export function HomePage(): React.JSX.Element {
             <SearchableSelect
               aria-label={cityId ? `${t('cityFilter')}: ${cityName}` : t('nationwide')}
               aria-busy={cities.isPending}
+              className="col-span-2"
               emptyMessage={t('noCitiesFound')}
               id="home-city"
               onValueChange={setCityId}
@@ -164,18 +164,40 @@ export function HomePage(): React.JSX.Element {
               searchPlaceholder={t('searchCities')}
               value={cityId}
             />
-            <div className="flex items-center">
-              <IconButton
-                aria-describedby="home-location-privacy"
-                disabled={!cities.data}
-                icon={LocateFixed}
-                label={t('useMyLocation')}
-                onClick={requestLocation}
-                type="button"
-                variant="secondary"
-              />
-            </div>
-            <div className="col-span-2 grid gap-1">
+            {!locationDismissed ? (
+              <div
+                className="col-span-2 grid gap-2"
+                role="group"
+                aria-label={t('locationPrompt')}
+              >
+                {location.status !== 'success' ? (
+                  <p className="text-sm text-primary-soft-text">{t('locationPrompt')}</p>
+                ) : null}
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    disabled={!cities.data}
+                    onClick={requestLocation}
+                    type="button"
+                    variant="secondary"
+                  >
+                    {t('useMyLocation')}
+                  </Button>
+                  {location.status !== 'success' ? (
+                    <Button
+                      onClick={() => {
+                        setCityId(cityId);
+                        setLocationDismissed(true);
+                      }}
+                      type="button"
+                      variant="ghost"
+                    >
+                      {t('locationNotNow')}
+                    </Button>
+                  ) : null}
+                </div>
+              </div>
+            ) : null}
+            <div className="col-span-2 grid gap-1 empty:hidden">
               {cities.isError ? (
                 <QueryError message={t('homeCitiesError')} onRetry={() => void cities.refetch()} />
               ) : null}
@@ -192,15 +214,6 @@ export function HomePage(): React.JSX.Element {
                   {t(locationError)}
                 </p>
               ) : null}
-              <p id="home-location-privacy" className="text-xs text-text-muted">
-                {t('locationPrivacy')}
-              </p>
-              <a
-                className="w-fit text-[0.6875rem] text-text-subtle underline decoration-border underline-offset-2 hover:text-primary-soft-text focus-visible:text-primary-soft-text"
-                href="https://creativecommons.org/licenses/by/4.0/"
-              >
-                {t('locationAttribution')}
-              </a>
             </div>
             <Button block className="col-span-2" type="submit">
               {t('search')}
