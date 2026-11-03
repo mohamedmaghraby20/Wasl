@@ -19,10 +19,10 @@ province-selection aid, not survey-grade or authoritative boundary identificatio
 boundary, in the sea, or outside the mapped polygons resolve to no city so the visitor can choose
 manually instead of receiving a nearest-city guess.
 
-The reported point must fall inside exactly one province. Its accuracy radius plus a 100 m
-conservative margin is checked against other provinces using a local metre-scale projection.
-A radius reaching another province stays unresolved; reaching only the sea does not reject a city.
-The margin is a UX safeguard, not a certified bound on this generalized dataset's errors.
+The reported point must fall inside exactly one province. Browser accuracy describes uncertainty,
+not a reason to discard a point inside a known city. Even when that radius overlaps neighboring
+provinces, discovery uses the province containing the estimated point. This is a city estimate,
+not a guarantee of the visitor's physical location; manual correction remains available.
 Boundary vintage, simplification tolerance and survey accuracy are not supplied by the publisher.
 
 No credentials, mapping SDK, server endpoint or runtime third-party mapping service is used.

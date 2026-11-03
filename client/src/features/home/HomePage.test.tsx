@@ -217,17 +217,33 @@ describe('HomePage', () => {
     expect(await screen.findByRole('link', { name: 'Arabic music night' })).toBeVisible();
   });
 
+  it('shows optional location failure as neutral guidance, not an error alert', async () => {
+    vi.stubGlobal('navigator', { geolocation: {
+      getCurrentPosition: (_success: PositionCallback, fail: PositionErrorCallback) => {
+        fail({ code: 1, message: 'Denied', PERMISSION_DENIED: 1, POSITION_UNAVAILABLE: 2, TIMEOUT: 3 });
+      },
+    } });
+    renderHome();
+
+    const guidance = await screen.findByText(/Location permission was not granted/);
+    expect(guidance).toHaveAttribute('role', 'status');
+    expect(guidance).toHaveClass('text-text-muted');
+    expect(guidance).not.toHaveClass('text-danger');
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Across Türkiye' })).toBeEnabled();
+  });
+
   it('keeps communities visible while the event section loads', async () => {
     renderHome({ eventsLoading: true });
     expect(await screen.findByRole('link', { name: 'Arab students in Ankara' })).toBeVisible();
-    expect(within(screen.getByRole('region', { name: 'Upcoming events across T??rkiye' })).getByRole('status')).toBeInTheDocument();
+    expect(within(screen.getByRole('region', { name: 'Upcoming events across Türkiye' })).getByRole('status')).toBeInTheDocument();
   });
 
   it('distinguishes a successfully empty nationwide collection from a loading or error state', async () => {
     renderHome({ eventsEmpty: true });
     expect(await screen.findByText('Nothing here yet')).toBeVisible();
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-    expect(within(screen.getByRole('region', { name: 'Upcoming events across T??rkiye' })).queryByRole('status')).not.toBeInTheDocument();
+    expect(within(screen.getByRole('region', { name: 'Upcoming events across Türkiye' })).queryByRole('status')).not.toBeInTheDocument();
   });
 
   it('keeps successful events visible while communities load independently', async () => {

@@ -45,7 +45,7 @@ void i18n.use(initReactI18next).init({
         locationTimeout:
           'Finding your location took too long. Your current city is unchanged; choose a city from the list.',
         locationUnmatched:
-          "We couldn't match your location to a supported city in Türkiye. Your current city is unchanged; choose a city from the list.",
+          "Choose a city to explore nearby communities and events.",
         locationBoundariesError:
           'City boundaries could not load. Your current city is unchanged; choose a city from the list.',
         locationCitiesError:
@@ -785,7 +785,7 @@ void i18n.use(initReactI18next).init({
         locationDenied: 'لم يتم منح إذن الموقع. لم يتغير اختيارك؛ اختر مدينة من القائمة.',
         locationUnavailable: 'تعذر تحديد موقعك. لم يتغير اختيارك؛ اختر مدينة من القائمة.',
         locationTimeout: 'استغرق تحديد موقعك وقتاً طويلاً. لم يتغير اختيارك؛ اختر مدينة من القائمة.',
-        locationUnmatched: 'تعذرت مطابقة موقعك مع مدينة مدعومة في تركيا. لم يتغير اختيارك؛ اختر مدينة من القائمة.',
+        locationUnmatched: 'اختر مدينة لاستكشاف المجتمعات والفعاليات القريبة منك.',
         locationBoundariesError: 'تعذر تحميل حدود المدن. لم يتغير اختيارك؛ حاول مجدداً أو اختر مدينة من القائمة.',
         locationCitiesError: 'تعذر تحميل المدن المدعومة ولم يُطبق الموقع. اختر مدينة من القائمة.',
         locationAttribution: 'حدود المحافظات: SimpleMaps، رخصة CC BY 4.0؛ مُكيّفة لمعرّفات مدن وصل.',

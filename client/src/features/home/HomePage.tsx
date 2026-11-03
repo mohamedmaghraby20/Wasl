@@ -176,7 +176,7 @@ export function HomePage(): React.JSX.Element {
                   {t('locationSuccess', { city: cityName })}
                 </p>
               ) : locationError ? (
-                <p className="text-xs font-medium text-danger" role="alert">
+                <p className="text-xs text-text-muted" role="status">
                   {t(locationError)}
                 </p>
               ) : null}

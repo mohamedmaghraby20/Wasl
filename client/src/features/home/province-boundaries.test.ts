@@ -69,6 +69,10 @@ describe('province boundary loading', () => {
 });
 
 describe('bundled province boundaries', () => {
+  it.each([50_000, 100_000])('infers Istanbul from its estimated point with a %i m accuracy radius', (accuracy) => {
+    expect(resolveProvinceCity(bundled.provinces, 28.9784, 41.0082, accuracy)).toBe('istanbul');
+  });
+
   it('resolves a coastal Istanbul fix even when its accuracy radius reaches the sea', () => {
     expect(resolveProvinceCity(bundled.provinces, 28.9784, 41.0082, 5_000)).toBe('istanbul');
   });
@@ -131,13 +135,13 @@ describe('bundled province boundaries', () => {
 });
 
 describe('province geometry resolution', () => {
-  it('rejects an accuracy radius reaching a different province, regardless of province order', () => {
+  it('uses the estimated point even when its accuracy radius reaches a different province', () => {
     const provinces = [
       boundary('first', polygon(square(30, 38, 33, 40))),
       boundary('second', polygon(square(33, 38, 35, 40))),
     ];
-    expect(resolveProvinceCity(provinces, 32.9999, 39, 100)).toBeNull();
-    expect(resolveProvinceCity([...provinces].reverse(), 32.9999, 39, 100)).toBeNull();
+    expect(resolveProvinceCity(provinces, 32.9999, 39, 100)).toBe('first');
+    expect(resolveProvinceCity([...provinces].reverse(), 32.9999, 39, 100)).toBe('first');
     expect(resolveProvinceCity(provinces, 32, 39, 100)).toBe('first');
   });
 

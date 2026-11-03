@@ -221,7 +221,7 @@ test('denying browser permission keeps manual city selection and search usable',
   await mockDiscovery(page);
   await mockLocation(page, { kind: 'denied' });
   await page.goto('/');
-  await expect(page.getByRole('alert')).toContainText('Location permission was not granted');
+  await expect(page.getByRole('status').filter({ hasText: 'Location permission was not granted' })).toBeVisible();
   expect(await locationCalls(page)).toBe(1);
   await expect(page.getByRole('button', { name: 'Use my location' })).toHaveCount(0);
   await selectCity(page, 'Istanbul');
@@ -261,7 +261,8 @@ for (const [kind, copy] of [
     await page.goto('/');
     await expect(page.locator('#home-city')).toContainText('Istanbul');
 
-    await expect(page.getByRole('alert')).toContainText(copy);
+    await expect(page.getByRole('status').filter({ hasText: copy })).toBeVisible();
+    await expect(page.getByRole('alert')).toHaveCount(0);
     await expect(page.locator('#home-city')).toContainText('Istanbul');
     await expect(page.getByRole('heading', { name: 'Upcoming events in Istanbul' })).toBeVisible();
     expect(await page.evaluate(() => localStorage.getItem('wasl-city'))).toBe('istanbul');
@@ -279,9 +280,13 @@ test('coordinates outside the mapped provinces never become a guessed city', asy
   await mockLocation(page, { kind: 'success', longitude: 23.7275, latitude: 37.9838 });
   await page.goto('/');
 
-  await expect(page.getByRole('alert')).toContainText(
-    "We couldn't match your location to a supported city",
-  );
+  const guidance = page.getByRole('status').filter({ hasText: 'Choose a city to explore nearby communities and events.' });
+  await expect(guidance).toBeVisible();
+  await expect(guidance).not.toHaveClass(/text-danger/);
+  await expect(page.getByRole('alert')).toHaveCount(0);
+  await page.locator('section[aria-labelledby="home-hero-heading"]').screenshot({ path: test.info().outputPath('location-fallback-desktop.png') });
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.locator('section[aria-labelledby="home-hero-heading"]').screenshot({ path: test.info().outputPath('location-fallback-mobile.png') });
   await expect(page.locator('#home-city')).toContainText('Istanbul');
   await expect(page.getByRole('heading', { name: 'Upcoming events in Istanbul' })).toBeVisible();
   expect(await page.evaluate(() => localStorage.getItem('wasl-city'))).toBe('istanbul');
@@ -295,7 +300,7 @@ test('a boundary data failure preserves the current state and retries on reload'
   await mockLocation(page, { kind: 'success', longitude: 32, latitude: 39 });
   await page.goto('/');
 
-  await expect(page.getByRole('alert')).toContainText('City boundaries could not load');
+  await expect(page.getByRole('status').filter({ hasText: 'City boundaries could not load' })).toBeVisible();
   await expect(page.locator('#home-city')).toContainText('Ankara');
   expect(await page.evaluate(() => localStorage.getItem('wasl-city'))).toBe('ankara');
 
@@ -373,7 +378,7 @@ test('Arabic RTL location feedback is keyboard accessible with usable copy', asy
 
   await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
   await expect(page.getByRole('button', { name: 'استخدم موقعي' })).toHaveCount(0);
-  await expect(page.getByRole('alert')).toContainText('لم يتم منح إذن الموقع');
+  await expect(page.getByRole('status').filter({ hasText: 'لم يتم منح إذن الموقع' })).toBeVisible();
   await expect(page.locator('#home-city')).toContainText('في جميع أنحاء تركيا');
   await expect(page.getByRole('link', { name: /SimpleMaps/ })).toHaveAttribute(
     'href',
@@ -403,14 +408,12 @@ test('the bundled province boundaries reject a real outside-country coordinate',
   await mockLocation(page, { kind: 'success', longitude: 23.7275, latitude: 37.9838 });
   await page.goto('/');
 
-  await expect(page.getByRole('alert')).toContainText(
-    "We couldn't match your location to a supported city",
-  );
+  await expect(page.getByRole('status').filter({ hasText: 'Choose a city to explore nearby communities and events.' })).toBeVisible();
   await expect(page.locator('#home-city')).toContainText('Across Türkiye');
   expect(await page.evaluate(() => localStorage.getItem('wasl-city'))).toBeNull();
 });
 
-test('an inaccurate fix crossing a province edge leaves manual selection in control', async ({ page }) => {
+test('an accuracy radius crossing a province edge still estimates the city and allows manual correction', async ({ page }) => {
   await mockDiscovery(page);
   await page.route('**/geo/tr-provinces.json', (route) => route.fulfill({ json: {
     provinces: [stubBoundaries.provinces[0], {
@@ -419,8 +422,8 @@ test('an inaccurate fix crossing a province edge leaves manual selection in cont
   } }));
   await mockLocation(page, { kind: 'success', longitude: 32.9999, latitude: 39, accuracy: 100 });
   await page.goto('/');
-  await expect(page.getByRole('alert')).toContainText("We couldn't match your location");
-  await expect(page.locator('#home-city')).toContainText('Across Türkiye');
+  await expect(page.locator('#home-city')).toContainText('Ankara');
+  await expect(page.getByRole('alert')).toHaveCount(0);
   await selectCity(page, 'Istanbul');
   await expect(page.locator('#home-city')).toContainText('Istanbul');
 });
@@ -434,7 +437,7 @@ for (const [name, longitude, latitude] of [
     await mockDiscovery(page);
     await mockLocation(page, { kind: 'success', longitude, latitude });
     await page.goto('/');
-    await expect(page.getByRole('alert')).toContainText("We couldn't match your location");
+    await expect(page.getByRole('status').filter({ hasText: 'Choose a city to explore nearby communities and events.' })).toBeVisible();
     await expect(page.locator('#home-city')).toContainText('Across Türkiye');
     expect(await page.evaluate(() => localStorage.getItem('wasl-city'))).toBeNull();
     await selectCity(page, 'Ankara');
@@ -454,7 +457,7 @@ for (const failure of ['network', 'json', 'geometry', 'unsupported-city'] as con
     });
     await mockLocation(page, { kind: 'success', longitude: 32, latitude: 39 });
     await page.goto('/');
-    await expect(page.getByRole('alert')).toContainText(failure === 'unsupported-city' ? "We couldn't match" : 'City boundaries could not load');
+    await expect(page.getByRole('status').filter({ hasText: failure === 'unsupported-city' ? 'Choose a city to explore' : 'City boundaries could not load' })).toBeVisible();
     await expect(page.locator('#home-city')).toContainText('Istanbul');
     await page.getByRole('searchbox').fill('music');
     await page.getByRole('button', { name: 'Search', exact: true }).click();
@@ -475,7 +478,7 @@ test('malformed geometry can be retried with a corrected asset on reload', async
   });
   await mockLocation(page, { kind: 'success', longitude: 32, latitude: 39 });
   await page.goto('/');
-  await expect(page.getByRole('alert')).toContainText('City boundaries could not load');
+  await expect(page.getByRole('status').filter({ hasText: 'City boundaries could not load' })).toBeVisible();
   await expect(page.locator('#home-city')).toContainText('Istanbul');
   await page.reload();
   await expect(page.locator('#home-city')).toContainText('Ankara');
@@ -512,7 +515,7 @@ test('a delayed polygon download cannot replace a manual city or block search', 
 
 test('browser-granted coarse Istanbul coordinates resolve automatically with no external mapping calls', async ({ page, context }) => {
   await context.grantPermissions(['geolocation']);
-  await context.setGeolocation({ longitude: 28.9784, latitude: 41.0082, accuracy: 5_000 });
+  await context.setGeolocation({ longitude: 28.9784, latitude: 41.0082, accuracy: 50_000 });
   await mockDiscovery(page, 'real');
   const boundaryRequests: string[] = [];
   page.on('request', (request) => { if (request.url().includes('/geo/')) boundaryRequests.push(request.url()); });
