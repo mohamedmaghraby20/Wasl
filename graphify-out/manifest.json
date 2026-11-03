@@ -546,9 +546,9 @@
     "semantic_hash": ""
   },
   "client/src/app/RootLayout.tsx": {
-    "mtime": 1793651041.4722328,
-    "seen": 1793701321.4626052,
-    "ast_hash": "684d7beb5a696a9716f9dd33249d498f",
+    "mtime": 1793704873.5737941,
+    "seen": 1793704964.241198,
+    "ast_hash": "48109b38249ba595e7cf32c745403c5f",
     "semantic_hash": ""
   },
   "client/src/app/RouteErrorBoundary.tsx": {
@@ -1032,15 +1032,15 @@
     "semantic_hash": ""
   },
   "client/src/features/home/HomePage.tsx": {
-    "mtime": 1793703879.0581307,
-    "seen": 1793703892.3719046,
-    "ast_hash": "c88d2213e345fc615c22936ec3c5ade8",
+    "mtime": 1793705281.597265,
+    "seen": 1793705372.5622299,
+    "ast_hash": "f2c46afedc2fc3d58da27e9363717928",
     "semantic_hash": ""
   },
   "client/src/features/home/HomeSection.tsx": {
-    "mtime": 1793702620.4688144,
-    "seen": 1793702706.8977268,
-    "ast_hash": "b202ddceaff2420bb45aa8765e40b8b6",
+    "mtime": 1793705186.1071067,
+    "seen": 1793705372.5622318,
+    "ast_hash": "2b72f7d00bc9d479daa7edf2faee5a0a",
     "semantic_hash": ""
   },
   "client/src/features/messaging/MessagesConversation.test.tsx": {
@@ -1314,9 +1314,9 @@
     "semantic_hash": ""
   },
   "client/src/features/resources/ResourceCard.tsx": {
-    "mtime": 1793702287.3718755,
-    "seen": 1793702494.0365686,
-    "ast_hash": "f6cea6bccb23a5dee98974c8014eb420",
+    "mtime": 1793704660.5361092,
+    "seen": 1793704799.122379,
+    "ast_hash": "e8d6256218637de1db76a417856ef793",
     "semantic_hash": ""
   },
   "client/src/features/resources/resource-utils.ts": {
@@ -3174,9 +3174,9 @@
     "semantic_hash": ""
   },
   "AGENTS.md": {
-    "mtime": 1793703772.5366397,
-    "seen": 1793703892.4268386,
-    "ast_hash": "86dd8a70fdf95579ac8ad0d77a7f35de",
+    "mtime": 1793704837.1130872,
+    "seen": 1793704964.2835584,
+    "ast_hash": "c98155ef3e1e4c7723beb8493ef57631",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
@@ -3378,9 +3378,9 @@
     "semantic_hash": ""
   },
   "client/e2e/home-geolocation.spec.ts": {
-    "mtime": 1793703810.6648767,
-    "seen": 1793703892.3583798,
-    "ast_hash": "b60468cc782f9c4802874950cadff755",
+    "mtime": 1793705557.9157906,
+    "seen": 1793705781.4392245,
+    "ast_hash": "3eed3779f964546de12cf506eb7a60e0",
     "semantic_hash": ""
   },
   "client/e2e/home-interests.spec.ts": {
@@ -3420,15 +3420,15 @@
     "semantic_hash": ""
   },
   "client/src/features/home/province-boundaries.test.ts": {
-    "mtime": 1793703772.524626,
-    "seen": 1793703892.37201,
-    "ast_hash": "f86cfd185bee2d87acac51c1a3163b85",
+    "mtime": 1793705531.7658846,
+    "seen": 1793705781.4692874,
+    "ast_hash": "7a47e072d3215bc6c6ec7bbab922fcbc",
     "semantic_hash": ""
   },
   "client/src/features/home/province-boundaries.ts": {
-    "mtime": 1793703772.5236263,
-    "seen": 1793703892.3720133,
-    "ast_hash": "02652fc9278170264444020deca9d265",
+    "mtime": 1793705525.2212634,
+    "seen": 1793705781.4692914,
+    "ast_hash": "f30bb8536d537b1f314b54d3b48cf834",
     "semantic_hash": ""
   },
   "client/src/features/home/useHomeCity.ts": {
@@ -3516,9 +3516,9 @@
     "semantic_hash": ""
   },
   "client/public/geo/README.md": {
-    "mtime": 1793703772.533116,
-    "seen": 1793703892.4273138,
-    "ast_hash": "de03c40b0c016c1ca2ac8f1d121a1587",
+    "mtime": 1793705553.2054887,
+    "seen": 1793705781.5902495,
+    "ast_hash": "a7ebc4cadb9424f62ed78d55c65d5fce",
     "semantic_hash": ""
   },
   "docs/PROJECT_HANDOFF.md": {
@@ -4446,9 +4446,9 @@
     "semantic_hash": ""
   },
   "client/e2e/home-sidebar.spec.ts": {
-    "mtime": 1793703811.9316845,
-    "seen": 1793703892.3586195,
-    "ast_hash": "98aa1e0cfd4262fc53e88a359b3273ef",
+    "mtime": 1793705186.108613,
+    "seen": 1793705372.5538309,
+    "ast_hash": "7a30af60716da6cbf2f192f94d4180b8",
     "semantic_hash": ""
   },
   "client/src/features/home/PersonalSidebar.test.tsx": {

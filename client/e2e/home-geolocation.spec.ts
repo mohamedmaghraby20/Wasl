@@ -217,6 +217,23 @@ test('requests browser permission on arrival without a button and applies the ma
   expect(consoleMessages.join(' ')).not.toMatch(/latitude|longitude|coords/i);
 });
 
+test('a real fix just outside the bundled Istanbul outline still resolves Istanbul', async ({
+  page,
+}) => {
+  await mockDiscovery(page, 'real');
+  await mockLocation(page, {
+    kind: 'success',
+    longitude: 28.744536049789996,
+    latitude: 40.97808633220821,
+    accuracy: 138,
+  });
+  await page.goto('/');
+
+  await expect(page.locator('#home-city')).toContainText('Istanbul');
+  await expect(page.getByRole('heading', { name: 'Upcoming events in Istanbul' })).toBeVisible();
+  await expect(page.getByRole('alert')).toHaveCount(0);
+});
+
 test('denying browser permission keeps manual city selection and search usable', async ({ page }) => {
   await mockDiscovery(page);
   await mockLocation(page, { kind: 'denied' });

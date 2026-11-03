@@ -73,6 +73,12 @@ describe('bundled province boundaries', () => {
     expect(resolveProvinceCity(bundled.provinces, 28.9784, 41.0082, accuracy)).toBe('istanbul');
   });
 
+  it('infers Istanbul from a real Chrome fix that landed 220 m outside the outline', () => {
+    expect(resolveProvinceCity(bundled.provinces, 28.744536049789996, 40.97808633220821, 138)).toBe(
+      'istanbul',
+    );
+  });
+
   it('resolves a coastal Istanbul fix even when its accuracy radius reaches the sea', () => {
     expect(resolveProvinceCity(bundled.provinces, 28.9784, 41.0082, 5_000)).toBe('istanbul');
   });
@@ -143,6 +149,25 @@ describe('province geometry resolution', () => {
     expect(resolveProvinceCity(provinces, 32.9999, 39, 100)).toBe('first');
     expect(resolveProvinceCity([...provinces].reverse(), 32.9999, 39, 100)).toBe('first');
     expect(resolveProvinceCity(provinces, 32, 39, 100)).toBe('first');
+  });
+
+  it('accepts one province just outside a generalized outline within the accuracy tolerance', () => {
+    const provinces = [boundary('west', polygon(square(30, 38, 32, 40)))];
+    expect(resolveProvinceCity(provinces, 32.002, 39)).toBeNull();
+    expect(resolveProvinceCity(provinces, 32.002, 39, 500)).toBe('west');
+  });
+
+  it('leaves a fix unresolved when two provinces are within the tolerance', () => {
+    const provinces = [
+      boundary('west', polygon(square(30, 38, 32, 40))),
+      boundary('east', polygon(square(32.004, 38, 34, 40))),
+    ];
+    expect(resolveProvinceCity(provinces, 32.002, 39, 500)).toBeNull();
+  });
+
+  it('caps the outline tolerance at one kilometre', () => {
+    const provinces = [boundary('west', polygon(square(30, 38, 32, 40)))];
+    expect(resolveProvinceCity(provinces, 32.02, 39, 50_000)).toBeNull();
   });
 
   it('excludes interior holes from a province', () => {
