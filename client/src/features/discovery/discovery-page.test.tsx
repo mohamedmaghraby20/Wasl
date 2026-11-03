@@ -142,9 +142,8 @@ function renderPage(
 function mockDiscoveryApi(
   detailNotFound = false,
   hasMore = false,
-): { submittedSearches: string[]; urls: URL[] } {
+): { urls: URL[] } {
   vi.stubEnv('VITE_API_URL', 'http://localhost:3000');
-  const submittedSearches: string[] = [];
   const urls: URL[] = [];
   const fetchMock = vi.fn((input: RequestInfo | URL) => {
     const url = new URL(
@@ -156,8 +155,6 @@ function mockDiscoveryApi(
     if (url.pathname.endsWith('/reference/cities'))
       data = [{ id: 'ankara', nameEn: 'Ankara', nameAr: 'Ankara', nameTr: 'Ankara' }];
     if (url.pathname.endsWith('/communities')) {
-      const query = url.searchParams.get('q');
-      if (query) submittedSearches.push(query);
       data = { ...communityResponse, hasMore };
     }
     if (url.pathname.endsWith('/events')) data = eventResponse;
@@ -170,7 +167,7 @@ function mockDiscoveryApi(
     } as Response);
   });
   vi.stubGlobal('fetch', fetchMock);
-  return { submittedSearches, urls };
+  return { urls };
 }
 
 describe('DiscoveryPage', () => {
@@ -191,19 +188,46 @@ describe('DiscoveryPage', () => {
     expect(urls.at(-1)?.searchParams.has('order')).toBe(false);
   });
 
-  it('shows both public resource types on the unified discovery route', async () => {
+  it('shows events by default on the unified discovery route', async () => {
     mockDiscoveryApi();
     renderPage();
 
-    expect(await screen.findByRole('heading', { name: 'Arab students in Ankara' })).toBeVisible();
     expect(await screen.findByRole('heading', { name: 'Arabic music night' })).toBeVisible();
+    expect(
+      screen.queryByRole('heading', { name: 'Arab students in Ankara' }),
+    ).not.toBeInTheDocument();
     expect(screen.getByLabelText('From date')).toBeVisible();
     expect(screen.getByLabelText('To date')).toBeVisible();
   });
 
-  it('submits search into URL state and fetches both resource types with the query', async () => {
+  it('switches between events and communities from the type filter', async () => {
     const user = userEvent.setup();
-    const { submittedSearches } = mockDiscoveryApi();
+    mockDiscoveryApi();
+    renderPage('/discover?q=ankara');
+
+    expect(await screen.findByRole('heading', { name: 'Arabic music night' })).toBeVisible();
+
+    await user.click(screen.getByRole('combobox', { name: 'Type' }));
+    await user.click(await screen.findByRole('option', { name: 'Communities' }));
+
+    await waitFor(() =>
+      expect(screen.getByLabelText('Current URL')).toHaveTextContent('/communities?q=ankara'),
+    );
+    expect(await screen.findByRole('heading', { name: 'Arab students in Ankara' })).toBeVisible();
+    expect(screen.queryByLabelText('From date')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('combobox', { name: 'Type' }));
+    await user.click(await screen.findByRole('option', { name: 'Events' }));
+
+    await waitFor(() =>
+      expect(screen.getByLabelText('Current URL')).toHaveTextContent('/events?q=ankara'),
+    );
+    expect(await screen.findByRole('heading', { name: 'Arabic music night' })).toBeVisible();
+  });
+
+  it('submits search into URL state and fetches the selected resource type with the query', async () => {
+    const user = userEvent.setup();
+    const { urls } = mockDiscoveryApi();
     renderPage();
 
     await user.type(screen.getByRole('searchbox', { name: 'Search' }), 'music');
@@ -213,7 +237,12 @@ describe('DiscoveryPage', () => {
     await waitFor(() =>
       expect(screen.getByLabelText('Current URL')).toHaveTextContent('/discover?q=music'),
     );
-    expect(submittedSearches).toContain('music');
+    expect(
+      urls.some(
+        (url) => url.pathname.endsWith('/events') && url.searchParams.get('q') === 'music',
+      ),
+    ).toBe(true);
+    expect(urls.some((url) => url.pathname.endsWith('/communities'))).toBe(false);
   });
 
   it('restores submitted search when navigating back and forward', async () => {
@@ -243,8 +272,6 @@ describe('DiscoveryPage', () => {
 
     const search = screen.getByRole('searchbox', { name: 'Search' });
     await user.tab();
-    expect(screen.getByRole('link', { name: 'Discover' })).toHaveFocus();
-    for (let index = 0; index < 10 && !search.matches(':focus'); index += 1) await user.tab();
     expect(search).toHaveFocus();
     await user.keyboard('music');
     await user.tab();
@@ -254,6 +281,8 @@ describe('DiscoveryPage', () => {
     await user.keyboard('{Enter}');
     await waitFor(() => expect(screen.getByLabelText('Current URL')).toHaveTextContent('?q=music'));
 
+    await user.tab();
+    expect(screen.getByRole('combobox', { name: 'Type' })).toHaveFocus();
     await user.tab();
     expect(screen.getByRole('button', { name: 'All cities' })).toHaveFocus();
   });
@@ -341,7 +370,7 @@ describe('DiscoveryPage', () => {
     expect(
       await screen.findByRole('heading', { level: 2, name: 'Community results' }),
     ).toBeVisible();
-    expect(screen.getByRole('heading', { level: 1, name: 'Communities' })).toBeVisible();
+    expect(screen.getByRole('heading', { level: 1, name: 'Discover' })).toBeVisible();
     expect(
       screen.queryByRole('heading', { level: 2, name: 'Communities' }),
     ).not.toBeInTheDocument();

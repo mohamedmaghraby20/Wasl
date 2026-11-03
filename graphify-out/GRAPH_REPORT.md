@@ -1,35 +1,35 @@
-# Graph Report - Wasl  (2026-11-03)
+# Graph Report - discover-unified  (2026-11-03)
 
 ## Corpus Check
-- 733 files · ~736,358 words
+- 733 files · ~736,192 words
 - Verdict: corpus is large enough that graph structure adds value.
-- Unclassified: 53 file(s) not represented in the graph (top: .csv 37, .css 8, (none) 4)
+- Unclassified: 54 file(s) not represented in the graph (top: .csv 37, .css 8, (none) 5)
 
 ## Summary
-- 5792 nodes · 14036 edges · 358 communities (232 shown, 126 thin omitted)
+- 5791 nodes · 14030 edges · 377 communities (254 shown, 123 thin omitted)
 - Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 418 edges (avg confidence: 0.86)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `2883f800`
+- Built from commit: `e7b4e424`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - Live Browser Design Canvas
-- @nestjs/common
+- app.module.ts
 - React Forms and Controls
 - Participation API Client
 - organizations.ts
 - Client Routing and Localization
-- AuthenticatedUser
+- OrganizationsService
 - PrivacyService
-- NotificationsService
+- MessagesPage.tsx
 - Live Session Recovery
-- Database
+- ChannelDeletionService
 - Discussions API Client
 - Discovery Contracts and Mocks
-- Button
+- react-router
 - Server Bootstrap and Dependencies
 - Design Catalog Validation
 - Shared Client Interaction Controls
@@ -38,7 +38,7 @@
 - messaging.ts
 - Design Output Color Coherence
 - Design Search Domain Detection
-- organizations.controller.ts
+- discovery.controller.ts
 - Screenshot Capture Runtime
 - Client Runtime Dependencies
 - privacy.ts
@@ -46,7 +46,7 @@
 - ResourceDetailsPage.tsx
 - Live Configuration Toolbar
 - Live Voice and Chat
-- resource-utils.ts
+- MessagingController
 - discovery.ts
 - Moderation API Client
 - Workspace Scripts and Linting
@@ -56,7 +56,7 @@
 - Design Stack Data Contracts
 - Participation Rules and Transitions
 - Users API and Mocks
-- OrganizationsController
+- OrganizerParticipationPanel.tsx
 - Participation API Mocks
 - Event Management Services
 - Inline Document Editing
@@ -70,7 +70,7 @@
 - Public Discovery Services
 - Client Development Dependencies
 - Discussion API Mocks
-- privacy.controller.ts
+- @nestjs/common
 - schema.ts
 - Interface Design Delivery Workflows
 - Design Search Behavior Tests
@@ -87,14 +87,14 @@
 - Manual Edit Review State
 - Privacy and Legal Schema
 - OrganizationManagePage.tsx
-- moderation.service.ts
-- Moderation API Mocks
+- moderation.controller.ts
+- messaging.controller.ts
 - Live Browser DOM Helpers
 - Live Session Persistence
 - Identity and Organization Schema
 - Svelte Live Injection Anchors
 - phase3.integration.ts
-- drizzle-orm
+- Database
 - CommunitiesController
 - Sitemap and Crawler Generation
 - Health API Client
@@ -110,7 +110,7 @@
 - Design Catalog Refresh Tests
 - Client TypeScript Configuration
 - Community and Event Schema
-- DeleteDialog.tsx
+- CommunityTopicPage.tsx
 - Shared TypeScript Compiler Options
 - Client Package Scripts
 - Issue tracker: GitHub
@@ -136,7 +136,7 @@
 - Supabase Security Reference Workflows
 - Postgres Queue and Upsert Patterns
 - Postgres Query Performance Diagnosis
-- withQueryKey
+- getPrivacyAdminControllerRetentionQueryOptions
 - Retrieval Threshold Gate Tests
 - Skill Script Path Validation
 - Wasl Design Tokens and Typography
@@ -144,7 +144,7 @@
 - Organization Verification Schema
 - Resource Moderator Schema
 - Shared TypeScript Build Configuration
-- discovery.msw.ts
+- communities.msw.ts
 - Design System Showcase Composition
 - UI UX Design Guidance
 - Skill Agent Presentation Metadata
@@ -220,15 +220,15 @@
 - Quick Reference
 - Public Crawler Exclusions
 - Comments
-- waslFetch
+- Findings by skill category
 - Issue tracker: Local Markdown
 - Approved technology baseline, not proof of installed dependencies
 - Comments
 - getPrivacyAdminControllerReviewAgeMutationOptions
 - privacyControllerExportData
 - getPrivacyControllerGetRequestQueryOptions
-- usePrivacyControllerListRequests
-- getPrivacyAdminControllerDecideMutationOptions
+- getPrivacyControllerListRequestsQueryOptions
+- PrivacyDataPage.tsx
 - 05: Nationwide online-event discovery
 - README.md
 - Ask Matt
@@ -301,6 +301,13 @@
 - getPrivacyControllerCreateRequestMutationOptions
 - getPrivacyControllerDeclareAgeMutationOptions
 - getPrivacyControllerStatusQueryOptions
+- Backend NestJS Best-Practices Review
+- participation-postgres.integration.ts
+- getMessagingControllerBlockMutationOptions
+- getMessagingControllerCommunityMutationOptions
+- getMessagingControllerDirectMessageMutationOptions
+- getMessagingControllerEventMutationOptions
+- getMessagingControllerReportMutationOptions
 - Implement Health Checks for Microservices
 - 01: Image-led resource cards and event availability
 - block-dangerous-git.sh
@@ -346,12 +353,24 @@
 - test-mock-external-services.md
 - test-use-testing-module.md
 - CREDITS.md
+- getMessagingControllerUnblockMutationOptions
+- getParticipationControllerCancelEventRegistrationMutationOptions
+- getParticipationControllerCommunityCountsQueryOptions
+- getParticipationControllerCommunityMemberPreviewQueryOptions
+- getParticipationControllerCommunityMembersQueryOptions
+- getParticipationControllerCommunityParticipantsQueryOptions
+- getParticipationControllerEventAttendeesQueryOptions
+- getParticipationControllerEventCountsQueryOptions
+- getParticipationControllerEventDecisionMutationOptions
+- getParticipationControllerJoinCommunityMutationOptions
+- getParticipationControllerLeaveCommunityMutationOptions
+- getParticipationControllerRegisterForEventMutationOptions
 
 ## God Nodes (most connected - your core abstractions)
 1. `waslFetch()` - 114 edges
 2. `react-i18next` - 102 edges
 3. `getAuthenticatedUser()` - 90 edges
-4. `react-router` - 82 edges
+4. `react-router` - 80 edges
 5. `@nestjs/common` - 78 edges
 6. `Database` - 78 edges
 7. `AuthenticatedUser` - 78 edges
@@ -383,67 +402,67 @@
 - **Comp-led asset production, human calibration and independent fidelity review** — _opencode_skills_impeccable_reference_component_review_component_review, _opencode_skills_impeccable_reference_component_review_first_viewport_review, _opencode_skills_impeccable_reference_degraded_asset_producer_asset_producer, _opencode_skills_impeccable_reference_degraded_finish_reviewer_finish_reviewer [INFERRED 0.95]
 - **Product capacity rules, authoritative server transaction and row-lock verification form participation correctness** — docs_context_01_product_admission_invariants, docs_context_02_architecture_authoritative_participation, docs_phases_phase_4_capacity_locking [INFERRED 0.95]
 
-## Communities (358 total, 126 thin omitted)
+## Communities (377 total, 123 thin omitted)
 
 ### Community 0 - "Live Browser Design Canvas"
 Cohesion: 0.03
 Nodes (120): applyGlobalBarLabelState(), applyLiveBarPreference(), applyParamValue(), applyPlaceholderSizingStyles(), averageRgb01(), bindEditBadgeProxy(), bufferToBase64(), buildCollapsible() (+112 more)
 
-### Community 1 - "@nestjs/common"
+### Community 1 - "app.module.ts"
 Cohesion: 0.11
-Nodes (20): @nestjs/common, HealthModule, Environment, environmentSchema, optionalText, validateEnvironment(), AuthModule, CommunitiesModule (+12 more)
+Nodes (19): HealthModule, Environment, environmentSchema, optionalText, validateEnvironment(), AuthModule, SUPABASE_AUTH_CLIENT, CommunitiesModule (+11 more)
 
 ### Community 2 - "React Forms and Controls"
 Cohesion: 0.09
-Nodes (63): useCommunitiesControllerCreate(), useCommunitiesControllerUpdate(), useDiscoveryControllerCities(), useEventsControllerCreate(), useEventsControllerUpdate(), useModerationControllerReport(), useOrganizationsControllerAcceptAdminInvitation(), useOrganizationsControllerCreate() (+55 more)
+Nodes (48): useCommunitiesControllerCreate(), useCommunitiesControllerMine(), useCommunitiesControllerUpdate(), useDiscoveryControllerCities(), useEventsControllerCreate(), useEventsControllerUpdate(), useOrganizationsControllerCreate(), useOrganizationsControllerUpdate() (+40 more)
 
 ### Community 3 - "Participation API Client"
-Cohesion: 0.03
-Nodes (101): getParticipationControllerCancelEventRegistrationMutationKey(), getParticipationControllerCancelEventRegistrationMutationOptions(), getParticipationControllerCancelEventRegistrationUrl(), getParticipationControllerCommunityCountsQueryKey(), getParticipationControllerCommunityCountsQueryOptions(), getParticipationControllerCommunityCountsUrl(), getParticipationControllerCommunityDecisionMutationKey(), getParticipationControllerCommunityDecisionMutationOptions() (+93 more)
+Cohesion: 0.04
+Nodes (59): getParticipationControllerCommunityDecisionMutationKey(), getParticipationControllerCommunityDecisionMutationOptions(), getParticipationControllerCommunityDecisionUrl(), getParticipationControllerCommunityStatusUrl(), getParticipationControllerEventAttendeePreviewQueryKey(), getParticipationControllerEventAttendeePreviewQueryOptions(), getParticipationControllerEventAttendeePreviewUrl(), getParticipationControllerEventParticipantsQueryKey() (+51 more)
 
 ### Community 4 - "organizations.ts"
 Cohesion: 0.02
-Nodes (148): getOrganizationsControllerAcceptAdminInvitationMutationKey(), getOrganizationsControllerAcceptAdminInvitationMutationOptions(), getOrganizationsControllerAcceptAdminInvitationUrl(), getOrganizationsControllerCreateAdminInvitationMutationKey(), getOrganizationsControllerCreateAdminInvitationMutationOptions(), getOrganizationsControllerCreateAdminInvitationUrl(), getOrganizationsControllerCreateMutationKey(), getOrganizationsControllerCreateMutationOptions() (+140 more)
+Nodes (147): getOrganizationsControllerAcceptAdminInvitationMutationKey(), getOrganizationsControllerAcceptAdminInvitationMutationOptions(), getOrganizationsControllerAcceptAdminInvitationUrl(), getOrganizationsControllerCreateAdminInvitationMutationKey(), getOrganizationsControllerCreateAdminInvitationMutationOptions(), getOrganizationsControllerCreateAdminInvitationUrl(), getOrganizationsControllerCreateMutationKey(), getOrganizationsControllerCreateMutationOptions() (+139 more)
 
 ### Community 5 - "Client Routing and Localization"
-Cohesion: 0.05
-Nodes (72): ApiError, AppProviders(), head, authMocks, LocationOutput(), renderPage(), AuthProvider(), mocks (+64 more)
+Cohesion: 0.04
+Nodes (74): getCommunityDiscussionsControllerListQueryKey(), getCommunityDiscussionsControllerListQueryOptions(), useCommunityDiscussionsControllerCreate(), useCommunityDiscussionsControllerList(), AppProviders(), head, LoadingState(), AuthProvider() (+66 more)
 
-### Community 6 - "AuthenticatedUser"
-Cohesion: 0.07
-Nodes (16): AccountStatus, AuthenticatedUser, fastify, FastifyRequest, CommunitiesService, slugPart(), isPublicUrl(), OrganizationsService (+8 more)
+### Community 6 - "OrganizationsService"
+Cohesion: 0.06
+Nodes (29): OrganizationsController, AcceptedOrganizationAdminInvitationDto, AcceptOrganizationAdminInvitationDto, CreatedOrganizationAdminInvitationDto, CreateOrganizationAdminInvitationDto, CreateOrganizationDto, DecidedOrganizationVerificationDto, DecideOrganizationVerificationDto (+21 more)
 
 ### Community 7 - "PrivacyService"
 Cohesion: 0.05
 Nodes (28): PrivacyAdminController, PrivacyController, ACCEPTABLE_DOCUMENT_TYPES, AcceptDocumentDto, AcceptedDocumentDto, AdminAgeEligibilityDto, AdminPrivacyRequestDto, CreatePrivacyRequestDto (+20 more)
 
-### Community 8 - "NotificationsService"
-Cohesion: 0.09
-Nodes (7): EventsService, slugPart(), ModerationService, NotificationsService, main(), main(), main()
+### Community 8 - "MessagesPage.tsx"
+Cohesion: 0.13
+Nodes (21): ApiError, getMessagingControllerBlockedUsersQueryKey(), getMessagingControllerBlockedUsersQueryOptions(), getMessagingControllerConversationsQueryKey(), getMessagingControllerConversationsQueryOptions(), messagingControllerConversations(), messagingControllerSession(), useMessagingControllerBlock() (+13 more)
 
 ### Community 9 - "Live Session Recovery"
 Cohesion: 0.06
 Nodes (89): applyParamDefaults(), applyPlaceholderDimensions(), applySavedSessionMeta(), buildCyclingRow(), clampVariantIndex(), clearHandled(), closedClipPath(), commitAcceptedVariantToDom() (+81 more)
 
-### Community 10 - "Database"
-Cohesion: 0.06
-Nodes (18): HealthResponseDto, ReadinessResponseDto, DATABASE, Database, DatabaseModule, PROVIDER_DATABASE, mocks, PrivacyGateService (+10 more)
+### Community 10 - "ChannelDeletionService"
+Cohesion: 0.14
+Nodes (5): 7. Database & ORM — migrations and transactions present; integration atomicity needs attention (high), CommunityDeletionService, ChannelDeletionService, MessagingSyncWorker, main()
 
 ### Community 11 - "Discussions API Client"
 Cohesion: 0.03
-Nodes (87): communityDiscussionsControllerClose(), CommunityDiscussionsControllerCloseMutationError, CommunityDiscussionsControllerCloseMutationResult, CommunityDiscussionsControllerCloseMutationVariables, communityDiscussionsControllerCreate(), CommunityDiscussionsControllerCreateMutationBody, CommunityDiscussionsControllerCreateMutationError, CommunityDiscussionsControllerCreateMutationResult (+79 more)
+Nodes (91): isPublicRead(), resolveApiUrl(), authMocks, waslFetch(), communityDiscussionsControllerClose(), CommunityDiscussionsControllerCloseMutationError, CommunityDiscussionsControllerCloseMutationResult, CommunityDiscussionsControllerCloseMutationVariables (+83 more)
 
 ### Community 12 - "Discovery Contracts and Mocks"
 Cohesion: 0.03
-Nodes (69): AcceptDocumentDtoDocumentType, AcceptedDocumentDto, AcceptedOrganizationAdminInvitationDtoRole, AdminAgeEligibilityDtoStatus, AdminPrivacyRequestDtoRequestType, AdminPrivacyRequestDtoStatus, BlockUserDto, CommunityActivityItemDto (+61 more)
+Nodes (66): AcceptDocumentDtoDocumentType, AcceptedDocumentDto, AcceptedOrganizationAdminInvitationDtoRole, AdminAgeEligibilityDtoStatus, AdminPrivacyRequestDtoRequestType, AdminPrivacyRequestDtoStatus, CommunityActivityItemDto, CommunityActivityItemDtoStatus (+58 more)
 
-### Community 13 - "Button"
-Cohesion: 0.07
-Nodes (44): getCommunitiesControllerMineQueryOptions(), useCommunitiesControllerMine(), getCommunityDiscussionsControllerDetailsQueryKey(), getCommunityDiscussionsControllerDetailsQueryOptions(), getCommunityDiscussionsControllerListQueryKey(), getCommunityDiscussionsControllerListQueryOptions(), getDiscussionsControllerListEventPostsQueryKey(), getDiscussionsControllerListEventPostsQueryOptions() (+36 more)
+### Community 13 - "react-router"
+Cohesion: 0.12
+Nodes (37): getDiscussionsControllerListEventPostsQueryKey(), getDiscussionsControllerListEventPostsQueryOptions(), useDiscussionsControllerClose(), useDiscussionsControllerCreateEventPost(), useDiscussionsControllerListEventPosts(), useDiscussionsControllerRemove(), useDiscussionsControllerUpdate(), useModerationControllerReport() (+29 more)
 
 ### Community 14 - "Server Bootstrap and Dependencies"
 Cohesion: 0.04
-Nodes (59): class-transformer, drizzle-kit, @fastify/helmet, @nestjs/cli, @nestjs/core, @nestjs/terminus, @nestjs/throttler, reflect-metadata (+51 more)
+Nodes (62): class-transformer, drizzle-kit, @fastify/helmet, @nestjs/cli, @nestjs/platform-fastify, @nestjs/terminus, @nestjs/testing, @nestjs/throttler (+54 more)
 
 ### Community 15 - "Design Catalog Validation"
 Cohesion: 0.06
@@ -451,19 +470,19 @@ Nodes (44): read_rows(), TestAccessibilityGuidance, TestChartsTypographyAndIcons
 
 ### Community 16 - "Shared Client Interaction Controls"
 Cohesion: 0.06
-Nodes (73): useDiscoveryControllerCategories(), usePrivacyControllerAccept(), usePrivacyControllerCancelRequest(), usePrivacyControllerCreateRequest(), usePrivacyControllerDeclareAge(), usePrivacyControllerStatus(), authenticatedRoutePaths, requiresAuthentication() (+65 more)
+Nodes (67): authenticatedRoutePaths, requiresAuthentication(), accountLinks, Brand(), navItemClass(), primaryLinks, RootLayout(), RouteErrorBoundary() (+59 more)
 
 ### Community 17 - "Discussion Domain Services"
-Cohesion: 0.06
-Nodes (33): 10. DevOps & deployment — useful config and shutdown setup; startup/config parity to resolve (medium), 1. Architecture — strong foundation; verify module boundaries (low/medium), 2. Dependency injection — good patterns; optional DB weakening startup guarantees (medium), 3. Error handling — centralized response; improve diagnostics and safe boundaries (medium), 4. Security — strong base; close input-validation and deployment gaps (high), 5. Performance — bounded lists; review query scaling and background scans (medium), 6. Testing — broad suite; improve integration and concurrency confidence (medium), 8. API Design — DTOs and OpenAPI exist; response DTOs are documentation-only (medium) (+25 more)
+Cohesion: 0.09
+Nodes (15): CommunityDiscussionsController, DiscussionsController, CommunityTopicDetailsDto, CommunityTopicDto, CommunityTopicPageDto, CreateCommunityTopicDto, CreateDiscussionPostDto, DiscussionPostDto (+7 more)
 
 ### Community 18 - "Design Reasoning Contracts"
 Cohesion: 0.06
 Nodes (13): DesignSystemGenerator, _resolve_dial(), apply_decision_rules(), _object_without_duplicates(), parse_decision_rules(), _validate_action(), TestReasoningMatch, read_rows() (+5 more)
 
 ### Community 19 - "messaging.ts"
-Cohesion: 0.04
-Nodes (73): getMessagingControllerBlockedUsersQueryKey(), getMessagingControllerBlockedUsersQueryOptions(), getMessagingControllerBlockedUsersUrl(), getMessagingControllerBlockMutationKey(), getMessagingControllerBlockMutationOptions(), getMessagingControllerBlockUrl(), getMessagingControllerCommunityMutationKey(), getMessagingControllerCommunityMutationOptions() (+65 more)
+Cohesion: 0.06
+Nodes (38): getMessagingControllerBlockedUsersUrl(), getMessagingControllerConversationsUrl(), getMessagingControllerSessionMutationKey(), getMessagingControllerSessionMutationOptions(), getMessagingControllerSessionUrl(), messagingControllerBlockedUsers(), MessagingControllerBlockedUsersQueryError, MessagingControllerBlockedUsersQueryResult (+30 more)
 
 ### Community 20 - "Design Output Color Coherence"
 Cohesion: 0.05
@@ -473,9 +492,9 @@ Nodes (21): ansi_ljust(), _button_outline_text_color(), _contrast_ratio(), _deri
 Cohesion: 0.05
 Nodes (26): _contains_phrase(), detect_domain(), _domain_keywords(), _exact_match_diagnostic(), _exact_row_identity(), _exact_stack_identifier(), _file_signature(), _legacy_successor_guidance() (+18 more)
 
-### Community 22 - "organizations.controller.ts"
-Cohesion: 0.18
-Nodes (20): AcceptedOrganizationAdminInvitationDto, AcceptOrganizationAdminInvitationDto, CreatedOrganizationAdminInvitationDto, CreateOrganizationAdminInvitationDto, CreateOrganizationDto, DecidedOrganizationVerificationDto, DecideOrganizationVerificationDto, ManagedOrganizationDto (+12 more)
+### Community 22 - "discovery.controller.ts"
+Cohesion: 0.16
+Nodes (9): cities, CategoryPublicDto, CityPublicDto, CommunityPageDto, CommunityPublicDto, EventPageDto, EventPublicDto, DiscoveryModule (+1 more)
 
 ### Community 23 - "Screenshot Capture Runtime"
 Cohesion: 0.09
@@ -483,19 +502,19 @@ Nodes (53): ae(), be(), bt(), Ce(), Ct(), de(), dt(), _e() (+45 more)
 
 ### Community 24 - "Client Runtime Dependencies"
 Cohesion: 0.05
-Nodes (55): dependencies, class-variance-authority@0.7.1, clsx@2.1.1, @hookform/resolvers@5.2.1, i18next@25.5.2, lucide-react@0.544.0, @radix-ui/react-alert-dialog@1.2.1, @radix-ui/react-checkbox@1.4.1 (+47 more)
+Nodes (56): dependencies, class-variance-authority@0.7.1, clsx@2.1.1, @hookform/resolvers@5.2.1, i18next@25.5.2, lucide-react@0.544.0, @radix-ui/react-alert-dialog@1.2.1, @radix-ui/react-checkbox@1.4.1 (+48 more)
 
 ### Community 25 - "privacy.ts"
 Cohesion: 0.04
-Nodes (45): PrivacyAdminControllerDecideMutationBody, PrivacyAdminControllerDecideMutationError, PrivacyAdminControllerDecideMutationResult, PrivacyAdminControllerDecideMutationVariables, PrivacyAdminControllerListQueryError, PrivacyAdminControllerListQueryResult, PrivacyAdminControllerRetentionQueryError, PrivacyAdminControllerRetentionQueryResult (+37 more)
+Nodes (51): getPrivacyAdminControllerDecideMutationKey(), getPrivacyAdminControllerDecideMutationOptions(), getPrivacyAdminControllerDecideUrl(), getPrivacyAdminControllerListUrl(), privacyAdminControllerDecide(), PrivacyAdminControllerDecideMutationBody, PrivacyAdminControllerDecideMutationError, PrivacyAdminControllerDecideMutationResult (+43 more)
 
 ### Community 26 - "Design Search Tooling"
 Cohesion: 0.06
 Nodes (11): _detect_page_type(), format_page_override_md(), generate_design_system(), _generate_intelligent_overrides(), persist_design_system(), safe_slug(), _write_persisted_file(), format_output() (+3 more)
 
 ### Community 27 - "ResourceDetailsPage.tsx"
-Cohesion: 0.07
-Nodes (73): getCommunitiesControllerMineQueryKey(), useCommunitiesControllerArchive(), useCommunitiesControllerRemove(), getDiscoveryControllerCommunityQueryKey(), getDiscoveryControllerCommunityQueryOptions(), getDiscoveryControllerEventQueryKey(), getDiscoveryControllerEventQueryOptions(), getDiscoveryControllerListCommunitiesQueryKey() (+65 more)
+Cohesion: 0.06
+Nodes (89): getCommunitiesControllerMineQueryKey(), useCommunitiesControllerArchive(), useCommunitiesControllerRemove(), getDiscoveryControllerCommunityQueryKey(), getDiscoveryControllerEventQueryKey(), getDiscoveryControllerListCommunitiesQueryKey(), getDiscoveryControllerListEventsQueryKey(), useDiscoveryControllerCategories() (+81 more)
 
 ### Community 28 - "Live Configuration Toolbar"
 Cohesion: 0.08
@@ -505,17 +524,13 @@ Nodes (46): actionLabel(), bindConfigureCountPillTooltip(), bindConfigureInlineC
 Cohesion: 0.09
 Nodes (46): agentHasWorkInFlight(), armPageChatForTyping(), attachSteerFocusDebug(), attachSteerFocusGuard(), buildSteerProcessingDots(), buildSteerQueueHint(), clearSteerAwaitTimer(), clearSteerFocusRecoverTimer() (+38 more)
 
-### Community 30 - "resource-utils.ts"
-Cohesion: 0.11
-Nodes (37): useDiscoveryControllerDiscoveryCategories(), useDiscoveryControllerListCommunities(), useDiscoveryControllerListEvents(), withQueryKey(), CommunityPublicDto, EventPublicDto, Badge(), badgeVariants (+29 more)
-
 ### Community 31 - "discovery.ts"
 Cohesion: 0.06
-Nodes (42): discoveryControllerCategories(), DiscoveryControllerCategoriesQueryError, DiscoveryControllerCategoriesQueryResult, discoveryControllerCities(), DiscoveryControllerCitiesQueryError, DiscoveryControllerCitiesQueryResult, discoveryControllerCommunity(), DiscoveryControllerCommunityQueryError (+34 more)
+Nodes (44): discoveryControllerCategories(), DiscoveryControllerCategoriesQueryError, DiscoveryControllerCategoriesQueryResult, discoveryControllerCities(), DiscoveryControllerCitiesQueryError, DiscoveryControllerCitiesQueryResult, discoveryControllerCommunity(), DiscoveryControllerCommunityQueryError (+36 more)
 
 ### Community 32 - "Moderation API Client"
-Cohesion: 0.05
-Nodes (50): getModerationControllerDecideMutationKey(), getModerationControllerDecideMutationOptions(), getModerationControllerDecideUrl(), getModerationControllerListUrl(), getModerationControllerReportMutationKey(), getModerationControllerReportMutationOptions(), getModerationControllerReportUrl(), getModeratorAssignmentsControllerAssignMutationKey() (+42 more)
+Cohesion: 0.04
+Nodes (69): getModerationControllerDecideMutationKey(), getModerationControllerDecideMutationOptions(), getModerationControllerDecideUrl(), getModerationControllerListUrl(), getModerationControllerReportMutationKey(), getModerationControllerReportMutationOptions(), getModerationControllerReportUrl(), getModeratorAssignmentsControllerAssignMutationKey() (+61 more)
 
 ### Community 33 - "Workspace Scripts and Linting"
 Cohesion: 0.05
@@ -538,16 +553,24 @@ Cohesion: 0.07
 Nodes (8): search_stack(), _rows(), TestNativeDesktopStackFreshness, read_rows(), TestTextLayoutDataContracts, TestTextLayoutRetrieval, _rows(), TestWebStackFreshness
 
 ### Community 38 - "Participation Rules and Transitions"
-Cohesion: 0.11
-Nodes (14): countStatuses(), ParticipationService, assertCommunityTransition(), assertEventTransition(), CommunityStatus, communityTransitions, EventStatus, eventTransitions (+6 more)
+Cohesion: 0.13
+Nodes (11): AuthenticatedUser, countStatuses(), ParticipationService, assertCommunityTransition(), assertEventTransition(), CommunityStatus, communityTransitions, EventStatus (+3 more)
 
 ### Community 39 - "Users API and Mocks"
-Cohesion: 0.06
-Nodes (46): getUsersControllerCurrentQueryKey(), getUsersControllerCurrentQueryOptions(), getUsersControllerCurrentUrl(), getUsersControllerPublicProfileQueryKey(), getUsersControllerPublicProfileQueryOptions(), getUsersControllerPublicProfileUrl(), getUsersControllerSearchQueryKey(), getUsersControllerSearchQueryOptions() (+38 more)
+Cohesion: 0.07
+Nodes (43): getUsersControllerCurrentQueryOptions(), getUsersControllerCurrentUrl(), getUsersControllerPublicProfileQueryKey(), getUsersControllerPublicProfileQueryOptions(), getUsersControllerPublicProfileUrl(), getUsersControllerSearchQueryKey(), getUsersControllerSearchQueryOptions(), getUsersControllerSearchUrl() (+35 more)
+
+### Community 40 - "OrganizerParticipationPanel.tsx"
+Cohesion: 0.23
+Nodes (15): useModeratorAssignmentsControllerAssign(), useModeratorAssignmentsControllerList(), useModeratorAssignmentsControllerRemove(), useParticipationControllerCommunityCounts(), useParticipationControllerCommunityDecision(), useParticipationControllerCommunityParticipants(), useParticipationControllerEventCounts(), useParticipationControllerEventDecision() (+7 more)
 
 ### Community 41 - "Participation API Mocks"
 Cohesion: 0.08
 Nodes (43): CommunityMemberDto, CommunityMemberPreviewDto, MembershipStateDto, MyActivityDto, ParticipantListItemDto, ParticipationCountsDto, ParticipationDecisionDto, RegistrationStateDto (+35 more)
+
+### Community 42 - "Event Management Services"
+Cohesion: 0.07
+Nodes (3): EventsController, CreateEventDto, slugPart()
 
 ### Community 43 - "Inline Document Editing"
 Cohesion: 0.07
@@ -559,19 +582,23 @@ Nodes (24): Public Communities, Public and Unlisted Events, docs/launch-decision
 
 ### Community 45 - "Communities API Client"
 Cohesion: 0.06
-Nodes (40): communitiesControllerArchive(), CommunitiesControllerArchiveMutationError, CommunitiesControllerArchiveMutationResult, CommunitiesControllerArchiveMutationVariables, communitiesControllerCreate(), CommunitiesControllerCreateMutationBody, CommunitiesControllerCreateMutationError, CommunitiesControllerCreateMutationResult (+32 more)
+Nodes (41): communitiesControllerArchive(), CommunitiesControllerArchiveMutationError, CommunitiesControllerArchiveMutationResult, CommunitiesControllerArchiveMutationVariables, communitiesControllerCreate(), CommunitiesControllerCreateMutationBody, CommunitiesControllerCreateMutationError, CommunitiesControllerCreateMutationResult (+33 more)
 
 ### Community 46 - "User Profile Domain Services"
 Cohesion: 0.10
 Nodes (3): UsersController, UpdateProfileDto, UsersService
 
+### Community 47 - "Moderation Domain Services"
+Cohesion: 0.14
+Nodes (5): ModerationController, ModeratorAssignmentsController, ModerationService, main(), main()
+
 ### Community 48 - "MessagingService"
-Cohesion: 0.07
-Nodes (15): 7. Database & ORM — migrations and transactions present; integration atomicity needs attention (high), MessagingController, BlockUserDto, CreateDirectMessageDto, MessagingBlockedUserDto, MessagingBlockResultDto, MessagingChannelDto, MessagingConversationItemDto (+7 more)
+Cohesion: 0.13
+Nodes (8): directMessagePair(), providerChannelId(), providerUserId(), MessagingService, StreamChatAdapter, main(), connectAs(), main()
 
 ### Community 49 - "Mock Service Worker Setup"
-Cohesion: 0.08
-Nodes (38): @faker-js/faker@10.6.0, CreatedResourceDto, DeletedCommunityDto, ManagedCommunityDto, NotificationDto, ReadNotificationDto, getCommunitiesControllerArchiveMockHandler(), getCommunitiesControllerArchiveResponseMock() (+30 more)
+Cohesion: 0.07
+Nodes (43): @faker-js/faker@10.6.0, CategoryPublicDto, CommunityPageDto, CreatedResourceDto, EventPageDto, HealthResponseDto, ReadinessResponseDto, getDiscoveryControllerCategoriesMockHandler() (+35 more)
 
 ### Community 50 - "Privacy API Mocks"
 Cohesion: 0.11
@@ -589,13 +616,13 @@ Nodes (31): devDependencies, @chromatic-com/storybook@4.1.0, jest-axe@10.0.0, js
 Cohesion: 0.12
 Nodes (29): CommunityTopicDetailsDto, CommunityTopicDto, CommunityTopicPageDto, DiscussionPostDto, DiscussionPostPageDto, getCommunityDiscussionsControllerCloseMockHandler(), getCommunityDiscussionsControllerCloseResponseMock(), getCommunityDiscussionsControllerCreateMockHandler() (+21 more)
 
-### Community 54 - "privacy.controller.ts"
-Cohesion: 0.07
-Nodes (22): fastify, @nestjs/swagger, PlatformAdminGuard, guardFor(), PRIVACY_GATE_EXEMPT, PrivacyGateExempt(), eligibleGate, notExempt (+14 more)
+### Community 54 - "@nestjs/common"
+Cohesion: 0.06
+Nodes (27): fastify, @nestjs/common, @nestjs/core, @nestjs/swagger, AccountStatus, fastify, FastifyRequest, PlatformAdminGuard (+19 more)
 
 ### Community 55 - "schema.ts"
-Cohesion: 0.05
-Nodes (74): buildDevelopmentSeed(), capacities, communityHistory(), eventHistory(), places, sampleOwnerEmail, sampleOwnerId, seedId() (+66 more)
+Cohesion: 0.06
+Nodes (69): buildDevelopmentSeed(), capacities, communityHistory(), eventHistory(), places, sampleOwnerEmail, sampleOwnerId, seedId() (+61 more)
 
 ### Community 57 - "Design Search Behavior Tests"
 Cohesion: 0.10
@@ -646,16 +673,16 @@ Cohesion: 0.14
 Nodes (21): age_eligibilities_reviewer_idx, age_eligibilities_status_idx, "identity"."age_eligibilities", "legal_acceptances", legal_acceptances_document_idx, legal_acceptances_user_type_version_unique, "legal_documents", legal_documents_type_status_idx (+13 more)
 
 ### Community 70 - "OrganizationManagePage.tsx"
-Cohesion: 0.16
-Nodes (24): getOrganizationsControllerListAdminInvitationsQueryKey(), getOrganizationsControllerListAdminInvitationsQueryOptions(), getOrganizationsControllerListManagersQueryKey(), getOrganizationsControllerListManagersQueryOptions(), getOrganizationsControllerListVerificationRequestsQueryKey(), getOrganizationsControllerListVerificationRequestsQueryOptions(), getOrganizationsControllerMineQueryKey(), getOrganizationsControllerMineQueryOptions() (+16 more)
+Cohesion: 0.15
+Nodes (26): getOrganizationsControllerListAdminInvitationsQueryKey(), getOrganizationsControllerListAdminInvitationsQueryOptions(), getOrganizationsControllerListManagersQueryKey(), getOrganizationsControllerListManagersQueryOptions(), getOrganizationsControllerListVerificationRequestsQueryKey(), getOrganizationsControllerListVerificationRequestsQueryOptions(), getOrganizationsControllerMineQueryKey(), getOrganizationsControllerMineQueryOptions() (+18 more)
 
-### Community 71 - "moderation.service.ts"
-Cohesion: 0.20
+### Community 71 - "moderation.controller.ts"
+Cohesion: 0.18
 Nodes (10): class-validator, ModerationKind, community, event, CreatedReportDto, CreateReportDto, DecideReportDto, ModerationPermissionsDto (+2 more)
 
-### Community 72 - "Moderation API Mocks"
-Cohesion: 0.17
-Nodes (19): CreatedReportDto, ModerationPermissionsDto, ModeratorUserDto, ReportReviewDto, getModerationControllerDecideMockHandler(), getModerationControllerDecideResponseMock(), getModerationControllerListMockHandler(), getModerationControllerListResponseMock() (+11 more)
+### Community 72 - "messaging.controller.ts"
+Cohesion: 0.30
+Nodes (9): BlockUserDto, CreateDirectMessageDto, MessagingBlockedUserDto, MessagingBlockResultDto, MessagingChannelDto, MessagingConversationItemDto, MessagingReportResultDto, MessagingSessionDto (+1 more)
 
 ### Community 73 - "Live Browser DOM Helpers"
 Cohesion: 0.16
@@ -677,25 +704,25 @@ Nodes (35): applyOriginalAttrsToSvelteAnchor(), buildSvelteExpressionTextMap(), 
 Cohesion: 0.16
 Nodes (15): admin, authClient, cleanupPool, communityIds, eventIds, expectStatus(), jsonRequest(), main() (+7 more)
 
-### Community 78 - "drizzle-orm"
-Cohesion: 0.10
-Nodes (23): dotenv, drizzle-orm, @nestjs/platform-fastify, @nestjs/testing, pg, categories, cities, communityCategories (+15 more)
+### Community 78 - "Database"
+Cohesion: 0.07
+Nodes (27): dotenv, drizzle-orm, pg, DATABASE, Database, PROVIDER_DATABASE, categories, communityMemberships (+19 more)
 
 ### Community 80 - "Sitemap and Crawler Generation"
 Cohesion: 0.22
 Nodes (15): apiBase, distDir, loadResources(), main(), Page, buildRobotsTxt(), buildSitemapXml(), canonicalResourcePath() (+7 more)
 
 ### Community 81 - "Health API Client"
-Cohesion: 0.16
-Nodes (18): getHealthControllerGetHealthQueryKey(), getHealthControllerGetHealthQueryOptions(), getHealthControllerGetHealthUrl(), getHealthControllerGetReadinessQueryKey(), getHealthControllerGetReadinessQueryOptions(), getHealthControllerGetReadinessUrl(), healthControllerGetHealth(), HealthControllerGetHealthQueryError (+10 more)
+Cohesion: 0.18
+Nodes (16): getHealthControllerGetHealthQueryKey(), getHealthControllerGetHealthQueryOptions(), getHealthControllerGetHealthUrl(), getHealthControllerGetReadinessQueryKey(), getHealthControllerGetReadinessQueryOptions(), getHealthControllerGetReadinessUrl(), healthControllerGetHealth(), HealthControllerGetHealthQueryError (+8 more)
 
 ### Community 82 - "PlatformModerationPage.tsx"
-Cohesion: 0.19
-Nodes (19): getModerationControllerListQueryKey(), getModerationControllerListQueryOptions(), useModerationControllerDecide(), useModerationControllerList(), getOrganizationsControllerListPendingVerificationRequestsQueryKey(), getOrganizationsControllerListPendingVerificationRequestsQueryOptions(), useOrganizationsControllerListPendingVerificationRequests(), getPrivacyAdminControllerListQueryKey() (+11 more)
+Cohesion: 0.16
+Nodes (23): getModerationControllerListQueryKey(), getModerationControllerListQueryOptions(), useModerationControllerDecide(), useModerationControllerList(), withQueryKey(), getOrganizationsControllerListPendingVerificationRequestsQueryKey(), getOrganizationsControllerListPendingVerificationRequestsQueryOptions(), useOrganizationsControllerDecideVerification() (+15 more)
 
 ### Community 83 - "Notifications API Client"
 Cohesion: 0.16
-Nodes (16): getNotificationsControllerListQueryKey(), getNotificationsControllerListQueryOptions(), getNotificationsControllerListUrl(), getNotificationsControllerMarkReadMutationKey(), getNotificationsControllerMarkReadMutationOptions(), getNotificationsControllerMarkReadUrl(), notificationsControllerList(), NotificationsControllerListQueryError (+8 more)
+Nodes (15): getNotificationsControllerListUrl(), getNotificationsControllerMarkReadMutationKey(), getNotificationsControllerMarkReadMutationOptions(), getNotificationsControllerMarkReadUrl(), notificationsControllerList(), NotificationsControllerListQueryError, NotificationsControllerListQueryResult, notificationsControllerMarkRead() (+7 more)
 
 ### Community 84 - "Shared Package Configuration"
 Cohesion: 0.13
@@ -713,9 +740,13 @@ Nodes (12): @storybook/react-vite@9.1.5, Default, meta, Story, IconActions, meta
 Cohesion: 0.22
 Nodes (20): actOnAgentTarget(), agentTargetBusyReason(), agentTargetOverlayGone(), agentTargetTaken(), claimAgentTarget(), claimAndActOnAgentTarget(), declineAgentTargetBusy(), declineAgentTargetUnresolvable() (+12 more)
 
+### Community 89 - "Health HTTP Endpoints"
+Cohesion: 0.17
+Nodes (3): HealthController, HealthResponseDto, ReadinessResponseDto
+
 ### Community 90 - "Notification Email Delivery"
-Cohesion: 0.16
-Nodes (7): 9. Microservices / integrations — adapters and queues exist; resilience is uneven (medium/high), @nestjs/config, NotificationEmailWorker, setup(), ResendEmailAdapter, input, rollback
+Cohesion: 0.17
+Nodes (6): 9. Microservices / integrations — adapters and queues exist; resilience is uneven (medium/high), @nestjs/config, NotificationEmailWorker, setup(), ResendEmailAdapter, input
 
 ### Community 92 - "Client TypeScript Configuration"
 Cohesion: 0.13
@@ -725,9 +756,9 @@ Nodes (14): compilerOptions, allowImportingTsExtensions, baseUrl, jsx, lib, modu
 Cohesion: 0.20
 Nodes (10): "communities", communities_public_created_idx, "community_categories", community_categories_pk, "event_categories", event_categories_pk, "events", events_public_start_idx (+2 more)
 
-### Community 94 - "DeleteDialog.tsx"
-Cohesion: 0.38
-Nodes (11): AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent(), AlertDialogDescription, AlertDialogTitle, AlertDialogTrigger, ConfirmDialog() (+3 more)
+### Community 94 - "CommunityTopicPage.tsx"
+Cohesion: 0.15
+Nodes (25): getCommunityDiscussionsControllerDetailsQueryKey(), getCommunityDiscussionsControllerDetailsQueryOptions(), useCommunityDiscussionsControllerClose(), useCommunityDiscussionsControllerDetails(), useCommunityDiscussionsControllerPost(), useCommunityDiscussionsControllerRemove(), useCommunityDiscussionsControllerUpdate(), withQueryKey() (+17 more)
 
 ### Community 95 - "Shared TypeScript Compiler Options"
 Cohesion: 0.13
@@ -829,9 +860,9 @@ Nodes (4): PostgreSQL INSERT ON CONFLICT documentation, PostgreSQL Advisory Lock
 Cohesion: 0.25
 Nodes (4): Supabase EXPLAIN and database inspection documentation, Supabase pg_stat_statements documentation, Supabase VACUUM operations documentation, Supabase Query Optimization documentation
 
-### Community 120 - "withQueryKey"
-Cohesion: 0.20
-Nodes (10): getPrivacyAdminControllerListQueryOptions(), getPrivacyAdminControllerListUrl(), getPrivacyAdminControllerRetentionQueryKey(), getPrivacyAdminControllerRetentionQueryOptions(), getPrivacyAdminControllerRetentionUrl(), privacyAdminControllerList(), privacyAdminControllerRetention(), usePrivacyAdminControllerList() (+2 more)
+### Community 120 - "getPrivacyAdminControllerRetentionQueryOptions"
+Cohesion: 0.40
+Nodes (5): getPrivacyAdminControllerRetentionQueryKey(), getPrivacyAdminControllerRetentionQueryOptions(), getPrivacyAdminControllerRetentionUrl(), privacyAdminControllerRetention(), usePrivacyAdminControllerRetention()
 
 ### Community 122 - "Skill Script Path Validation"
 Cohesion: 0.38
@@ -857,9 +888,9 @@ Nodes (6): "resource_moderators", resource_moderators_assigner_idx, resource_mod
 Cohesion: 0.29
 Nodes (6): compilerOptions, outDir, rootDir, extends, include, ../tsconfig.base.json
 
-### Community 129 - "discovery.msw.ts"
-Cohesion: 0.19
-Nodes (18): CategoryPublicDto, CommunityPageDto, EventPageDto, getDiscoveryControllerCategoriesMockHandler(), getDiscoveryControllerCategoriesResponseMock(), getDiscoveryControllerCitiesMockHandler(), getDiscoveryControllerCitiesResponseMock(), getDiscoveryControllerCommunityMockHandler() (+10 more)
+### Community 129 - "communities.msw.ts"
+Cohesion: 0.25
+Nodes (13): DeletedCommunityDto, ManagedCommunityDto, getCommunitiesControllerArchiveMockHandler(), getCommunitiesControllerArchiveResponseMock(), getCommunitiesControllerCreateMockHandler(), getCommunitiesControllerCreateResponseMock(), getCommunitiesControllerMineMockHandler(), getCommunitiesControllerMineResponseMock() (+5 more)
 
 ### Community 130 - "Design System Showcase Composition"
 Cohesion: 0.33
@@ -997,9 +1028,9 @@ Nodes (16): 10. DevOps & Deployment (LOW-MEDIUM), 1. Architecture (CRITICAL), 2.
 Cohesion: 0.29
 Nodes (6): 04: Member-ranked community discovery, Comments, Final integration merge verification — 2026-11-02, Implementation and verification — ticket 04, Integration completion, Latest ticket-06 integration verification
 
-### Community 218 - "waslFetch"
-Cohesion: 0.33
-Nodes (6): isPublicRead(), resolveApiUrl(), authMocks, waslFetch(), getParticipationControllerMyActivityUrl(), participationControllerMyActivity()
+### Community 218 - "Findings by skill category"
+Cohesion: 0.15
+Nodes (10): 10. DevOps & deployment — useful config and shutdown setup; startup/config parity to resolve (medium), 1. Architecture — strong foundation; verify module boundaries (low/medium), 2. Dependency injection — good patterns; optional DB weakening startup guarantees (medium), 3. Error handling — centralized response; improve diagnostics and safe boundaries (medium), 4. Security — strong base; close input-validation and deployment gaps (high), 5. Performance — bounded lists; review query scaling and background scans (medium), 6. Testing — broad suite; improve integration and concurrency confidence (medium), 8. API Design — DTOs and OpenAPI exist; response DTOs are documentation-only (medium) (+2 more)
 
 ### Community 219 - "Issue tracker: Local Markdown"
 Cohesion: 0.40
@@ -1025,13 +1056,13 @@ Nodes (5): getPrivacyControllerExportDataQueryKey(), getPrivacyControllerExportD
 Cohesion: 0.40
 Nodes (5): getPrivacyControllerGetRequestQueryKey(), getPrivacyControllerGetRequestQueryOptions(), getPrivacyControllerGetRequestUrl(), privacyControllerGetRequest(), usePrivacyControllerGetRequest()
 
-### Community 225 - "usePrivacyControllerListRequests"
-Cohesion: 0.40
-Nodes (5): getPrivacyControllerListRequestsQueryKey(), getPrivacyControllerListRequestsQueryOptions(), getPrivacyControllerListRequestsUrl(), privacyControllerListRequests(), usePrivacyControllerListRequests()
-
-### Community 226 - "getPrivacyAdminControllerDecideMutationOptions"
+### Community 225 - "getPrivacyControllerListRequestsQueryOptions"
 Cohesion: 0.50
-Nodes (4): getPrivacyAdminControllerDecideMutationKey(), getPrivacyAdminControllerDecideMutationOptions(), getPrivacyAdminControllerDecideUrl(), privacyAdminControllerDecide()
+Nodes (4): getPrivacyControllerListRequestsQueryKey(), getPrivacyControllerListRequestsQueryOptions(), getPrivacyControllerListRequestsUrl(), privacyControllerListRequests()
+
+### Community 226 - "PrivacyDataPage.tsx"
+Cohesion: 0.29
+Nodes (11): usePrivacyControllerAccept(), usePrivacyControllerCancelRequest(), usePrivacyControllerCreateRequest(), usePrivacyControllerDeclareAge(), usePrivacyControllerListRequests(), usePrivacyControllerStatus(), withQueryKey(), openStatuses (+3 more)
 
 ### Community 227 - "05: Nationwide online-event discovery"
 Cohesion: 0.50
@@ -1313,6 +1344,82 @@ Nodes (4): getPrivacyControllerDeclareAgeMutationKey(), getPrivacyControllerDecl
 Cohesion: 0.50
 Nodes (4): getPrivacyControllerStatusQueryKey(), getPrivacyControllerStatusQueryOptions(), getPrivacyControllerStatusUrl(), privacyControllerStatus()
 
+### Community 303 - "Backend NestJS Best-Practices Review"
+Cohesion: 0.22
+Nodes (8): Backend NestJS Best-Practices Review, Executive summary, Phase 1 — close request-boundary gaps (highest priority), Phase 2 — make integrations safe under retries and replicas, Phase 3 — tighten runtime contracts and diagnostics, Phase 4 — scale and contract assurance, Suggested fix plan, Verification status
+
+### Community 304 - "participation-postgres.integration.ts"
+Cohesion: 0.46
+Nodes (7): createTestTables(), identityIds, main(), makeUsers(), quoteIdentifier(), seedResources(), setupPool
+
+### Community 305 - "getMessagingControllerBlockMutationOptions"
+Cohesion: 0.50
+Nodes (4): getMessagingControllerBlockMutationKey(), getMessagingControllerBlockMutationOptions(), getMessagingControllerBlockUrl(), messagingControllerBlock()
+
+### Community 306 - "getMessagingControllerCommunityMutationOptions"
+Cohesion: 0.50
+Nodes (4): getMessagingControllerCommunityMutationKey(), getMessagingControllerCommunityMutationOptions(), getMessagingControllerCommunityUrl(), messagingControllerCommunity()
+
+### Community 307 - "getMessagingControllerDirectMessageMutationOptions"
+Cohesion: 0.50
+Nodes (4): getMessagingControllerDirectMessageMutationKey(), getMessagingControllerDirectMessageMutationOptions(), getMessagingControllerDirectMessageUrl(), messagingControllerDirectMessage()
+
+### Community 308 - "getMessagingControllerEventMutationOptions"
+Cohesion: 0.50
+Nodes (4): getMessagingControllerEventMutationKey(), getMessagingControllerEventMutationOptions(), getMessagingControllerEventUrl(), messagingControllerEvent()
+
+### Community 309 - "getMessagingControllerReportMutationOptions"
+Cohesion: 0.50
+Nodes (4): getMessagingControllerReportMutationKey(), getMessagingControllerReportMutationOptions(), getMessagingControllerReportUrl(), messagingControllerReport()
+
+### Community 365 - "getMessagingControllerUnblockMutationOptions"
+Cohesion: 0.50
+Nodes (4): getMessagingControllerUnblockMutationKey(), getMessagingControllerUnblockMutationOptions(), getMessagingControllerUnblockUrl(), messagingControllerUnblock()
+
+### Community 366 - "getParticipationControllerCancelEventRegistrationMutationOptions"
+Cohesion: 0.50
+Nodes (4): getParticipationControllerCancelEventRegistrationMutationKey(), getParticipationControllerCancelEventRegistrationMutationOptions(), getParticipationControllerCancelEventRegistrationUrl(), participationControllerCancelEventRegistration()
+
+### Community 367 - "getParticipationControllerCommunityCountsQueryOptions"
+Cohesion: 0.50
+Nodes (4): getParticipationControllerCommunityCountsQueryKey(), getParticipationControllerCommunityCountsQueryOptions(), getParticipationControllerCommunityCountsUrl(), participationControllerCommunityCounts()
+
+### Community 368 - "getParticipationControllerCommunityMemberPreviewQueryOptions"
+Cohesion: 0.50
+Nodes (4): getParticipationControllerCommunityMemberPreviewQueryKey(), getParticipationControllerCommunityMemberPreviewQueryOptions(), getParticipationControllerCommunityMemberPreviewUrl(), participationControllerCommunityMemberPreview()
+
+### Community 369 - "getParticipationControllerCommunityMembersQueryOptions"
+Cohesion: 0.50
+Nodes (4): getParticipationControllerCommunityMembersQueryKey(), getParticipationControllerCommunityMembersQueryOptions(), getParticipationControllerCommunityMembersUrl(), participationControllerCommunityMembers()
+
+### Community 370 - "getParticipationControllerCommunityParticipantsQueryOptions"
+Cohesion: 0.50
+Nodes (4): getParticipationControllerCommunityParticipantsQueryKey(), getParticipationControllerCommunityParticipantsQueryOptions(), getParticipationControllerCommunityParticipantsUrl(), participationControllerCommunityParticipants()
+
+### Community 371 - "getParticipationControllerEventAttendeesQueryOptions"
+Cohesion: 0.50
+Nodes (4): getParticipationControllerEventAttendeesQueryKey(), getParticipationControllerEventAttendeesQueryOptions(), getParticipationControllerEventAttendeesUrl(), participationControllerEventAttendees()
+
+### Community 372 - "getParticipationControllerEventCountsQueryOptions"
+Cohesion: 0.50
+Nodes (4): getParticipationControllerEventCountsQueryKey(), getParticipationControllerEventCountsQueryOptions(), getParticipationControllerEventCountsUrl(), participationControllerEventCounts()
+
+### Community 373 - "getParticipationControllerEventDecisionMutationOptions"
+Cohesion: 0.50
+Nodes (4): getParticipationControllerEventDecisionMutationKey(), getParticipationControllerEventDecisionMutationOptions(), getParticipationControllerEventDecisionUrl(), participationControllerEventDecision()
+
+### Community 374 - "getParticipationControllerJoinCommunityMutationOptions"
+Cohesion: 0.50
+Nodes (4): getParticipationControllerJoinCommunityMutationKey(), getParticipationControllerJoinCommunityMutationOptions(), getParticipationControllerJoinCommunityUrl(), participationControllerJoinCommunity()
+
+### Community 375 - "getParticipationControllerLeaveCommunityMutationOptions"
+Cohesion: 0.50
+Nodes (4): getParticipationControllerLeaveCommunityMutationKey(), getParticipationControllerLeaveCommunityMutationOptions(), getParticipationControllerLeaveCommunityUrl(), participationControllerLeaveCommunity()
+
+### Community 376 - "getParticipationControllerRegisterForEventMutationOptions"
+Cohesion: 0.50
+Nodes (4): getParticipationControllerRegisterForEventMutationKey(), getParticipationControllerRegisterForEventMutationOptions(), getParticipationControllerRegisterForEventUrl(), participationControllerRegisterForEvent()
+
 ## Ambiguous Edges - Review These
 - `Tasks 147–149 blocked on approved legal and privacy inputs` → `18+ declaration, legal acceptance, privacy export and provider-deletion retry foundations`  [AMBIGUOUS]
   docs/project_handoff.md · relation: conceptually_related_to
@@ -1324,21 +1431,21 @@ Nodes (4): getPrivacyControllerStatusQueryKey(), getPrivacyControllerStatusQuery
 ## Knowledge Gaps
 - **102 isolated node(s):** `../tsconfig.base.json`, `../tsconfig.base.json`, `community`, `event`, `./tsconfig.json` (+97 more)
   These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1906 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **126 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **123 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `@tanstack/react-query` connect `Client Routing and Localization` to `React Forms and Controls`, `Participation API Client`, `organizations.ts`, `Discussions API Client`, `Button`, `Shared Client Interaction Controls`, `messaging.ts`, `Client Runtime Dependencies`, `privacy.ts`, `ResourceDetailsPage.tsx`, `discovery.ts`, `Moderation API Client`, `Users API and Mocks`, `Communities API Client`, `Events API Client`, `OrganizationManagePage.tsx`, `Health API Client`, `PlatformModerationPage.tsx`, `Notifications API Client`?**
-  _High betweenness centrality (0.038) - this node is a cross-community bridge._
+- **Why does `@tanstack/react-query` connect `Client Routing and Localization` to `React Forms and Controls`, `Participation API Client`, `organizations.ts`, `MessagesPage.tsx`, `Discussions API Client`, `react-router`, `messaging.ts`, `Client Runtime Dependencies`, `privacy.ts`, `ResourceDetailsPage.tsx`, `discovery.ts`, `Moderation API Client`, `Users API and Mocks`, `OrganizerParticipationPanel.tsx`, `Communities API Client`, `Events API Client`, `OrganizationManagePage.tsx`, `Health API Client`, `PlatformModerationPage.tsx`, `Notifications API Client`, `CommunityTopicPage.tsx`, `PrivacyDataPage.tsx`?**
+  _High betweenness centrality (0.039) - this node is a cross-community bridge._
 - **What connects `../tsconfig.base.json`, `../tsconfig.base.json`, `community` to the rest of the system?**
   _102 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Live Browser Design Canvas` be split into smaller, more focused modules?**
   _Cohesion score 0.03136507936507937 - nodes in this community are weakly interconnected._
-- **Why does `waslFetch()` connect `waslFetch` to `Participation API Client`, `organizations.ts`, `Client Routing and Localization`, `Discussions API Client`, `messaging.ts`, `getPrivacyControllerAcceptMutationOptions`, `getPrivacyControllerCancelRequestMutationOptions`, `privacy.ts`, `discovery.ts`, `Moderation API Client`, `Users API and Mocks`, `getPrivacyControllerCreateRequestMutationOptions`, `Communities API Client`, `getPrivacyControllerDeclareAgeMutationOptions`, `getPrivacyControllerStatusQueryOptions`, `Events API Client`, `Health API Client`, `Notifications API Client`, `getPrivacyAdminControllerReviewAgeMutationOptions`, `privacyControllerExportData`, `getPrivacyControllerGetRequestQueryOptions`, `usePrivacyControllerListRequests`, `getPrivacyAdminControllerDecideMutationOptions`, `getPrivacyAdminControllerRetryMutationOptions`, `withQueryKey`?**
+- **Why does `waslFetch()` connect `Discussions API Client` to `Participation API Client`, `organizations.ts`, `MessagesPage.tsx`, `messaging.ts`, `getPrivacyControllerAcceptMutationOptions`, `getPrivacyControllerCancelRequestMutationOptions`, `privacy.ts`, `discovery.ts`, `Moderation API Client`, `Users API and Mocks`, `getPrivacyControllerCreateRequestMutationOptions`, `Communities API Client`, `getPrivacyControllerDeclareAgeMutationOptions`, `getPrivacyControllerStatusQueryOptions`, `getMessagingControllerBlockMutationOptions`, `getMessagingControllerCommunityMutationOptions`, `getMessagingControllerDirectMessageMutationOptions`, `getMessagingControllerEventMutationOptions`, `getMessagingControllerReportMutationOptions`, `Events API Client`, `Health API Client`, `Notifications API Client`, `getPrivacyAdminControllerRetentionQueryOptions`, `getPrivacyAdminControllerReviewAgeMutationOptions`, `privacyControllerExportData`, `getPrivacyControllerGetRequestQueryOptions`, `getPrivacyControllerListRequestsQueryOptions`, `getMessagingControllerUnblockMutationOptions`, `getParticipationControllerCancelEventRegistrationMutationOptions`, `getParticipationControllerCommunityCountsQueryOptions`, `getParticipationControllerCommunityMemberPreviewQueryOptions`, `getParticipationControllerCommunityMembersQueryOptions`, `getParticipationControllerCommunityParticipantsQueryOptions`, `getParticipationControllerEventAttendeesQueryOptions`, `getParticipationControllerEventCountsQueryOptions`, `getParticipationControllerEventDecisionMutationOptions`, `getParticipationControllerJoinCommunityMutationOptions`, `getParticipationControllerLeaveCommunityMutationOptions`, `getParticipationControllerRegisterForEventMutationOptions`, `getPrivacyAdminControllerRetryMutationOptions`?**
   _High betweenness centrality (0.021) - this node is a cross-community bridge._
-- **Should `@nestjs/common` be split into smaller, more focused modules?**
-  _Cohesion score 0.10935143288084465 - nodes in this community are weakly interconnected._
+- **Should `app.module.ts` be split into smaller, more focused modules?**
+  _Cohesion score 0.1099290780141844 - nodes in this community are weakly interconnected._
 
 ### Low-confidence Hints
 _AMBIGUOUS edges — the extractor was unsure. Verify before acting on these._

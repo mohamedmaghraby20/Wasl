@@ -1,5 +1,4 @@
-import { ArrowRight, SearchX } from 'lucide-react';
-import { Link } from 'react-router';
+import { SearchX } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { CommunityPublicDto, EventPublicDto } from '@/api/generated/wasl-client.schemas';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -19,8 +18,6 @@ export function DiscoverySection({
   error,
   onRetry,
   hasMore,
-  showExploreAll,
-  exploreHref,
   onPageChange,
 }: {
   kind: ResourceKind;
@@ -32,8 +29,6 @@ export function DiscoverySection({
   error: boolean;
   onRetry: () => void;
   hasMore: boolean;
-  showExploreAll: boolean;
-  exploreHref: string;
   onPageChange: (page: number) => void;
 }): React.JSX.Element {
   const { t, i18n } = useTranslation();
@@ -54,15 +49,6 @@ export function DiscoverySection({
             </p>
           ) : null}
         </div>
-        {showExploreAll && (
-          <Link
-            className="inline-flex items-center gap-1 text-sm font-semibold text-primary-soft-text hover:underline"
-            to={exploreHref}
-          >
-            {t('exploreAll')}
-            <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />
-          </Link>
-        )}
       </div>
 
       {loading ? (
@@ -105,7 +91,7 @@ export function DiscoverySection({
         </div>
       )}
 
-      {!showExploreAll && !loading && !error && results && results.length > 0 && (
+      {!loading && !error && results && results.length > 0 && (
         <DiscoveryPagination page={page} canGoForward={hasMore} onPageChange={onPageChange} />
       )}
     </section>

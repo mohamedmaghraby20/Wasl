@@ -1,5 +1,4 @@
 ﻿import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
 import { DiscoveryFilters } from './DiscoveryFilters';
 import { DiscoverySection } from './DiscoverySection';
 import { usePageMetadata } from './usePageMetadata';
@@ -17,55 +16,25 @@ export function DiscoveryPage(): React.JSX.Element {
     cities,
     categories,
     updateFilter,
+    changeKind,
     changePage,
     clearFilters,
-    allPath,
-    communityPath,
-    eventPath,
   } = useDiscoveryPageState(i18n.language);
-  const title = kind === 'all' ? t('discover') : t(kind);
-  const communityTitle = kind === 'all' ? t('communities') : t('communityResults');
-  const eventTitle = kind === 'all' ? t('events') : t('eventResults');
+  const isCommunity = kind === 'communities';
+  const results = isCommunity ? communities : events;
 
-  usePageMetadata(title, t('discoverIntro'));
-
-  const tabs = [
-    { key: 'all', label: t('discover'), to: allPath },
-    { key: 'communities', label: t('communities'), to: communityPath },
-    { key: 'events', label: t('events'), to: eventPath },
-  ];
+  usePageMetadata(t('discover'), t('discoverIntro'));
 
   return (
     <section className="grid gap-8" aria-labelledby="discovery-title">
-      <header className="grid gap-4">
-        <div className="grid gap-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary-soft-text">
-            {t('brand')}
-          </p>
-          <h1 className="text-3xl font-extrabold sm:text-4xl" id="discovery-title">
-            {title}
-          </h1>
-          <p className="max-w-2xl text-text-muted">{t('discoverIntro')}</p>
-        </div>
-
-        <nav aria-label={t('resourceTypesNavigation')}>
-          <div className="inline-flex flex-wrap items-center gap-1 rounded-full border border-border bg-surface-soft p-1">
-            {tabs.map((tab) => (
-              <Link
-                aria-current={kind === tab.key ? 'page' : undefined}
-                className={
-                  kind === tab.key
-                    ? 'rounded-full bg-card px-4 py-1.5 text-sm font-semibold text-text shadow-xs'
-                    : 'rounded-full px-4 py-1.5 text-sm font-medium text-text-muted transition-colors hover:text-text'
-                }
-                key={tab.key}
-                to={tab.to}
-              >
-                {tab.label}
-              </Link>
-            ))}
-          </div>
-        </nav>
+      <header className="grid gap-2">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary-soft-text">
+          {t('brand')}
+        </p>
+        <h1 className="text-3xl font-extrabold sm:text-4xl" id="discovery-title">
+          {t('discover')}
+        </h1>
+        <p className="max-w-2xl text-text-muted">{t('discoverIntro')}</p>
       </header>
 
       <DiscoveryFilters
@@ -87,40 +56,21 @@ export function DiscoveryPage(): React.JSX.Element {
         onClear={clearFilters}
         onSearch={(value) => updateFilter('q', value)}
         onFilterChange={updateFilter}
+        onKindChange={changeKind}
       />
 
-      {kind !== 'events' && (
-        <DiscoverySection
-          kind="communities"
-          title={communityTitle}
-          total={communities.data?.total}
-          results={communities.data?.items}
-          page={page}
-          loading={communities.isPending}
-          error={communities.isError}
-          onRetry={() => void communities.refetch()}
-          hasMore={communities.data?.hasMore ?? false}
-          showExploreAll={kind === 'all'}
-          exploreHref={communityPath}
-          onPageChange={changePage}
-        />
-      )}
-      {kind !== 'communities' && (
-        <DiscoverySection
-          kind="events"
-          title={eventTitle}
-          total={events.data?.total}
-          results={events.data?.items}
-          page={page}
-          loading={events.isPending}
-          error={events.isError}
-          onRetry={() => void events.refetch()}
-          hasMore={events.data?.hasMore ?? false}
-          showExploreAll={kind === 'all'}
-          exploreHref={eventPath}
-          onPageChange={changePage}
-        />
-      )}
+      <DiscoverySection
+        kind={kind}
+        title={isCommunity ? t('communityResults') : t('eventResults')}
+        total={results.data?.total}
+        results={results.data?.items}
+        page={page}
+        loading={results.isPending}
+        error={results.isError}
+        onRetry={() => void results.refetch()}
+        hasMore={results.data?.hasMore ?? false}
+        onPageChange={changePage}
+      />
     </section>
   );
 }
