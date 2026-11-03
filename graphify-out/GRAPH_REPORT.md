@@ -1,7 +1,7 @@
 # Graph Report - discover-unified  (2026-11-03)
 
 ## Corpus Check
-- 733 files · ~736,208 words
+- 733 files · ~736,192 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 54 file(s) not represented in the graph (top: .csv 37, .css 8, (none) 5)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `d3435011`
+- Built from commit: `e7b4e424`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 

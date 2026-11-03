@@ -546,9 +546,9 @@
     "semantic_hash": ""
   },
   "client/src/app/RootLayout.tsx": {
-    "mtime": 1793712503.8456903,
-    "seen": 1793712954.961967,
-    "ast_hash": "459ee69a42cebd1cd4cd86d463c65af0",
+    "mtime": 1793713113.3206694,
+    "seen": 1793713221.7248735,
+    "ast_hash": "84e0773c9cc452263178dc446e71b7d0",
     "semantic_hash": ""
   },
   "client/src/app/RouteErrorBoundary.tsx": {
@@ -3378,9 +3378,9 @@
     "semantic_hash": ""
   },
   "client/e2e/home-geolocation.spec.ts": {
-    "mtime": 1793712503.8082113,
-    "seen": 1793712954.9619124,
-    "ast_hash": "8f3e96098326eccfd7e9a67ef19f01a8",
+    "mtime": 1793713113.338286,
+    "seen": 1793713221.7211342,
+    "ast_hash": "80f5f45c545eb4fb343889066df690e4",
     "semantic_hash": ""
   },
   "client/e2e/home-interests.spec.ts": {

@@ -35,8 +35,6 @@ import { requiresAuthentication } from './auth-routes';
 const primaryLinks = [
   { key: 'home', to: '/', end: true },
   { key: 'discover', to: '/discover', end: false },
-  { key: 'communities', to: '/communities', end: false },
-  { key: 'events', to: '/events', end: false },
 ] as const;
 
 const accountLinks = [
