@@ -78,45 +78,66 @@ export function resolveProvinceCity(
   ) {
     return null;
   }
+  // Discovery needs the city at the estimated point, not certainty across the entire accuracy circle.
   let match: string | undefined;
   for (const province of provinces) {
     const result = classify(province.geometry, longitude, latitude);
     if (result === 'boundary') return null;
-    // A shoreline is not a competing city; reject uncertainty only when it reaches another province.
-    if (result === 'outside' && nearBoundary(province.geometry, longitude, latitude, accuracy + 100)) return null;
     if (result === 'inside') {
       if (match !== undefined) return null;
       match = province.id;
     }
   }
+  if (match !== undefined) return match;
+  return nearestProvince(provinces, longitude, latitude, accuracy);
+}
+
+// The bundled outlines are generalized, so a real fix can land just outside the correct province.
+function nearestProvince(
+  provinces: ProvinceBoundary[],
+  longitude: number,
+  latitude: number,
+  accuracy: number,
+): string | null {
+  const tolerance = Math.min(accuracy + 100, 1_000);
+  let match: string | undefined;
+  for (const province of provinces) {
+    if (distanceToBoundary(province.geometry, longitude, latitude) > tolerance) continue;
+    // Two possible provinces are not an estimate; leave the choice to the visitor.
+    if (match !== undefined) return null;
+    match = province.id;
+  }
   return match ?? null;
 }
 
-function nearBoundary(
+function distanceToBoundary(
   geometry: ProvinceGeometry,
   longitude: number,
   latitude: number,
-  radius: number,
-): boolean {
-  const polygons = geometry.type === 'Polygon' ? [geometry.coordinates] : geometry.coordinates;
+): number {
+  const polygons =
+    geometry.type === 'Polygon' ? [geometry.coordinates] : geometry.coordinates;
   const xScale = 111_320 * Math.cos((latitude * Math.PI) / 180);
   const yScale = 110_574;
+  let nearest = Infinity;
   for (const rings of polygons) {
     for (const ring of rings) {
       for (let index = 1; index < ring.length; index += 1) {
-        const start = ring[index - 1]!;
-        const end = ring[index]!;
+        const start = ring[index - 1];
+        const end = ring[index];
+        if (!start || !end) continue;
         const x = (start[0]! - longitude) * xScale;
         const y = (start[1]! - latitude) * yScale;
         const dx = (end[0]! - start[0]!) * xScale;
         const dy = (end[1]! - start[1]!) * yScale;
         const lengthSquared = dx * dx + dy * dy;
-        const projection = lengthSquared === 0 ? 0 : Math.max(0, Math.min(1, -(x * dx + y * dy) / lengthSquared));
-        if (Math.hypot(x + projection * dx, y + projection * dy) <= radius) return true;
+        const projection =
+          lengthSquared === 0 ? 0 : Math.max(0, Math.min(1, -(x * dx + y * dy) / lengthSquared));
+        nearest = Math.min(nearest, Math.hypot(x + projection * dx, y + projection * dy));
       }
     }
   }
-  return false;
+  return nearest;
 }
 
 type Classification = 'inside' | 'outside' | 'boundary';

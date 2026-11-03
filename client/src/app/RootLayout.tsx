@@ -159,7 +159,14 @@ export function RootLayout(): React.JSX.Element {
             </Button>
             {user ? (
               <>
-                <Button asChild aria-label={t('create')} title={t('create')} className="hidden sm:inline-flex" size="icon-sm" variant="secondary">
+                <Button
+                  asChild
+                  aria-label={t('create')}
+                  title={t('create')}
+                  className="hidden sm:inline-flex"
+                  size="icon-sm"
+                  variant="secondary"
+                >
                   <Link to="/create">
                     <Plus aria-hidden="true" />
                   </Link>
@@ -314,7 +321,7 @@ export function RootLayout(): React.JSX.Element {
         </div>
       </header>
       <main
-        className="mx-auto w-full max-w-(--container-max) flex-1 px-4 py-8 outline-none sm:px-6 sm:py-12"
+        className={`mx-auto w-full flex-1 px-4 py-8 outline-none sm:px-6 sm:py-12 ${pathname === '/' && user ? 'lg:px-8' : 'max-w-(--container-max)'}`}
         id="main-content"
         ref={mainRef}
         tabIndex={-1}

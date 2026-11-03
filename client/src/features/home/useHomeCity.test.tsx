@@ -11,7 +11,7 @@ const cities: CityPublicDto[] = [
 ];
 const position: GeolocationPosition = {
   coords: {
-    longitude: 28.9784, latitude: 41.0082, accuracy: 5_000,
+    longitude: 28.9784, latitude: 41.0082, accuracy: 50_000,
     altitude: null, altitudeAccuracy: null, heading: null, speed: null,
     toJSON: () => ({}),
   },

@@ -28,15 +28,14 @@ export function ResourceCard({
   const CoverIcon = event ? CalendarDays : UsersRound;
   const remaining =
     event?.capacity == null ? null : Math.max(0, event.capacity - event.acceptedRegistrationCount);
+  const attendeeCount =
+    event?.acceptedRegistrationCount ?? ('memberCount' in item ? item.memberCount : null);
 
   return (
-    <article className="group relative flex min-w-0 flex-col gap-4 rounded-(--shape-radius-card) border border-border bg-card p-5 shadow-xs transition-[box-shadow,translate,border-color] duration-(--motion-duration-base) ease-(--motion-ease-standard) hover:-translate-y-0.5 hover:border-border-strong hover:shadow-md motion-reduce:transform-none motion-reduce:transition-none has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-ring has-[a:focus-visible]:ring-offset-2 has-[a:focus-visible]:ring-offset-background">
-      <div
-        aria-hidden="true"
-        className="-mx-5 -mt-5 grid aspect-video place-items-center overflow-hidden rounded-t-(--shape-radius-card) bg-primary-soft text-primary-soft-text"
-      >
+    <article className="group relative flex min-w-0 flex-col overflow-hidden rounded-(--shape-radius-card) border border-border bg-card shadow-xs transition-[box-shadow,translate,border-color] duration-(--motion-duration-base) ease-(--motion-ease-standard) hover:-translate-y-0.5 hover:border-border-strong hover:shadow-md motion-reduce:transform-none motion-reduce:transition-none has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-ring has-[a:focus-visible]:ring-offset-2 has-[a:focus-visible]:ring-offset-background">
+      <div className="relative grid aspect-video place-items-center overflow-hidden bg-primary-soft text-primary-soft-text">
         {failedCover === cover ? (
-          <CoverIcon className="size-10" strokeWidth={1.75} />
+          <CoverIcon aria-hidden="true" className="size-10" strokeWidth={1.75} />
         ) : (
           <img
             alt=""
@@ -49,33 +48,14 @@ export function ResourceCard({
             width={1200}
           />
         )}
-      </div>
-      {(event && date) || firstCategory ? (
-        <div className="flex items-start justify-between gap-3">
-          {event && date ? (
-            <div className="flex items-center gap-2.5">
-              <div className="grid w-11 shrink-0 place-items-center rounded-lg bg-primary-soft py-1.5 text-primary-soft-text">
-                <span className="text-[0.625rem] font-bold uppercase leading-none tracking-wide">
-                  {date.month}
-                </span>
-                <span className="mt-0.5 text-lg font-bold leading-none">{date.day}</span>
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs font-semibold uppercase tracking-wide text-text-subtle">
-                  {date.weekday}
-                </p>
-                <p className="text-sm font-medium text-text">{date.time}</p>
-              </div>
-            </div>
-          ) : (
-            <span />
-          )}
-          <div className="flex flex-wrap justify-end gap-1.5">
-            {firstCategory ? (
-              <Badge variant="outline">{localizedName(firstCategory, i18n.language)}</Badge>
-            ) : null}
+        {firstCategory ? (
+          <div className="absolute start-3 top-3 flex flex-wrap items-center gap-1.5">
+            <Badge className="bg-card" variant="outline">
+              {localizedName(firstCategory, i18n.language)}
+            </Badge>
             {otherCategories.length > 0 ? (
               <Badge
+                className="bg-card"
                 title={otherCategories
                   .map((category) => localizedName(category, i18n.language))
                   .join(', ')}
@@ -85,11 +65,10 @@ export function ResourceCard({
               </Badge>
             ) : null}
           </div>
-        </div>
-      ) : null}
-
-      <div className="grid gap-2">
-        <h3 className="text-lg font-semibold leading-snug tracking-tight">
+        ) : null}
+      </div>
+      <div className="grid flex-1 content-start gap-2 p-4">
+        <h3 className="line-clamp-2 text-base font-semibold leading-snug tracking-tight">
           <Link
             className="rounded-sm transition-colors group-hover:text-primary-soft-text focus-visible:outline-none after:absolute after:inset-0 after:rounded-(--shape-radius-card) after:content-['']"
             to={`/${kind}/${item.slug}`}
@@ -97,55 +76,75 @@ export function ResourceCard({
             {localizedResourceTitle(item)}
           </Link>
         </h3>
-        <p className="line-clamp-2 text-sm leading-relaxed text-text-muted">{item.description}</p>
-      </div>
-
-      {kind === 'communities' && 'memberCount' in item ? (
-        <p className="text-sm text-text-muted">
-          {t('communityMemberCount', { count: item.memberCount })}
-        </p>
-      ) : null}
-      {event ? (
-        <div className="mt-auto grid gap-1.5 text-sm">
-          <p className="text-text-muted">
-            {t('eventRegisteredCount', { count: event.acceptedRegistrationCount })}
+        {event && date ? (
+          <p className="flex flex-wrap items-center gap-x-1.5 text-sm text-text-muted">
+            <span>
+              {date.weekday}, {date.month} {date.day}
+            </span>
+            <span aria-hidden="true">·</span>
+            <span>{date.time}</span>
           </p>
-          {!event.cancelled ? (
-            <>
-              <p
-                className={`font-medium ${remaining === 0 ? 'text-warning' : 'text-primary-soft-text'}`}
-              >
-                {remaining === null
-                  ? t('eventUnlimitedCapacity')
-                  : remaining === 0
-                    ? t('eventFullWaitlist')
-                    : t('eventPlacesLeft', { count: remaining })}
-              </p>
-              {event.admissionMode === 'approval' ? (
-                <p className="text-text-muted">{t('eventApprovalRequired')}</p>
-              ) : null}
-            </>
+        ) : null}
+        {event && !event.cancelled ? (
+          <div className="flex flex-wrap gap-1.5">
+            <Badge variant={remaining === 0 ? 'warning' : remaining === null ? 'neutral' : 'primary'}>
+              {remaining === null
+                ? t('eventUnlimitedCapacity')
+                : remaining === 0
+                  ? t('eventFullWaitlist')
+                  : t('eventPlacesLeft', { count: remaining })}
+            </Badge>
+            {event.admissionMode === 'approval' ? (
+              <Badge variant="neutral">{t('eventApprovalRequired')}</Badge>
+            ) : null}
+          </div>
+        ) : null}
+        <div className="mt-auto grid gap-2 border-t border-border pt-3 text-xs text-text-subtle">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
+            <span className="inline-flex min-w-0 items-center gap-1.5">
+              <UsersRound aria-hidden="true" className="size-3.5 shrink-0" />
+              <span className="truncate">{item.hostName}</span>
+            </span>
+            <span className="inline-flex min-w-0 items-center gap-1.5">
+              {event?.online ? (
+                <Video aria-hidden="true" className="size-3.5 shrink-0" />
+              ) : (
+                <MapPin aria-hidden="true" className="size-3.5 shrink-0" />
+              )}
+              <span className="truncate">
+                {event?.online ? t('online') : (item.cityName ?? '')}
+              </span>
+            </span>
+            {event?.cancelled ? (
+              <Badge className="ms-auto" variant="danger">
+                {t('cancelled')}
+              </Badge>
+            ) : null}
+          </div>
+          {attendeeCount !== null ? (
+            <div className="flex items-center gap-2">
+              <span aria-hidden="true" className="flex -space-x-1.5">
+                {[
+                  'bg-primary-soft text-primary-soft-text',
+                  'bg-surface-soft text-text-muted',
+                  'bg-warning-soft text-warning',
+                ].map((tone) => (
+                  <span
+                    className={`grid size-6 place-items-center rounded-full border-2 border-card ${tone}`}
+                    key={tone}
+                  >
+                    <UsersRound className="size-3.5" />
+                  </span>
+                ))}
+              </span>
+              <span className="text-sm font-semibold text-text">
+                {event
+                  ? t('eventRegisteredCount', { count: attendeeCount })
+                  : t('communityMemberCount', { count: attendeeCount })}
+              </span>
+            </div>
           ) : null}
         </div>
-      ) : null}
-      <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-border pt-3 text-xs text-text-subtle">
-        <span className="inline-flex min-w-0 items-center gap-1.5">
-          <UsersRound aria-hidden="true" className="size-3.5 shrink-0" />
-          <span className="truncate">{item.hostName}</span>
-        </span>
-        <span className="inline-flex min-w-0 items-center gap-1.5">
-          {event?.online ? (
-            <Video aria-hidden="true" className="size-3.5 shrink-0" />
-          ) : (
-            <MapPin aria-hidden="true" className="size-3.5 shrink-0" />
-          )}
-          <span className="truncate">{event?.online ? t('online') : (item.cityName ?? '')}</span>
-        </span>
-        {event?.cancelled ? (
-          <Badge className="ms-auto" variant="danger">
-            {t('cancelled')}
-          </Badge>
-        ) : null}
       </div>
     </article>
   );

@@ -196,6 +196,8 @@ When the user corrects your approach, append a one-line rule here before ending 
 - Use the reusable typed-name deletion workflow for every delete action, including impact warnings, pending/error states, and completion feedback.
 - Give community category legends explicit bottom spacing; fieldset grid gaps do not separate the legend from its options.
 - Request native browser location permission automatically on home-page entry; use manual city selection as fallback, without a custom consent question or location button.
+- Show optional geolocation failures as neutral guidance, not red alerts; infer discovery city from the estimated point rather than requiring its whole accuracy radius to fit one province.
+- Give the signed-in home sidebar its own column outside the narrow app content width; use the available viewport and keep event cards comfortably wide, with the sidebar on the left in English and mirrored in Arabic.
 
 ---
 
