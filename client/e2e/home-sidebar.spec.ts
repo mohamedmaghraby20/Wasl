@@ -65,9 +65,26 @@ for (const language of ['en', 'ar']) {
           path.endsWith('/discovery/categories')
         )
           return route.fulfill({ json: [] });
-        return route.fulfill({
-          json: { items: [], page: 1, pageSize: 4, total: 0, hasMore: false },
-        });
+        const items = Array.from({ length: 4 }, (_, index) => ({
+          id: `discovery-${index}`,
+          slug: `discovery-${index}`,
+          name: `Community ${index + 1}`,
+          title: `Gathering ${index + 1}`,
+          description: 'Meet people who share your interests.',
+          hostName: 'Wasl friends',
+          hostType: 'user',
+          online: false,
+          cityName: 'Ankara',
+          categories: [],
+          startsAt: '2099-01-01T12:00:00Z',
+          cancelled: false,
+          visibility: 'public',
+          admissionMode: 'approval',
+          capacity: 10,
+          acceptedRegistrationCount: 4,
+          memberCount: 12,
+        }));
+        return route.fulfill({ json: { items, page: 1, pageSize: 4, total: 4, hasMore: false } });
       });
       await page.goto('/');
       await expect(page.locator('aside')).toHaveCount(0);
@@ -86,9 +103,13 @@ for (const language of ['en', 'ar']) {
       expect(await page.locator('html').evaluate((el) => el.scrollWidth <= innerWidth)).toBe(true);
       const box = (await sidebar.boundingBox())!;
       const discovery = (await page.locator('#events-heading').boundingBox())!;
-      if (width === 1440)
-        expect(language === 'en' ? box.x > discovery.x : box.x < discovery.x).toBe(true);
-      else expect(box.y + box.height <= discovery.y).toBe(true);
+      if (width === 1440) {
+        expect(language === 'en' ? box.x < discovery.x : box.x > discovery.x).toBe(true);
+        expect((await page.locator('main').boundingBox())!.width).toBeGreaterThan(1380);
+        expect(
+          (await page.locator('#events-cards article').first().boundingBox())!.width,
+        ).toBeGreaterThanOrEqual(340);
+      } else expect(box.y + box.height <= discovery.y).toBe(true);
       await page.screenshot({ path: testInfo.outputPath('sidebar.png'), fullPage: true });
       await sidebar
         .getByRole('link', { name: language === 'en' ? 'See all your events' : 'عرض كل فعالياتك' })

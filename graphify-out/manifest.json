@@ -546,9 +546,9 @@
     "semantic_hash": ""
   },
   "client/src/app/RootLayout.tsx": {
-    "mtime": 1793651041.4722328,
-    "seen": 1793701321.4626052,
-    "ast_hash": "684d7beb5a696a9716f9dd33249d498f",
+    "mtime": 1793704873.5737941,
+    "seen": 1793704964.241198,
+    "ast_hash": "48109b38249ba595e7cf32c745403c5f",
     "semantic_hash": ""
   },
   "client/src/app/RouteErrorBoundary.tsx": {
@@ -1032,15 +1032,15 @@
     "semantic_hash": ""
   },
   "client/src/features/home/HomePage.tsx": {
-    "mtime": 1793703879.0581307,
-    "seen": 1793703892.3719046,
-    "ast_hash": "c88d2213e345fc615c22936ec3c5ade8",
+    "mtime": 1793704873.6437838,
+    "seen": 1793704964.247359,
+    "ast_hash": "f2c46afedc2fc3d58da27e9363717928",
     "semantic_hash": ""
   },
   "client/src/features/home/HomeSection.tsx": {
-    "mtime": 1793702620.4688144,
-    "seen": 1793702706.8977268,
-    "ast_hash": "b202ddceaff2420bb45aa8765e40b8b6",
+    "mtime": 1793704873.6814115,
+    "seen": 1793704964.2473621,
+    "ast_hash": "75c1e6f08c95c271076dc43452ee3ec2",
     "semantic_hash": ""
   },
   "client/src/features/messaging/MessagesConversation.test.tsx": {
@@ -1314,9 +1314,9 @@
     "semantic_hash": ""
   },
   "client/src/features/resources/ResourceCard.tsx": {
-    "mtime": 1793702287.3718755,
-    "seen": 1793702494.0365686,
-    "ast_hash": "f6cea6bccb23a5dee98974c8014eb420",
+    "mtime": 1793704660.5361092,
+    "seen": 1793704799.122379,
+    "ast_hash": "e8d6256218637de1db76a417856ef793",
     "semantic_hash": ""
   },
   "client/src/features/resources/resource-utils.ts": {
@@ -3174,9 +3174,9 @@
     "semantic_hash": ""
   },
   "AGENTS.md": {
-    "mtime": 1793703772.5366397,
-    "seen": 1793703892.4268386,
-    "ast_hash": "86dd8a70fdf95579ac8ad0d77a7f35de",
+    "mtime": 1793704837.1130872,
+    "seen": 1793704964.2835584,
+    "ast_hash": "c98155ef3e1e4c7723beb8493ef57631",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
@@ -4446,9 +4446,9 @@
     "semantic_hash": ""
   },
   "client/e2e/home-sidebar.spec.ts": {
-    "mtime": 1793703811.9316845,
-    "seen": 1793703892.3586195,
-    "ast_hash": "98aa1e0cfd4262fc53e88a359b3273ef",
+    "mtime": 1793704873.723538,
+    "seen": 1793704964.2380192,
+    "ast_hash": "398182e2360dea156355a2bf2ef527a3",
     "semantic_hash": ""
   },
   "client/src/features/home/PersonalSidebar.test.tsx": {

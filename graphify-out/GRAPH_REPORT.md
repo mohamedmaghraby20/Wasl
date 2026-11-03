@@ -1,7 +1,7 @@
 # Graph Report - Wasl  (2026-11-03)
 
 ## Corpus Check
-- 733 files · ~735,698 words
+- 733 files · ~735,881 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 53 file(s) not represented in the graph (top: .csv 37, .css 8, (none) 4)
 

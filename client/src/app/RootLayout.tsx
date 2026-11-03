@@ -314,7 +314,7 @@ export function RootLayout(): React.JSX.Element {
         </div>
       </header>
       <main
-        className="mx-auto w-full max-w-(--container-max) flex-1 px-4 py-8 outline-none sm:px-6 sm:py-12"
+        className={`mx-auto w-full flex-1 px-4 py-8 outline-none sm:px-6 sm:py-12 ${pathname === '/' && user ? 'lg:px-8' : 'max-w-(--container-max)'}`}
         id="main-content"
         ref={mainRef}
         tabIndex={-1}

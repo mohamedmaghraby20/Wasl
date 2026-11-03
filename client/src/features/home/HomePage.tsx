@@ -102,10 +102,12 @@ export function HomePage(): React.JSX.Element {
     ogType: 'website',
   });
   return (
-    <div className="grid min-w-0 gap-8 sm:gap-10">
+    <div
+      className={`grid min-w-0 gap-8 sm:gap-10 ${user ? 'xl:grid-cols-[clamp(18rem,24vw,26rem)_minmax(0,1fr)] xl:items-start xl:gap-x-12' : ''}`}
+    >
       <section
         aria-labelledby="home-hero-heading"
-        className="rounded-(--shape-radius-xl) border border-primary/20 bg-primary-soft"
+        className={`order-1 rounded-(--shape-radius-xl) border border-primary/20 bg-primary-soft ${user ? 'xl:col-start-2' : ''}`}
       >
         <div className="grid items-center gap-5 p-5 sm:p-6 lg:grid-cols-[0.8fr_1.2fr] lg:gap-8 lg:p-8">
           <div className="grid content-center gap-3">
@@ -189,65 +191,62 @@ export function HomePage(): React.JSX.Element {
         </div>
       </section>
 
-      <div
-        className={
-          user ? 'grid min-w-0 items-start gap-6 xl:grid-cols-[minmax(0,1fr)_20rem]' : 'min-w-0'
-        }
-      >
-        {user ? (
-          <div className="mb-8 min-w-0 xl:order-2 xl:mb-0">
-            <PersonalSidebar />
-          </div>
-        ) : null}
-        <div className="grid min-w-0 gap-8 sm:gap-10 xl:order-1">
-          <HomeSection
-            title={
-              cityId && !fallback
-                ? t('upcomingEventsInCity', { city: cityName })
-                : t('upcomingEventsNationwide')
-            }
-            kind="events"
-            language={i18n.language}
-            items={events.data?.items}
-            isPending={events.isPending}
-            isError={events.isError}
-            onRetry={() => void events.refetch()}
-            viewAll={`/events?${eventDestination}`}
-          />
-          <HomeSection
-            title={
-              cityId && !communityFallback
-                ? t('communitiesInCity', { city: cityName })
-                : t('communitiesNationwide')
-            }
-            kind="communities"
-            language={i18n.language}
-            items={communities.data?.items}
-            isPending={communities.isPending}
-            isError={communities.isError}
-            onRetry={() => void communities.refetch()}
-            viewAll={`/communities?${communityDestination}`}
-          />
-          {!onlineEmpty && (
-            <HomeSection
-              title={t('upcomingOnlineEvents')}
-              kind="events"
-              sectionId="online-events"
-              language={i18n.language}
-              items={onlineEvents.data?.items}
-              isPending={onlineEvents.isPending}
-              isError={onlineEvents.isError}
-              onRetry={() => void onlineEvents.refetch()}
-              viewAll={`/events?${onlineDestination}`}
-            />
-          )}
-          <HomeInterests cityId={cityId} />
+      {user ? (
+        <div className="order-2 min-w-0 xl:col-start-1 xl:row-start-1 xl:row-span-3">
+          <PersonalSidebar />
         </div>
+      ) : null}
+      <div className={`order-3 grid min-w-0 gap-8 sm:gap-10 ${user ? 'xl:col-start-2' : ''}`}>
+        <HomeSection
+          wideCards={Boolean(user)}
+          title={
+            cityId && !fallback
+              ? t('upcomingEventsInCity', { city: cityName })
+              : t('upcomingEventsNationwide')
+          }
+          kind="events"
+          language={i18n.language}
+          items={events.data?.items}
+          isPending={events.isPending}
+          isError={events.isError}
+          onRetry={() => void events.refetch()}
+          viewAll={`/events?${eventDestination}`}
+        />
+        <HomeSection
+          wideCards={Boolean(user)}
+          title={
+            cityId && !communityFallback
+              ? t('communitiesInCity', { city: cityName })
+              : t('communitiesNationwide')
+          }
+          kind="communities"
+          language={i18n.language}
+          items={communities.data?.items}
+          isPending={communities.isPending}
+          isError={communities.isError}
+          onRetry={() => void communities.refetch()}
+          viewAll={`/communities?${communityDestination}`}
+        />
+        {!onlineEmpty && (
+          <HomeSection
+            wideCards={Boolean(user)}
+            title={t('upcomingOnlineEvents')}
+            kind="events"
+            sectionId="online-events"
+            language={i18n.language}
+            items={onlineEvents.data?.items}
+            isPending={onlineEvents.isPending}
+            isError={onlineEvents.isError}
+            onRetry={() => void onlineEvents.refetch()}
+            viewAll={`/events?${onlineDestination}`}
+          />
+        )}
+        <HomeInterests cityId={cityId} />
       </div>
       {!authLoading && !user ? (
         <section
           aria-labelledby="home-signup-heading"
-          className="flex flex-wrap items-center justify-between gap-4 rounded-(--shape-radius-xl) bg-primary-soft p-5 sm:p-6"
+          className="order-4 flex flex-wrap items-center justify-between gap-4 rounded-(--shape-radius-xl) bg-primary-soft p-5 sm:p-6"
         >
           <div className="grid gap-2">
             <h2 id="home-signup-heading" className="text-xl font-bold sm:text-2xl">
@@ -262,7 +261,7 @@ export function HomePage(): React.JSX.Element {
       ) : null}
       <section
         aria-labelledby="home-create-heading"
-        className="flex flex-wrap items-center justify-between gap-4 border-t border-border pt-6"
+        className={`order-5 flex flex-wrap items-center justify-between gap-4 border-t border-border pt-6 ${user ? 'xl:col-start-2' : ''}`}
       >
         <div className="grid gap-2">
           <h2 id="home-create-heading" className="text-xl font-bold sm:text-2xl">
