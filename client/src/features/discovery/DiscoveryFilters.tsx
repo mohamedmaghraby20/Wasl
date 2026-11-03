@@ -10,7 +10,7 @@ import { SearchableSelect } from '@/components/ui/SearchableSelect';
 import { SearchInput } from '@/components/ui/SearchInput';
 import { Select } from '@/components/ui/Select';
 import { localizedName } from '@/features/resources/resource-utils';
-import type { DiscoveryKind } from './discovery-utils';
+import type { ResourceKind } from '@/features/resources/resource-utils';
 
 const filterControlClass = 'shrink-0 sm:w-44';
 
@@ -45,12 +45,13 @@ export function DiscoveryFilters({
   categoriesPending,
   onSearch,
   onFilterChange,
+  onKindChange,
   onRetryCities,
   onRetryCategories,
   showClear,
   onClear,
 }: {
-  kind: DiscoveryKind;
+  kind: ResourceKind;
   searchValue: string;
   cityValue: string;
   categoryValue: string;
@@ -64,6 +65,7 @@ export function DiscoveryFilters({
   categoriesPending: boolean;
   onSearch: (value: string) => void;
   onFilterChange: (key: 'city' | 'category' | 'from' | 'to', value: string) => void;
+  onKindChange: (kind: ResourceKind) => void;
   onRetryCities: () => void;
   onRetryCategories: () => void;
   showClear: boolean;
@@ -150,6 +152,16 @@ export function DiscoveryFilters({
       </div>
 
       <div className="grid grid-cols-2 items-center gap-2 sm:flex sm:flex-wrap">
+        <Select
+          aria-label={t('typeFilter')}
+          className={filterControlClass}
+          onValueChange={(value) => onKindChange(value as ResourceKind)}
+          options={[
+            { value: 'events', label: t('events') },
+            { value: 'communities', label: t('communities') },
+          ]}
+          value={kind}
+        />
         <SearchableSelect
           aria-busy={citiesPending}
           aria-label={cityValue ? `${t('cityFilter')}: ${cityName}` : t('allCities')}
