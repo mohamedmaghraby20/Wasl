@@ -1,10 +1,8 @@
-import { LocateFixed } from 'lucide-react';
 import { useState } from 'react';
 import { Form, Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useSeoMeta } from '@unhead/react';
 import { Button } from '@/components/ui/Button';
-import { IconButton } from '@/components/ui/IconButton';
 import { SearchInput } from '@/components/ui/SearchInput';
 import { SearchableSelect } from '@/components/ui/SearchableSelect';
 import { QueryError } from '@/components/feedback/QueryError';
@@ -12,6 +10,7 @@ import { localizedName } from '@/features/resources/resource-utils';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { HomeSection } from './HomeSection';
 import { HomeInterests } from './HomeInterests';
+import { PersonalSidebar } from './PersonalSidebar';
 import { useHomeCity } from './useHomeCity';
 import type { LocationError } from './useHomeCity';
 import {
@@ -37,9 +36,7 @@ export function HomePage(): React.JSX.Element {
   const [query, setQuery] = useState('');
   const lang: 'ar' | 'en' = i18n.language.startsWith('ar') ? 'ar' : 'en';
   const cities = useDiscoveryControllerCities();
-  const { cityId, restoringCity, setCityId, selectedCity, location, requestLocation } = useHomeCity(
-    cities.data,
-  );
+  const { cityId, restoringCity, setCityId, selectedCity, location } = useHomeCity(cities.data);
   const cityReady = !restoringCity || cities.isError;
   const cityName = selectedCity ? localizedName(selectedCity, i18n.language) : cityId;
   const locationBusy = location.status === 'locating' || location.status === 'resolving';
@@ -103,10 +100,12 @@ export function HomePage(): React.JSX.Element {
     ogType: 'website',
   });
   return (
-    <div className="grid min-w-0 gap-8 sm:gap-10">
+    <div
+      className={`grid min-w-0 gap-8 sm:gap-10 ${user ? 'xl:grid-cols-[clamp(18rem,24vw,26rem)_minmax(0,1fr)] xl:items-start xl:gap-x-12' : ''}`}
+    >
       <section
         aria-labelledby="home-hero-heading"
-        className="rounded-(--shape-radius-xl) border border-primary/20 bg-primary-soft"
+        className={`order-1 rounded-(--shape-radius-xl) border border-primary/20 bg-primary-soft ${user ? 'xl:col-start-2' : ''}`}
       >
         <div className="grid items-center gap-5 p-5 sm:p-6 lg:grid-cols-[0.8fr_1.2fr] lg:gap-8 lg:p-8">
           <div className="grid content-center gap-3">
@@ -148,6 +147,7 @@ export function HomePage(): React.JSX.Element {
             <SearchableSelect
               aria-label={cityId ? `${t('cityFilter')}: ${cityName}` : t('nationwide')}
               aria-busy={cities.isPending}
+              className="col-span-2"
               emptyMessage={t('noCitiesFound')}
               id="home-city"
               onValueChange={setCityId}
@@ -164,18 +164,7 @@ export function HomePage(): React.JSX.Element {
               searchPlaceholder={t('searchCities')}
               value={cityId}
             />
-            <div className="flex items-center">
-              <IconButton
-                aria-describedby="home-location-privacy"
-                disabled={!cities.data}
-                icon={LocateFixed}
-                label={t('useMyLocation')}
-                onClick={requestLocation}
-                type="button"
-                variant="secondary"
-              />
-            </div>
-            <div className="col-span-2 grid gap-1">
+            <div className="col-span-2 grid gap-1 empty:hidden">
               {cities.isError ? (
                 <QueryError message={t('homeCitiesError')} onRetry={() => void cities.refetch()} />
               ) : null}
@@ -188,19 +177,10 @@ export function HomePage(): React.JSX.Element {
                   {t('locationSuccess', { city: cityName })}
                 </p>
               ) : locationError ? (
-                <p className="text-xs font-medium text-danger" role="alert">
+                <p className="text-xs text-text-muted" role="status">
                   {t(locationError)}
                 </p>
               ) : null}
-              <p id="home-location-privacy" className="text-xs text-text-muted">
-                {t('locationPrivacy')}
-              </p>
-              <a
-                className="w-fit text-[0.6875rem] text-text-subtle underline decoration-border underline-offset-2 hover:text-primary-soft-text focus-visible:text-primary-soft-text"
-                href="https://creativecommons.org/licenses/by/4.0/"
-              >
-                {t('locationAttribution')}
-              </a>
             </div>
             <Button block className="col-span-2" type="submit">
               {t('search')}
@@ -209,52 +189,62 @@ export function HomePage(): React.JSX.Element {
         </div>
       </section>
 
-      <HomeSection
-        title={
-          cityId && !fallback
-            ? t('upcomingEventsInCity', { city: cityName })
-            : t('upcomingEventsNationwide')
-        }
-        kind="events"
-        language={i18n.language}
-        items={events.data?.items}
-        isPending={events.isPending}
-        isError={events.isError}
-        onRetry={() => void events.refetch()}
-        viewAll={`/events?${eventDestination}`}
-      />
-      <HomeSection
-        title={
-          cityId && !communityFallback
-            ? t('communitiesInCity', { city: cityName })
-            : t('communitiesNationwide')
-        }
-        kind="communities"
-        language={i18n.language}
-        items={communities.data?.items}
-        isPending={communities.isPending}
-        isError={communities.isError}
-        onRetry={() => void communities.refetch()}
-        viewAll={`/communities?${communityDestination}`}
-      />
-      {!onlineEmpty && (
+      {user ? (
+        <div className="order-2 min-w-0 xl:col-start-1 xl:row-start-1 xl:row-span-3">
+          <PersonalSidebar />
+        </div>
+      ) : null}
+      <div className={`order-3 grid min-w-0 gap-8 sm:gap-10 ${user ? 'xl:col-start-2' : ''}`}>
         <HomeSection
-          title={t('upcomingOnlineEvents')}
+          wideCards={Boolean(user)}
+          title={
+            cityId && !fallback
+              ? t('upcomingEventsInCity', { city: cityName })
+              : t('upcomingEventsNationwide')
+          }
           kind="events"
-          sectionId="online-events"
           language={i18n.language}
-          items={onlineEvents.data?.items}
-          isPending={onlineEvents.isPending}
-          isError={onlineEvents.isError}
-          onRetry={() => void onlineEvents.refetch()}
-          viewAll={`/events?${onlineDestination}`}
+          items={events.data?.items}
+          isPending={events.isPending}
+          isError={events.isError}
+          onRetry={() => void events.refetch()}
+          viewAll={`/events?${eventDestination}`}
         />
-      )}
-      <HomeInterests cityId={cityId} />
+        <HomeSection
+          wideCards={Boolean(user)}
+          title={
+            cityId && !communityFallback
+              ? t('communitiesInCity', { city: cityName })
+              : t('communitiesNationwide')
+          }
+          kind="communities"
+          language={i18n.language}
+          items={communities.data?.items}
+          isPending={communities.isPending}
+          isError={communities.isError}
+          onRetry={() => void communities.refetch()}
+          viewAll={`/communities?${communityDestination}`}
+        />
+        {!onlineEmpty && (
+          <HomeSection
+            wideCards={Boolean(user)}
+            title={t('upcomingOnlineEvents')}
+            kind="events"
+            sectionId="online-events"
+            language={i18n.language}
+            items={onlineEvents.data?.items}
+            isPending={onlineEvents.isPending}
+            isError={onlineEvents.isError}
+            onRetry={() => void onlineEvents.refetch()}
+            viewAll={`/events?${onlineDestination}`}
+          />
+        )}
+        <HomeInterests cityId={cityId} />
+      </div>
       {!authLoading && !user ? (
         <section
           aria-labelledby="home-signup-heading"
-          className="flex flex-wrap items-center justify-between gap-4 rounded-(--shape-radius-xl) bg-primary-soft p-5 sm:p-6"
+          className="order-4 flex flex-wrap items-center justify-between gap-4 rounded-(--shape-radius-xl) bg-primary-soft p-5 sm:p-6"
         >
           <div className="grid gap-2">
             <h2 id="home-signup-heading" className="text-xl font-bold sm:text-2xl">
@@ -269,7 +259,7 @@ export function HomePage(): React.JSX.Element {
       ) : null}
       <section
         aria-labelledby="home-create-heading"
-        className="flex flex-wrap items-center justify-between gap-4 border-t border-border pt-6"
+        className={`order-5 flex flex-wrap items-center justify-between gap-4 border-t border-border pt-6 ${user ? 'xl:col-start-2' : ''}`}
       >
         <div className="grid gap-2">
           <h2 id="home-create-heading" className="text-xl font-bold sm:text-2xl">

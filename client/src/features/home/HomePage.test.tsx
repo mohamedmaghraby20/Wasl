@@ -4,7 +4,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { I18nextProvider } from 'react-i18next';
 import { createMemoryRouter, RouterProvider, useLocation } from 'react-router';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { i18n } from '@/lib/i18n';
 import { HomePage } from './HomePage';
 import { AuthProvider } from '@/features/auth/AuthProvider';
@@ -84,6 +84,9 @@ function renderHome(
     onlineRequests?: URL[];
   } = {},
 ): void {
+  if (!navigator.geolocation) {
+    vi.stubGlobal('navigator', { geolocation: { getCurrentPosition: vi.fn() } });
+  }
   vi.stubEnv('VITE_API_URL', 'http://localhost:3000');
   vi.stubGlobal(
     'fetch',
@@ -172,9 +175,20 @@ function renderHome(
   );
 }
 
+const getCurrentPosition = vi.fn();
+
 describe('HomePage', () => {
+  beforeEach(() => {
+    getCurrentPosition.mockReset();
+    Object.defineProperty(window.navigator, 'geolocation', {
+      configurable: true,
+      value: { getCurrentPosition },
+    });
+  });
+
   afterEach(() => {
     localStorage.removeItem('wasl-city');
+    Reflect.deleteProperty(window.navigator, 'geolocation');
     vi.unstubAllGlobals();
     vi.unstubAllEnvs();
   });
@@ -192,6 +206,21 @@ describe('HomePage', () => {
     expect(search).toHaveAttribute('name', 'q');
   });
 
+  it('requests native location permission on arrival with no custom consent controls', async () => {
+    const getCurrentPosition = vi.fn();
+    vi.stubGlobal('navigator', { geolocation: { getCurrentPosition } });
+    renderHome();
+
+    await waitFor(() => expect(getCurrentPosition).toHaveBeenCalledTimes(1));
+    expect(screen.queryByText(/Coordinates are matched/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Province boundaries/)).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Use my location' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Not now' })).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Across Türkiye' }));
+    await userEvent.click(screen.getByRole('option', { name: 'Ankara' }));
+    expect(await screen.findByRole('heading', { name: 'Upcoming events in Ankara' })).toBeVisible();
+  });
+
   it('keeps search and successful discovery usable when city reference loading fails', async () => {
     renderHome({ citiesError: true });
     expect(await screen.findByRole('alert')).toHaveTextContent('Cities could not load');
@@ -199,17 +228,33 @@ describe('HomePage', () => {
     expect(await screen.findByRole('link', { name: 'Arabic music night' })).toBeVisible();
   });
 
+  it('shows optional location failure as neutral guidance, not an error alert', async () => {
+    vi.stubGlobal('navigator', { geolocation: {
+      getCurrentPosition: (_success: PositionCallback, fail: PositionErrorCallback) => {
+        fail({ code: 1, message: 'Denied', PERMISSION_DENIED: 1, POSITION_UNAVAILABLE: 2, TIMEOUT: 3 });
+      },
+    } });
+    renderHome();
+
+    const guidance = await screen.findByText(/Location permission was not granted/);
+    expect(guidance).toHaveAttribute('role', 'status');
+    expect(guidance).toHaveClass('text-text-muted');
+    expect(guidance).not.toHaveClass('text-danger');
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Across Türkiye' })).toBeEnabled();
+  });
+
   it('keeps communities visible while the event section loads', async () => {
     renderHome({ eventsLoading: true });
     expect(await screen.findByRole('link', { name: 'Arab students in Ankara' })).toBeVisible();
-    expect(screen.getByRole('status')).toBeInTheDocument();
+    expect(within(screen.getByRole('region', { name: 'Upcoming events across Türkiye' })).getByRole('status')).toBeInTheDocument();
   });
 
   it('distinguishes a successfully empty nationwide collection from a loading or error state', async () => {
     renderHome({ eventsEmpty: true });
     expect(await screen.findByText('Nothing here yet')).toBeVisible();
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    expect(within(screen.getByRole('region', { name: 'Upcoming events across Türkiye' })).queryByRole('status')).not.toBeInTheDocument();
   });
 
   it('keeps successful events visible while communities load independently', async () => {

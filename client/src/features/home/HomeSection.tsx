@@ -20,6 +20,7 @@ export function HomeSection({
   onRetry,
   viewAll,
   sectionId = kind,
+  wideCards = false,
 }: {
   title: string;
   kind: ResourceKind;
@@ -30,6 +31,7 @@ export function HomeSection({
   onRetry: () => void;
   viewAll?: string;
   sectionId?: string;
+  wideCards?: boolean;
 }): React.JSX.Element {
   const { t } = useTranslation();
   const resource = title.toLocaleLowerCase(language);
@@ -61,8 +63,7 @@ export function HomeSection({
     if (!element) return;
     element.scrollBy({ left: element.clientWidth * (forward ? 1 : -1) * (rtl ? -1 : 1) });
   };
-  const rowClass =
-    'grid min-w-0 grid-flow-col auto-cols-[85%] gap-4 overflow-x-auto overscroll-x-contain p-1 -m-1 sm:auto-cols-[calc((100%-1rem)/2)] xl:auto-cols-[calc((100%-3rem)/4)]';
+  const rowClass = `grid min-w-0 grid-flow-col auto-cols-[85%] gap-4 overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden p-1 -m-1 sm:auto-cols-[calc((100%-1rem)/2)] ${wideCards ? 'xl:auto-cols-[min(100%,19rem)]' : 'xl:auto-cols-[calc((100%-3rem)/4)]'}`;
   return (
     <section className="grid gap-4" aria-labelledby={`${sectionId}-heading`}>
       <div className="grid gap-1 sm:flex sm:items-end sm:justify-between sm:gap-3">
@@ -107,14 +108,20 @@ export function HomeSection({
           <div aria-hidden="true" className={rowClass}>
             {Array.from({ length: 4 }, (_, index) => (
               <div
-                className={`flex flex-col gap-4 rounded-(--shape-radius-card) border border-border bg-card p-5 ${kind === 'events' ? 'min-h-[31rem]' : 'min-h-[26rem]'}`}
+                className={`flex flex-col gap-2 rounded-(--shape-radius-card) border border-border bg-card p-4 ${kind === 'events' ? 'min-h-[24.5rem]' : 'min-h-[18rem]'}`}
                 key={index}
               >
-                <Skeleton className="-mx-5 -mt-5 aspect-video rounded-b-none rounded-t-(--shape-radius-card)" />
-                <Skeleton className="h-5 w-24" />
-                <Skeleton className="h-5 w-3/4" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-2/3" />
+                <Skeleton className="-mx-4 -mt-4 aspect-video rounded-b-none rounded-t-(--shape-radius-card)" />
+                <Skeleton className="h-6 w-3/4" />
+                <Skeleton className="h-4 w-1/2" />
+                <div className="flex gap-1.5">
+                  <Skeleton className="h-6 w-24" />
+                  <Skeleton className="h-6 w-20" />
+                </div>
+                <div className="mt-auto grid gap-2 border-t border-border pt-3">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-6 w-2/3" />
+                </div>
               </div>
             ))}
           </div>
@@ -151,7 +158,7 @@ export function HomeSection({
         >
           {items.slice(0, 4).map((item) => (
             <div
-              className={`min-w-0 [&>article]:h-full ${kind === 'events' ? 'min-h-[31rem]' : 'min-h-[26rem]'}`}
+              className={`min-w-0 [&>article]:h-full ${kind === 'events' ? 'min-h-[24.5rem]' : 'min-h-[18rem]'}`}
               key={item.id}
             >
               <ResourceCard item={item} kind={kind} />

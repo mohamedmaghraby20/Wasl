@@ -47,9 +47,15 @@ export function AppFooter(): React.JSX.Element {
         </nav>
       </div>
       <div className="border-t border-border">
-        <p className="mx-auto max-w-(--container-max) px-4 py-5 text-xs text-text-subtle sm:px-6">
-          {t('footerRights', { year })}
-        </p>
+        <div className="mx-auto grid max-w-(--container-max) gap-2 px-4 py-5 text-xs text-text-subtle sm:px-6">
+          <p>{t('footerRights', { year })}</p>
+          <a
+            className="w-fit underline underline-offset-2 hover:text-primary-soft-text focus-visible:text-primary-soft-text"
+            href="https://creativecommons.org/licenses/by/4.0/"
+          >
+            {t('locationAttribution')}
+          </a>
+        </div>
       </div>
     </footer>
   );

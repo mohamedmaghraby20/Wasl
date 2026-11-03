@@ -28,17 +28,27 @@ void i18n.use(initReactI18next).init({
     en: {
       translation: {
         brand: 'Wasl',
+        homePersonalActivity: 'Your activity',
+        homeGoing: 'Going',
+        homeGoingEmpty: 'Looks like you’re free',
+        homeFindEvents: 'Find events',
+        homeYourCommunities: 'Your communities',
+        homeCommunitiesEmpty: 'Find your people in a community.',
+        homeExploreCommunities: 'Explore communities',
+        homeSeeAll: 'See all',
+        homeSeeAllEvents: 'See all your events',
+        homeSeeAllCommunities: 'See all your communities',
+        homeAllActivity: 'All activity',
         home: 'Home',
         nationwide: 'Across Türkiye',
         upcomingEventsNationwide: 'Upcoming events across Türkiye',
         upcomingEventsInCity: 'Upcoming events in {{city}}',
         upcomingOnlineEvents: 'Upcoming online events',
         homeCitiesError: 'Cities could not load. Search and event discovery are still available.',
-        useMyLocation: 'Use my location',
         locatingCity: 'Finding your city…',
         locationSuccess: 'City set to {{city}}.',
-        locationPrivacy: 'Coordinates are matched on your device, not sent to Wasl. Only your city is remembered. Approximate boundaries; you can change the city.',
-        locationUnsupported: 'Location is not available in this browser. Choose a city from the list.',
+        locationUnsupported:
+          'Location is not available in this browser. Choose a city from the list.',
         locationInsecure: 'Location needs a secure connection. Choose a city from the list.',
         locationDenied:
           'Location permission was not granted. Your current city is unchanged; choose a city from the list.',
@@ -47,13 +57,12 @@ void i18n.use(initReactI18next).init({
         locationTimeout:
           'Finding your location took too long. Your current city is unchanged; choose a city from the list.',
         locationUnmatched:
-          "We couldn't match your location to a supported city in Türkiye. Your current city is unchanged; choose a city from the list.",
+          'Choose a city to explore nearby communities and events.',
         locationBoundariesError:
           'City boundaries could not load. Your current city is unchanged; choose a city from the list.',
         locationCitiesError:
           'Supported cities could not load, so location was not applied. Choose a city from the list.',
-        locationAttribution:
-          'Province boundaries: SimpleMaps, CC BY 4.0 (adapted to Wasl cities)',
+        locationAttribution: 'Province boundaries: SimpleMaps, CC BY 4.0 (adapted to Wasl cities)',
         homeInterests: 'Browse by interest',
         homeInterestsError: 'Interests could not load. Try again or use search.',
         discover: 'Discover',
@@ -774,25 +783,38 @@ void i18n.use(initReactI18next).init({
     ar: {
       translation: {
         brand: 'وصل',
+        homePersonalActivity: 'نشاطك',
+        homeGoing: 'سأحضر',
+        homeGoingEmpty: 'يبدو أن جدولك فارغ',
+        homeFindEvents: 'ابحث عن فعاليات',
+        homeYourCommunities: 'مجتمعاتك',
+        homeCommunitiesEmpty: 'اعثر على مجتمع يشاركك اهتماماتك.',
+        homeExploreCommunities: 'استكشف المجتمعات',
+        homeSeeAll: 'عرض الكل',
+        homeSeeAllEvents: 'عرض كل فعالياتك',
+        homeSeeAllCommunities: 'عرض كل مجتمعاتك',
+        homeAllActivity: 'كل النشاط',
         home: 'الرئيسية',
         nationwide: 'في جميع أنحاء تركيا',
         upcomingEventsNationwide: 'فعاليات قادمة في جميع أنحاء تركيا',
         upcomingEventsInCity: 'فعاليات قادمة في {{city}}',
         upcomingOnlineEvents: 'فعاليات قادمة عبر الإنترنت',
         homeCitiesError: 'تعذر تحميل المدن. لا يزال البحث واستكشاف الفعاليات متاحين.',
-        useMyLocation: 'استخدم موقعي',
         locatingCity: 'جارٍ تحديد مدينتك…',
         locationSuccess: 'تم اختيار {{city}}.',
-        locationPrivacy: 'تُطابق الإحداثيات على جهازك ولا تُرسل إلى وصل. نتذكر مدينتك فقط. الحدود تقريبية ويمكنك تغيير المدينة.',
         locationUnsupported: 'الموقع غير متاح في هذا المتصفح. اختر مدينة من القائمة.',
         locationInsecure: 'يتطلب الموقع اتصالاً آمناً. اختر مدينة من القائمة.',
         locationDenied: 'لم يتم منح إذن الموقع. لم يتغير اختيارك؛ اختر مدينة من القائمة.',
         locationUnavailable: 'تعذر تحديد موقعك. لم يتغير اختيارك؛ اختر مدينة من القائمة.',
-        locationTimeout: 'استغرق تحديد موقعك وقتاً طويلاً. لم يتغير اختيارك؛ اختر مدينة من القائمة.',
-        locationUnmatched: 'تعذرت مطابقة موقعك مع مدينة مدعومة في تركيا. لم يتغير اختيارك؛ اختر مدينة من القائمة.',
-        locationBoundariesError: 'تعذر تحميل حدود المدن. لم يتغير اختيارك؛ حاول مجدداً أو اختر مدينة من القائمة.',
+        locationTimeout:
+          'استغرق تحديد موقعك وقتاً طويلاً. لم يتغير اختيارك؛ اختر مدينة من القائمة.',
+        locationUnmatched:
+          'اختر مدينة لاستكشاف المجتمعات والفعاليات القريبة منك.',
+        locationBoundariesError:
+          'تعذر تحميل حدود المدن. لم يتغير اختيارك؛ حاول مجدداً أو اختر مدينة من القائمة.',
         locationCitiesError: 'تعذر تحميل المدن المدعومة ولم يُطبق الموقع. اختر مدينة من القائمة.',
-        locationAttribution: 'حدود المحافظات: SimpleMaps، رخصة CC BY 4.0؛ مُكيّفة لمعرّفات مدن وصل.',
+        locationAttribution:
+          'حدود المحافظات: SimpleMaps، رخصة CC BY 4.0؛ مُكيّفة لمعرّفات مدن وصل.',
         homeInterests: 'تصفح حسب الاهتمام',
         homeInterestsError: 'تعذر تحميل الاهتمامات. أعد المحاولة أو استخدم البحث.',
         discover: 'اكتشف',
