@@ -10,6 +10,7 @@ import { localizedName } from '@/features/resources/resource-utils';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { HomeSection } from './HomeSection';
 import { HomeInterests } from './HomeInterests';
+import { PersonalSidebar } from './PersonalSidebar';
 import { useHomeCity } from './useHomeCity';
 import type { LocationError } from './useHomeCity';
 import {
@@ -188,48 +189,61 @@ export function HomePage(): React.JSX.Element {
         </div>
       </section>
 
-      <HomeSection
-        title={
-          cityId && !fallback
-            ? t('upcomingEventsInCity', { city: cityName })
-            : t('upcomingEventsNationwide')
+      <div
+        className={
+          user ? 'grid min-w-0 items-start gap-6 xl:grid-cols-[minmax(0,1fr)_20rem]' : 'min-w-0'
         }
-        kind="events"
-        language={i18n.language}
-        items={events.data?.items}
-        isPending={events.isPending}
-        isError={events.isError}
-        onRetry={() => void events.refetch()}
-        viewAll={`/events?${eventDestination}`}
-      />
-      <HomeSection
-        title={
-          cityId && !communityFallback
-            ? t('communitiesInCity', { city: cityName })
-            : t('communitiesNationwide')
-        }
-        kind="communities"
-        language={i18n.language}
-        items={communities.data?.items}
-        isPending={communities.isPending}
-        isError={communities.isError}
-        onRetry={() => void communities.refetch()}
-        viewAll={`/communities?${communityDestination}`}
-      />
-      {!onlineEmpty && (
-        <HomeSection
-          title={t('upcomingOnlineEvents')}
-          kind="events"
-          sectionId="online-events"
-          language={i18n.language}
-          items={onlineEvents.data?.items}
-          isPending={onlineEvents.isPending}
-          isError={onlineEvents.isError}
-          onRetry={() => void onlineEvents.refetch()}
-          viewAll={`/events?${onlineDestination}`}
-        />
-      )}
-      <HomeInterests cityId={cityId} />
+      >
+        {user ? (
+          <div className="mb-8 min-w-0 xl:order-2 xl:mb-0">
+            <PersonalSidebar />
+          </div>
+        ) : null}
+        <div className="grid min-w-0 gap-8 sm:gap-10 xl:order-1">
+          <HomeSection
+            title={
+              cityId && !fallback
+                ? t('upcomingEventsInCity', { city: cityName })
+                : t('upcomingEventsNationwide')
+            }
+            kind="events"
+            language={i18n.language}
+            items={events.data?.items}
+            isPending={events.isPending}
+            isError={events.isError}
+            onRetry={() => void events.refetch()}
+            viewAll={`/events?${eventDestination}`}
+          />
+          <HomeSection
+            title={
+              cityId && !communityFallback
+                ? t('communitiesInCity', { city: cityName })
+                : t('communitiesNationwide')
+            }
+            kind="communities"
+            language={i18n.language}
+            items={communities.data?.items}
+            isPending={communities.isPending}
+            isError={communities.isError}
+            onRetry={() => void communities.refetch()}
+            viewAll={`/communities?${communityDestination}`}
+          />
+          {!onlineEmpty && (
+            <HomeSection
+              title={t('upcomingOnlineEvents')}
+              kind="events"
+              sectionId="online-events"
+              language={i18n.language}
+              items={onlineEvents.data?.items}
+              isPending={onlineEvents.isPending}
+              isError={onlineEvents.isError}
+              onRetry={() => void onlineEvents.refetch()}
+              viewAll={`/events?${onlineDestination}`}
+            />
+          )}
+          <HomeInterests cityId={cityId} />
+        </div>
+      </div>
       {!authLoading && !user ? (
         <section
           aria-labelledby="home-signup-heading"

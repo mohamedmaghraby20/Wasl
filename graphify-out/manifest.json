@@ -1026,15 +1026,15 @@
     "semantic_hash": ""
   },
   "client/src/features/home/HomePage.test.tsx": {
-    "mtime": 1793702268.1123464,
-    "seen": 1793702494.031602,
-    "ast_hash": "709d7860cca41d88c0149bbedcfabf5b",
+    "mtime": 1793703810.6672223,
+    "seen": 1793703892.3719003,
+    "ast_hash": "7b3a92cda05a4c58ad5af425e3dec10e",
     "semantic_hash": ""
   },
   "client/src/features/home/HomePage.tsx": {
-    "mtime": 1793702211.2162619,
-    "seen": 1793702494.0316043,
-    "ast_hash": "d70a82971da3c4de55255f3721e3823e",
+    "mtime": 1793703879.0581307,
+    "seen": 1793703892.3719046,
+    "ast_hash": "c88d2213e345fc615c22936ec3c5ade8",
     "semantic_hash": ""
   },
   "client/src/features/home/HomeSection.tsx": {
@@ -1218,15 +1218,15 @@
     "semantic_hash": ""
   },
   "client/src/features/participation/MyActivityPage.test.tsx": {
-    "mtime": 1792781269.3471437,
-    "seen": 1793650684.3164363,
-    "ast_hash": "494d4e51fcf5615f122929670d41da64",
+    "mtime": 1793703711.6159885,
+    "seen": 1793703892.3762736,
+    "ast_hash": "3d7b6abbcf431e66b24a32c62c0194d7",
     "semantic_hash": ""
   },
   "client/src/features/participation/MyActivityPage.tsx": {
-    "mtime": 1793651041.4947402,
-    "seen": 1793701321.4693751,
-    "ast_hash": "c05969e6034f1fa38aa7d2cb2c741120",
+    "mtime": 1793703711.6011443,
+    "seen": 1793703892.3762772,
+    "ast_hash": "997ff0c7f08461fcf841d06abb74bdc5",
     "semantic_hash": ""
   },
   "client/src/features/participation/OrganizerParticipationPanel.test.tsx": {
@@ -1344,9 +1344,9 @@
     "semantic_hash": ""
   },
   "client/src/lib/i18n.ts": {
-    "mtime": 1793702211.217279,
-    "seen": 1793702494.0369015,
-    "ast_hash": "4409fb127ae5dc38e6a8eda130fee3b0",
+    "mtime": 1793703772.529115,
+    "seen": 1793703892.3786955,
+    "ast_hash": "510dfa1472b686293674fb6ec249672b",
     "semantic_hash": ""
   },
   "client/src/lib/sitemap.test.ts": {
@@ -3174,9 +3174,9 @@
     "semantic_hash": ""
   },
   "AGENTS.md": {
-    "mtime": 1793702211.2213216,
-    "seen": 1793702494.0815651,
-    "ast_hash": "d59cf92191d1230e727da347e9d48b30",
+    "mtime": 1793703772.5366397,
+    "seen": 1793703892.4268386,
+    "ast_hash": "86dd8a70fdf95579ac8ad0d77a7f35de",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
@@ -3378,9 +3378,9 @@
     "semantic_hash": ""
   },
   "client/e2e/home-geolocation.spec.ts": {
-    "mtime": 1793702389.1296804,
-    "seen": 1793702494.0208175,
-    "ast_hash": "037a79bbf8dc80e77e6b84af48b4085b",
+    "mtime": 1793703810.6648767,
+    "seen": 1793703892.3583798,
+    "ast_hash": "b60468cc782f9c4802874950cadff755",
     "semantic_hash": ""
   },
   "client/e2e/home-interests.spec.ts": {
@@ -3420,15 +3420,15 @@
     "semantic_hash": ""
   },
   "client/src/features/home/province-boundaries.test.ts": {
-    "mtime": 1793702268.111346,
-    "seen": 1793702494.0316074,
-    "ast_hash": "5249df9b57ba7179a0e964ce44fc8af7",
+    "mtime": 1793703772.524626,
+    "seen": 1793703892.37201,
+    "ast_hash": "f86cfd185bee2d87acac51c1a3163b85",
     "semantic_hash": ""
   },
   "client/src/features/home/province-boundaries.ts": {
-    "mtime": 1793702211.215112,
-    "seen": 1793702494.0316088,
-    "ast_hash": "f62c84c6f12ac8a5b4b2d57513a3478a",
+    "mtime": 1793703772.5236263,
+    "seen": 1793703892.3720133,
+    "ast_hash": "02652fc9278170264444020deca9d265",
     "semantic_hash": ""
   },
   "client/src/features/home/useHomeCity.ts": {
@@ -3516,9 +3516,9 @@
     "semantic_hash": ""
   },
   "client/public/geo/README.md": {
-    "mtime": 1793702211.2182815,
-    "seen": 1793702494.0819104,
-    "ast_hash": "8ae6c64f9a7ea1a2f4cf458e8c05a4e1",
+    "mtime": 1793703772.533116,
+    "seen": 1793703892.4273138,
+    "ast_hash": "de03c40b0c016c1ca2ac8f1d121a1587",
     "semantic_hash": ""
   },
   "docs/PROJECT_HANDOFF.md": {
@@ -4440,9 +4440,27 @@
     "semantic_hash": ""
   },
   "client/src/features/home/useHomeCity.test.tsx": {
-    "mtime": 1793702469.8031054,
-    "seen": 1793702494.031611,
-    "ast_hash": "d60f79df3f88b03131906c6de7cdd2f5",
+    "mtime": 1793703772.5261161,
+    "seen": 1793703892.3720186,
+    "ast_hash": "22570a493b19bab07d41cb65cd15bb9d",
+    "semantic_hash": ""
+  },
+  "client/e2e/home-sidebar.spec.ts": {
+    "mtime": 1793703811.9316845,
+    "seen": 1793703892.3586195,
+    "ast_hash": "98aa1e0cfd4262fc53e88a359b3273ef",
+    "semantic_hash": ""
+  },
+  "client/src/features/home/PersonalSidebar.test.tsx": {
+    "mtime": 1793703711.541973,
+    "seen": 1793703892.372003,
+    "ast_hash": "7d71a1f7b5b741857d1cacd78b1d4cd8",
+    "semantic_hash": ""
+  },
+  "client/src/features/home/PersonalSidebar.tsx": {
+    "mtime": 1793703711.5124924,
+    "seen": 1793703892.3720071,
+    "ast_hash": "fadf72c9e22b03be1327bba572b21e42",
     "semantic_hash": ""
   },
   ".opencode/package-lock.json": {

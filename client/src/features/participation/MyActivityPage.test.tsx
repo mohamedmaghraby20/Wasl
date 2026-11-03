@@ -25,13 +25,13 @@ vi.mock('@/api/generated/participation/participation', () => ({
   }),
 }));
 
-function renderPage(): void {
+function renderPage(path = '/activity'): void {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   render(
     <I18nextProvider i18n={i18n}>
       <UnheadProvider head={createHead()}>
         <QueryClientProvider client={queryClient}>
-          <MemoryRouter initialEntries={['/activity']}>
+          <MemoryRouter initialEntries={[path]}>
             <Routes>
               <Route path="/activity" element={<MyActivityPage />} />
             </Routes>
@@ -63,6 +63,20 @@ describe('MyActivityPage', () => {
       screen.getByText('You have not joined or requested to join a Community yet.'),
     ).toBeVisible();
     expect(screen.getByText('You have not registered for an Event yet.')).toBeVisible();
+  });
+
+  it('opens the linked list and lets the user switch lists', async () => {
+    mocks.useActivity.mockReturnValue({
+      data: { communities: [], events: [] },
+      isPending: false,
+      isError: false,
+    });
+    renderPage('/activity?view=events');
+    expect(screen.getByRole('region', { name: 'My Events' })).toBeVisible();
+    expect(screen.queryByRole('region', { name: 'My Communities' })).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('link', { name: 'My Communities' }));
+    expect(screen.getByRole('region', { name: 'My Communities' })).toBeVisible();
+    expect(screen.queryByRole('region', { name: 'My Events' })).not.toBeInTheDocument();
   });
 
   it('shows statuses and lets the user leave their own active community', async () => {

@@ -1,6 +1,6 @@
 import { CalendarDays, LogOut, TicketX, UsersRound } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Link, Navigate } from 'react-router';
+import { Link, Navigate, useSearchParams } from 'react-router';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import {
@@ -28,6 +28,8 @@ const statusVariant = (status: string): 'success' | 'warning' | 'neutral' =>
 export function MyActivityPage(): React.JSX.Element {
   const { t, i18n } = useTranslation();
   const { user, loading } = useAuth();
+  const [searchParams] = useSearchParams();
+  const view = searchParams.get('view');
   const queryClient = useQueryClient();
   const activity = useParticipationControllerMyActivity({ query: { enabled: Boolean(user) } });
   const leave = useParticipationControllerLeaveCommunity();
@@ -37,9 +39,7 @@ export function MyActivityPage(): React.JSX.Element {
 
   if (!loading && !user) return <Navigate replace to="/sign-in?returnTo=%2Factivity" />;
   if (activity.isPending)
-    return (
-      <LoadingSkeleton layout="list" message={t('loadingMyActivity')} rows={5} />
-    );
+    return <LoadingSkeleton layout="list" message={t('loadingMyActivity')} rows={5} />;
   if (activity.isError) {
     return (
       <QueryError message={t('loadMyActivityError')} onRetry={() => void activity.refetch()} />
@@ -87,104 +87,130 @@ export function MyActivityPage(): React.JSX.Element {
         <h1 className="text-3xl font-extrabold">{t('myActivity')}</h1>
         <p className="text-sm leading-relaxed text-text-muted">{t('myActivityDescription')}</p>
       </header>
-      <section className="grid gap-4" aria-labelledby="activity-communities-heading">
-        <h2 className="text-xl font-bold" id="activity-communities-heading">
-          {t('myCommunities')}
-        </h2>
-        {activity.data.communities.length ? (
-          <ul className="divide-y divide-border overflow-hidden rounded-(--shape-radius-card) border border-border bg-card shadow-xs">
-            {activity.data.communities.map((item) => (
-              <li
-                className="flex flex-wrap items-center justify-between gap-4 px-4 py-3.5"
-                key={item.id}
-              >
-                <div className="grid min-w-0 gap-1.5">
-                  <Link
-                    className="inline-flex items-center gap-2 font-semibold text-text transition-colors hover:text-primary-soft-text"
-                    to={`/communities/${item.slug}`}
-                  >
-                    <UsersRound aria-hidden="true" className="size-4 shrink-0 text-text-subtle" />
-                    {item.name}
-                  </Link>
-                  <Badge className="w-fit" variant={statusVariant(item.status)}>
-                    {t(`participationStatus_${item.status}`)}
-                  </Badge>
-                </div>
-                {['ACTIVE', 'PENDING', 'WAITLISTED'].includes(item.status) ? (
-                  <IconButton
-                    icon={LogOut}
-                    label={t('leaveCommunity')}
-                    intent="danger"
-                    disabled={leave.isPending}
-                    onClick={() => void leaveCommunity(item.id)}
-                    variant="ghost"
-                  />
-                ) : null}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <EmptyState
-            description={t('noCommunityActivity')}
-            icon={UsersRound}
-            title={t('myCommunities')}
-          />
-        )}
-      </section>
-      <section className="grid gap-4" aria-labelledby="activity-events-heading">
-        <h2 className="text-xl font-bold" id="activity-events-heading">
-          {t('myEvents')}
-        </h2>
-        {activity.data.events.length ? (
-          <ul className="divide-y divide-border overflow-hidden rounded-(--shape-radius-card) border border-border bg-card shadow-xs">
-            {activity.data.events.map((item) => (
-              <li
-                className="flex flex-wrap items-center justify-between gap-4 px-4 py-3.5"
-                key={item.id}
-              >
-                <div className="grid min-w-0 gap-1.5">
-                  <Link
-                    className="inline-flex items-center gap-2 font-semibold text-text transition-colors hover:text-primary-soft-text"
-                    to={`/events/${item.slug}`}
-                  >
-                    <CalendarDays aria-hidden="true" className="size-4 shrink-0 text-text-subtle" />
-                    {item.title}
-                  </Link>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Badge variant={statusVariant(item.status)}>
+      <nav aria-label={t('myActivity')} className="flex flex-wrap gap-2">
+        {(['all', 'events', 'communities'] as const).map((item) => (
+          <Link
+            key={item}
+            to={item === 'all' ? '/activity' : `/activity?view=${item}`}
+            aria-current={
+              (item === 'all' ? view !== 'events' && view !== 'communities' : view === item)
+                ? 'page'
+                : undefined
+            }
+            className="inline-flex min-h-11 items-center rounded-(--shape-radius-control) px-4 text-sm font-semibold hover:bg-primary-soft focus-visible:outline-2 focus-visible:outline-ring aria-[current=page]:bg-primary-soft aria-[current=page]:text-primary-soft-text"
+          >
+            {t(
+              item === 'all' ? 'homeAllActivity' : item === 'events' ? 'myEvents' : 'myCommunities',
+            )}
+          </Link>
+        ))}
+      </nav>
+      {view !== 'events' && (
+        <section className="grid gap-4" aria-labelledby="activity-communities-heading">
+          <h2 className="text-xl font-bold" id="activity-communities-heading">
+            {t('myCommunities')}
+          </h2>
+          {activity.data.communities.length ? (
+            <ul className="divide-y divide-border overflow-hidden rounded-(--shape-radius-card) border border-border bg-card shadow-xs">
+              {activity.data.communities.map((item) => (
+                <li
+                  className="flex flex-wrap items-center justify-between gap-4 px-4 py-3.5"
+                  key={item.id}
+                >
+                  <div className="grid min-w-0 gap-1.5">
+                    <Link
+                      className="inline-flex items-center gap-2 font-semibold text-text transition-colors hover:text-primary-soft-text"
+                      to={`/communities/${item.slug}`}
+                    >
+                      <UsersRound aria-hidden="true" className="size-4 shrink-0 text-text-subtle" />
+                      {item.name}
+                    </Link>
+                    <Badge className="w-fit" variant={statusVariant(item.status)}>
                       {t(`participationStatus_${item.status}`)}
                     </Badge>
-                    <span className="text-xs text-text-subtle">
-                      {formatTurkeyDateTime(item.startsAt, i18n.language, 'full')}
-                    </span>
                   </div>
-                  {item.cancelled ? (
-                    <p className="text-sm font-medium text-danger" role="status">
-                      {t('cancelledMessage')}
-                    </p>
+                  {['ACTIVE', 'PENDING', 'WAITLISTED'].includes(item.status) ? (
+                    <IconButton
+                      icon={LogOut}
+                      label={t('leaveCommunity')}
+                      intent="danger"
+                      disabled={leave.isPending}
+                      onClick={() => void leaveCommunity(item.id)}
+                      variant="ghost"
+                    />
                   ) : null}
-                </div>
-                {['ACCEPTED', 'PENDING', 'WAITLISTED'].includes(item.status) && !item.cancelled ? (
-                  <IconButton
-                    icon={TicketX}
-                    label={t('cancelRegistration')}
-                    intent="danger"
-                    disabled={cancel.isPending}
-                    onClick={() => void cancelRegistration(item.id)}
-                    variant="ghost"
-                  />
-                ) : null}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <EmptyState
-            description={t('noEventActivity')}
-            icon={CalendarDays}
-            title={t('myEvents')}
-          />
-        )}
-      </section>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <EmptyState
+              description={t('noCommunityActivity')}
+              icon={UsersRound}
+              title={t('myCommunities')}
+            />
+          )}
+        </section>
+      )}
+      {view !== 'communities' && (
+        <section className="grid gap-4" aria-labelledby="activity-events-heading">
+          <h2 className="text-xl font-bold" id="activity-events-heading">
+            {t('myEvents')}
+          </h2>
+          {activity.data.events.length ? (
+            <ul className="divide-y divide-border overflow-hidden rounded-(--shape-radius-card) border border-border bg-card shadow-xs">
+              {activity.data.events.map((item) => (
+                <li
+                  className="flex flex-wrap items-center justify-between gap-4 px-4 py-3.5"
+                  key={item.id}
+                >
+                  <div className="grid min-w-0 gap-1.5">
+                    <Link
+                      className="inline-flex items-center gap-2 font-semibold text-text transition-colors hover:text-primary-soft-text"
+                      to={`/events/${item.slug}`}
+                    >
+                      <CalendarDays
+                        aria-hidden="true"
+                        className="size-4 shrink-0 text-text-subtle"
+                      />
+                      {item.title}
+                    </Link>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge variant={statusVariant(item.status)}>
+                        {t(`participationStatus_${item.status}`)}
+                      </Badge>
+                      <span className="text-xs text-text-subtle">
+                        {formatTurkeyDateTime(item.startsAt, i18n.language, 'full')}
+                      </span>
+                    </div>
+                    {item.cancelled ? (
+                      <p className="text-sm font-medium text-danger" role="status">
+                        {t('cancelledMessage')}
+                      </p>
+                    ) : null}
+                  </div>
+                  {['ACCEPTED', 'PENDING', 'WAITLISTED'].includes(item.status) &&
+                  !item.cancelled ? (
+                    <IconButton
+                      icon={TicketX}
+                      label={t('cancelRegistration')}
+                      intent="danger"
+                      disabled={cancel.isPending}
+                      onClick={() => void cancelRegistration(item.id)}
+                      variant="ghost"
+                    />
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <EmptyState
+              description={t('noEventActivity')}
+              icon={CalendarDays}
+              title={t('myEvents')}
+            />
+          )}
+        </section>
+      )}
       {dialog}
     </div>
   );
