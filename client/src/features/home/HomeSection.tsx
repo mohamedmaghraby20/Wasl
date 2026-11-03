@@ -92,7 +92,7 @@ export function HomeSection({
             </div>
           ) : null}
           <Link
-            className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-sm text-sm font-semibold text-primary-soft-text hover:underline"
+            className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-sm text-sm font-semibold text-primary-soft-text hover:underline sm:me-28"
             to={viewAll ?? `/${kind}`}
           >
             {t('exploreAll')}
