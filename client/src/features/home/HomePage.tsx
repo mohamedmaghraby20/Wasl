@@ -33,10 +33,9 @@ export function HomePage(): React.JSX.Element {
   const { t, i18n } = useTranslation();
   const { user, loading: authLoading } = useAuth();
   const [query, setQuery] = useState('');
-  const [locationDismissed, setLocationDismissed] = useState(false);
   const lang: 'ar' | 'en' = i18n.language.startsWith('ar') ? 'ar' : 'en';
   const cities = useDiscoveryControllerCities();
-  const { cityId, restoringCity, setCityId, selectedCity, location, requestLocation } = useHomeCity(
+  const { cityId, restoringCity, setCityId, selectedCity, location } = useHomeCity(
     cities.data,
   );
   const cityReady = !restoringCity || cities.isError;
@@ -164,39 +163,6 @@ export function HomePage(): React.JSX.Element {
               searchPlaceholder={t('searchCities')}
               value={cityId}
             />
-            {!locationDismissed ? (
-              <div
-                className="col-span-2 grid gap-2"
-                role="group"
-                aria-label={t('locationPrompt')}
-              >
-                {location.status !== 'success' ? (
-                  <p className="text-sm text-primary-soft-text">{t('locationPrompt')}</p>
-                ) : null}
-                <div className="flex flex-wrap gap-2">
-                  <Button
-                    disabled={!cities.data}
-                    onClick={requestLocation}
-                    type="button"
-                    variant="secondary"
-                  >
-                    {t('useMyLocation')}
-                  </Button>
-                  {location.status !== 'success' ? (
-                    <Button
-                      onClick={() => {
-                        setCityId(cityId);
-                        setLocationDismissed(true);
-                      }}
-                      type="button"
-                      variant="ghost"
-                    >
-                      {t('locationNotNow')}
-                    </Button>
-                  ) : null}
-                </div>
-              </div>
-            ) : null}
             <div className="col-span-2 grid gap-1 empty:hidden">
               {cities.isError ? (
                 <QueryError message={t('homeCitiesError')} onRetry={() => void cities.refetch()} />

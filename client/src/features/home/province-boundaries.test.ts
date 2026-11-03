@@ -69,6 +69,10 @@ describe('province boundary loading', () => {
 });
 
 describe('bundled province boundaries', () => {
+  it('resolves a coastal Istanbul fix even when its accuracy radius reaches the sea', () => {
+    expect(resolveProvinceCity(bundled.provinces, 28.9784, 41.0082, 5_000)).toBe('istanbul');
+  });
+
   it('maps one distinct boundary to every supported Wasl city id', () => {
     const ids = bundled.provinces.map((province) => province.id).sort();
     expect(ids).toEqual([...supportedCityIds].sort());
@@ -127,6 +131,16 @@ describe('bundled province boundaries', () => {
 });
 
 describe('province geometry resolution', () => {
+  it('rejects an accuracy radius reaching a different province, regardless of province order', () => {
+    const provinces = [
+      boundary('first', polygon(square(30, 38, 33, 40))),
+      boundary('second', polygon(square(33, 38, 35, 40))),
+    ];
+    expect(resolveProvinceCity(provinces, 32.9999, 39, 100)).toBeNull();
+    expect(resolveProvinceCity([...provinces].reverse(), 32.9999, 39, 100)).toBeNull();
+    expect(resolveProvinceCity(provinces, 32, 39, 100)).toBe('first');
+  });
+
   it('excludes interior holes from a province', () => {
     const geometry = polygon(square(30, 39, 33, 41), square(31, 39.5, 32, 40.5));
     const provinces = [boundary('ring', geometry)];

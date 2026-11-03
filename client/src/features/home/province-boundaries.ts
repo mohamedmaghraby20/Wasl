@@ -80,10 +80,10 @@ export function resolveProvinceCity(
   }
   let match: string | undefined;
   for (const province of provinces) {
-    // The data is generalized: 100 m is a conservative UX margin, not a certified error bound.
-    if (nearBoundary(province.geometry, longitude, latitude, accuracy + 100)) return null;
     const result = classify(province.geometry, longitude, latitude);
     if (result === 'boundary') return null;
+    // A shoreline is not a competing city; reject uncertainty only when it reaches another province.
+    if (result === 'outside' && nearBoundary(province.geometry, longitude, latitude, accuracy + 100)) return null;
     if (result === 'inside') {
       if (match !== undefined) return null;
       match = province.id;

@@ -195,6 +195,7 @@ When the user corrects your approach, append a one-line rule here before ending 
 - Use the shared SearchInput for app search fields, preserving each caller's submit/filter semantics and responsive width.
 - Use the reusable typed-name deletion workflow for every delete action, including impact warnings, pending/error states, and completion feedback.
 - Give community category legends explicit bottom spacing; fieldset grid gaps do not separate the legend from its options.
+- Request native browser location permission automatically on home-page entry; use manual city selection as fallback, without a custom consent question or location button.
 
 ---
 

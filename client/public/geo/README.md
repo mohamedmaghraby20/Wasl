@@ -1,8 +1,8 @@
 # Türkiye province boundaries
 
-`tr-provinces.json` is a bundled, same-origin snapshot used only to map an explicitly requested
-browser location to a supported Wasl city. It is loaded lazily after the visitor chooses
-“Use my location”; it is not part of the eager homepage bundle.
+`tr-provinces.json` is a bundled, same-origin snapshot used to map a browser location to a
+supported Wasl city. The homepage requests browser location permission automatically once per
+visit, then loads the snapshot only if coordinates are available; it is not in the eager bundle.
 
 - Source: SimpleMaps, Türkiye ADM1 — https://simplemaps.com/gis/country/tr
 - License: CC BY 4.0 — https://creativecommons.org/licenses/by/4.0/
@@ -19,14 +19,15 @@ province-selection aid, not survey-grade or authoritative boundary identificatio
 boundary, in the sea, or outside the mapped polygons resolve to no city so the visitor can choose
 manually instead of receiving a nearest-city guess.
 
-The browser's reported accuracy radius plus a 100 m conservative margin is checked against
-every polygon edge using a local metre-scale projection. An intersecting radius stays unresolved.
+The reported point must fall inside exactly one province. Its accuracy radius plus a 100 m
+conservative margin is checked against other provinces using a local metre-scale projection.
+A radius reaching another province stays unresolved; reaching only the sea does not reject a city.
 The margin is a UX safeguard, not a certified bound on this generalized dataset's errors.
 Boundary vintage, simplification tolerance and survey accuracy are not supplied by the publisher.
 
 No credentials, mapping SDK, server endpoint or runtime third-party mapping service is used.
 Only this static asset must load on first use; HTTP, parse and mapping failures preserve the
-selection and allow retry/manual correction. Coordinates remain in short-lived browser callbacks,
+selection and allow manual correction or a fresh attempt on reload. Coordinates remain in short-lived browser callbacks,
 never in storage, URLs, query keys, logs or discovery requests. Browser/OS positioning itself can
 use network services; local matching does not imply offline device positioning.
 

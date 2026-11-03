@@ -42,6 +42,12 @@ async function mockDiscovery(
     delayOnline?: boolean;
   } = {},
 ) {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'geolocation', {
+      configurable: true,
+      value: { getCurrentPosition: () => {} },
+    });
+  });
   const requests: URL[] = [];
   await page.route('**/api/v1/**', async (route) => {
     const url = new URL(route.request().url());
@@ -427,7 +433,9 @@ test('a valid remembered city waits for references before becoming active', asyn
     await route.fulfill({ json: cities });
   });
   await page.goto('/');
-  await expect(page.getByRole('link', { name: 'Nationwide gathering', exact: true })).toBeVisible();
+  await expect(page.locator('#home-city')).toHaveAttribute('aria-busy', 'true');
+  await expect(page.getByRole('link', { name: 'Nationwide gathering', exact: true })).toHaveCount(0);
+  expect(requests.filter((url) => url.pathname.endsWith('/events') && url.searchParams.get('modality') === 'in-person')).toEqual([]);
   expect(requests.filter((url) => url.searchParams.has('city'))).toEqual([]);
   release();
   await expect(page.locator('#home-city')).toContainText('Ankara');

@@ -30,12 +30,13 @@ function rememberedCity(): string {
   }
 }
 
-// Manual selection and explicit location resolution commit through the same setter.
+// Manual selection and automatic location resolution commit through the same setter.
 export function useHomeCity(cities: CityPublicDto[] | undefined) {
   const [candidate, setCandidate] = useState(rememberedCity);
   const [cityId, setCity] = useState('');
   const [location, setLocation] = useState<LocationState>({ status: 'idle' });
   const generation = useRef(0);
+  const automaticallyRequested = useRef(false);
 
   const setCityId = useCallback((value: string): void => {
     generation.current += 1;
@@ -104,6 +105,11 @@ export function useHomeCity(cities: CityPublicDto[] | undefined) {
     }
   }, [cities, setCityId]);
 
+  const selectCityId = useCallback((value: string): void => {
+    automaticallyRequested.current = true;
+    setCityId(value);
+  }, [setCityId]);
+
   useEffect(() => {
     if (cities && candidate) {
       setCityId(cities.some((city) => city.id === candidate) ? candidate : '');
@@ -111,6 +117,17 @@ export function useHomeCity(cities: CityPublicDto[] | undefined) {
     }
     if (cities && cityId && !cities.some((city) => city.id === cityId)) setCityId('');
   }, [cities, candidate, cityId, setCityId]);
+
+  useEffect(() => {
+    if (!cities || candidate || automaticallyRequested.current) return;
+    // Defer so Strict Mode's setup/cleanup replay cannot invalidate the only request.
+    const timer = window.setTimeout(() => {
+      if (automaticallyRequested.current) return;
+      automaticallyRequested.current = true;
+      requestLocation();
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [cities, candidate, requestLocation]);
 
   useEffect(
     () => () => {
@@ -122,9 +139,8 @@ export function useHomeCity(cities: CityPublicDto[] | undefined) {
   return {
     cityId,
     restoringCity: Boolean(candidate),
-    setCityId,
+    setCityId: selectCityId,
     selectedCity: cities?.find((city) => city.id === cityId),
     location,
-    requestLocation,
   };
 }
