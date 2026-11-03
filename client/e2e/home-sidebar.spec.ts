@@ -108,7 +108,13 @@ for (const language of ['en', 'ar']) {
         expect((await page.locator('main').boundingBox())!.width).toBeGreaterThan(1380);
         expect(
           (await page.locator('#events-cards article').first().boundingBox())!.width,
-        ).toBeGreaterThanOrEqual(340);
+        ).toBeGreaterThanOrEqual(280);
+        expect(
+          await page.locator('#events-cards').evaluate((el) => {
+            const style = getComputedStyle(el);
+            return style.scrollbarWidth === 'none' || style.overflowY === 'hidden';
+          }),
+        ).toBe(true);
       } else expect(box.y + box.height <= discovery.y).toBe(true);
       await page.screenshot({ path: testInfo.outputPath('sidebar.png'), fullPage: true });
       await sidebar
