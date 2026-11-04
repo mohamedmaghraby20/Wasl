@@ -8,4 +8,4 @@
 - For parallel agents in the same repository, use separate branches and worktrees under `./worktrees/`; add `/worktrees/` to `.gitignore`.
 - Merge parallel branches sequentially. After a successful merge, remove clean worktrees and merged local branches; preserve any uncommitted or unmerged work.
 - Ignore `.env`, `.env.*`, and secrets; keep `.env.example` tracked with placeholders only. Never commit credentials or tokens.
-- Check `git status` and staged changes before committing. Do not push, force-push, reset, clean, or rewrite history without explicit approval.
+- Check `git status` and staged changes before committing.
