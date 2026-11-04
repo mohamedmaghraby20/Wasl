@@ -40,9 +40,11 @@ the app.
 
 ---
 
-## version control/git
+## Git Workflow
 
-[`/docs/VERSION_CONTROL.md`](/docs/VERSION_CONTROL.md)
+- Before starting any code-changing task and after completing any task, read and follow `docs/VERSION_CONTROL.md` throughout the entire task. Do not consider the task complete until its version control requirements are satisfied.
+
+[`/docs/GIT_WORKFLOW.md`](/docs/GIT_WORKFLOW.md.md)
 
 ---
 
