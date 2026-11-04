@@ -127,16 +127,13 @@ export function HomePage(): React.JSX.Element {
             method="get"
             role="search"
           >
-            <label className="col-span-2 text-sm font-semibold text-text" htmlFor="home-search">
-              {t('homeSearchLabel')}
-            </label>
             <div className="col-span-2">
               <SearchInput
                 aria-label={t('homeSearchLabel')}
                 id="home-search"
                 name="q"
                 onValueChange={setQuery}
-                placeholder={t('exploreByName')}
+                placeholder={t('homeSearchLabel')}
                 value={query}
               />
             </div>

@@ -199,6 +199,8 @@ describe('HomePage', () => {
     expect(await screen.findByRole('link', { name: 'Arab students in Ankara' })).toBeVisible();
     expect(await screen.findByRole('link', { name: 'Arabic music night' })).toBeVisible();
     const search = screen.getByRole('searchbox', { name: 'Search communities and events' });
+    expect(search).toHaveAttribute('placeholder', 'Search communities and events');
+    expect(screen.queryByText('Search communities and events')).not.toBeInTheDocument();
     const form = search.closest('form');
     if (!form) throw new Error('The search field must be inside a form.');
     expect(form).toHaveAttribute('method', 'get');
