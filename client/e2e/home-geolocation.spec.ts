@@ -357,9 +357,9 @@ test('a new home visit wins over a delayed earlier automatic response', async ({
   await page.goto('/');
 
   await expect(page.getByText('Finding your city…')).toBeVisible();
-  await page.getByRole('link', { name: 'Discover', exact: true }).first().click();
-  await expect(page).toHaveURL(/\/discover/);
-  await page.getByRole('link', { name: 'Home', exact: true }).click();
+  await page.getByRole('link', { name: 'Events', exact: true }).first().click();
+  await expect(page).toHaveURL(/\/events/);
+  await page.getByRole('link', { name: 'Wasl', exact: true }).first().click();
 
   await expect(page.locator('#home-city')).toContainText('Istanbul');
   await page.evaluate(() => (window as unknown as { releaseLocations: (() => void)[] }).releaseLocations.shift()?.());
@@ -579,11 +579,11 @@ test('navigating away invalidates an outstanding location response', async ({ pa
   await mockLocation(page, { kind: 'success', longitude: 32, latitude: 39, defer: true });
   await page.goto('/');
   await expect(page.getByText('Finding your city…')).toBeVisible();
-  await page.getByRole('link', { name: 'Discover', exact: true }).first().click();
-  await expect(page).toHaveURL(/\/discover/);
+  await page.getByRole('link', { name: 'Events', exact: true }).first().click();
+  await expect(page).toHaveURL(/\/events/);
   await page.evaluate(() => (window as unknown as { releaseLocations: (() => void)[] }).releaseLocations.shift()?.());
   expect(await page.evaluate(() => localStorage.getItem('wasl-city'))).toBeNull();
-  await page.getByRole('link', { name: 'Home', exact: true }).click();
+  await page.getByRole('link', { name: 'Wasl', exact: true }).first().click();
   await expect(page.locator('#home-city')).toContainText('Across Türkiye');
   await expect(page.getByText('Finding your city…')).toBeVisible();
   expect(await locationCalls(page)).toBe(2);

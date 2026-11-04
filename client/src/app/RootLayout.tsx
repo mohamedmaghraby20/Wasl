@@ -32,11 +32,6 @@ import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from '@/com
 import { cn } from '@/lib/cn';
 import { requiresAuthentication } from './auth-routes';
 
-const primaryLinks = [
-  { key: 'home', to: '/', end: true },
-  { key: 'discover', to: '/discover', end: false },
-] as const;
-
 const accountLinks = [
   { key: 'create', to: '/create', icon: Plus },
   { key: 'myActivity', to: '/activity', icon: CalendarCheck },
@@ -61,14 +56,6 @@ function Brand(): React.JSX.Element {
     </Link>
   );
 }
-
-const navItemClass = (isActive: boolean): string =>
-  cn(
-    'relative flex h-11 items-center rounded-(--shape-radius-control) px-3.5 text-sm font-medium transition-colors duration-(--motion-duration-fast)',
-    isActive
-      ? 'bg-primary-soft text-primary-soft-text'
-      : 'text-text-muted hover:bg-surface-soft hover:text-text',
-  );
 
 export function RootLayout(): React.JSX.Element {
   const { t, i18n: activeI18n } = useTranslation();
@@ -129,21 +116,6 @@ export function RootLayout(): React.JSX.Element {
       <header className="sticky top-0 z-(--z-sticky) border-b border-border/80 bg-card/85 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-(--container-max) items-center gap-4 px-4 sm:px-6">
           <Brand />
-          <nav
-            aria-label={t('primaryNavigation')}
-            className="ms-2 hidden items-center gap-0.5 md:flex"
-          >
-            {primaryLinks.map((item) => (
-              <NavLink
-                className={({ isActive }) => navItemClass(isActive)}
-                end={item.end}
-                key={item.key}
-                to={item.to}
-              >
-                {t(item.key)}
-              </NavLink>
-            ))}
-          </nav>
           <div className="ms-auto flex items-center gap-1.5">
             <Button
               aria-label={languageLabel}
@@ -234,27 +206,6 @@ export function RootLayout(): React.JSX.Element {
                 <SheetTitle className="mb-2 px-1">
                   <Brand />
                 </SheetTitle>
-                <nav aria-label={t('primaryNavigation')} className="grid gap-1">
-                  {primaryLinks.map((item) => (
-                    <SheetClose asChild key={item.key}>
-                      <NavLink
-                        className={({ isActive }) =>
-                          cn(
-                            'flex h-11 items-center rounded-(--shape-radius-control) px-3 text-[0.95rem] font-medium transition-colors',
-                            isActive
-                              ? 'bg-primary-soft text-primary-soft-text'
-                              : 'text-text hover:bg-surface-soft',
-                          )
-                        }
-                        end={item.end}
-                        to={item.to}
-                      >
-                        {t(item.key)}
-                      </NavLink>
-                    </SheetClose>
-                  ))}
-                </nav>
-                <div className="my-2 h-px bg-border" />
                 <nav aria-label={t('accountMenu')} className="grid gap-1">
                   {user ? (
                     <>
