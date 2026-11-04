@@ -1,5 +1,4 @@
 # Wasl — Approved Technology Context (Batch 01)
-Source: [Technology Selection](https://app.notion.com/p/3f0578fa2944812e95e4cf7822b1d293).
 
 **Document role:** Approved baseline technologies. It is a plan, not evidence of which dependencies are already installed. Inspect actual `package.json` files before changes.
 
@@ -35,6 +34,3 @@ Source: [Technology Selection](https://app.notion.com/p/3f0578fa2944812e95e4cf78
 
 ## What a beginner should remember
 **Framework** (NestJS/React), **runtime** (Node.js), **HTTP engine** (Fastify), **database engine** (PostgreSQL), **managed host** (Supabase/Render), **code generator** (Orval) solve different problems. Not every dependency belongs in the initial setup task.
-
-## For Codex
-This document is reference context, not a directive to install every listed tool immediately. Only implement the dependencies needed for the approved current microtask. Read actual repository state first.
