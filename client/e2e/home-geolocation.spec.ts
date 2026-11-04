@@ -257,7 +257,7 @@ test('a return visit automatically refreshes the remembered city', async ({
   await page.reload();
   await expect(page.locator('#home-city')).toContainText('Ankara');
   await expect(page.getByRole('heading', { name: 'Upcoming events in Ankara' })).toBeVisible();
-  await expect(page.getByText('City set to Ankara.')).toBeVisible();
+  await expect(page.getByText('City set to Ankara.')).toHaveCount(0);
   expect(await locationCalls(page)).toBe(1);
 });
 
@@ -325,7 +325,7 @@ test('a boundary data failure preserves the current state and retries on reload'
   await page.route('**/geo/tr-provinces.json', (route) => route.fulfill({ json: stubBoundaries }));
   await page.reload();
   await expect(page.locator('#home-city')).toContainText('Ankara');
-  await expect(page.getByText('City set to Ankara.')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Upcoming events in Ankara' })).toBeVisible();
   await expect(page.getByRole('alert')).toHaveCount(0);
 });
 
@@ -380,7 +380,6 @@ test('manual correction persists city-only state and reload refreshes location',
   expect(await page.evaluate(() => localStorage.getItem('wasl-city'))).toBe('istanbul');
   await page.reload();
 
-  await expect(page.getByText('City set to Ankara.')).toBeVisible();
   await expect(page.locator('#home-city')).toContainText('Ankara');
   expect(await page.evaluate(() => localStorage.getItem('wasl-city'))).toBe('ankara');
   expect(await page.evaluate(() => JSON.stringify({ ...localStorage, ...sessionStorage }))).not.toMatch(/latitude|longitude|coords|32\.8597|39\.9334/i);
@@ -538,7 +537,6 @@ test('browser-granted coarse Istanbul coordinates resolve automatically with no 
   page.on('request', (request) => { if (request.url().includes('/geo/')) boundaryRequests.push(request.url()); });
   await page.goto('/');
   await expect(page.getByRole('button', { name: 'Use my location' })).toHaveCount(0);
-  await expect(page.getByRole('status').filter({ hasText: 'City set to Istanbul.' })).toBeVisible();
   await expect(page.locator('#home-city')).toContainText('Istanbul');
   expect(boundaryRequests).toEqual([new URL('/geo/tr-provinces.json', page.url()).href]);
   await page.screenshot({ path: test.info().outputPath('home-geolocation-desktop-ltr.png'), fullPage: true });
@@ -594,7 +592,8 @@ test('Arabic success and keyboard city correction stay synchronized in RTL', asy
   await mockDiscovery(page);
   await mockLocation(page, { kind: 'success', longitude: 32, latitude: 39 });
   await page.goto('/');
-  await expect(page.getByRole('status').filter({ hasText: 'تم اختيار أنقرة.' })).toBeVisible();
+  await expect(page.locator('#home-city')).toContainText('أنقرة');
+  await expect(page.getByText('تم اختيار أنقرة.')).toHaveCount(0);
   await page.locator('#home-city').focus();
   await page.keyboard.press('Enter');
   const search = page.getByRole('combobox');

@@ -46,7 +46,6 @@ void i18n.use(initReactI18next).init({
         upcomingOnlineEvents: 'Upcoming online events',
         homeCitiesError: 'Cities could not load. Search and event discovery are still available.',
         locatingCity: 'Finding your city…',
-        locationSuccess: 'City set to {{city}}.',
         locationUnsupported:
           'Location is not available in this browser. Choose a city from the list.',
         locationInsecure: 'Location needs a secure connection. Choose a city from the list.',
@@ -802,7 +801,6 @@ void i18n.use(initReactI18next).init({
         upcomingOnlineEvents: 'فعاليات قادمة عبر الإنترنت',
         homeCitiesError: 'تعذر تحميل المدن. لا يزال البحث واستكشاف الفعاليات متاحين.',
         locatingCity: 'جارٍ تحديد مدينتك…',
-        locationSuccess: 'تم اختيار {{city}}.',
         locationUnsupported: 'الموقع غير متاح في هذا المتصفح. اختر مدينة من القائمة.',
         locationInsecure: 'يتطلب الموقع اتصالاً آمناً. اختر مدينة من القائمة.',
         locationDenied: 'لم يتم منح إذن الموقع. لم يتغير اختيارك؛ اختر مدينة من القائمة.',

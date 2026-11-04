@@ -169,10 +169,6 @@ export function HomePage(): React.JSX.Element {
                 <p className="text-xs font-medium text-text-muted" role="status">
                   {t('locatingCity')}
                 </p>
-              ) : location.status === 'success' ? (
-                <p className="text-xs font-medium text-success" role="status">
-                  {t('locationSuccess', { city: cityName })}
-                </p>
               ) : locationError ? (
                 <p className="text-xs text-text-muted" role="status">
                   {t(locationError)}
