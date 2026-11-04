@@ -1,7 +1,7 @@
 import {
   Bell,
   CalendarCheck,
-  Globe2,
+  Languages,
   LogOut,
   Menu,
   MessageSquare,
@@ -121,11 +121,12 @@ export function RootLayout(): React.JSX.Element {
               aria-label={languageLabel}
               className="hidden md:inline-flex"
               onClick={() => void changeLanguage()}
-              size="icon"
+              size="sm"
               title={languageLabel}
               variant="ghost"
             >
-              <Globe2 aria-hidden="true" />
+              <Languages aria-hidden="true" />
+              <span lang={isArabic ? 'en' : 'ar'} dir="auto">{isArabic ? 'English' : 'العربية'}</span>
             </Button>
             {user ? (
               <>
@@ -260,7 +261,7 @@ export function RootLayout(): React.JSX.Element {
                     onClick={() => void changeLanguage()}
                     type="button"
                   >
-                    <Globe2 aria-hidden="true" />
+                    <Languages aria-hidden="true" />
                     <span className="min-w-0 truncate">{languageLabel}</span>
                   </button>
                 </div>
