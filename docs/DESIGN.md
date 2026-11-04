@@ -1,3 +1,3 @@
 # UI/UX Design Rules
 
--For design tokens used in this app [`/docs/design/`](/docs/design/)
+-For design tokens used in this app are under the folder '/docs/design'
