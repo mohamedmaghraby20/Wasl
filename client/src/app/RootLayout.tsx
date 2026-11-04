@@ -33,10 +33,7 @@ import { cn } from '@/lib/cn';
 import { requiresAuthentication } from './auth-routes';
 
 const accountLinks = [
-  { key: 'create', to: '/create', icon: Plus },
   { key: 'myActivity', to: '/activity', icon: CalendarCheck },
-  { key: 'notifications', to: '/notifications', icon: Bell },
-  { key: 'messages', to: '/messages', icon: MessageSquare },
   { key: 'profileTitle', to: '/profile', icon: UserRound },
   { key: 'privacyTitle', to: '/privacy', icon: ShieldCheck },
 ] as const;
@@ -142,6 +139,16 @@ export function RootLayout(): React.JSX.Element {
                     <Plus aria-hidden="true" />
                   </Link>
                 </Button>
+                <Button asChild aria-label={t('messages')} title={t('messages')} size="icon" variant="ghost">
+                  <Link to="/messages">
+                    <MessageSquare aria-hidden="true" />
+                  </Link>
+                </Button>
+                <Button asChild aria-label={t('notifications')} title={t('notifications')} size="icon" variant="ghost">
+                  <Link to="/notifications">
+                    <Bell aria-hidden="true" />
+                  </Link>
+                </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button
@@ -210,6 +217,15 @@ export function RootLayout(): React.JSX.Element {
                 <nav aria-label={t('accountMenu')} className="grid gap-1">
                   {user ? (
                     <>
+                      <SheetClose asChild>
+                        <NavLink
+                          className="flex h-11 items-center gap-3 rounded-(--shape-radius-control) px-3 text-[0.95rem] font-medium text-text-muted hover:bg-surface-soft hover:text-text sm:hidden"
+                          to="/create"
+                        >
+                          <Plus aria-hidden="true" className="size-4" />
+                          {t('create')}
+                        </NavLink>
+                      </SheetClose>
                       {accountLinks.map((item) => (
                         <SheetClose asChild key={item.key}>
                           <NavLink
