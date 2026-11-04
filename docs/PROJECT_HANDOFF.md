@@ -33,7 +33,7 @@ Everything that was planned to be **built** is built. What remains is shipping, 
 
 ## Providers and data
 
-- **Supabase** — one project (`vuznrkujfmxrggonuvif`), used for development and, from now on, for the MVP. 23 migrations applied (`0000`–`0022`). 31 public tables, all with Row Level Security enabled. `pgmq` and the `notification_emails` queue exist. The `profile-photos` bucket is public with a 5 MB limit and JPEG/PNG/WebP only.
+- **Supabase** — one project, used for development and, from now on, for the MVP. 23 migrations applied (`0000`–`0022`). 31 public tables, all with Row Level Security enabled. `pgmq` and the `notification_emails` queue exist. The `profile-photos` bucket is public with a 5 MB limit and JPEG/PNG/WebP only.
 - **Sample data** — the database is seeded with labelled sample users, communities, events, memberships and registrations. This data ships with the MVP. The seed refuses to run when `NODE_ENV=production`.
 - **Stream** — one app for community chat, event chat and DMs. Permissions are verified (`STREAM_PERMISSIONS_VERIFIED=true`).
 - **Resend** — no verified sending domain yet. Development email goes out from `onboarding@resend.dev`.
@@ -55,15 +55,6 @@ Everything that was planned to be **built** is built. What remains is shipping, 
 - **Signed-in routes:** `/profile`, `/profile/edit`, `/activity`, `/messages`, `/notifications`, `/privacy`, `/create/*`, `/*/edit`, `/*/manage`, `/organizations/invitations/accept`, `/admin`.
 - **Database:** `server/src/db/schema.ts` and `server/drizzle/*.sql`; applied migrations are immutable history.
 
-## Verified state (2026-10-28, `main`)
-
-- `pnpm typecheck` — passes.
-- `pnpm lint` — passes with `--max-warnings=0`.
-- `pnpm test` — **126 server tests / 21 files** and **87 client tests / 26 files** pass.
-- `pnpm test:privacy:postgres` — passes against the project database: age/acceptance gate, under-18 refusal, organization-ownership block on deletion, cancellation, anonymization, provider failure and retry, export, retention blocker, admin age review, and the in-app notice created on a decision (with no email queued).
-- `pnpm build` — passes: OpenAPI and Orval clients regenerate, server and client build, and the client build writes `sitemap.xml` (27 URLs on the seeded data) and a `robots.txt` with a `Sitemap:` line.
-- `GET /api/v1/health/ready` — returns `200` with `database: "up"` against the project, and `503` when the database is unreachable.
-- CI and the Render blueprint are committed but have not run yet: the repository is now on GitHub at `mohamedmaghraby20/Wasl` (`main`), so CI starts on the next push or pull request.
 
 ## Known gaps
 
@@ -77,7 +68,6 @@ Everything that was planned to be **built** is built. What remains is shipping, 
 
 ## Repository state
 
-Everything is merged into `main` and pushed to `origin` (`mohamedmaghraby20/Wasl`); `git status` is clean. The phase branches (`feature/phase7-notification-schema`, `feature/phase8-local-hardening`) and `master` are already contained in `main`. CI and the Render blueprint are committed but have never executed, so the first pipeline run and the first deploy are still ahead.
 
 ## Local commands
 
