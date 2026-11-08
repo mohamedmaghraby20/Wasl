@@ -56,7 +56,7 @@ export function DiscoverySection({
           <p className="sr-only" role="status">
             {t('loading', { resource })}
           </p>
-          <div aria-hidden="true" className="grid gap-4 sm:grid-cols-2">
+          <div aria-hidden="true" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 6 }, (_, index) => (
               <div
                 className="grid gap-4 rounded-(--shape-radius-card) border border-border bg-card p-5"
@@ -84,7 +84,7 @@ export function DiscoverySection({
           title={t('noResultsTitle')}
         />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {results.map((item) => (
             <ResourceCard key={item.id} item={item} kind={kind} />
           ))}

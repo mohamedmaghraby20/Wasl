@@ -62,7 +62,7 @@ export function HomeSection({
     element.scrollBy({ left: element.clientWidth * (forward ? 1 : -1) * (rtl ? -1 : 1) });
   };
   const rowClass =
-    'grid min-w-0 grid-flow-col auto-cols-[85%] gap-4 overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden p-1 -m-1 sm:auto-cols-[calc((100%-1rem)/2)]';
+    'grid min-w-0 grid-flow-col auto-cols-[85%] gap-4 overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden p-1 -m-1 sm:auto-cols-[calc((100%-1rem)/2)] xl:auto-cols-[calc((100%-2rem)/3)]';
   return (
     <section className="grid gap-4" aria-labelledby={`${sectionId}-heading`}>
       <div className="grid gap-1 sm:flex sm:items-end sm:justify-between sm:gap-3">
