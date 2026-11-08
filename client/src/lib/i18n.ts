@@ -55,8 +55,7 @@ void i18n.use(initReactI18next).init({
           'Your location could not be determined. Your current city is unchanged; choose a city from the list.',
         locationTimeout:
           'Finding your location took too long. Your current city is unchanged; choose a city from the list.',
-        locationUnmatched:
-          'Choose a city to explore nearby communities and events.',
+        locationUnmatched: 'Choose a city to explore nearby communities and events.',
         locationBoundariesError:
           'City boundaries could not load. Your current city is unchanged; choose a city from the list.',
         locationCitiesError:
@@ -73,6 +72,9 @@ void i18n.use(initReactI18next).init({
         event: 'event',
         welcome: 'Find your people in Türkiye',
         starter: 'Explore public communities and events across Türkiye.',
+        homeHeroEyebrow: 'Your people are out there',
+        homeHeroTitle: 'Find your next community.',
+        homeHeroDescription: 'Shared interests make a big city feel smaller.',
         notFound: 'Page not found',
         routeNotFoundDescription: 'This address does not match a page on Wasl.',
         routeErrorTitle: 'This page could not load',
@@ -417,6 +419,8 @@ void i18n.use(initReactI18next).init({
         backTo: 'Back to {{resource}}',
         copyShare: 'Copy share link',
         exploreAll: 'Explore all',
+        viewResource: 'View details',
+        exploreCommunity: 'Explore',
         homePreviousCards: 'Previous cards',
         homeSignupTitle: 'Find your next gathering',
         homeSignupDescription: 'Create an account to join events and become part of a community.',
@@ -425,6 +429,7 @@ void i18n.use(initReactI18next).init({
         homeNextCards: 'Next cards',
         homeBrowseCards: 'Browse {{resource}}',
         homeSearchLabel: 'Search communities and events',
+        homeSearchExample: 'Try “football in Istanbul”',
         fromDate: 'From date',
         toDate: 'To date',
         pickDate: 'Pick a date',
@@ -806,8 +811,7 @@ void i18n.use(initReactI18next).init({
         locationUnavailable: 'تعذر تحديد موقعك. لم يتغير اختيارك؛ اختر مدينة من القائمة.',
         locationTimeout:
           'استغرق تحديد موقعك وقتاً طويلاً. لم يتغير اختيارك؛ اختر مدينة من القائمة.',
-        locationUnmatched:
-          'اختر مدينة لاستكشاف المجتمعات والفعاليات القريبة منك.',
+        locationUnmatched: 'اختر مدينة لاستكشاف المجتمعات والفعاليات القريبة منك.',
         locationBoundariesError:
           'تعذر تحميل حدود المدن. لم يتغير اختيارك؛ حاول مجدداً أو اختر مدينة من القائمة.',
         locationCitiesError: 'تعذر تحميل المدن المدعومة ولم يُطبق الموقع. اختر مدينة من القائمة.',
@@ -824,6 +828,9 @@ void i18n.use(initReactI18next).init({
         event: 'فعالية',
         welcome: 'اعثر على مجتمعك في تركيا',
         starter: 'اكتشف المجتمعات والفعاليات العامة في أنحاء تركيا.',
+        homeHeroEyebrow: 'مجتمعك أقرب مما تظن',
+        homeHeroTitle: 'اكتشف مجتمعك القادم.',
+        homeHeroDescription: 'الاهتمامات المشتركة تجعل المدينة الكبيرة أقرب إليك.',
         notFound: 'الصفحة غير موجودة',
         routeNotFoundDescription: 'هذا العنوان لا يطابق صفحة في وصل.',
         routeErrorTitle: 'تعذر تحميل هذه الصفحة',
@@ -1177,6 +1184,8 @@ void i18n.use(initReactI18next).init({
         backTo: 'العودة إلى {{resource}}',
         copyShare: 'نسخ رابط المشاركة',
         exploreAll: 'استكشف الكل',
+        viewResource: 'عرض التفاصيل',
+        exploreCommunity: 'استكشف',
         homePreviousCards: 'البطاقات السابقة',
         homeSignupTitle: 'اعثر على لقائك القادم',
         homeSignupDescription: 'أنشئ حسابًا للانضمام إلى الفعاليات والمشاركة في مجتمع.',
@@ -1185,6 +1194,7 @@ void i18n.use(initReactI18next).init({
         homeNextCards: 'البطاقات التالية',
         homeBrowseCards: 'تصفح {{resource}}',
         homeSearchLabel: 'ابحث عن المجتمعات والفعاليات',
+        homeSearchExample: 'جرّب «كرة القدم في إسطنبول»',
         fromDate: 'من تاريخ',
         toDate: 'إلى تاريخ',
         pickDate: 'اختر تاريخًا',

@@ -8,7 +8,7 @@ export function Label({
 }: ComponentProps<typeof LabelPrimitive.Root>): React.JSX.Element {
   return (
     <LabelPrimitive.Root
-      className={cn('text-sm font-medium leading-none text-text', className)}
+      className={cn('text-xs font-bold leading-normal text-text', className)}
       {...props}
     />
   );

@@ -1,6 +1,7 @@
 import * as SelectPrimitive from '@radix-ui/react-select';
 import { Check, ChevronDown } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/cn';
 import { useDownwardDropdown } from '@/lib/use-downward-dropdown';
 
@@ -40,8 +41,11 @@ export function Select({
   'aria-busy': ariaBusy,
 }: SelectProps): React.JSX.Element {
   const { open, onOpenChange, triggerRef } = useDownwardDropdown(300);
+  const { i18n } = useTranslation();
+  const direction = i18n.dir();
   return (
     <SelectPrimitive.Root
+      dir={direction}
       disabled={disabled}
       name={name}
       onValueChange={onValueChange}
@@ -50,12 +54,13 @@ export function Select({
       onOpenChange={onOpenChange}
     >
       <SelectPrimitive.Trigger
+        dir={direction}
         aria-busy={ariaBusy}
         aria-describedby={ariaDescribedBy}
         aria-invalid={ariaInvalid}
         aria-label={ariaLabel}
         className={cn(
-          'flex h-11 w-full min-w-0 items-center justify-between gap-2 rounded-(--shape-radius-control) border border-input bg-background px-3 text-start text-sm text-text shadow-xs transition-[border-color,background-color] duration-(--motion-duration-fast) hover:border-border-control-hover disabled:cursor-not-allowed disabled:opacity-(--opacity-disabled) aria-invalid:border-danger [&>span]:truncate',
+          'flex h-11 w-full min-w-0 items-center justify-between gap-2 rounded-(--shape-radius-control) border border-input bg-surface px-3 text-start text-sm text-text transition-[border-color,background-color] duration-(--motion-duration-fast) hover:border-border-control-hover disabled:cursor-not-allowed disabled:bg-surface-soft disabled:opacity-(--opacity-disabled) aria-invalid:border-danger [&>span]:truncate',
           !value && 'text-text-subtle',
           className,
         )}

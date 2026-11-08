@@ -34,6 +34,8 @@ export function HomePage(): React.JSX.Element {
   const { t, i18n } = useTranslation();
   const { user, loading: authLoading } = useAuth();
   const [query, setQuery] = useState('');
+  const isMac =
+    typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/i.test(navigator.platform);
   const lang: 'ar' | 'en' = i18n.language.startsWith('ar') ? 'ar' : 'en';
   const cities = useDiscoveryControllerCities();
   const { cityId, restoringCity, setCityId, selectedCity, location } = useHomeCity(cities.data);
@@ -105,37 +107,69 @@ export function HomePage(): React.JSX.Element {
     >
       <section
         aria-labelledby="home-hero-heading"
-        className={`order-1 rounded-(--shape-radius-xl) border border-primary/20 bg-primary-soft ${user ? 'xl:col-start-2' : ''}`}
+        className={`relative isolate order-1 overflow-hidden rounded-(--shape-radius-2xl) border border-border bg-[radial-gradient(ellipse_at_88%_22%,var(--color-primary-soft),transparent_44%),linear-gradient(135deg,var(--color-surface),var(--color-surface-soft))] shadow-(--shadow-card) ${user ? 'xl:col-start-2' : ''}`}
       >
-        <div className="grid items-center gap-5 p-5 sm:p-6 lg:grid-cols-[0.8fr_1.2fr] lg:gap-8 lg:p-8">
-          <div className="grid content-center gap-3">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute end-[-5rem] top-20 size-72 rounded-full border border-primary/30 sm:size-80"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute end-[-2rem] top-32 size-48 rounded-full border border-primary/30 sm:size-56"
+        />
+        <div className="relative z-10 grid gap-8 p-6 sm:p-8 lg:p-10">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="inline-flex items-center gap-2 text-sm font-extrabold text-text">
+              <span
+                aria-hidden="true"
+                className="grid size-9 place-items-center rounded-(--shape-radius-md) bg-primary text-base text-primary-foreground"
+              >
+                w
+              </span>
+              <span>{t('brand')}</span>
+            </div>
+          </div>
+          <div className="grid w-full max-w-[54rem] content-start gap-3">
+            <p className="text-xs font-bold tracking-wide text-text-muted">
+              {t('homeHeroEyebrow')}
+            </p>
             <h1
               id="home-hero-heading"
-              className="max-w-[20ch] font-heading text-2xl font-extrabold sm:text-3xl rtl:max-w-[26ch]"
+              className="max-w-full font-heading text-4xl font-extrabold leading-[1.1] sm:text-5xl lg:text-6xl rtl:leading-[1.3]"
             >
-              {t('welcome')}
+              {t('homeHeroTitle')}
             </h1>
-            <p className="max-w-(--container-reading) text-base leading-relaxed text-text-muted">
-              {t('starter')}
+            <p className="max-w-(--container-reading) text-base leading-relaxed text-text-muted sm:text-lg">
+              {t('homeHeroDescription')}
             </p>
           </div>
 
           <Form
             action="/discover"
             aria-label={t('homeSearchLabel')}
-            className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-3"
+            className="grid w-full max-w-[54rem] min-w-0 gap-3 lg:grid-cols-3"
             method="get"
             role="search"
           >
-            <div className="col-span-2">
+            <div className="relative min-w-0">
               <SearchInput
                 aria-label={t('homeSearchLabel')}
+                className="h-12 border-border pe-16 shadow-(--elevation-xs)"
                 id="home-search"
                 name="q"
                 onValueChange={setQuery}
-                placeholder={t('homeSearchLabel')}
+                placeholder={t('homeSearchExample')}
                 value={query}
               />
+              {!query ? (
+                <kbd
+                  aria-hidden="true"
+                  dir="ltr"
+                  className="pointer-events-none absolute end-3 top-1/2 -translate-y-1/2 rounded-(--shape-radius-sm) border border-border bg-surface px-1.5 py-1 text-xs font-medium text-text-muted"
+                >
+                  {isMac ? '⌘ K' : 'Ctrl K'}
+                </kbd>
+              ) : null}
             </div>
             <input type="hidden" name="upcoming" value="true" />
             <input type="hidden" name="nonCancelled" value="true" />
@@ -144,7 +178,7 @@ export function HomePage(): React.JSX.Element {
             <SearchableSelect
               aria-label={cityId ? `${t('cityFilter')}: ${cityName}` : t('nationwide')}
               aria-busy={cities.isPending}
-              className="col-span-2"
+              className="h-12"
               emptyMessage={t('noCitiesFound')}
               id="home-city"
               onValueChange={setCityId}
@@ -161,7 +195,10 @@ export function HomePage(): React.JSX.Element {
               searchPlaceholder={t('searchCities')}
               value={cityId}
             />
-            <div className="col-span-2 grid gap-1 empty:hidden">
+            <Button className="h-12 w-full" type="submit">
+              {t('search')}
+            </Button>
+            <div className="grid gap-1 empty:hidden lg:col-span-3">
               {cities.isError ? (
                 <QueryError message={t('homeCitiesError')} onRetry={() => void cities.refetch()} />
               ) : null}
@@ -175,9 +212,6 @@ export function HomePage(): React.JSX.Element {
                 </p>
               ) : null}
             </div>
-            <Button block className="col-span-2" type="submit">
-              {t('search')}
-            </Button>
           </Form>
         </div>
       </section>
@@ -189,7 +223,6 @@ export function HomePage(): React.JSX.Element {
       ) : null}
       <div className={`order-3 grid min-w-0 gap-8 sm:gap-10 ${user ? 'xl:col-start-2' : ''}`}>
         <HomeSection
-          wideCards={Boolean(user)}
           title={
             cityId && !fallback
               ? t('upcomingEventsInCity', { city: cityName })
@@ -204,7 +237,6 @@ export function HomePage(): React.JSX.Element {
           viewAll={`/events?${eventDestination}`}
         />
         <HomeSection
-          wideCards={Boolean(user)}
           title={
             cityId && !communityFallback
               ? t('communitiesInCity', { city: cityName })
@@ -220,7 +252,6 @@ export function HomePage(): React.JSX.Element {
         />
         {!onlineEmpty && (
           <HomeSection
-            wideCards={Boolean(user)}
             title={t('upcomingOnlineEvents')}
             kind="events"
             sectionId="online-events"

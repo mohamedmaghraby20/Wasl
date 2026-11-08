@@ -96,7 +96,11 @@ function renderHome(
         'http://localhost:3000',
       );
       if (url.pathname.endsWith('/discovery/categories'))
-        return Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve([]) } as Response);
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve([]),
+        } as Response);
       if (url.pathname.endsWith('/reference/cities'))
         return Promise.resolve({
           ok: !options.citiesError,
@@ -150,7 +154,8 @@ function renderHome(
         status: 200,
         json: () =>
           Promise.resolve({
-            items: url.pathname.endsWith('/communities') && !options.communitiesEmpty ? [community] : [],
+            items:
+              url.pathname.endsWith('/communities') && !options.communitiesEmpty ? [community] : [],
             page: 1,
             pageSize: 4,
           }),
@@ -199,7 +204,7 @@ describe('HomePage', () => {
     expect(await screen.findByRole('link', { name: 'Arab students in Ankara' })).toBeVisible();
     expect(await screen.findByRole('link', { name: 'Arabic music night' })).toBeVisible();
     const search = screen.getByRole('searchbox', { name: 'Search communities and events' });
-    expect(search).toHaveAttribute('placeholder', 'Search communities and events');
+    expect(search).toHaveAttribute('placeholder', 'Try “football in Istanbul”');
     expect(screen.queryByText('Search communities and events')).not.toBeInTheDocument();
     const form = search.closest('form');
     if (!form) throw new Error('The search field must be inside a form.');
@@ -231,11 +236,19 @@ describe('HomePage', () => {
   });
 
   it('shows optional location failure as neutral guidance, not an error alert', async () => {
-    vi.stubGlobal('navigator', { geolocation: {
-      getCurrentPosition: (_success: PositionCallback, fail: PositionErrorCallback) => {
-        fail({ code: 1, message: 'Denied', PERMISSION_DENIED: 1, POSITION_UNAVAILABLE: 2, TIMEOUT: 3 });
+    vi.stubGlobal('navigator', {
+      geolocation: {
+        getCurrentPosition: (_success: PositionCallback, fail: PositionErrorCallback) => {
+          fail({
+            code: 1,
+            message: 'Denied',
+            PERMISSION_DENIED: 1,
+            POSITION_UNAVAILABLE: 2,
+            TIMEOUT: 3,
+          });
+        },
       },
-    } });
+    });
     renderHome();
 
     const guidance = await screen.findByText(/Location permission was not granted/);
@@ -249,14 +262,22 @@ describe('HomePage', () => {
   it('keeps communities visible while the event section loads', async () => {
     renderHome({ eventsLoading: true });
     expect(await screen.findByRole('link', { name: 'Arab students in Ankara' })).toBeVisible();
-    expect(within(screen.getByRole('region', { name: 'Upcoming events across Türkiye' })).getByRole('status')).toBeInTheDocument();
+    expect(
+      within(screen.getByRole('region', { name: 'Upcoming events across Türkiye' })).getByRole(
+        'status',
+      ),
+    ).toBeInTheDocument();
   });
 
   it('distinguishes a successfully empty nationwide collection from a loading or error state', async () => {
     renderHome({ eventsEmpty: true });
     expect(await screen.findByText('Nothing here yet')).toBeVisible();
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-    expect(within(screen.getByRole('region', { name: 'Upcoming events across Türkiye' })).queryByRole('status')).not.toBeInTheDocument();
+    expect(
+      within(screen.getByRole('region', { name: 'Upcoming events across Türkiye' })).queryByRole(
+        'status',
+      ),
+    ).not.toBeInTheDocument();
   });
 
   it('keeps successful events visible while communities load independently', async () => {

@@ -1,6 +1,6 @@
 # Wasl Design System — Preview v1
 
-A standalone HTML/CSS preview and starter token contract for Wasl. It uses **Manrope** for English and **Tajawal** for Arabic, with a soft gray foundation and a brighter lime accent. The accent `#8CC63E` is a provisional starting point.
+A standalone HTML/CSS preview and starter token contract for Wasl. It uses **Manrope** for English and **Tajawal** for Arabic, with soft neutral surfaces and a deep brown accent (`#70492E`) in light mode, paired with pale brown highlights. The existing dark palette is unchanged.
 
 ## Files
 
@@ -13,7 +13,7 @@ A standalone HTML/CSS preview and starter token contract for Wasl. It uses **Man
 
 ## Preview controls
 
-- **Theme:** Wasl Lime is the intended direction. Ocean and Plum are demo presets to prove the theme contract can support future alternatives; they are not proposed Wasl brand decisions.
+- **Theme:** Wasl Brown is the intended direction. Ocean and Plum are demo presets to prove the theme contract can support future alternatives; they are not proposed Wasl brand decisions.
 - **Mode:** switch light/dark without changing components.
 - **Density:** switch comfortable/compact spacing and control sizing.
 

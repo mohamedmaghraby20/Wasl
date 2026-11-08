@@ -18,7 +18,7 @@ export function PopoverContent({
       <PopoverPrimitive.Content
         align={align}
         className={cn(
-          'z-(--z-dropdown) w-auto rounded-xl border border-border bg-popover p-3 text-popover-foreground shadow-lg outline-hidden data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
+          'z-(--z-dropdown) w-auto rounded-(--shape-radius-card) border border-border bg-popover p-3 text-popover-foreground shadow-(--shadow-popover) outline-hidden data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
           className,
         )}
         sideOffset={sideOffset}

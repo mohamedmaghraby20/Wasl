@@ -182,37 +182,37 @@
   --tracking-tight: 0;
 }
 
-/* Wasl Lime — provisional brand accent: #8CC63E. */
+/* Wasl brown light theme; the existing dark palette remains unchanged. */
 :root[data-theme="wasl"][data-mode="light"] {
   color-scheme: light;
-  --color-canvas: var(--color-gray-50);
-  --color-surface: var(--color-white);
-  --color-surface-soft: var(--color-gray-100);
-  --color-surface-raised: var(--color-white);
-  --color-text: var(--color-gray-950);
-  --color-text-muted: var(--color-gray-600);
-  --color-text-subtle: #687063;
-  --color-border: var(--color-gray-200);
-  --color-border-strong: var(--color-gray-300);
-  --color-border-control: #7F8678;
-  --color-border-control-hover: #5F665A;
-  --color-primary: var(--color-lime-500);
-  --color-primary-hover: var(--color-lime-600);
-  --color-primary-active: var(--color-lime-700);
-  --color-on-primary: var(--color-gray-950);
-  --color-primary-soft: var(--color-lime-100);
-  --color-primary-soft-text: var(--color-lime-900);
-  --color-ring: #537D1B;
+  --color-canvas: #F8F6F4;
+  --color-surface: #FFFFFF;
+  --color-surface-soft: #F2EEEA;
+  --color-surface-raised: #FFFFFF;
+  --color-text: #2D2521;
+  --color-text-muted: #6A5D55;
+  --color-text-subtle: #6D5F57;
+  --color-border: #E8E1DB;
+  --color-border-strong: #D4C8BF;
+  --color-border-control: #8A786B;
+  --color-border-control-hover: #6A584C;
+  --color-primary: #70492E;
+  --color-primary-hover: #5E3B25;
+  --color-primary-active: #4D2F1D;
+  --color-on-primary: #FFFFFF;
+  --color-primary-soft: #F4E8DE;
+  --color-primary-soft-text: #70492E;
+  --color-ring: #70492E;
   --color-success: var(--color-green-700);
   --color-success-soft: var(--color-green-100);
-  --color-warning: var(--color-amber-700);
-  --color-warning-soft: var(--color-amber-100);
+  --color-warning: #694779;
+  --color-warning-soft: #F2EAF5;
   --color-danger: var(--color-red-700);
   --color-danger-hover: #A52F29;
   --color-danger-soft: var(--color-red-100);
   --color-info: var(--color-blue-700);
   --color-info-soft: var(--color-blue-100);
-  --color-shadow: 20 30 12;
+  --color-shadow: 43 27 19;
   --shape-radius-card: var(--shape-radius-xl);
   --shape-radius-control: var(--shape-radius-md);
   --shape-radius-dialog: var(--shape-radius-2xl);
@@ -242,8 +242,8 @@
   --color-ring: var(--color-lime-200);
   --color-success: var(--color-green-300);
   --color-success-soft: var(--color-green-900);
-  --color-warning: var(--color-amber-300);
-  --color-warning-soft: var(--color-amber-900);
+  --color-warning: #DFC5E9;
+  --color-warning-soft: #392A40;
   --color-danger: var(--color-red-300);
   --color-danger-hover: #FFAAA2;
   --color-danger-soft: var(--color-red-900);
@@ -278,8 +278,8 @@
   --color-ring: #4B8FD9;
   --color-success: var(--color-green-700);
   --color-success-soft: var(--color-green-100);
-  --color-warning: var(--color-amber-700);
-  --color-warning-soft: var(--color-amber-100);
+  --color-warning: #694779;
+  --color-warning-soft: #F2EAF5;
   --color-danger: var(--color-red-700);
   --color-danger-hover: #A52F29;
   --color-danger-soft: var(--color-red-100);
@@ -314,8 +314,8 @@
   --color-ring: #8FC1FA;
   --color-success: var(--color-green-300);
   --color-success-soft: var(--color-green-900);
-  --color-warning: var(--color-amber-300);
-  --color-warning-soft: var(--color-amber-900);
+  --color-warning: #DFC5E9;
+  --color-warning-soft: #392A40;
   --color-danger: var(--color-red-300);
   --color-danger-hover: #FFAAA2;
   --color-danger-soft: var(--color-red-900);
@@ -347,8 +347,8 @@
   --color-ring: #9D70CA;
   --color-success: var(--color-green-700);
   --color-success-soft: var(--color-green-100);
-  --color-warning: var(--color-amber-700);
-  --color-warning-soft: var(--color-amber-100);
+  --color-warning: #694779;
+  --color-warning-soft: #F2EAF5;
   --color-danger: var(--color-red-700);
   --color-danger-hover: #A52F29;
   --color-danger-soft: var(--color-red-100);
@@ -383,8 +383,8 @@
   --color-ring: #D1B2F1;
   --color-success: var(--color-green-300);
   --color-success-soft: var(--color-green-900);
-  --color-warning: var(--color-amber-300);
-  --color-warning-soft: var(--color-amber-900);
+  --color-warning: #DFC5E9;
+  --color-warning-soft: #392A40;
   --color-danger: var(--color-red-300);
   --color-danger-hover: #FFAAA2;
   --color-danger-soft: var(--color-red-900);

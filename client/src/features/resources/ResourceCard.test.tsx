@@ -59,6 +59,13 @@ beforeEach(async () => {
 });
 
 describe('image-led resource cards', () => {
+  it.each(['en', 'ar'])('offers a translated details action for events in %s', async (language) => {
+    await i18n.changeLanguage(language);
+    show(event, 'events');
+    expect(
+      screen.getByRole('link', { name: language === 'ar' ? 'عرض التفاصيل' : 'View details' }),
+    ).toHaveAttribute('href', '/events/weekend-walk');
+  });
   it.each(['en', 'ar'])(
     'shows the public member aggregate on community cards in %s',
     async (language) => {
@@ -121,7 +128,6 @@ describe('image-led resource cards', () => {
   it('shows accepted registrations and remaining seats without counting the host preview', () => {
     show(event, 'events');
     expect(screen.getByText('1 registered')).toBeVisible();
-    expect(screen.queryByText(event.hostName)).not.toBeInTheDocument();
     expect(screen.getByText('2 places left')).toBeVisible();
     expect(screen.getByText('03:00 PM')).toBeVisible();
   });
@@ -133,12 +139,12 @@ describe('image-led resource cards', () => {
     async (kind, item, title) => {
       show(item, kind);
       const cover = screen.getByAltText('');
-      expect(cover).toHaveAttribute('src', expect.stringMatching(/^\/images\/.+\.jpg$/));
+      expect(cover).toHaveAttribute('src', expect.stringMatching(/^\/images\/.+\.svg$/));
       expect(cover).toHaveAttribute('width');
       expect(cover).toHaveAttribute('height');
       fireEvent.error(cover);
       expect(cover).not.toBeInTheDocument();
-      if (kind === 'communities') expect(screen.getByText(item.hostName)).toBeVisible();
+      expect(screen.queryByText(item.hostName)).not.toBeInTheDocument();
       expect(screen.getByText('Ankara')).toBeVisible();
       expect(screen.getByText('Culture')).toBeVisible();
       await userEvent.click(screen.getByRole('link', { name: title }));
