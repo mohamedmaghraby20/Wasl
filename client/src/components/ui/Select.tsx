@@ -55,7 +55,7 @@ export function Select({
         aria-invalid={ariaInvalid}
         aria-label={ariaLabel}
         className={cn(
-          'flex h-11 w-full min-w-0 items-center justify-between gap-2 rounded-(--shape-radius-control) border border-input bg-background px-3 text-start text-sm text-text shadow-xs transition-[border-color,background-color] duration-(--motion-duration-fast) hover:border-border-control-hover disabled:cursor-not-allowed disabled:opacity-(--opacity-disabled) aria-invalid:border-danger [&>span]:truncate',
+          'flex h-11 w-full min-w-0 items-center justify-between gap-2 rounded-(--shape-radius-control) border border-input bg-surface px-3 text-start text-sm text-text transition-[border-color,background-color] duration-(--motion-duration-fast) hover:border-border-control-hover disabled:cursor-not-allowed disabled:bg-surface-soft disabled:opacity-(--opacity-disabled) aria-invalid:border-danger [&>span]:truncate',
           !value && 'text-text-subtle',
           className,
         )}

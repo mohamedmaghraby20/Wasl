@@ -59,6 +59,13 @@ beforeEach(async () => {
 });
 
 describe('image-led resource cards', () => {
+  it.each(['en', 'ar'])('offers a translated details action for events in %s', async (language) => {
+    await i18n.changeLanguage(language);
+    show(event, 'events');
+    expect(
+      screen.getByRole('link', { name: language === 'ar' ? 'عرض التفاصيل' : 'View details' }),
+    ).toHaveAttribute('href', '/events/weekend-walk');
+  });
   it.each(['en', 'ar'])(
     'shows the public member aggregate on community cards in %s',
     async (language) => {

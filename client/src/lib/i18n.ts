@@ -55,8 +55,7 @@ void i18n.use(initReactI18next).init({
           'Your location could not be determined. Your current city is unchanged; choose a city from the list.',
         locationTimeout:
           'Finding your location took too long. Your current city is unchanged; choose a city from the list.',
-        locationUnmatched:
-          'Choose a city to explore nearby communities and events.',
+        locationUnmatched: 'Choose a city to explore nearby communities and events.',
         locationBoundariesError:
           'City boundaries could not load. Your current city is unchanged; choose a city from the list.',
         locationCitiesError:
@@ -417,6 +416,7 @@ void i18n.use(initReactI18next).init({
         backTo: 'Back to {{resource}}',
         copyShare: 'Copy share link',
         exploreAll: 'Explore all',
+        viewResource: 'View details',
         homePreviousCards: 'Previous cards',
         homeSignupTitle: 'Find your next gathering',
         homeSignupDescription: 'Create an account to join events and become part of a community.',
@@ -807,8 +807,7 @@ void i18n.use(initReactI18next).init({
         locationUnavailable: 'تعذر تحديد موقعك. لم يتغير اختيارك؛ اختر مدينة من القائمة.',
         locationTimeout:
           'استغرق تحديد موقعك وقتاً طويلاً. لم يتغير اختيارك؛ اختر مدينة من القائمة.',
-        locationUnmatched:
-          'اختر مدينة لاستكشاف المجتمعات والفعاليات القريبة منك.',
+        locationUnmatched: 'اختر مدينة لاستكشاف المجتمعات والفعاليات القريبة منك.',
         locationBoundariesError:
           'تعذر تحميل حدود المدن. لم يتغير اختيارك؛ حاول مجدداً أو اختر مدينة من القائمة.',
         locationCitiesError: 'تعذر تحميل المدن المدعومة ولم يُطبق الموقع. اختر مدينة من القائمة.',
@@ -1178,6 +1177,7 @@ void i18n.use(initReactI18next).init({
         backTo: 'العودة إلى {{resource}}',
         copyShare: 'نسخ رابط المشاركة',
         exploreAll: 'استكشف الكل',
+        viewResource: 'عرض التفاصيل',
         homePreviousCards: 'البطاقات السابقة',
         homeSignupTitle: 'اعثر على لقائك القادم',
         homeSignupDescription: 'أنشئ حسابًا للانضمام إلى الفعاليات والمشاركة في مجتمع.',
