@@ -150,13 +150,13 @@ export function HomePage(): React.JSX.Element {
               <span>{t('brand')}</span>
             </div>
           </div>
-          <div className="grid max-w-2xl content-start gap-3">
+          <div className="grid w-full max-w-[54rem] content-start gap-3">
             <p className="text-xs font-bold tracking-wide text-text-muted">
               {t('homeHeroEyebrow')}
             </p>
             <h1
               id="home-hero-heading"
-              className="max-w-[15ch] font-heading text-4xl font-extrabold leading-[1.1] sm:text-5xl rtl:max-w-[20ch] rtl:leading-[1.3]"
+              className="max-w-full font-heading text-4xl font-extrabold leading-[1.1] sm:text-5xl lg:text-6xl rtl:leading-[1.3]"
             >
               {t('homeHeroTitle')}
             </h1>
