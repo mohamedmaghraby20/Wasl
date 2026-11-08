@@ -105,25 +105,51 @@ export function HomePage(): React.JSX.Element {
     >
       <section
         aria-labelledby="home-hero-heading"
-        className={`order-1 rounded-(--shape-radius-xl) border border-primary/20 bg-primary-soft ${user ? 'xl:col-start-2' : ''}`}
+        className={`relative isolate order-1 overflow-hidden rounded-(--shape-radius-2xl) border border-border bg-[radial-gradient(ellipse_at_88%_22%,var(--color-primary-soft),transparent_44%),linear-gradient(135deg,var(--color-surface),var(--color-surface-soft))] shadow-(--shadow-card) ${user ? 'xl:col-start-2' : ''}`}
       >
-        <div className="grid items-center gap-5 p-5 sm:p-6 lg:grid-cols-[0.8fr_1.2fr] lg:gap-8 lg:p-8">
-          <div className="grid content-center gap-3">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute end-[-5rem] top-20 size-72 rounded-full border border-primary/30 sm:size-80"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute end-[-2rem] top-32 size-48 rounded-full border border-primary/30 sm:size-56"
+        />
+        <div className="relative z-10 grid gap-8 p-6 sm:p-8 lg:p-10">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="inline-flex items-center gap-2 text-sm font-extrabold text-text">
+              <span
+                aria-hidden="true"
+                className="grid size-9 place-items-center rounded-(--shape-radius-md) bg-primary text-base text-primary-foreground"
+              >
+                w
+              </span>
+              <span>{t('brand')}</span>
+            </div>
+            <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-2 text-xs font-semibold text-text-muted">
+              <span aria-hidden="true" className="size-2 rounded-full bg-primary" />
+              {t('homeHeroTag')}
+            </span>
+          </div>
+          <div className="grid max-w-2xl content-start gap-3">
+            <p className="text-xs font-bold tracking-wide text-text-muted">
+              {t('homeHeroEyebrow')}
+            </p>
             <h1
               id="home-hero-heading"
-              className="max-w-[20ch] font-heading text-2xl font-extrabold sm:text-3xl rtl:max-w-[26ch]"
+              className="max-w-[15ch] font-heading text-4xl font-extrabold leading-[1.1] sm:text-5xl rtl:max-w-[20ch] rtl:leading-[1.3]"
             >
-              {t('welcome')}
+              {t('homeHeroTitle')}
             </h1>
-            <p className="max-w-(--container-reading) text-base leading-relaxed text-text-muted">
-              {t('starter')}
+            <p className="max-w-(--container-reading) text-base leading-relaxed text-text-muted sm:text-lg">
+              {t('homeHeroDescription')}
             </p>
           </div>
 
           <Form
             action="/discover"
             aria-label={t('homeSearchLabel')}
-            className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-3"
+            className="grid w-full max-w-2xl min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-3"
             method="get"
             role="search"
           >
@@ -144,7 +170,7 @@ export function HomePage(): React.JSX.Element {
             <SearchableSelect
               aria-label={cityId ? `${t('cityFilter')}: ${cityName}` : t('nationwide')}
               aria-busy={cities.isPending}
-              className="col-span-2"
+              className="col-span-2 sm:col-span-1"
               emptyMessage={t('noCitiesFound')}
               id="home-city"
               onValueChange={setCityId}
@@ -161,6 +187,9 @@ export function HomePage(): React.JSX.Element {
               searchPlaceholder={t('searchCities')}
               value={cityId}
             />
+            <Button className="col-span-2 sm:col-span-1" type="submit">
+              {t('search')}
+            </Button>
             <div className="col-span-2 grid gap-1 empty:hidden">
               {cities.isError ? (
                 <QueryError message={t('homeCitiesError')} onRetry={() => void cities.refetch()} />
@@ -175,9 +204,6 @@ export function HomePage(): React.JSX.Element {
                 </p>
               ) : null}
             </div>
-            <Button block className="col-span-2" type="submit">
-              {t('search')}
-            </Button>
           </Form>
         </div>
       </section>
