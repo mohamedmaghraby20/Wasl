@@ -7,7 +7,6 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import {
   localizedName,
-  defaultResourceCover,
   localizedResourceTitle,
   turkeyDateParts,
   type ResourceKind,
@@ -24,7 +23,7 @@ export function ResourceCard({
   const event = kind === 'events' && 'startsAt' in item ? item : undefined;
   const date = event ? turkeyDateParts(event.startsAt, i18n.language) : undefined;
   const [firstCategory, ...otherCategories] = item.categories;
-  const cover = defaultResourceCover(item.id, kind);
+  const cover = '/images/community-covers/' + kind + '-abstract.svg';
   const [failedCover, setFailedCover] = useState<string>();
   const CoverIcon = event ? CalendarDays : UsersRound;
   const remaining =
@@ -149,17 +148,21 @@ export function ResourceCard({
             ) : null}
           </div>
         </div>
-        <div className="mt-auto grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-t border-border px-(--card-padding) py-4 text-xs text-text-muted">
-          <div className="flex min-w-0 items-center gap-2">
-            <span className="inline-flex min-w-0 items-center gap-2">
+        <div
+          dir="ltr"
+          className="mt-auto grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-t border-border px-(--card-padding) py-4 text-xs text-text-muted"
+        >
+          <div dir={i18n.dir()} className="flex min-w-0 items-center gap-2">
+            {event ? (
               <span
                 aria-hidden="true"
-                className="grid size-8 shrink-0 place-items-center rounded-full border-2 border-surface bg-primary text-xs font-bold text-primary-foreground"
+                className="grid size-7 shrink-0 place-items-center rounded-full border-2 border-surface bg-[#e8f2c8] text-[0.55rem] font-bold leading-none text-[#53662e]"
               >
-                {hostInitials || <UsersRound className="size-4" />}
+                {hostInitials || <UsersRound className="size-3" />}
               </span>
-              <span className="truncate">{item.hostName}</span>
-            </span>
+            ) : (
+              <UsersRound aria-hidden="true" className="size-4 shrink-0" />
+            )}
             {attendeeCount !== null ? (
               <span className="min-w-0 text-xs text-text-muted">
                 {event
@@ -172,9 +175,11 @@ export function ResourceCard({
             asChild
             className="relative z-10 h-(--control-height-sm) px-(--button-padding-inline-sm) text-xs pointer-coarse:h-11"
             size="sm"
-            variant={event ? 'primary' : 'outline'}
+            variant="outline"
           >
-            <Link to={`/${kind}/${item.slug}`}>{t('viewResource')}</Link>
+            <Link to={`/${kind}/${item.slug}`}>
+              {t(event ? 'viewResource' : 'exploreCommunity')}
+            </Link>
           </Button>
         </div>
       </div>

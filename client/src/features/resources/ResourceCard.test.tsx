@@ -139,12 +139,12 @@ describe('image-led resource cards', () => {
     async (kind, item, title) => {
       show(item, kind);
       const cover = screen.getByAltText('');
-      expect(cover).toHaveAttribute('src', expect.stringMatching(/^\/images\/.+\.jpg$/));
+      expect(cover).toHaveAttribute('src', expect.stringMatching(/^\/images\/.+\.svg$/));
       expect(cover).toHaveAttribute('width');
       expect(cover).toHaveAttribute('height');
       fireEvent.error(cover);
       expect(cover).not.toBeInTheDocument();
-      expect(screen.getByText(item.hostName)).toBeVisible();
+      expect(screen.queryByText(item.hostName)).not.toBeInTheDocument();
       expect(screen.getByText('Ankara')).toBeVisible();
       expect(screen.getByText('Culture')).toBeVisible();
       await userEvent.click(screen.getByRole('link', { name: title }));

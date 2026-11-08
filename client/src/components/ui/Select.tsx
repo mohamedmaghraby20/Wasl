@@ -1,6 +1,7 @@
 import * as SelectPrimitive from '@radix-ui/react-select';
 import { Check, ChevronDown } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/cn';
 import { useDownwardDropdown } from '@/lib/use-downward-dropdown';
 
@@ -40,8 +41,11 @@ export function Select({
   'aria-busy': ariaBusy,
 }: SelectProps): React.JSX.Element {
   const { open, onOpenChange, triggerRef } = useDownwardDropdown(300);
+  const { i18n } = useTranslation();
+  const direction = i18n.dir();
   return (
     <SelectPrimitive.Root
+      dir={direction}
       disabled={disabled}
       name={name}
       onValueChange={onValueChange}
@@ -50,6 +54,7 @@ export function Select({
       onOpenChange={onOpenChange}
     >
       <SelectPrimitive.Trigger
+        dir={direction}
         aria-busy={ariaBusy}
         aria-describedby={ariaDescribedBy}
         aria-invalid={ariaInvalid}
