@@ -18,7 +18,7 @@
     themeSelect.value = root.dataset.theme;
     if (metaThemeColor) {
       const colors = {
-        wasl: isDark ? "#12150F" : "#F9F4EC",
+        wasl: isDark ? "#12150F" : "#F8F6F4",
         ocean: isDark ? "#111923" : "#F3F6FA",
         plum: isDark ? "#19121E" : "#F7F4F9"
       };
