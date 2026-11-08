@@ -1,6 +1,6 @@
 # Wasl Design System — Preview v1
 
-A standalone HTML/CSS preview and starter token contract for Wasl. It uses **Manrope** for English and **Tajawal** for Arabic, with soft neutral surfaces and a muted brown accent (`#AD8568`) in light mode, supported by deeper brown (`#70492E`) for text and focus. The existing dark palette is unchanged.
+A standalone HTML/CSS preview and starter token contract for Wasl. It uses **Manrope** for English and **Tajawal** for Arabic, with soft neutral surfaces and a deep brown accent (`#70492E`) in light mode, paired with pale brown highlights. The existing dark palette is unchanged.
 
 ## Files
 
