@@ -168,7 +168,7 @@ export function HomePage(): React.JSX.Element {
           <Form
             action="/discover"
             aria-label={t('homeSearchLabel')}
-            className="grid w-full max-w-sm min-w-0 gap-3"
+            className="grid w-full max-w-[54rem] min-w-0 gap-3 lg:grid-cols-3"
             method="get"
             role="search"
           >
@@ -176,7 +176,7 @@ export function HomePage(): React.JSX.Element {
               <SearchInput
                 aria-label={t('homeSearchLabel')}
                 aria-keyshortcuts="Control+K Meta+K"
-                className="h-12 border-border pe-20 shadow-(--elevation-xs)"
+                className="h-12 border-border pe-16 shadow-(--elevation-xs)"
                 id="home-search"
                 name="q"
                 onValueChange={setQuery}
@@ -188,7 +188,7 @@ export function HomePage(): React.JSX.Element {
                 <kbd
                   aria-hidden="true"
                   dir="ltr"
-                  className="pointer-events-none absolute end-4 top-1/2 -translate-y-1/2 rounded-(--shape-radius-sm) border border-border bg-surface px-2 py-1 text-xs font-medium text-text-muted"
+                  className="pointer-events-none absolute end-3 top-1/2 -translate-y-1/2 rounded-(--shape-radius-sm) border border-border bg-surface px-1.5 py-1 text-xs font-medium text-text-muted"
                 >
                   {isMac ? '⌘ K' : 'Ctrl K'}
                 </kbd>
@@ -221,7 +221,7 @@ export function HomePage(): React.JSX.Element {
             <Button className="h-12 w-full" type="submit">
               {t('search')}
             </Button>
-            <div className="grid gap-1 empty:hidden">
+            <div className="grid gap-1 empty:hidden lg:col-span-3">
               {cities.isError ? (
                 <QueryError message={t('homeCitiesError')} onRetry={() => void cities.refetch()} />
               ) : null}
