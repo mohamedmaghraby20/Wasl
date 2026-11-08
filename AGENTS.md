@@ -12,12 +12,11 @@ in their project instructions.
 
 ## Tech Stack
 
-[`/docs/03-TECH-STACK.md`](/docs/03-TECH-STACK.md)
-
 Read this only when you need context about the technology stack used to build
-the app.
+the app [`/docs/03-TECH-STACK.md`](/docs/03-TECH-STACK.md).
 
-## Commands
+
+## Commands & Scripts
 
 - Install: `corepack pnpm install`
 - Build: `corepack pnpm build`
@@ -37,10 +36,9 @@ the app.
 - When a task matches an installed skill under `.agents/skills/`, read its `SKILL.md` and follow that skill's task-specific workflow.
 - For every code-changing/task, read and follow `docs/VERSION_CONTROL.md` before making changes, regardless of the task type.
 
-
 ---
 
-## Git Workflow
+## Git Conventions
 
 - Before starting any code-changing task and after completing any task, read and follow `docs/GIT_WORKFLOW.md` throughout the entire task. Do not consider the task complete until its version control requirements are satisfied.
 
@@ -48,20 +46,20 @@ the app.
 
 ---
 
-## Front-end/client
+## Front-end/client Conventions
 
-[`/docs/FRONTEND.md`](/docs/FRONTEND.md)
-
----
-
-## Back-end/server
-
-[`/docs/BACKEND.md`](/docs/BACKEND.md)
+Reference [`/docs/FRONTEND.md`](/docs/FRONTEND.md)
 
 ---
-## Design/UI/UX
 
-[`/docs/design`](/docs/DESIGN.md)
+## Back-end/server Conventions
+
+Reference [`/docs/BACKEND.md`](/docs/BACKEND.md)
+
+---
+## Design/UI/UX Conventions
+
+Reference [`/docs/design`](/docs/DESIGN.md)
 
 ---
 
@@ -81,10 +79,10 @@ See `docs/agents/domain.md`.
 
 ## Project Learnings
 
-[`/docs/PROJECT_LEARNINGS.md`](/docs/PROJECT_LEARNINGS.md)
+Reference [`/docs/PROJECT_LEARNINGS.md`](/docs/PROJECT_LEARNINGS.md)
 
 ---
 
-## graphify
+## Graphify
 
-[`/docs/GRAPHIFY.md`](/docs/GRAPHIFY.md)
+Reference [`/docs/GRAPHIFY.md`](/docs/GRAPHIFY.md)
