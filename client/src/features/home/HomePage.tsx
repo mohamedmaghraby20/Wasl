@@ -168,15 +168,15 @@ export function HomePage(): React.JSX.Element {
           <Form
             action="/discover"
             aria-label={t('homeSearchLabel')}
-            className="grid w-full max-w-2xl min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-3"
+            className="grid w-full max-w-sm min-w-0 gap-3"
             method="get"
             role="search"
           >
-            <div className="relative col-span-2 max-w-md">
+            <div className="relative min-w-0">
               <SearchInput
                 aria-label={t('homeSearchLabel')}
                 aria-keyshortcuts="Control+K Meta+K"
-                className="h-14 border-border pe-20 shadow-(--elevation-xs)"
+                className="h-12 border-border pe-20 shadow-(--elevation-xs)"
                 id="home-search"
                 name="q"
                 onValueChange={setQuery}
@@ -201,7 +201,7 @@ export function HomePage(): React.JSX.Element {
             <SearchableSelect
               aria-label={cityId ? `${t('cityFilter')}: ${cityName}` : t('nationwide')}
               aria-busy={cities.isPending}
-              className="col-span-2 sm:col-span-1"
+              className="h-12"
               emptyMessage={t('noCitiesFound')}
               id="home-city"
               onValueChange={setCityId}
@@ -218,10 +218,10 @@ export function HomePage(): React.JSX.Element {
               searchPlaceholder={t('searchCities')}
               value={cityId}
             />
-            <Button className="col-span-2 sm:col-span-1" type="submit">
+            <Button className="h-12 w-full" type="submit">
               {t('search')}
             </Button>
-            <div className="col-span-2 grid gap-1 empty:hidden">
+            <div className="grid gap-1 empty:hidden">
               {cities.isError ? (
                 <QueryError message={t('homeCitiesError')} onRetry={() => void cities.refetch()} />
               ) : null}
