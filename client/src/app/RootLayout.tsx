@@ -19,6 +19,7 @@ import { toast } from 'sonner';
 import { usePrivacyControllerStatus } from '@/api/generated/privacy/privacy';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { AppFooter } from '@/components/layout/AppFooter';
+import { GlobalSearch } from '@/components/layout/GlobalSearch';
 import { Button } from '@/components/ui/Button';
 import {
   DropdownMenu,
@@ -114,6 +115,7 @@ export function RootLayout(): React.JSX.Element {
         <div className="mx-auto flex h-16 max-w-(--container-max) items-center gap-4 px-4 sm:px-6">
           <Brand />
           <div className="ms-auto flex items-center gap-1.5">
+            <GlobalSearch />
             <Button
               aria-label={languageLabel}
               className="hidden md:inline-flex"

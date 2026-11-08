@@ -213,17 +213,6 @@ describe('HomePage', () => {
     expect(search).toHaveAttribute('name', 'q');
   });
 
-  it('focuses the homepage search with Ctrl+K and Command+K', async () => {
-    const user = userEvent.setup();
-    renderHome();
-    const search = screen.getByRole('searchbox', { name: 'Search communities and events' });
-    await user.keyboard('{Control>}k{/Control}');
-    expect(search).toHaveFocus();
-    search.blur();
-    await user.keyboard('{Meta>}k{/Meta}');
-    expect(search).toHaveFocus();
-  });
-
   it('requests native location permission on arrival with no custom consent controls', async () => {
     const getCurrentPosition = vi.fn();
     vi.stubGlobal('navigator', { geolocation: { getCurrentPosition } });

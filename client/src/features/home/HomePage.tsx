@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { Form, Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useSeoMeta } from '@unhead/react';
@@ -34,29 +34,8 @@ export function HomePage(): React.JSX.Element {
   const { t, i18n } = useTranslation();
   const { user, loading: authLoading } = useAuth();
   const [query, setQuery] = useState('');
-  const searchRef = useRef<HTMLInputElement>(null);
   const isMac =
     typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/i.test(navigator.platform);
-  useEffect(() => {
-    const focusSearch = (event: KeyboardEvent): void => {
-      if (
-        event.defaultPrevented ||
-        event.isComposing ||
-        event.altKey ||
-        event.shiftKey ||
-        !(event.ctrlKey || event.metaKey) ||
-        event.key.toLowerCase() !== 'k'
-      )
-        return;
-      const target = event.target;
-      if (target instanceof Element && target.closest('[role="dialog"], [role="alertdialog"]'))
-        return;
-      event.preventDefault();
-      searchRef.current?.focus();
-    };
-    window.addEventListener('keydown', focusSearch);
-    return () => window.removeEventListener('keydown', focusSearch);
-  }, []);
   const lang: 'ar' | 'en' = i18n.language.startsWith('ar') ? 'ar' : 'en';
   const cities = useDiscoveryControllerCities();
   const { cityId, restoringCity, setCityId, selectedCity, location } = useHomeCity(cities.data);
@@ -175,13 +154,11 @@ export function HomePage(): React.JSX.Element {
             <div className="relative min-w-0">
               <SearchInput
                 aria-label={t('homeSearchLabel')}
-                aria-keyshortcuts="Control+K Meta+K"
                 className="h-12 border-border pe-16 shadow-(--elevation-xs)"
                 id="home-search"
                 name="q"
                 onValueChange={setQuery}
                 placeholder={t('homeSearchExample')}
-                ref={searchRef}
                 value={query}
               />
               {!query ? (
