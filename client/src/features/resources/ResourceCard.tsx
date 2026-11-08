@@ -149,26 +149,28 @@ export function ResourceCard({
             ) : null}
           </div>
         </div>
-        <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-border px-(--card-padding) py-4 text-xs text-text-muted">
-          <span className="inline-flex min-w-0 items-center gap-2">
-            <span
-              aria-hidden="true"
-              className="grid size-8 shrink-0 place-items-center rounded-full border-2 border-surface bg-primary text-xs font-bold text-primary-foreground"
-            >
-              {hostInitials || <UsersRound className="size-4" />}
+        <div className="mt-auto grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-t border-border px-(--card-padding) py-4 text-xs text-text-muted">
+          <div className="flex min-w-0 items-center gap-2">
+            <span className="inline-flex min-w-0 items-center gap-2">
+              <span
+                aria-hidden="true"
+                className="grid size-8 shrink-0 place-items-center rounded-full border-2 border-surface bg-primary text-xs font-bold text-primary-foreground"
+              >
+                {hostInitials || <UsersRound className="size-4" />}
+              </span>
+              <span className="truncate">{item.hostName}</span>
             </span>
-            <span className="truncate">{item.hostName}</span>
-          </span>
-          {attendeeCount !== null ? (
-            <span className="text-xs font-semibold text-text-muted">
-              {event
-                ? t('eventRegisteredCount', { count: attendeeCount })
-                : t('communityMemberCount', { count: attendeeCount })}
-            </span>
-          ) : null}
+            {attendeeCount !== null ? (
+              <span className="min-w-0 text-xs text-text-muted">
+                {event
+                  ? t('eventRegisteredCount', { count: attendeeCount })
+                  : t('communityMemberCount', { count: attendeeCount })}
+              </span>
+            ) : null}
+          </div>
           <Button
             asChild
-            className="relative z-10 ms-auto"
+            className="relative z-10 h-(--control-height-sm) px-(--button-padding-inline-sm) text-xs pointer-coarse:h-11"
             size="sm"
             variant={event ? 'primary' : 'outline'}
           >
