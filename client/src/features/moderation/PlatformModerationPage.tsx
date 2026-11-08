@@ -451,7 +451,6 @@ export function PlatformModerationPage(): React.JSX.Element {
                   {request.providerActions.map((action) => (
                     <li key={action.id}>
                       {action.provider} · {action.action} · {action.status}
-                      {action.lastError ? ` · ${action.lastError}` : ''}
                     </li>
                   ))}
                 </ul>

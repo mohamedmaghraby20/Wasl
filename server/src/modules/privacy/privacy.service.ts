@@ -974,7 +974,7 @@ export class PrivacyService {
         attemptCount: action.attemptCount,
         lastAttemptAt: action.lastAttemptAt,
         completedAt: action.completedAt,
-        lastError: action.lastError,
+        lastError: null,
       })),
     };
   }

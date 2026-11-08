@@ -305,7 +305,7 @@ async function main(): Promise<void> {
           (action) => action.provider === 'STREAM',
         );
         assert.equal(streamAction?.status, 'FAILED');
-        assert.match(streamAction?.lastError ?? '', /Stream provider unavailable/);
+        assert.equal(streamAction?.lastError, null);
         assert.equal(
           approved.providerActions?.find((action) => action.provider === 'WASL')?.status,
           'SUCCEEDED',

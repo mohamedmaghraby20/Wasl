@@ -60,7 +60,6 @@ export function AuthPage(): React.JSX.Element {
       setError(
         authErrorMessage(cause, {
           invalidCredentials: t('authInvalidCredentials'),
-          accountExists: t('authAccountExists'),
           weakPassword: t('authWeakPassword'),
           generic: t('authRequestFailed'),
         }),

@@ -14,11 +14,11 @@ export class MessagingSyncWorker implements OnApplicationBootstrap, OnApplicatio
 
   onApplicationBootstrap(): void {
     this.timer = setInterval(() => {
-      void this.deletion.process().catch((error: unknown) => {
-        this.logger.error('Unable to process deleted chat channels.', error);
+      void this.deletion.process().catch(() => {
+        this.logger.error('Unable to process deleted chat channels.');
       });
-      void this.messaging.reconcilePendingMemberships().catch((error: unknown) => {
-        this.logger.error('Unable to reconcile pending Stream channel membership.', error);
+      void this.messaging.reconcilePendingMemberships().catch(() => {
+        this.logger.error('Unable to reconcile pending chat membership.');
       });
     }, 30_000);
     this.timer.unref();

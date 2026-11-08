@@ -118,7 +118,6 @@ export function authErrorMessage(
   error: unknown,
   messages: {
     invalidCredentials: string;
-    accountExists: string;
     weakPassword: string;
     generic: string;
   },
@@ -128,7 +127,6 @@ export function authErrorMessage(
   if (text.includes('invalid login credentials') || text.includes('email not confirmed')) {
     return messages.invalidCredentials;
   }
-  if (text.includes('already registered')) return messages.accountExists;
   if (text.includes('password') && (text.includes('short') || text.includes('least'))) {
     return messages.weakPassword;
   }
