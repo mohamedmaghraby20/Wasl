@@ -140,7 +140,7 @@ describe('MessagesPage', () => {
 
     renderPage();
 
-    expect(await screen.findByText(/Messaging is not enabled yet/)).toBeVisible();
+    expect(await screen.findByText(/Messaging is temporarily unavailable/)).toBeVisible();
   });
 
   it('shows the reconnect state when the realtime connection goes offline', async () => {

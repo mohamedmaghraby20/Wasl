@@ -70,6 +70,12 @@ describe('AuthPage', () => {
     expect(authMocks.signIn).toHaveBeenCalledWith('person@example.com', 'correct-horse-battery');
   });
 
+  it('shows a friendly message when sign-in is unavailable', () => {
+    authMocks.useAuth.mockReturnValue({ configured: false, loading: false, user: null });
+    renderPage('/sign-in');
+    expect(screen.getByRole('alert')).toHaveTextContent('Sign-in is temporarily unavailable. Please try again later.');
+  });
+
   it('confirms when sign-up requires an email link', async () => {
     const user = userEvent.setup();
     renderPage('/sign-up');
