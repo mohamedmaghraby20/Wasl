@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Form, Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useSeoMeta } from '@unhead/react';
@@ -34,6 +34,29 @@ export function HomePage(): React.JSX.Element {
   const { t, i18n } = useTranslation();
   const { user, loading: authLoading } = useAuth();
   const [query, setQuery] = useState('');
+  const searchRef = useRef<HTMLInputElement>(null);
+  const isMac =
+    typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/i.test(navigator.platform);
+  useEffect(() => {
+    const focusSearch = (event: KeyboardEvent): void => {
+      if (
+        event.defaultPrevented ||
+        event.isComposing ||
+        event.altKey ||
+        event.shiftKey ||
+        !(event.ctrlKey || event.metaKey) ||
+        event.key.toLowerCase() !== 'k'
+      )
+        return;
+      const target = event.target;
+      if (target instanceof Element && target.closest('[role="dialog"], [role="alertdialog"]'))
+        return;
+      event.preventDefault();
+      searchRef.current?.focus();
+    };
+    window.addEventListener('keydown', focusSearch);
+    return () => window.removeEventListener('keydown', focusSearch);
+  }, []);
   const lang: 'ar' | 'en' = i18n.language.startsWith('ar') ? 'ar' : 'en';
   const cities = useDiscoveryControllerCities();
   const { cityId, restoringCity, setCityId, selectedCity, location } = useHomeCity(cities.data);
@@ -126,10 +149,6 @@ export function HomePage(): React.JSX.Element {
               </span>
               <span>{t('brand')}</span>
             </div>
-            <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-2 text-xs font-semibold text-text-muted">
-              <span aria-hidden="true" className="size-2 rounded-full bg-primary" />
-              {t('homeHeroTag')}
-            </span>
           </div>
           <div className="grid max-w-2xl content-start gap-3">
             <p className="text-xs font-bold tracking-wide text-text-muted">
@@ -153,15 +172,27 @@ export function HomePage(): React.JSX.Element {
             method="get"
             role="search"
           >
-            <div className="col-span-2">
+            <div className="relative col-span-2 max-w-md">
               <SearchInput
                 aria-label={t('homeSearchLabel')}
+                aria-keyshortcuts="Control+K Meta+K"
+                className="h-14 border-border pe-20 shadow-(--elevation-xs)"
                 id="home-search"
                 name="q"
                 onValueChange={setQuery}
-                placeholder={t('homeSearchLabel')}
+                placeholder={t('homeSearchExample')}
+                ref={searchRef}
                 value={query}
               />
+              {!query ? (
+                <kbd
+                  aria-hidden="true"
+                  dir="ltr"
+                  className="pointer-events-none absolute end-4 top-1/2 -translate-y-1/2 rounded-(--shape-radius-sm) border border-border bg-surface px-2 py-1 text-xs font-medium text-text-muted"
+                >
+                  {isMac ? '⌘ K' : 'Ctrl K'}
+                </kbd>
+              ) : null}
             </div>
             <input type="hidden" name="upcoming" value="true" />
             <input type="hidden" name="nonCancelled" value="true" />
