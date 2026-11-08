@@ -189,7 +189,6 @@ export function HomePage(): React.JSX.Element {
       ) : null}
       <div className={`order-3 grid min-w-0 gap-8 sm:gap-10 ${user ? 'xl:col-start-2' : ''}`}>
         <HomeSection
-          wideCards={Boolean(user)}
           title={
             cityId && !fallback
               ? t('upcomingEventsInCity', { city: cityName })
@@ -204,7 +203,6 @@ export function HomePage(): React.JSX.Element {
           viewAll={`/events?${eventDestination}`}
         />
         <HomeSection
-          wideCards={Boolean(user)}
           title={
             cityId && !communityFallback
               ? t('communitiesInCity', { city: cityName })
@@ -220,7 +218,6 @@ export function HomePage(): React.JSX.Element {
         />
         {!onlineEmpty && (
           <HomeSection
-            wideCards={Boolean(user)}
             title={t('upcomingOnlineEvents')}
             kind="events"
             sectionId="online-events"

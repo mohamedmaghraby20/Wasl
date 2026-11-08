@@ -31,6 +31,13 @@ export function ResourceCard({
     event?.capacity == null ? null : Math.max(0, event.capacity - event.acceptedRegistrationCount);
   const attendeeCount =
     event?.acceptedRegistrationCount ?? ('memberCount' in item ? item.memberCount : null);
+  const hostInitials = item.hostName
+    .trim()
+    .split(/\s+/u)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => Array.from(part)[0]?.toLocaleUpperCase() ?? '')
+    .join('');
 
   return (
     <article className="group relative flex min-w-0 flex-col overflow-hidden rounded-(--shape-radius-card) border border-border bg-card shadow-(--shadow-card) transition-[box-shadow,translate] duration-(--motion-duration-base) ease-(--motion-ease-standard) hover:-translate-y-0.5 hover:shadow-(--shadow-card-hover) motion-reduce:transform-none motion-reduce:transition-none has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-ring has-[a:focus-visible]:ring-offset-2 has-[a:focus-visible]:ring-offset-background">
@@ -144,7 +151,12 @@ export function ResourceCard({
         </div>
         <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-border px-(--card-padding) py-4 text-xs text-text-muted">
           <span className="inline-flex min-w-0 items-center gap-2">
-            <UsersRound aria-hidden="true" className="size-4 shrink-0" />
+            <span
+              aria-hidden="true"
+              className="grid size-8 shrink-0 place-items-center rounded-full border-2 border-surface bg-primary text-xs font-bold text-primary-foreground"
+            >
+              {hostInitials || <UsersRound className="size-4" />}
+            </span>
             <span className="truncate">{item.hostName}</span>
           </span>
           {attendeeCount !== null ? (
