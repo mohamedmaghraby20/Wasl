@@ -40,9 +40,9 @@ the app [`/docs/03-TECH-STACK.md`](/docs/03-TECH-STACK.md).
 
 ## Git Conventions
 
-- Before starting any code-changing task and after completing any task, read and follow `docs/GIT_WORKFLOW.md` throughout the entire task. Do not consider the task complete until its version control requirements are satisfied.
+- Before starting any code-changing task and after completing any task, read and follow `docs/GIT_CONVENTIONS.md` throughout the entire task. Do not consider the task complete until its version control requirements are satisfied.
 
-[`/docs/GIT_WORKFLOW.md`](/docs/GIT_WORKFLOW.md.md)
+[`/docs/GIT_CONVENTIONS.md`](/docs/GIT_CONVENTIONS.md)
 
 ---
 

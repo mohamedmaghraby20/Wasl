@@ -121,6 +121,7 @@ describe('image-led resource cards', () => {
   it('shows accepted registrations and remaining seats without counting the host preview', () => {
     show(event, 'events');
     expect(screen.getByText('1 registered')).toBeVisible();
+    expect(screen.queryByText(event.hostName)).not.toBeInTheDocument();
     expect(screen.getByText('2 places left')).toBeVisible();
     expect(screen.getByText('03:00 PM')).toBeVisible();
   });
@@ -137,7 +138,7 @@ describe('image-led resource cards', () => {
       expect(cover).toHaveAttribute('height');
       fireEvent.error(cover);
       expect(cover).not.toBeInTheDocument();
-      expect(screen.getByText(item.hostName)).toBeVisible();
+      if (kind === 'communities') expect(screen.getByText(item.hostName)).toBeVisible();
       expect(screen.getByText('Ankara')).toBeVisible();
       expect(screen.getByText('Culture')).toBeVisible();
       await userEvent.click(screen.getByRole('link', { name: title }));

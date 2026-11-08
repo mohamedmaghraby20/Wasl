@@ -101,10 +101,12 @@ export function ResourceCard({
         ) : null}
         <div className="mt-auto grid gap-2 border-t border-border pt-3 text-xs text-text-subtle">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
-            <span className="inline-flex min-w-0 items-center gap-1.5">
-              <UsersRound aria-hidden="true" className="size-3.5 shrink-0" />
-              <span className="truncate">{item.hostName}</span>
-            </span>
+            {!event ? (
+              <span className="inline-flex min-w-0 items-center gap-1.5">
+                <UsersRound aria-hidden="true" className="size-3.5 shrink-0" />
+                <span className="truncate">{item.hostName}</span>
+              </span>
+            ) : null}
             <span className="inline-flex min-w-0 items-center gap-1.5">
               {event?.online ? (
                 <Video aria-hidden="true" className="size-3.5 shrink-0" />
@@ -122,22 +124,25 @@ export function ResourceCard({
             ) : null}
           </div>
           {attendeeCount !== null ? (
-            <div className="flex items-center gap-2">
-              <span aria-hidden="true" className="flex -space-x-1.5">
-                {[
-                  'bg-primary-soft text-primary-soft-text',
-                  'bg-surface-soft text-text-muted',
-                  'bg-warning-soft text-warning',
-                ].map((tone) => (
-                  <span
-                    className={`grid size-6 place-items-center rounded-full border-2 border-card ${tone}`}
-                    key={tone}
-                  >
-                    <UsersRound className="size-3.5" />
+            <div className="flex items-center gap-3">
+              <span aria-hidden="true" className="flex -space-x-[0.35rem] rtl:space-x-reverse">
+                {['bg-[#e8f2c8] text-[#53662e]', 'bg-[#e2f0fa] text-[#39729a]']
+                  .slice(0, attendeeCount)
+                  .map((tone) => (
+                    <span
+                      className={`grid size-7 shrink-0 place-items-center rounded-full border-2 border-card ${tone}`}
+                      key={tone}
+                    >
+                      <UsersRound className="size-3" />
+                    </span>
+                  ))}
+                {attendeeCount > 2 ? (
+                  <span className="grid size-7 shrink-0 place-items-center rounded-full border-2 border-card bg-[#fff0d4] text-[0.55rem] font-bold leading-none text-[#a45a08]">
+                    +{attendeeCount - 2}
                   </span>
-                ))}
+                ) : null}
               </span>
-              <span className="text-sm font-semibold text-text">
+              <span className="text-sm text-text-muted">
                 {event
                   ? t('eventRegisteredCount', { count: attendeeCount })
                   : t('communityMemberCount', { count: attendeeCount })}
