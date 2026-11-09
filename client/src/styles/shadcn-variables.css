@@ -35,9 +35,3 @@
   --sidebar-ring: var(--color-ring);
   --radius: var(--shape-radius-card);
 }
-
-/* The Wasl light secondary action uses the approved blush and cacao pair. */
-:root[data-theme="wasl"][data-mode="light"] {
-  --secondary: var(--color-primary-soft);
-  --secondary-foreground: var(--color-primary-soft-text);
-}

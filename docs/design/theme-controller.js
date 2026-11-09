@@ -6,7 +6,7 @@
   const metaThemeColor = document.querySelector('meta[name="theme-color"]');
 
   const modeNames = { light: "Light mode", dark: "Dark mode" };
-  const themeNames = { wasl: "Cacao & Terracotta", ocean: "Ocean", plum: "Plum" };
+  const themeNames = { wasl: "Monochrome", ocean: "Ocean", plum: "Plum" };
 
   function updateControls() {
     const isDark = root.dataset.mode === "dark";
@@ -18,7 +18,7 @@
     themeSelect.value = root.dataset.theme;
     if (metaThemeColor) {
       const colors = {
-        wasl: isDark ? "#12150F" : "#F9F3EE",
+        wasl: isDark ? "#101010" : "#FFFFFF",
         ocean: isDark ? "#111923" : "#F3F6FA",
         plum: isDark ? "#19121E" : "#F7F4F9"
       };

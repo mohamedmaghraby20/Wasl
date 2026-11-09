@@ -1,6 +1,6 @@
 # Wasl Design System — Preview v1
 
-A standalone HTML/CSS preview and starter token contract for Wasl. It uses **Manrope** for English and **Tajawal** for Arabic, with Cacao (`#402922`), Terracotta (`#9C4E3A`), Cream (`#F9F3EE`) and Blush (`#F6E7E0`) for the light-mode review. The existing dark palette is unchanged.
+A standalone HTML/CSS preview and starter token contract for Wasl. It uses **Manrope** for English and **Tajawal** for Arabic. The Wasl theme uses black, white, and neutral grays in light and dark modes.
 
 ## Files
 
@@ -13,7 +13,7 @@ A standalone HTML/CSS preview and starter token contract for Wasl. It uses **Man
 
 ## Preview controls
 
-- **Theme:** Cacao & Terracotta is the candidate under review. Ocean and Plum are demo presets to prove the theme contract can support future alternatives; they are not proposed Wasl brand decisions.
+- **Theme:** Monochrome is the Wasl theme. Ocean and Plum are demo presets to prove the theme contract can support future alternatives; they are not proposed Wasl brand decisions.
 - **Mode:** switch light/dark without changing components.
 - **Density:** switch comfortable/compact spacing and control sizing.
 

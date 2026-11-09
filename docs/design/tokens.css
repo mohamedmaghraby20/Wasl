@@ -135,10 +135,10 @@
   --motion-ease-emphasized: cubic-bezier(0.2, 0, 0, 1.1);
 
   /* Elevation */
-  --elevation-xs: 0 1px 2px rgb(20 30 12 / 5%);
-  --elevation-sm: 0 2px 6px rgb(20 30 12 / 6%), 0 1px 2px rgb(20 30 12 / 4%);
-  --elevation-md: 0 8px 24px rgb(20 30 12 / 8%), 0 2px 6px rgb(20 30 12 / 4%);
-  --elevation-lg: 0 18px 42px rgb(20 30 12 / 12%), 0 4px 12px rgb(20 30 12 / 5%);
+  --elevation-xs: 0 1px 2px rgb(0 0 0 / 5%);
+  --elevation-sm: 0 2px 6px rgb(0 0 0 / 6%), 0 1px 2px rgb(0 0 0 / 4%);
+  --elevation-md: 0 8px 24px rgb(0 0 0 / 8%), 0 2px 6px rgb(0 0 0 / 4%);
+  --elevation-lg: 0 18px 42px rgb(0 0 0 / 12%), 0 4px 12px rgb(0 0 0 / 5%);
   --opacity-disabled: 0.52;
   --opacity-muted: 0.68;
 
@@ -182,27 +182,27 @@
   --tracking-tight: 0;
 }
 
-/* Wasl Cacao & Terracotta light theme; the existing dark palette remains unchanged. */
+/* Wasl monochrome theme. */
 :root[data-theme="wasl"][data-mode="light"] {
   color-scheme: light;
-  --color-canvas: #F9F3EE;
+  --color-canvas: #FFFFFF;
   --color-surface: #FFFFFF;
-  --color-surface-soft: #F0E8E2;
+  --color-surface-soft: #F2F2F2;
   --color-surface-raised: #FFFFFF;
-  --color-text: #251C19;
-  --color-text-muted: #62524B;
-  --color-text-subtle: #62524B;
-  --color-border: #614D44;
-  --color-border-strong: #402922;
-  --color-border-control: #614D44;
-  --color-border-control-hover: #402922;
-  --color-primary: #402922;
-  --color-primary-hover: #9C4E3A;
-  --color-primary-active: #33211B;
+  --color-text: #141414;
+  --color-text-muted: #575757;
+  --color-text-subtle: #575757;
+  --color-border: #767676;
+  --color-border-strong: #333333;
+  --color-border-control: #767676;
+  --color-border-control-hover: #333333;
+  --color-primary: #000000;
+  --color-primary-hover: #292929;
+  --color-primary-active: #141414;
   --color-on-primary: #FFFFFF;
-  --color-primary-soft: #F6E7E0;
-  --color-primary-soft-text: #402922;
-  --color-ring: #245A78;
+  --color-primary-soft: #EEEEEE;
+  --color-primary-soft-text: #141414;
+  --color-ring: #454545;
   --color-success: #276343;
   --color-success-soft: #E7F3E9;
   --color-warning: #704700;
@@ -212,7 +212,7 @@
   --color-danger-soft: #FFEBEB;
   --color-info: #245A78;
   --color-info-soft: #E7F3FA;
-  --color-shadow: 64 41 34;
+  --color-shadow: 0 0 0;
   --shape-radius-card: 0.25rem;
   --shape-radius-control: 0.25rem;
   --shape-radius-dialog: 0.25rem;
@@ -223,28 +223,28 @@
 }
 :root[data-theme="wasl"][data-mode="dark"] {
   color-scheme: dark;
-  --color-canvas: var(--color-dark-950);
-  --color-surface: var(--color-dark-900);
-  --color-surface-soft: var(--color-dark-800);
-  --color-surface-raised: var(--color-dark-850);
-  --color-text: var(--color-dark-50);
-  --color-text-muted: var(--color-dark-200);
-  --color-text-subtle: var(--color-dark-300);
-  --color-border: var(--color-dark-700);
-  --color-border-strong: var(--color-dark-600);
-  --color-border-control: #68795C;
-  --color-border-control-hover: #7D916F;
-  --color-primary: var(--color-lime-300);
-  --color-primary-hover: var(--color-lime-200);
-  --color-primary-active: var(--color-lime-400);
-  --color-on-primary: var(--color-dark-950);
-  --color-primary-soft: var(--color-dark-800);
-  --color-primary-soft-text: var(--color-lime-100);
-  --color-ring: var(--color-lime-200);
+  --color-canvas: #101010;
+  --color-surface: #181818;
+  --color-surface-soft: #262626;
+  --color-surface-raised: #202020;
+  --color-text: #FAFAFA;
+  --color-text-muted: #C2C2C2;
+  --color-text-subtle: #A3A3A3;
+  --color-border: #474747;
+  --color-border-strong: #606060;
+  --color-border-control: #858585;
+  --color-border-control-hover: #A3A3A3;
+  --color-primary: #FFFFFF;
+  --color-primary-hover: #DEDEDE;
+  --color-primary-active: #C4C4C4;
+  --color-on-primary: #101010;
+  --color-primary-soft: #2B2B2B;
+  --color-primary-soft-text: #FAFAFA;
+  --color-ring: #D4D4D4;
   --color-success: var(--color-green-300);
   --color-success-soft: var(--color-green-900);
-  --color-warning: #DFC5E9;
-  --color-warning-soft: #392A40;
+  --color-warning: #F1C46E;
+  --color-warning-soft: #3A2D19;
   --color-danger: var(--color-red-300);
   --color-danger-hover: #FFAAA2;
   --color-danger-soft: var(--color-red-900);

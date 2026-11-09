@@ -197,8 +197,8 @@ svg.icon { width: var(--icon-size-md); height: var(--icon-size-md); flex: 0 0 au
 .button-primary { background: var(--color-primary); color: var(--color-on-primary); }
 .button-primary:where(:hover, [data-preview-hover]):not(:disabled) { background: var(--color-primary-hover); }
 .button-primary:active:not(:disabled) { background: var(--color-primary-active); }
-.button-secondary { background: var(--color-primary-soft); color: var(--color-primary-soft-text); border-color: var(--color-border-control); }
-.button-secondary:where(:hover, [data-preview-hover]):not(:disabled) { background: var(--color-primary-soft-text); color: var(--color-primary-soft); }
+.button-secondary { background: var(--color-surface-soft); color: var(--color-text); border-color: var(--color-border-control); }
+.button-secondary:where(:hover, [data-preview-hover]):not(:disabled) { background: var(--color-text); color: var(--color-surface-soft); }
 .button-outline { border-color: var(--color-border-strong); background: var(--color-surface); color: var(--color-text); }
 .button-outline:where(:hover, [data-preview-hover]):not(:disabled) { border-color: var(--color-primary-soft-text); background: var(--color-primary-soft); color: var(--color-primary-soft-text); }
 .button-ghost { background: transparent; color: var(--color-text-muted); }
