@@ -182,43 +182,44 @@
   --tracking-tight: 0;
 }
 
-/* Wasl brown light theme; the existing dark palette remains unchanged. */
+/* Wasl Cacao & Terracotta light theme; the existing dark palette remains unchanged. */
 :root[data-theme="wasl"][data-mode="light"] {
   color-scheme: light;
-  --color-canvas: #F8F6F4;
+  --color-canvas: #F9F3EE;
   --color-surface: #FFFFFF;
-  --color-surface-soft: #F2EEEA;
+  --color-surface-soft: #F0E8E2;
   --color-surface-raised: #FFFFFF;
-  --color-text: #2D2521;
-  --color-text-muted: #6A5D55;
-  --color-text-subtle: #6D5F57;
-  --color-border: #E8E1DB;
-  --color-border-strong: #D4C8BF;
-  --color-border-control: #8A786B;
-  --color-border-control-hover: #6A584C;
-  --color-primary: #70492E;
-  --color-primary-hover: #5E3B25;
-  --color-primary-active: #4D2F1D;
+  --color-text: #251C19;
+  --color-text-muted: #62524B;
+  --color-text-subtle: #62524B;
+  --color-border: #614D44;
+  --color-border-strong: #402922;
+  --color-border-control: #614D44;
+  --color-border-control-hover: #402922;
+  --color-primary: #402922;
+  --color-primary-hover: #9C4E3A;
+  --color-primary-active: #33211B;
   --color-on-primary: #FFFFFF;
-  --color-primary-soft: #F4E8DE;
-  --color-primary-soft-text: #70492E;
-  --color-ring: #70492E;
-  --color-success: var(--color-green-700);
-  --color-success-soft: var(--color-green-100);
-  --color-warning: #694779;
-  --color-warning-soft: #F2EAF5;
-  --color-danger: var(--color-red-700);
-  --color-danger-hover: #A52F29;
-  --color-danger-soft: var(--color-red-100);
-  --color-info: var(--color-blue-700);
-  --color-info-soft: var(--color-blue-100);
-  --color-shadow: 43 27 19;
-  --shape-radius-card: var(--shape-radius-xl);
-  --shape-radius-control: var(--shape-radius-md);
-  --shape-radius-dialog: var(--shape-radius-2xl);
-  --shadow-card: var(--elevation-sm);
-  --shadow-card-hover: var(--elevation-md);
+  --color-primary-soft: #F6E7E0;
+  --color-primary-soft-text: #402922;
+  --color-ring: #245A78;
+  --color-success: #276343;
+  --color-success-soft: #E7F3E9;
+  --color-warning: #704700;
+  --color-warning-soft: #FFF1CD;
+  --color-danger: #9A2830;
+  --color-danger-hover: #802128;
+  --color-danger-soft: #FFEBEB;
+  --color-info: #245A78;
+  --color-info-soft: #E7F3FA;
+  --color-shadow: 64 41 34;
+  --shape-radius-card: 0.25rem;
+  --shape-radius-control: 0.25rem;
+  --shape-radius-dialog: 0.25rem;
+  --shadow-card: none;
+  --shadow-card-hover: 4px 4px 0 var(--color-primary);
   --shadow-popover: var(--elevation-lg);
+  --motion-hover-lift: 0px;
 }
 :root[data-theme="wasl"][data-mode="dark"] {
   color-scheme: dark;

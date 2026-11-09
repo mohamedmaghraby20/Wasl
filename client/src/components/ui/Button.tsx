@@ -9,15 +9,15 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          'rounded-(--shape-radius-control) bg-primary text-primary-foreground shadow-xs hover:bg-primary-hover hover:shadow-sm active:bg-primary-active',
+          'rounded-(--shape-radius-control) bg-primary text-primary-foreground hover:bg-primary-hover active:bg-primary-active',
         secondary:
-          'rounded-(--shape-radius-control) border border-transparent bg-surface-soft text-text hover:bg-border active:bg-border-strong',
+          'rounded-(--shape-radius-control) border border-border-control bg-secondary text-secondary-foreground transition-none hover:bg-secondary-foreground hover:text-secondary active:bg-primary-active active:text-primary-foreground',
         outline:
-          'rounded-(--shape-radius-control) border border-border-strong bg-surface text-text hover:border-primary hover:bg-primary-soft hover:text-primary-soft-text focus-visible:bg-primary-soft focus-visible:text-primary-soft-text active:bg-primary-soft',
+          'rounded-(--shape-radius-control) border border-border-strong bg-surface text-text hover:border-primary-soft-text hover:bg-primary-soft hover:text-primary-soft-text focus-visible:bg-primary-soft focus-visible:text-primary-soft-text active:bg-primary-soft',
         ghost:
-          'rounded-(--shape-radius-control) text-text-muted hover:bg-surface-soft hover:text-primary-soft-text focus-visible:bg-surface-soft focus-visible:text-primary-soft-text',
+          'rounded-(--shape-radius-control) text-text-muted hover:bg-surface-soft hover:text-text focus-visible:bg-surface-soft focus-visible:text-text',
         danger:
-          'rounded-(--shape-radius-control) bg-danger text-white shadow-xs hover:bg-danger-hover active:bg-danger-hover',
+          'rounded-(--shape-radius-control) bg-destructive text-destructive-foreground hover:bg-danger-hover active:bg-danger-hover',
         'danger-ghost':
           'rounded-(--shape-radius-control) text-danger hover:bg-danger-soft hover:text-danger focus-visible:bg-danger-soft focus-visible:text-danger',
         link: 'rounded-(--shape-radius-sm) text-primary-soft-text underline decoration-primary/50 decoration-2 underline-offset-4 hover:decoration-primary',
