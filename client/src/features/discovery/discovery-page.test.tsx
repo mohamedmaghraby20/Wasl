@@ -178,7 +178,7 @@ describe('DiscoveryPage', () => {
 
     const format = screen.getByRole('combobox', { name: 'Event format' });
     expect(format).toHaveTextContent('Online');
-    expect(format).toHaveClass('bg-primary-soft');
+    expect(format).toHaveClass('bg-primary');
     expect(screen.queryByRole('group', { name: 'Filters' })).not.toBeInTheDocument();
 
     await user.click(format);
@@ -190,11 +190,11 @@ describe('DiscoveryPage', () => {
     );
 
     expect(format).toHaveTextContent('On-site');
-    expect(format).not.toHaveClass('bg-primary-soft');
+    expect(format).toHaveClass('bg-primary');
     await user.click(format);
     await user.click(await screen.findByRole('option', { name: 'Online' }));
     expect(screen.getByLabelText('Current URL')).toHaveTextContent(/^\/events\?modality=online$/);
-    expect(format).toHaveClass('bg-primary-soft');
+    expect(format).toHaveClass('bg-primary');
   });
 
   afterEach(() => {

@@ -11,8 +11,11 @@ import { SearchInput } from '@/components/ui/SearchInput';
 import { Select } from '@/components/ui/Select';
 import { localizedName } from '@/features/resources/resource-utils';
 import type { ResourceKind } from '@/features/resources/resource-utils';
+import { cn } from '@/lib/cn';
 
 const filterControlClass = 'shrink-0 sm:w-44';
+const selectedFilterClass =
+  'border-primary bg-primary font-semibold text-primary-foreground hover:border-primary [&>svg]:text-current';
 
 type ActiveFilter = {
   key: string;
@@ -156,7 +159,7 @@ export function DiscoveryFilters({
       <div className="grid grid-cols-2 items-center gap-2 sm:flex sm:flex-wrap">
         <Select
           aria-label={t('typeFilter')}
-          className={filterControlClass}
+          className={cn(filterControlClass, selectedFilterClass)}
           onValueChange={(value) => onKindChange(value as ResourceKind)}
           options={[
             { value: 'events', label: t('events') },
@@ -167,7 +170,7 @@ export function DiscoveryFilters({
         <SearchableSelect
           aria-busy={citiesPending}
           aria-label={cityValue ? `${t('cityFilter')}: ${cityName}` : t('allCities')}
-          className={filterControlClass}
+          className={cn(filterControlClass, cityValue && selectedFilterClass)}
           disabled={citiesPending || citiesError || !cities}
           emptyMessage={t('noCitiesFound')}
           id="discovery-city"
@@ -185,7 +188,7 @@ export function DiscoveryFilters({
           aria-label={
             categoryValue ? `${t('categoryFilter')}: ${categoryName}` : t('allCategories')
           }
-          className={filterControlClass}
+          className={cn(filterControlClass, categoryValue && selectedFilterClass)}
           disabled={categoriesPending || categoriesError || !categories}
           onValueChange={(value) => onFilterChange('category', value)}
           options={(categories ?? []).map((category) => ({
@@ -199,11 +202,7 @@ export function DiscoveryFilters({
           <>
             <Select
               aria-label={t('eventFormat')}
-              className={
-                modalityValue === 'online'
-                  ? `${filterControlClass} border-primary bg-primary-soft font-semibold text-primary-soft-text hover:border-primary`
-                  : filterControlClass
-              }
+              className={cn(filterControlClass, selectedFilterClass)}
               onValueChange={(value) => onFilterChange('modality', value)}
               options={[
                 { value: 'in-person', label: t('onSite') },
@@ -213,7 +212,7 @@ export function DiscoveryFilters({
             />
             <DatePicker
               align="start"
-              className="w-full shrink-0 sm:w-44"
+              className={cn('w-full', filterControlClass, fromValue && selectedFilterClass)}
               label={t('fromDate')}
               onChange={(value) => onFilterChange('from', value)}
               placeholder={t('fromDate')}
@@ -221,7 +220,7 @@ export function DiscoveryFilters({
             />
             <DatePicker
               align="end"
-              className="w-full shrink-0 sm:w-44"
+              className={cn('w-full', filterControlClass, toValue && selectedFilterClass)}
               label={t('toDate')}
               min={fromValue}
               onChange={(value) => onFilterChange('to', value)}
