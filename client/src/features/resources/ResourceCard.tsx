@@ -162,7 +162,7 @@ export function ResourceCard({
             className={`mt-auto grid items-center gap-2 border-t border-border text-text-muted ${event ? 'px-5 py-2 text-sm @xs:grid-cols-[minmax(0,1fr)_auto]' : 'grid-cols-[minmax(0,1fr)_auto] px-(--card-padding) py-4 text-xs'}`}
           >
             <div dir={i18n.dir()} className="flex min-w-0 items-center gap-2">
-              {!event && <UsersRound aria-hidden="true" className="size-4 shrink-0" />}
+              <UsersRound aria-hidden="true" className="size-4 shrink-0" />
               {attendeeCount !== null ? (
                 <span className="min-w-0 text-text-muted">
                   {event
