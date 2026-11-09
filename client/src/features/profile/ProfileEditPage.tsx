@@ -168,7 +168,7 @@ export function ProfileEditPage(): React.JSX.Element {
             aria-labelledby="profile-photo-heading"
             className="grid gap-4 sm:grid-cols-[7rem_1fr] sm:items-center"
           >
-            <div className="grid size-24 place-items-center overflow-hidden rounded-full border border-border bg-primary-soft text-3xl font-bold text-primary-soft-text">
+            <div className="grid size-24 place-items-center overflow-hidden rounded-(--shape-radius-control) border border-border bg-primary-soft text-3xl font-bold text-primary-soft-text">
               {photoSource ? (
                 <img alt="" className="size-full object-cover" src={photoSource} />
               ) : (

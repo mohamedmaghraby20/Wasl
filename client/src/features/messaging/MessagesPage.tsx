@@ -341,7 +341,7 @@ export function MessagesPage(): React.JSX.Element {
         {t('messages')}
       </h1>
       <p
-        className="inline-flex w-fit items-center gap-2 rounded-full bg-surface-soft px-3 py-1 text-xs font-medium text-text-muted"
+        className="inline-flex w-fit items-center gap-2 rounded-(--shape-radius-control) bg-surface-soft px-3 py-1 text-xs font-medium text-text-muted"
         role="status"
       >
         <span

@@ -44,11 +44,11 @@ export function ProfilePage(): React.JSX.Element {
           {person.avatarUrl ? (
             <img
               alt=""
-              className="size-24 shrink-0 rounded-full border border-border object-cover"
+              className="size-24 shrink-0 rounded-(--shape-radius-control) border border-border object-cover"
               src={person.avatarUrl}
             />
           ) : (
-            <div className="grid size-24 shrink-0 place-items-center rounded-full bg-primary-soft text-3xl font-bold text-primary-soft-text">
+            <div className="grid size-24 shrink-0 place-items-center rounded-(--shape-radius-control) bg-primary-soft text-3xl font-bold text-primary-soft-text">
               {initials || <CircleUserRound aria-hidden="true" className="size-9" />}
             </div>
           )}

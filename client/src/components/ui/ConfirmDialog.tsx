@@ -42,8 +42,8 @@ export function ConfirmDialog({
           <span
             className={
               destructive
-                ? 'grid size-10 shrink-0 place-items-center rounded-full bg-danger-soft text-danger'
-                : 'grid size-10 shrink-0 place-items-center rounded-full bg-primary-soft text-primary-soft-text'
+                ? 'grid size-10 shrink-0 place-items-center rounded-(--shape-radius-control) bg-danger-soft text-danger'
+                : 'grid size-10 shrink-0 place-items-center rounded-(--shape-radius-control) bg-primary-soft text-primary-soft-text'
             }
           >
             <AlertTriangle aria-hidden="true" className="size-5" />

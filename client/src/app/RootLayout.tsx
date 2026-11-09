@@ -47,7 +47,7 @@ function Brand(): React.JSX.Element {
       to="/"
       aria-label={t('brand')}
     >
-      <span className="grid size-9 place-items-center rounded-[0.7rem] bg-primary text-primary-foreground shadow-xs">
+      <span className="grid size-9 place-items-center rounded-(--shape-radius-control) bg-primary text-primary-foreground shadow-xs">
         <Waypoints aria-hidden="true" className="size-[1.15rem]" />
       </span>
       <span className="font-heading text-lg font-extrabold tracking-tight">{t('brand')}</span>
@@ -155,7 +155,7 @@ export function RootLayout(): React.JSX.Element {
                   <DropdownMenuTrigger asChild>
                     <button
                       aria-label={t('accountMenu')}
-                      className="grid size-11 place-items-center rounded-full bg-primary-soft text-sm font-bold text-primary-soft-text transition-shadow hover:ring-2 hover:ring-primary/40"
+                      className="grid size-11 place-items-center rounded-(--shape-radius-control) bg-primary-soft text-sm font-bold text-primary-soft-text transition-shadow hover:ring-2 hover:ring-primary/40"
                       type="button"
                     >
                       {initial}

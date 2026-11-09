@@ -30,7 +30,7 @@ export function SheetContent({
           side === 'start' &&
             'inset-y-0 start-0 h-full w-[86%] max-w-sm border-e duration-(--motion-duration-slow) data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left rtl:data-[state=closed]:slide-out-to-right rtl:data-[state=open]:slide-in-from-right',
           side === 'top' &&
-            'inset-x-0 top-0 max-h-[85vh] overflow-y-auto rounded-b-2xl border-b duration-(--motion-duration-slow) data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top',
+            'inset-x-0 top-0 max-h-[85vh] overflow-y-auto rounded-(--shape-radius-control) border-b duration-(--motion-duration-slow) data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top',
           className,
         )}
         {...props}
@@ -38,7 +38,7 @@ export function SheetContent({
         {children}
         <DialogPrimitive.Close
           aria-label={closeLabel}
-          className="absolute end-2 top-2 grid size-11 place-items-center rounded-full text-text-muted transition-colors hover:bg-surface-soft hover:text-primary-soft-text focus-visible:bg-surface-soft focus-visible:text-primary-soft-text"
+          className="absolute end-2 top-2 grid size-11 place-items-center rounded-(--shape-radius-control) text-text-muted transition-colors hover:bg-surface-soft hover:text-primary-soft-text focus-visible:bg-surface-soft focus-visible:text-primary-soft-text"
         >
           <X aria-hidden="true" className="size-4" />
         </DialogPrimitive.Close>

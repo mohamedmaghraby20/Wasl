@@ -136,7 +136,7 @@ export function CommunityMembersPage({
             value={search}
           />
         </Field>
-        <span className="rounded-full bg-primary-soft px-4 py-2 text-sm font-semibold text-primary-soft-text">
+        <span className="rounded-(--shape-radius-control) bg-primary-soft px-4 py-2 text-sm font-semibold text-primary-soft-text">
           {t(heading)}: {members.data.length}
         </span>
       </div>
@@ -154,7 +154,7 @@ export function CommunityMembersPage({
                   <span
                     className={
                       member.isHost
-                        ? 'inline-flex rounded-full bg-primary-soft px-2 py-1 text-xs font-semibold text-primary-soft-text'
+                        ? 'inline-flex rounded-(--shape-radius-control) bg-primary-soft px-2 py-1 text-xs font-semibold text-primary-soft-text'
                         : 'text-sm text-text-muted'
                     }
                   >

@@ -47,7 +47,7 @@ export function CategoryPicker({
           return (
             <div
               className={cn(
-                'flex items-center gap-2 rounded-full border px-3 py-1.5 transition-colors',
+                'flex items-center gap-2 rounded-(--shape-radius-control) border px-3 py-1.5 transition-colors',
                 checked
                   ? 'border-primary/40 bg-primary-soft'
                   : 'border-border-control bg-surface-soft hover:border-border-control-hover',

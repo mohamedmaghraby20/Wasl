@@ -28,7 +28,7 @@ export function EventAttendeePreview({ eventId }: { eventId: string }): React.JS
         >
           {t('attendees')}
           {!members.isPending && !members.isError ? (
-            <span className="inline-flex min-w-8 items-center justify-center rounded-full border border-border px-2 py-1 text-xs font-medium">
+            <span className="inline-flex min-w-8 items-center justify-center rounded-(--shape-radius-control) border border-border px-2 py-1 text-xs font-medium">
               {total}
             </span>
           ) : null}
@@ -57,7 +57,7 @@ export function EventAttendeePreview({ eventId }: { eventId: string }): React.JS
                 <span className="relative mb-5 [&>span:first-child]:size-22">
                   <Avatar displayName={member.displayName} avatarUrl={member.avatarUrl} />
                   {member.isHost ? (
-                    <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 rounded-full border-2 border-card bg-primary-soft px-2.5 py-1 text-xs font-bold text-primary-soft-text">
+                    <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 rounded-(--shape-radius-control) border-2 border-card bg-primary-soft px-2.5 py-1 text-xs font-bold text-primary-soft-text">
                       {t('attendeeHost')}
                     </span>
                   ) : null}
@@ -88,7 +88,7 @@ export function EventAttendeePreview({ eventId }: { eventId: string }): React.JS
                       avatarUrl={person.avatarUrl}
                     />
                   ))}
-                  <span className="grid place-items-center rounded-full bg-primary-soft text-xs font-bold text-primary-soft-text">
+                  <span className="grid place-items-center rounded-(--shape-radius-control) bg-primary-soft text-xs font-bold text-primary-soft-text">
                     +{remaining}
                   </span>
                 </span>

@@ -64,13 +64,13 @@ export function TagInput({
     >
       {value.map((item) => (
         <span
-          className="inline-flex max-w-full items-center gap-1 rounded-full bg-surface-soft py-1 pe-1 ps-2.5 text-xs font-medium text-text"
+          className="inline-flex max-w-full items-center gap-1 rounded-(--shape-radius-control) border border-border bg-surface-soft py-1 pe-1 ps-2.5 text-xs font-medium text-text"
           key={item}
         >
           <span className="truncate">{item}</span>
           <button
             aria-label={t('removeInterest', { interest: item })}
-            className="grid size-6 shrink-0 place-items-center rounded-full text-text-subtle transition-colors hover:bg-danger-soft hover:text-danger focus-visible:bg-danger-soft focus-visible:text-danger disabled:pointer-events-none pointer-coarse:size-11"
+            className="grid size-6 shrink-0 place-items-center rounded-(--shape-radius-control) text-text-subtle transition-colors hover:bg-danger-soft hover:text-danger focus-visible:bg-danger-soft focus-visible:text-danger disabled:pointer-events-none pointer-coarse:size-11"
             disabled={disabled}
             onClick={() => onChange(value.filter((current) => current !== item))}
             type="button"

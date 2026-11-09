@@ -10,7 +10,7 @@ export function AppFooter(): React.JSX.Element {
       <div className="mx-auto grid max-w-(--container-max) gap-8 px-4 py-10 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr]">
         <div className="grid content-start gap-3">
           <Link className="inline-flex items-center gap-2.5" to="/">
-            <span className="grid size-9 place-items-center rounded-[0.7rem] bg-primary text-primary-foreground">
+            <span className="grid size-9 place-items-center rounded-(--shape-radius-control) bg-primary text-primary-foreground">
               <Waypoints aria-hidden="true" className="size-4.5" />
             </span>
             <span className="font-heading text-lg font-extrabold tracking-tight">{t('brand')}</span>

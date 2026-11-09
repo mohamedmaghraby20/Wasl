@@ -30,7 +30,7 @@ export function LoadingSkeleton({
                 className="flex items-center gap-3 rounded-(--shape-radius-card) border border-border bg-card p-4"
                 key={index}
               >
-                <Skeleton className="size-11 shrink-0 rounded-full" />
+                <Skeleton className="size-11 shrink-0 rounded-(--shape-radius-control)" />
                 <div className="grid min-w-0 flex-1 gap-2">
                   <Skeleton className="h-4 w-2/5" />
                   <Skeleton className="h-3 w-3/5" />
@@ -46,7 +46,7 @@ export function LoadingSkeleton({
                 className="grid min-h-40 content-start justify-items-center gap-4 rounded-(--shape-radius-card) border border-border bg-card p-5"
                 key={index}
               >
-                <Skeleton className="size-14 rounded-full" />
+                <Skeleton className="size-14 rounded-(--shape-radius-control)" />
                 <div className="grid w-full justify-items-center gap-2">
                   <Skeleton className="h-4 w-2/3" />
                   <Skeleton className="h-3 w-1/2" />
@@ -57,7 +57,7 @@ export function LoadingSkeleton({
         ) : layout === 'profile' ? (
           <div className="grid gap-5">
             <div className="flex flex-wrap items-center gap-5 rounded-(--shape-radius-card) border border-border bg-card p-6">
-              <Skeleton className="size-20 shrink-0 rounded-full" />
+              <Skeleton className="size-20 shrink-0 rounded-(--shape-radius-control)" />
               <div className="grid min-w-0 flex-1 gap-3">
                 <Skeleton className="h-3 w-24" />
                 <Skeleton className="h-7 w-2/3" />

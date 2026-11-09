@@ -98,11 +98,11 @@
 
   /* Shape, borders and control sizing */
   --shape-radius-none: 0;
-  --shape-radius-sm: 0.375rem;
-  --shape-radius-md: 0.625rem;
-  --shape-radius-lg: 0.875rem;
-  --shape-radius-xl: 1.125rem;
-  --shape-radius-2xl: 1.5rem;
+  --shape-radius-sm: var(--shape-radius-none);
+  --shape-radius-md: var(--shape-radius-none);
+  --shape-radius-lg: var(--shape-radius-none);
+  --shape-radius-xl: var(--shape-radius-none);
+  --shape-radius-2xl: var(--shape-radius-none);
   --shape-radius-pill: 999px;
   --border-width: 1px;
   --border-width-strong: 1.5px;
@@ -213,9 +213,9 @@
   --color-info: #245A78;
   --color-info-soft: #E7F3FA;
   --color-shadow: 64 41 34;
-  --shape-radius-card: 0.25rem;
-  --shape-radius-control: 0.25rem;
-  --shape-radius-dialog: 0.25rem;
+  --shape-radius-card: var(--shape-radius-none);
+  --shape-radius-control: var(--shape-radius-none);
+  --shape-radius-dialog: var(--shape-radius-none);
   --shadow-card: none;
   --shadow-card-hover: 4px 4px 0 var(--color-primary);
   --shadow-popover: var(--elevation-lg);
@@ -286,9 +286,9 @@
   --color-danger-soft: var(--color-red-100);
   --color-info: var(--color-blue-700);
   --color-info-soft: var(--color-blue-100);
-  --shape-radius-card: 0.625rem;
-  --shape-radius-control: 0.5rem;
-  --shape-radius-dialog: 1rem;
+  --shape-radius-card: var(--shape-radius-none);
+  --shape-radius-control: var(--shape-radius-none);
+  --shape-radius-dialog: var(--shape-radius-none);
   --shadow-card: 0 1px 3px rgb(28 48 74 / 7%);
   --shadow-card-hover: 0 8px 24px rgb(28 48 74 / 11%);
   --shadow-popover: 0 18px 42px rgb(28 48 74 / 16%);
@@ -355,9 +355,9 @@
   --color-danger-soft: var(--color-red-100);
   --color-info: var(--color-blue-700);
   --color-info-soft: var(--color-blue-100);
-  --shape-radius-card: var(--shape-radius-2xl);
-  --shape-radius-control: var(--shape-radius-lg);
-  --shape-radius-dialog: 1.75rem;
+  --shape-radius-card: var(--shape-radius-none);
+  --shape-radius-control: var(--shape-radius-none);
+  --shape-radius-dialog: var(--shape-radius-none);
   --shadow-card: 0 3px 12px rgb(57 32 73 / 7%);
   --shadow-card-hover: 0 12px 30px rgb(57 32 73 / 12%);
   --shadow-popover: 0 18px 42px rgb(57 32 73 / 17%);

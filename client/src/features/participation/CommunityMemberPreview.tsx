@@ -125,7 +125,7 @@ export function CommunityMemberPreview({
               <li key={member.userId}>
                 <Link
                   aria-label={member.displayName}
-                  className="block w-fit rounded-full [&>span]:size-8 [&>span]:text-sm sm:[&>span]:size-9"
+                  className="block w-fit rounded-(--shape-radius-control) [&>span]:size-8 [&>span]:text-sm sm:[&>span]:size-9"
                   title={member.displayName}
                   to={`/users/${member.userId}`}
                 >

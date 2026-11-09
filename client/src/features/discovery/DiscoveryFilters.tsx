@@ -224,7 +224,7 @@ export function DiscoveryFilters({
             });
             return (
               <span
-                className="inline-flex items-center gap-1 rounded-full border border-border-control bg-surface-soft py-1 ps-3 pe-1 text-xs text-text"
+                className="inline-flex items-center gap-1 rounded-(--shape-radius-control) border border-border-control bg-surface-soft py-1 ps-3 pe-1 text-xs text-text"
                 key={filter.key}
               >
                 <span>
@@ -232,7 +232,7 @@ export function DiscoveryFilters({
                 </span>
                 <button
                   aria-label={removeLabel}
-                  className="grid size-9 place-items-center rounded-full text-text-muted transition-colors hover:bg-danger-soft hover:text-danger focus-visible:bg-danger-soft focus-visible:text-danger pointer-coarse:size-11"
+                  className="grid size-9 place-items-center rounded-(--shape-radius-control) text-text-muted transition-colors hover:bg-danger-soft hover:text-danger focus-visible:bg-danger-soft focus-visible:text-danger pointer-coarse:size-11"
                   onClick={filter.onRemove}
                   title={removeLabel}
                   type="button"

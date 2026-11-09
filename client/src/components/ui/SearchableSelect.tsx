@@ -190,9 +190,9 @@ export function SearchableSelect({
                   aria-selected={option.value === value}
                   aria-disabled={option.disabled || undefined}
                   className={cn(
-                    'flex min-h-11 w-full cursor-pointer select-none items-center gap-2 rounded-md px-2.5 py-2 text-start text-sm text-text transition-colors hover:bg-primary-soft hover:text-primary-soft-text',
+                    'flex min-h-11 w-full cursor-pointer select-none items-center gap-2 rounded-none px-2.5 py-2 text-start text-sm text-text transition-colors hover:bg-accent hover:text-accent-foreground',
                     option.value === value && 'font-semibold',
-                    index === activeIndex && 'bg-primary-soft text-primary-soft-text',
+                    (index === activeIndex || option.value === value) && 'bg-accent text-accent-foreground',
                   )}
                   id={`${id}-option-${index}`}
                   onClick={() => choose(option)}

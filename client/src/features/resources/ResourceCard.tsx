@@ -156,7 +156,7 @@ export function ResourceCard({
             {event ? (
               <span
                 aria-hidden="true"
-                className="grid size-7 shrink-0 place-items-center rounded-full border-2 border-surface bg-[#e8f2c8] text-[0.55rem] font-bold leading-none text-[#53662e]"
+                className="grid size-7 shrink-0 place-items-center rounded-(--shape-radius-control) border-2 border-surface bg-[#e8f2c8] text-[0.55rem] font-bold leading-none text-[#53662e]"
               >
                 {hostInitials || <UsersRound className="size-3" />}
               </span>

@@ -8,7 +8,7 @@ export function Avatar({
   return (
     <span
       aria-hidden="true"
-      className="grid size-16 shrink-0 place-items-center overflow-hidden rounded-full bg-primary-soft text-xl font-bold text-primary-soft-text"
+      className="grid size-16 shrink-0 place-items-center overflow-hidden rounded-(--shape-radius-control) bg-primary-soft text-xl font-bold text-primary-soft-text"
     >
       {avatarUrl ? (
         <img alt="" className="size-full object-cover" src={avatarUrl} />

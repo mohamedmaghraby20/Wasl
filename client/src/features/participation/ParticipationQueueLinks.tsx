@@ -31,13 +31,13 @@ export function ParticipationQueueLinks({
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-semibold">
       <Link
-        className="rounded-full bg-primary-soft px-2.5 py-1 text-primary-soft-text hover:underline"
+        className="rounded-(--shape-radius-control) bg-primary-soft px-2.5 py-1 text-primary-soft-text hover:underline"
         to={`${base}?status=PENDING`}
       >
         {t('queuePendingCount', { count: counts.data.PENDING })}
       </Link>
       <Link
-        className="rounded-full bg-surface-soft px-2.5 py-1 text-text-muted hover:underline"
+        className="rounded-(--shape-radius-control) bg-surface-soft px-2.5 py-1 text-text-muted hover:underline"
         to={`${base}?status=WAITLISTED`}
       >
         {t('queueWaitlistedCount', { count: counts.data.WAITLISTED })}

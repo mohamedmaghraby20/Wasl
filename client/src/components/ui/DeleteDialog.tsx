@@ -52,7 +52,7 @@ export function DeleteDialog({
       <AlertDialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto">
         <div className="grid gap-4">
           <span
-            className={`grid size-10 place-items-center rounded-full ${state === 'complete' ? 'bg-success-soft text-success' : 'bg-danger-soft text-danger'}`}
+            className={`grid size-10 place-items-center rounded-(--shape-radius-control) ${state === 'complete' ? 'bg-success-soft text-success' : 'bg-danger-soft text-danger'}`}
           >
             {state === 'complete' ? (
               <Check aria-hidden="true" className="size-5" />

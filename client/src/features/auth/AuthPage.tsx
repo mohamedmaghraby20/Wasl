@@ -75,7 +75,7 @@ export function AuthPage(): React.JSX.Element {
     <section className="mx-auto grid max-w-5xl overflow-hidden rounded-(--shape-radius-card) border border-border bg-card shadow-(--shadow-card) lg:min-h-[38rem] lg:grid-cols-2">
       <aside className="relative flex min-h-64 flex-col justify-between overflow-hidden bg-foreground p-7 text-background sm:p-10 lg:p-12">
         <div className="relative z-10 flex items-center gap-2 font-heading text-lg font-extrabold">
-          <span className="grid size-9 place-items-center rounded-full bg-primary text-primary-foreground">
+          <span className="grid size-9 place-items-center rounded-(--shape-radius-control) bg-primary text-primary-foreground">
             <UsersRound aria-hidden="true" className="size-4.5" />
           </span>
           {t('brand')}

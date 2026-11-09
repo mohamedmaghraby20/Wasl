@@ -26,7 +26,7 @@ export function EmptyState({
       role={role}
     >
       {Icon ? (
-        <span className="grid size-11 place-items-center rounded-full bg-surface-soft text-text-subtle">
+        <span className="grid size-11 place-items-center rounded-(--shape-radius-control) bg-surface-soft text-text-subtle">
           <Icon aria-hidden="true" className="size-5" />
         </span>
       ) : null}

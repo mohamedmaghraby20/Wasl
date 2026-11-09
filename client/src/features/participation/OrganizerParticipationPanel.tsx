@@ -335,7 +335,7 @@ export function OrganizerParticipationPanel({
                   <div className="flex min-w-0 items-center gap-3">
                     <span
                       aria-hidden="true"
-                      className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-full bg-primary-soft text-sm font-bold text-primary-soft-text"
+                      className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-(--shape-radius-control) bg-primary-soft text-sm font-bold text-primary-soft-text"
                     >
                       {participant.avatarUrl ? (
                         <img

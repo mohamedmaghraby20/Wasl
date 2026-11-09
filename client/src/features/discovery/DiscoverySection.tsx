@@ -65,7 +65,7 @@ export function DiscoverySection({
                 <Skeleton className="-mx-5 -mt-5 aspect-video rounded-b-none rounded-t-(--shape-radius-card)" />
                 <div className="flex items-center justify-between">
                   <Skeleton className="size-11 rounded-lg" />
-                  <Skeleton className="h-5 w-20 rounded-full" />
+                  <Skeleton className="h-5 w-20 rounded-(--shape-radius-control)" />
                 </div>
                 <Skeleton className="h-5 w-3/4" />
                 <Skeleton className="h-4 w-full" />

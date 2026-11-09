@@ -184,7 +184,7 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
         <span className="sr-only">{t('loadingDetails')}</span>
         <Skeleton className="h-4 w-28" />
         <div className="grid gap-4 rounded-(--shape-radius-card) border border-border bg-card p-6 shadow-sm sm:p-8">
-          <Skeleton className="h-5 w-24 rounded-full" />
+          <Skeleton className="h-5 w-24 rounded-(--shape-radius-control)" />
           <Skeleton className="h-9 w-2/3" />
           <Skeleton className="h-4 w-full" />
           <Skeleton className="h-4 w-5/6" />

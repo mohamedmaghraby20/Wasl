@@ -36,7 +36,7 @@ export function DropdownMenuContent({
         avoidCollisions={false}
         align={align}
         className={cn(
-          'z-(--z-dropdown) min-w-52 overflow-hidden rounded-xl border border-border bg-popover p-1 text-popover-foreground shadow-lg data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
+          'z-(--z-dropdown) min-w-52 overflow-hidden rounded-(--shape-radius-card) border border-border bg-popover p-1 text-popover-foreground shadow-lg data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
           className,
         )}
         sideOffset={sideOffset}
@@ -54,7 +54,7 @@ export function DropdownMenuItem({
   return (
     <DropdownMenuPrimitive.Item
       className={cn(
-        'relative flex min-h-11 cursor-pointer select-none items-center gap-2.5 rounded-md px-2.5 py-2 text-sm text-text outline-hidden transition-colors duration-(--motion-duration-fast) data-[disabled]:pointer-events-none data-[disabled]:opacity-(--opacity-disabled) data-[highlighted]:bg-surface-soft data-[highlighted]:text-primary-soft-text [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:text-inherit',
+        'relative flex min-h-11 cursor-pointer select-none items-center gap-2.5 rounded-none px-2.5 py-2 text-sm text-text outline-hidden transition-colors duration-(--motion-duration-fast) data-[disabled]:pointer-events-none data-[disabled]:opacity-(--opacity-disabled) data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:text-inherit',
         inset && 'ps-8',
         className,
       )}
@@ -73,7 +73,7 @@ export function DropdownMenuCheckboxItem({
     <DropdownMenuPrimitive.CheckboxItem
       checked={checked}
       className={cn(
-        'relative flex min-h-11 cursor-pointer select-none items-center rounded-md py-2 pe-2.5 ps-8 text-sm text-text outline-hidden data-[highlighted]:bg-surface-soft',
+        'relative flex min-h-11 cursor-pointer select-none items-center rounded-none py-2 pe-2.5 ps-8 text-sm text-text outline-hidden data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground',
         className,
       )}
       {...props}
@@ -120,7 +120,7 @@ export function DropdownMenuSubTrigger({
   return (
     <DropdownMenuPrimitive.SubTrigger
       className={cn(
-        'flex min-h-11 cursor-pointer select-none items-center gap-2.5 rounded-md px-2.5 py-2 text-sm text-text outline-hidden data-[state=open]:bg-surface-soft data-[highlighted]:bg-surface-soft',
+        'flex min-h-11 cursor-pointer select-none items-center gap-2.5 rounded-none px-2.5 py-2 text-sm text-text outline-hidden data-[state=open]:bg-accent data-[state=open]:text-accent-foreground data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground',
         className,
       )}
       {...props}
@@ -141,7 +141,7 @@ export function DropdownMenuSubContent({
     <DropdownMenuPrimitive.Portal>
       <DropdownMenuPrimitive.SubContent
         className={cn(
-          'z-(--z-dropdown) min-w-44 rounded-xl border border-border bg-popover p-1 text-popover-foreground shadow-lg data-[state=open]:animate-in data-[state=open]:fade-in-0',
+          'z-(--z-dropdown) min-w-44 rounded-(--shape-radius-card) border border-border bg-popover p-1 text-popover-foreground shadow-lg data-[state=open]:animate-in data-[state=open]:fade-in-0',
           className,
         )}
         {...props}
