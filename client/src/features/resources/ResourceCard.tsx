@@ -128,7 +128,7 @@ export function ResourceCard({
               {event && !event.cancelled ? (
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   <Badge
-                    className="py-0.5 text-base leading-snug @sm:text-lg"
+                    className="px-2 text-xs"
                     variant={
                       remaining === 0 ? 'warning' : remaining === null ? 'neutral' : 'primary'
                     }
@@ -140,14 +140,14 @@ export function ResourceCard({
                         : t('eventPlacesLeft', { count: remaining })}
                   </Badge>
                   {event.admissionMode === 'approval' ? (
-                    <Badge className="py-0.5 text-base leading-snug @sm:text-lg" variant="neutral">
+                    <Badge className="px-2 text-xs" variant="neutral">
                       {t('eventApprovalRequired')}
                     </Badge>
                   ) : null}
                 </div>
               ) : null}
               {event?.cancelled ? (
-                <Badge className="mt-2 py-0.5 text-base leading-snug @sm:text-lg" variant="danger">
+                <Badge className="mt-2 px-2 text-xs" variant="danger">
                   {t('cancelled')}
                 </Badge>
               ) : null}
@@ -178,7 +178,7 @@ export function ResourceCard({
             </div>
             <Button
               asChild
-              className={`relative z-10 px-(--button-padding-inline-sm) ${event ? 'justify-self-start text-base @sm:text-lg' : 'h-(--control-height-sm) text-xs pointer-coarse:h-11'}`}
+              className={`relative z-10 h-(--control-height-sm) px-(--button-padding-inline-sm) text-xs pointer-coarse:h-11 ${event ? 'justify-self-start' : ''}`}
               size="sm"
               variant="outline"
             >
