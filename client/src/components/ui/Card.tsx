@@ -4,6 +4,7 @@ import { cn } from '@/lib/cn';
 export function Card({ className, ...props }: ComponentProps<'div'>): React.JSX.Element {
   return (
     <div
+      data-card
       className={cn(
         'rounded-(--shape-radius-card) border border-border bg-card text-card-foreground shadow-(--shadow-card)',
         className,

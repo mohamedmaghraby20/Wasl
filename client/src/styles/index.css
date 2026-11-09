@@ -174,3 +174,15 @@ input[type='search']::-webkit-search-cancel-button {
     transition-duration: 0.01ms !important;
   }
 }
+
+@media (hover: hover) {
+  .button-offset-hover:hover:not(:disabled, [aria-disabled='true'], [data-card] *) {
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .button-offset-hover:hover:not(:disabled, [aria-disabled='true'], [data-card] *) {
+      translate: 0 -2px;
+    }
+  }
+}

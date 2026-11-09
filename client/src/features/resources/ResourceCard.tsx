@@ -39,7 +39,7 @@ export function ResourceCard({
     .join('');
 
   return (
-    <article className="group relative flex min-w-0 flex-col overflow-hidden rounded-(--shape-radius-card) border border-border bg-card shadow-(--shadow-card) transition-[box-shadow,translate] duration-(--motion-duration-base) ease-(--motion-ease-standard) hover:-translate-y-0.5 hover:shadow-(--shadow-card-hover) motion-reduce:transform-none motion-reduce:transition-none has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-ring has-[a:focus-visible]:ring-offset-2 has-[a:focus-visible]:ring-offset-background">
+    <article data-card className="group relative flex min-w-0 flex-col overflow-hidden rounded-(--shape-radius-card) border border-border bg-card shadow-(--shadow-card) transition-[box-shadow,translate] duration-(--motion-duration-base) ease-(--motion-ease-standard) hover:-translate-y-0.5 hover:shadow-(--shadow-card-hover) motion-reduce:transform-none motion-reduce:transition-none has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-ring has-[a:focus-visible]:ring-offset-2 has-[a:focus-visible]:ring-offset-background">
       <div
         className={`relative grid place-items-center overflow-hidden bg-primary-soft text-primary-soft-text ${event ? 'h-(--event-cover-height)' : 'h-(--community-cover-height)'}`}
       >
