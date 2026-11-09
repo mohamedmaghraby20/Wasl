@@ -2,6 +2,8 @@ import { CalendarDays, UsersRound } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
+import { useCommunitiesControllerMine } from '@/api/generated/communities/communities';
+import { useEventsControllerMine } from '@/api/generated/events/events';
 import { useParticipationControllerMyActivity } from '@/api/generated/participation/participation';
 import { Button } from '@/components/ui/Button';
 import { LoadingSkeleton } from '@/components/feedback/LoadingSkeleton';
@@ -30,9 +32,74 @@ function Thumbnail({ id, kind }: { id: string; kind: ResourceKind }): React.JSX.
   );
 }
 
+const card = 'min-w-0 rounded-(--shape-radius-xl) border border-border bg-card p-5 shadow-xs';
+const link =
+  'inline-flex min-h-11 items-center rounded-sm text-sm font-semibold text-primary-soft-text hover:underline focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2';
+const row =
+  'flex min-w-0 items-center gap-3 rounded-sm py-4 transition-colors hover:bg-primary-soft focus-visible:outline-2 focus-visible:outline-ring focus-visible:-outline-offset-2';
+
+/** Show a short preview of the resources the API says the viewer can manage. */
+function ManagedSection({
+  kind,
+  query,
+}: {
+  kind: ResourceKind;
+  query: {
+    data: { id: string; name: string }[] | undefined;
+    isPending: boolean;
+    isError: boolean;
+    refetch: () => unknown;
+  };
+}): React.JSX.Element {
+  const { t } = useTranslation();
+  const heading = `home-managed-${kind}`;
+  const title = t(kind === 'events' ? 'homeManagedEvents' : 'homeManagedCommunities');
+  const Icon = kind === 'events' ? CalendarDays : UsersRound;
+
+  return (
+    <section aria-labelledby={heading} className={card}>
+      <h2 id={heading} className="font-bold">
+        {title}
+      </h2>
+      {query.isPending ? (
+        <LoadingSkeleton layout="list" message={t('loading', { resource: t(kind) })} rows={2} />
+      ) : query.isError ? (
+        <QueryError
+          message={t('loadError', { resource: t(kind) })}
+          onRetry={() => void query.refetch()}
+        />
+      ) : query.data?.length ? (
+        <>
+          <ul className="divide-y divide-border">
+            {query.data.slice(0, 3).map(({ id, name }) => (
+              <li key={id}>
+                <Link className={row} to={`/${kind}/${id}`}>
+                  <Icon aria-hidden="true" className="size-4 shrink-0 text-text-muted" />
+                  <span className="line-clamp-2 min-w-0 text-sm font-semibold wrap-anywhere">
+                    {name}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <Link className={link} to={`/create#managed-${kind}`} aria-label={`${t('homeSeeAll')} · ${title}`}>
+            {t('homeSeeAll')}
+          </Link>
+        </>
+      ) : (
+        <p className="mt-2 text-sm text-text-muted">{t('managedResourcesEmpty')}</p>
+      )}
+    </section>
+  );
+}
+
 export function PersonalSidebar(): React.JSX.Element {
   const { t, i18n } = useTranslation();
   const activity = useParticipationControllerMyActivity();
+  const managedCommunities = useCommunitiesControllerMine();
+  const managedEvents = useEventsControllerMine({
+    query: { select: (items) => items.map(({ id, title }) => ({ id, name: title })) },
+  });
   const now = Date.now();
   const events = (activity.data?.events ?? [])
     .filter(
@@ -42,11 +109,6 @@ export function PersonalSidebar(): React.JSX.Element {
   const communities = (activity.data?.communities ?? [])
     .filter((item) => item.status === 'ACTIVE')
     .sort((a, b) => Date.parse(b.requestedAt) - Date.parse(a.requestedAt));
-  const card = 'min-w-0 rounded-(--shape-radius-xl) border border-border bg-card p-5 shadow-xs';
-  const link =
-    'inline-flex min-h-11 items-center rounded-sm text-sm font-semibold text-primary-soft-text hover:underline focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2';
-  const row =
-    'flex min-w-0 items-center gap-3 rounded-sm py-4 transition-colors hover:bg-primary-soft focus-visible:outline-2 focus-visible:outline-ring focus-visible:-outline-offset-2';
   return (
     <aside aria-label={t('homePersonalActivity')} className="grid min-w-0 content-start gap-3">
       {activity.isPending ? (
@@ -138,6 +200,8 @@ export function PersonalSidebar(): React.JSX.Element {
           </section>
         </>
       )}
+      <ManagedSection kind="events" query={managedEvents} />
+      <ManagedSection kind="communities" query={managedCommunities} />
     </aside>
   );
 }

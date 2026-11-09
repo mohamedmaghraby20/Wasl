@@ -59,6 +59,10 @@ for (const language of ['en', 'ar']) {
           });
         if (path.endsWith('/privacy/status'))
           return route.fulfill({ json: { requiresOnboarding: false } });
+        if (path.endsWith('/events/mine'))
+          return route.fulfill({ json: [{ id: 'managed-event', title: 'Hosted event' }] });
+        if (path.endsWith('/communities/mine'))
+          return route.fulfill({ json: [{ id: 'managed-community', name: 'Managed community' }] });
         if (
           path.endsWith('/mine') ||
           path.includes('/reference/') ||
@@ -95,7 +99,15 @@ for (const language of ['en', 'ar']) {
       const sidebar = page.getByRole('complementary', {
         name: language === 'en' ? 'Your activity' : 'نشاطك',
       });
-      await expect(sidebar.getByRole('listitem')).toHaveCount(6);
+      await expect(sidebar.getByRole('listitem')).toHaveCount(8);
+      await expect(sidebar.getByRole('link', { name: 'Hosted event' })).toHaveAttribute(
+        'href',
+        '/events/managed-event',
+      );
+      await expect(sidebar.getByRole('link', { name: 'Managed community' })).toHaveAttribute(
+        'href',
+        '/communities/managed-community',
+      );
       await expect(sidebar.getByRole('link', { name: events[0]!.title })).toHaveAttribute(
         'href',
         '/events/event-1',
@@ -131,7 +143,7 @@ for (const language of ['en', 'ar']) {
       await expect(page.locator('#activity-communities-heading')).toHaveCount(0);
       empty = true;
       await page.goto('/');
-      await expect(sidebar.getByRole('listitem')).toHaveCount(0);
+      await expect(sidebar.getByRole('listitem')).toHaveCount(2);
       await expect(
         sidebar.getByRole('link', { name: language === 'en' ? 'Find events' : 'ابحث عن فعاليات' }),
       ).toBeVisible();
@@ -139,7 +151,7 @@ for (const language of ['en', 'ar']) {
       fail = true;
       await page.reload();
       await expect(sidebar.getByRole('alert')).toBeVisible({ timeout: 15000 });
-      await expect(sidebar.getByRole('link')).toHaveCount(0);
+      await expect(sidebar.getByRole('link', { name: 'Hosted event' })).toBeVisible();
       fail = false;
       await sidebar.getByRole('button').click();
       await expect(
