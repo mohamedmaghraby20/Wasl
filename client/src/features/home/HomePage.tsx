@@ -103,11 +103,11 @@ export function HomePage(): React.JSX.Element {
   });
   return (
     <div
-      className={`grid min-w-0 gap-8 sm:gap-10 ${user ? 'xl:grid-cols-[clamp(18rem,24vw,26rem)_minmax(0,1fr)] xl:items-start xl:gap-x-12' : ''}`}
+      className={`grid min-w-0 gap-8 sm:gap-10 ${user ? 'xl:grid-cols-[clamp(15rem,19vw,17rem)_minmax(0,1fr)] rtl:xl:grid-cols-[minmax(0,1fr)_clamp(15rem,19vw,17rem)] xl:items-start xl:gap-x-6' : ''}`}
     >
       <section
         aria-labelledby="home-hero-heading"
-        className={`relative isolate order-1 overflow-hidden rounded-(--shape-radius-2xl) border border-border bg-[radial-gradient(ellipse_at_88%_22%,var(--color-primary-soft),transparent_44%),linear-gradient(135deg,var(--color-surface),var(--color-surface-soft))] shadow-(--shadow-card) ${user ? 'xl:col-start-2' : ''}`}
+        className={`relative isolate order-1 overflow-hidden rounded-(--shape-radius-2xl) border border-border bg-[radial-gradient(ellipse_at_88%_22%,var(--color-primary-soft),transparent_44%),linear-gradient(135deg,var(--color-surface),var(--color-surface-soft))] shadow-(--shadow-card) ${user ? 'xl:col-start-2 rtl:xl:col-start-1' : ''}`}
       >
         <div
           aria-hidden="true"
@@ -217,11 +217,11 @@ export function HomePage(): React.JSX.Element {
       </section>
 
       {user ? (
-        <div className="order-2 min-w-0 xl:col-start-1 xl:row-start-1 xl:row-span-3">
+        <div className="order-2 min-w-0 xl:col-start-1 rtl:xl:col-start-2 xl:row-start-1 xl:row-span-3">
           <PersonalSidebar />
         </div>
       ) : null}
-      <div className={`order-3 grid min-w-0 gap-8 sm:gap-10 ${user ? 'xl:col-start-2' : ''}`}>
+      <div className={`order-3 grid min-w-0 gap-8 sm:gap-10 ${user ? 'xl:col-start-2 rtl:xl:col-start-1' : ''}`}>
         <HomeSection
           title={
             cityId && !fallback
@@ -284,7 +284,7 @@ export function HomePage(): React.JSX.Element {
       ) : null}
       <section
         aria-labelledby="home-create-heading"
-        className={`order-5 flex flex-wrap items-center justify-between gap-4 border-t border-border pt-6 ${user ? 'xl:col-start-2' : ''}`}
+        className={`order-5 flex flex-wrap items-center justify-between gap-4 border-t border-border pt-6 ${user ? 'xl:col-start-2 rtl:xl:col-start-1' : ''}`}
       >
         <div className="grid gap-2">
           <h2 id="home-create-heading" className="text-xl font-bold sm:text-2xl">

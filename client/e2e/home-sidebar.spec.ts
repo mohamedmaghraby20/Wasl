@@ -104,7 +104,13 @@ for (const language of ['en', 'ar']) {
       const box = (await sidebar.boundingBox())!;
       const discovery = (await page.locator('#events-heading').boundingBox())!;
       if (width === 1440) {
-        expect(language === 'en' ? box.x < discovery.x : box.x > discovery.x).toBe(true);
+        const cards = (await page.locator('#events-cards').boundingBox())!;
+        expect(box.x + box.width).toBeLessThan(cards.x);
+        expect(box.width).toBeLessThanOrEqual(272);
+        expect(cards.width).toBeGreaterThan(box.width * 3);
+        const direction = language === 'ar' ? 'rtl' : 'ltr';
+        await expect(sidebar).toHaveCSS('direction', direction);
+        await expect(page.locator('#events-cards')).toHaveCSS('direction', direction);
         expect((await page.locator('main').boundingBox())!.width).toBeGreaterThan(1380);
         expect(
           (await page.locator('#events-cards article').first().boundingBox())!.width,
