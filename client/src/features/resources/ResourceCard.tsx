@@ -30,22 +30,15 @@ export function ResourceCard({
     event?.capacity == null ? null : Math.max(0, event.capacity - event.acceptedRegistrationCount);
   const attendeeCount =
     event?.acceptedRegistrationCount ?? ('memberCount' in item ? item.memberCount : null);
-  const hostInitials = item.hostName
-    .trim()
-    .split(/\s+/u)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => Array.from(part)[0]?.toLocaleUpperCase() ?? '')
-    .join('');
 
   return (
     <article
       data-card
-      className={`group @container relative flex min-w-0 flex-col overflow-hidden rounded-(--shape-radius-card) border border-border bg-card shadow-(--shadow-card) transition-[box-shadow,translate] duration-(--motion-duration-base) ease-(--motion-ease-standard) hover:-translate-y-0.5 hover:shadow-(--shadow-card-hover) motion-reduce:transform-none motion-reduce:transition-none has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-ring has-[a:focus-visible]:ring-offset-2 has-[a:focus-visible]:ring-offset-background ${event ? 'self-start' : 'h-full'}`}
+      className={`group @container relative flex min-w-0 flex-col overflow-hidden rounded-(--shape-radius-card) border border-border bg-card shadow-(--shadow-card) transition-[box-shadow,translate] duration-(--motion-duration-base) ease-(--motion-ease-standard) hover:-translate-y-0.5 hover:shadow-(--shadow-card-hover) motion-reduce:transform-none motion-reduce:transition-none has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-ring has-[a:focus-visible]:ring-offset-2 has-[a:focus-visible]:ring-offset-background ${event ? 'self-start hover:bg-primary-hover hover:text-primary-foreground' : 'h-full'}`}
     >
       <div className="flex flex-1 flex-col">
         <div
-          className={`relative grid place-items-center overflow-hidden bg-primary-soft text-primary-soft-text ${event ? 'h-(--event-cover-height) shrink-0' : 'h-(--community-cover-height)'}`}
+          className={`relative grid place-items-center overflow-hidden bg-primary-soft text-primary-soft-text ${event ? 'h-(--event-cover-height) shrink-0 border-b border-border' : 'h-(--community-cover-height)'}`}
         >
           {failedCover === cover ? (
             <CoverIcon aria-hidden="true" className="size-10" strokeWidth={1.75} />
@@ -67,7 +60,7 @@ export function ResourceCard({
             <div className="min-w-0">
               {firstCategory ? (
                 <p
-                  className={`font-bold text-text-muted ${event ? 'text-base @sm:text-lg' : 'text-xs'}`}
+                  className={`text-text-muted ${event ? 'text-sm font-medium group-hover:text-primary-foreground' : 'text-xs font-bold'}`}
                   title={otherCategories
                     .map((category) => localizedName(category, i18n.language))
                     .join(', ')}
@@ -77,17 +70,17 @@ export function ResourceCard({
                 </p>
               ) : null}
               <h3
-                className={`mt-1 font-extrabold leading-tight tracking-tight ${event ? 'break-words text-2xl @sm:text-[1.6875rem]' : 'line-clamp-2 text-lg'}`}
+                className={`mt-1 leading-snug ${event ? 'break-words text-xl font-semibold' : 'line-clamp-2 text-lg font-extrabold tracking-tight'}`}
               >
                 <Link
-                  className="rounded-sm transition-colors group-hover:text-primary-soft-text focus-visible:outline-none after:absolute after:inset-0 after:rounded-(--shape-radius-card) after:content-['']"
+                  className={`rounded-sm transition-colors focus-visible:outline-none after:absolute after:inset-0 after:rounded-(--shape-radius-card) after:content-[''] ${event ? '' : 'group-hover:text-primary-soft-text'}`}
                   to={`/${kind}/${item.slug}`}
                 >
                   {localizedResourceTitle(item)}
                 </Link>
               </h3>
               {event && date ? (
-                <p className="mt-1 flex flex-wrap items-center gap-x-2 text-base text-text-muted @sm:text-lg">
+                <p className="mt-1 flex flex-wrap items-center gap-x-2 text-sm text-text-muted group-hover:text-primary-foreground">
                   <Clock3 aria-hidden="true" className="size-4 shrink-0" />
                   <span>
                     {date.weekday}, {date.month} {date.day}
@@ -102,14 +95,21 @@ export function ResourceCard({
                 </p>
               ) : null}
               <p
-                className={`flex items-start gap-2 text-text-muted ${event ? 'mt-1 text-base @sm:text-lg' : 'mt-2 text-xs'}`}
+                className={`flex items-start gap-2 text-text-muted ${event ? 'mt-1 text-sm group-hover:text-primary-foreground' : 'mt-2 text-xs'}`}
               >
                 {event?.online ? (
                   <Video aria-hidden="true" className="size-4 shrink-0" />
                 ) : (
                   <MapPin aria-hidden="true" className="size-4 shrink-0" />
                 )}
-                <span className={event ? 'min-w-0 break-words' : 'truncate'}>
+                <span
+                  className="min-w-0 truncate"
+                  title={
+                    event && !event.online
+                      ? [event.locationName, item.cityName].filter(Boolean).join(', ')
+                      : undefined
+                  }
+                >
                   {event?.online ? (
                     t('online')
                   ) : (
@@ -128,10 +128,8 @@ export function ResourceCard({
               {event && !event.cancelled ? (
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   <Badge
-                    className="px-2 text-xs"
-                    variant={
-                      remaining === 0 ? 'warning' : remaining === null ? 'neutral' : 'primary'
-                    }
+                    className="border-current px-2 text-xs group-hover:text-primary-foreground"
+                    variant="outline"
                   >
                     {remaining === null
                       ? t('eventUnlimitedCapacity')
@@ -140,14 +138,20 @@ export function ResourceCard({
                         : t('eventPlacesLeft', { count: remaining })}
                   </Badge>
                   {event.admissionMode === 'approval' ? (
-                    <Badge className="px-2 text-xs" variant="neutral">
+                    <Badge
+                      className="border-current px-2 text-xs group-hover:text-primary-foreground"
+                      variant="outline"
+                    >
                       {t('eventApprovalRequired')}
                     </Badge>
                   ) : null}
                 </div>
               ) : null}
               {event?.cancelled ? (
-                <Badge className="mt-2 px-2 text-xs" variant="danger">
+                <Badge
+                  className="mt-2 border-current px-2 text-xs group-hover:text-primary-foreground"
+                  variant="outline"
+                >
                   {t('cancelled')}
                 </Badge>
               ) : null}
@@ -155,19 +159,10 @@ export function ResourceCard({
           </div>
           <div
             dir="ltr"
-            className={`mt-auto grid items-center gap-2 border-t border-border text-text-muted ${event ? 'px-3 py-2 text-base @xs:grid-cols-[minmax(0,1fr)_auto]' : 'grid-cols-[minmax(0,1fr)_auto] px-(--card-padding) py-4 text-xs'}`}
+            className={`mt-auto grid items-center gap-2 border-t border-border text-text-muted ${event ? 'px-5 py-2 text-sm group-hover:text-primary-foreground @xs:grid-cols-[minmax(0,1fr)_auto]' : 'grid-cols-[minmax(0,1fr)_auto] px-(--card-padding) py-4 text-xs'}`}
           >
             <div dir={i18n.dir()} className="flex min-w-0 items-center gap-2">
-              {event ? (
-                <span
-                  aria-hidden="true"
-                  className="grid size-7 shrink-0 place-items-center rounded-(--shape-radius-control) border-2 border-surface bg-[#e8f2c8] text-[0.55rem] font-bold leading-none text-[#53662e]"
-                >
-                  {hostInitials || <UsersRound className="size-3" />}
-                </span>
-              ) : (
-                <UsersRound aria-hidden="true" className="size-4 shrink-0" />
-              )}
+              {!event && <UsersRound aria-hidden="true" className="size-4 shrink-0" />}
               {attendeeCount !== null ? (
                 <span className="min-w-0 text-text-muted">
                   {event
