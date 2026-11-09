@@ -1,1 +1,2 @@
 export const DISCOVERY_PAGE_SIZE = 12;
+export const DISCOVERY_EVENT_PAGE_SIZE = 24;

@@ -6,7 +6,7 @@ import {
   useDiscoveryControllerListEvents,
 } from '@/api/generated/discovery/discovery';
 import { languageCode, type ResourceKind } from '@/features/resources/resource-utils';
-import { DISCOVERY_PAGE_SIZE } from './discovery-utils';
+import { DISCOVERY_EVENT_PAGE_SIZE, DISCOVERY_PAGE_SIZE } from './discovery-utils';
 
 function resetPage(params: URLSearchParams): URLSearchParams {
   const next = new URLSearchParams(params);
@@ -25,7 +25,17 @@ export function useDiscoveryPageState(language: string) {
   const filterKeys =
     kind === 'communities'
       ? ['q', 'city', 'category', 'order']
-      : ['q', 'city', 'category', 'from', 'to', 'modality', 'cityScope', 'upcoming', 'nonCancelled'];
+      : [
+          'q',
+          'city',
+          'category',
+          'from',
+          'to',
+          'modality',
+          'cityScope',
+          'upcoming',
+          'nonCancelled',
+        ];
   const hasFilters = filterKeys.some((key) => params.has(key));
   const lang = languageCode(language);
   const communityParams = {
@@ -38,6 +48,7 @@ export function useDiscoveryPageState(language: string) {
   };
   const eventParams = {
     ...communityParams,
+    pageSize: DISCOVERY_EVENT_PAGE_SIZE,
     ...(params.get('from') ? { from: params.get('from')! } : {}),
     ...(params.get('to') ? { to: params.get('to')! } : {}),
     ...(params.get('modality') === 'online' || params.get('modality') === 'in-person'
