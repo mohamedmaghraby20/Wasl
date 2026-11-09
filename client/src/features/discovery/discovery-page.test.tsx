@@ -181,15 +181,19 @@ describe('DiscoveryPage', () => {
     expect(screen.getByRole('button', { name: 'Remove filter Event format: Online' })).toBeVisible();
 
     await user.click(format);
+    expect(screen.queryByRole('option', { name: 'All formats' })).not.toBeInTheDocument();
     await user.click(await screen.findByRole('option', { name: 'On-site' }));
-    expect(screen.getByLabelText('Current URL')).toHaveTextContent(/^\/events\?modality=in-person$/);
+    expect(screen.getByLabelText('Current URL')).toHaveTextContent(/^\/events$/);
     await waitFor(() =>
       expect(urls.some((url) => url.searchParams.get('modality') === 'in-person')).toBe(true),
     );
 
-    await user.click(screen.getByRole('button', { name: 'Remove filter Event format: On-site' }));
+    expect(format).toHaveTextContent('On-site');
+    await user.click(format);
+    await user.click(await screen.findByRole('option', { name: 'Online' }));
+    await user.click(screen.getByRole('button', { name: 'Remove filter Event format: Online' }));
     expect(screen.getByLabelText('Current URL')).toHaveTextContent(/^\/events$/);
-    expect(format).toHaveTextContent('All formats');
+    expect(format).toHaveTextContent('On-site');
   });
 
   afterEach(() => {

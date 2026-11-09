@@ -56,7 +56,7 @@ export function DiscoveryFilters({
   searchValue: string;
   cityValue: string;
   categoryValue: string;
-  modalityValue: '' | 'online' | 'in-person';
+  modalityValue: 'online' | 'in-person';
   fromValue: string;
   toValue: string;
   cities: CityPublicDto[] | undefined;
@@ -111,11 +111,11 @@ export function DiscoveryFilters({
       onRemove: () => onFilterChange('category', ''),
     });
   }
-  if (kind === 'events' && modalityValue) {
+  if (kind === 'events' && modalityValue === 'online') {
     activeFilters.push({
       key: 'modality',
       label: t('eventFormat'),
-      value: modalityValue === 'online' ? t('online') : t('onSite'),
+      value: t('online'),
       onRemove: () => onFilterChange('modality', ''),
     });
   }
@@ -208,13 +208,12 @@ export function DiscoveryFilters({
             <Select
               aria-label={t('eventFormat')}
               className={filterControlClass}
-              onValueChange={(value) => onFilterChange('modality', value === 'all' ? '' : value)}
+              onValueChange={(value) => onFilterChange('modality', value)}
               options={[
-                { value: 'all', label: t('allEventFormats') },
-                { value: 'online', label: t('online') },
                 { value: 'in-person', label: t('onSite') },
+                { value: 'online', label: t('online') },
               ]}
-              value={modalityValue || 'all'}
+              value={modalityValue}
             />
             <DatePicker
               align="start"

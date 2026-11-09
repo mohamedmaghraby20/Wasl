@@ -22,9 +22,8 @@ export function useDiscoveryPageState(language: string) {
     pathname.replace(/\/+$/, '') === '/communities' ? 'communities' : 'events';
   const requestedPage = Number(params.get('page') ?? 1);
   const page = Number.isInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
-  const requestedModality = params.get('modality');
-  const modality: '' | 'online' | 'in-person' =
-    requestedModality === 'online' || requestedModality === 'in-person' ? requestedModality : '';
+  const modality: 'online' | 'in-person' =
+    params.get('modality') === 'online' ? 'online' : 'in-person';
   const filterKeys =
     kind === 'communities'
       ? ['q', 'city', 'category', 'order']
@@ -34,12 +33,12 @@ export function useDiscoveryPageState(language: string) {
           'category',
           'from',
           'to',
-          'modality',
           'cityScope',
           'upcoming',
           'nonCancelled',
         ];
-  const hasFilters = filterKeys.some((key) => params.has(key));
+  const hasFilters =
+    filterKeys.some((key) => params.has(key)) || (kind === 'events' && modality === 'online');
   const lang = languageCode(language);
   const communityParams = {
     ...(params.get('q') ? { q: params.get('q')! } : {}),
@@ -54,7 +53,7 @@ export function useDiscoveryPageState(language: string) {
     pageSize: DISCOVERY_EVENT_PAGE_SIZE,
     ...(params.get('from') ? { from: params.get('from')! } : {}),
     ...(params.get('to') ? { to: params.get('to')! } : {}),
-    ...(modality ? { modality } : {}),
+    modality,
     ...(params.get('cityScope') === 'include-online' || params.get('cityScope') === 'strict'
       ? { cityScope: params.get('cityScope') as 'include-online' | 'strict' }
       : {}),
@@ -83,7 +82,7 @@ export function useDiscoveryPageState(language: string) {
     value: string,
   ): void => {
     const next = resetPage(params);
-    if (value) next.set(key, value);
+    if (value && !(key === 'modality' && value === 'in-person')) next.set(key, value);
     else next.delete(key);
     if (key === 'from' && value && next.get('to') && value > next.get('to')!) next.delete('to');
     setParams(next, { preventScrollReset: true });
