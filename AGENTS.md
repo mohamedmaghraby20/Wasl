@@ -1,12 +1,7 @@
 # Wasl repository guidance
 
-Project-specific operating instructions for coding agents working on Wasl, a
-bilingual Arabic/English community and event platform for Arabs in Türkiye.
-Read this file before every task and keep it aligned with the actual project
-structure and commands.
+Project-specific operating instructions for coding agents working on Wasl, a bilingual Arabic/English community and event platform for Arabs in Türkiye.
 This file contains references to other files under `./docs/`, each covering a specific aspect of the application. Only explore a referenced file when the current task relates to its subject.
-Claude Code and Gemini CLI can read this file through the `@AGENTS.md` reference
-in their project instructions.
 
 ---
 
@@ -40,9 +35,10 @@ the app [`/docs/03-TECH-STACK.md`](/docs/03-TECH-STACK.md).
 
 ## Git Conventions
 
-- Before starting any code-changing task and after completing any task, read and follow `docs/GIT_CONVENTIONS.md` throughout the entire task. Do not consider the task complete until its version control requirements are satisfied.
+- Check git status and uncommitted code when a new session starts.
+- Do not consider the task complete until its version control requirements found in `docs/GIT_CONVENTIONS.md` are satisfied. 
 
-[`/docs/GIT_CONVENTIONS.md`](/docs/GIT_CONVENTIONS.md)
+Reference [`/docs/GIT_CONVENTIONS.md`](/docs/GIT_CONVENTIONS.md)
 
 ---
 

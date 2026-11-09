@@ -1,0 +1,26 @@
+/* WASL design system v0.1 — candidate light theme. Standalone CSS source of truth. */
+:root {
+  --wasl-cacao: #402922; --wasl-terracotta: #9c4e3a; --wasl-blush: #f6e7e0; --wasl-cream: #f9f3ee;
+  --wasl-ink: #251c19; --wasl-muted-ink: #62524b; --wasl-white: #ffffff; --wasl-border: #614d44;
+  --wasl-positive: #276343; --wasl-positive-bg: #e7f3e9; --wasl-warning: #704700; --wasl-warning-bg: #fff1cd;
+  --wasl-danger: #9a2830; --wasl-danger-bg: #ffebeb; --wasl-info: #245a78; --wasl-info-bg: #e7f3fa;
+  --wasl-space-1: 0.25rem; --wasl-space-2: 0.5rem; --wasl-space-3: 0.75rem; --wasl-space-4: 1rem;
+  --wasl-space-5: 1.25rem; --wasl-space-6: 1.5rem; --wasl-space-8: 2rem; --wasl-space-12: 3rem; --wasl-space-16: 4rem;
+  --wasl-font-sans: Arial, Tahoma, sans-serif; --wasl-font-arabic: Tahoma, Arial, sans-serif;
+  --wasl-text-xs: 0.75rem; --wasl-text-sm: 0.875rem; --wasl-text-base: 1rem; --wasl-text-lg: 1.25rem;
+  --wasl-text-xl: 1.5rem; --wasl-text-display: clamp(2.75rem, 6.5vw, 5.125rem);
+  --wasl-radius-control: 0.25rem; --wasl-radius-card: 0.25rem; --wasl-radius-pill: 9999px;
+  --wasl-border-width: 1px; --wasl-shadow-card: none; --wasl-shadow-hover: 4px 4px 0 var(--wasl-cacao);
+  --wasl-focus: #245a78; --wasl-motion-fast: 120ms; --wasl-layout-max: 80rem;
+  /* shadcn-compatible semantic aliases: full colors, not HSL channel triples. */
+  --background: var(--wasl-cream); --foreground: var(--wasl-ink);
+  --card: var(--wasl-white); --card-foreground: var(--wasl-ink);
+  --popover: var(--wasl-white); --popover-foreground: var(--wasl-ink);
+  --primary: var(--wasl-cacao); --primary-foreground: var(--wasl-white);
+  --secondary: var(--wasl-blush); --secondary-foreground: var(--wasl-cacao);
+  --muted: #f0e8e2; --muted-foreground: var(--wasl-muted-ink);
+  --accent: var(--wasl-blush); --accent-foreground: var(--wasl-cacao);
+  --destructive: var(--wasl-danger); --destructive-foreground: var(--wasl-white);
+  --border: var(--wasl-border); --input: var(--wasl-border); --ring: var(--wasl-focus); --radius: var(--wasl-radius-control);
+}
+:lang(ar), [dir="rtl"] { --wasl-font-sans: var(--wasl-font-arabic); }
