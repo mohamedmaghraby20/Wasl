@@ -111,14 +111,6 @@ export function DiscoveryFilters({
       onRemove: () => onFilterChange('category', ''),
     });
   }
-  if (kind === 'events' && modalityValue === 'online') {
-    activeFilters.push({
-      key: 'modality',
-      label: t('eventFormat'),
-      value: t('online'),
-      onRemove: () => onFilterChange('modality', ''),
-    });
-  }
   if (kind !== 'communities' && fromValue) {
     activeFilters.push({
       key: 'from',
@@ -207,7 +199,11 @@ export function DiscoveryFilters({
           <>
             <Select
               aria-label={t('eventFormat')}
-              className={filterControlClass}
+              className={
+                modalityValue === 'online'
+                  ? `${filterControlClass} border-primary bg-primary-soft font-semibold text-primary-soft-text hover:border-primary`
+                  : filterControlClass
+              }
               onValueChange={(value) => onFilterChange('modality', value)}
               options={[
                 { value: 'in-person', label: t('onSite') },

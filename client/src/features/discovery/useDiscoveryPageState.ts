@@ -37,8 +37,7 @@ export function useDiscoveryPageState(language: string) {
           'upcoming',
           'nonCancelled',
         ];
-  const hasFilters =
-    filterKeys.some((key) => params.has(key)) || (kind === 'events' && modality === 'online');
+  const hasFilters = filterKeys.some((key) => params.has(key));
   const lang = languageCode(language);
   const communityParams = {
     ...(params.get('q') ? { q: params.get('q')! } : {}),
