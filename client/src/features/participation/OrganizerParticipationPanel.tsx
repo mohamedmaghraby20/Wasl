@@ -22,6 +22,7 @@ import {
   useParticipationControllerEventDecision,
   useParticipationControllerEventParticipants,
 } from '@/api/generated/participation/participation';
+import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { IconButton } from '@/components/ui/IconButton';
 import { useConfirm } from '@/components/ui/ConfirmDialog';
@@ -29,7 +30,6 @@ import { QueryError } from '@/components/feedback/QueryError';
 import { LoadingSkeleton } from '@/components/feedback/LoadingSkeleton';
 import { ApiError } from '@/api/fetcher';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { Field } from '@/components/ui/Field';
 import { SearchInput } from '@/components/ui/SearchInput';
 import { cn } from '@/lib/cn';
 import {
@@ -65,6 +65,24 @@ export function OrganizerParticipationPanel({
   const selectedStatus = statuses.includes(params.get('status') ?? '')
     ? params.get('status')!
     : 'PENDING';
+  const statusLabel = (status: string): string =>
+    status === 'PENDING'
+      ? t('requestPendingLabel')
+      : status === 'WAITLISTED'
+        ? t('requestWaitlistedLabel')
+        : status === 'ACTIVE'
+          ? t('attendeeMember')
+          : status === 'ACCEPTED'
+            ? t('countAccepted')
+            : t(`participationStatus_${status}`);
+  const statusVariant = (status: string): 'warning' | 'neutral' | 'success' | 'danger' =>
+    status === 'PENDING'
+      ? 'warning'
+      : status === 'WAITLISTED'
+        ? 'neutral'
+        : status === 'NO_SHOW'
+          ? 'danger'
+          : 'success';
   const queryClient = useQueryClient();
   const communityCounts = useParticipationControllerCommunityCounts(resourceId, {
     query: { enabled: kind === 'communities' },
@@ -240,17 +258,12 @@ export function OrganizerParticipationPanel({
       ) : (
         <>
           {busy ? (
-            <p
-              className="flex items-center gap-2 text-sm text-text-muted"
-              role="status"
-              aria-live="polite"
-            >
-              <LoaderCircle aria-hidden="true" className="size-4 animate-spin" />
+            <p className="sr-only" role="status" aria-live="polite">
               {t('updatingParticipation')}
             </p>
           ) : null}
           {mode === 'all' ? (
-            <dl className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <dl className="grid grid-cols-2 gap-px border-y border-border bg-border sm:grid-cols-4">
               <Count label={t('countPending')} value={counts.data.PENDING} />
               <Count label={t('countWaitlisted')} value={counts.data.WAITLISTED} />
               <Count
@@ -261,76 +274,97 @@ export function OrganizerParticipationPanel({
                 <Count
                   label={t('capacityLabel')}
                   value={
-                    counts.data.capacity === 'unlimited' ? t('unlimited') : counts.data.capacity
+                    counts.data.capacity === 'unlimited'
+                      ? t('unlimited')
+                      : `${occupied} / ${counts.data.capacity}`
                   }
                 />
               ) : null}
             </dl>
           ) : null}
           {atCapacity && counts.data.WAITLISTED > 0 && counts.data.admissionMode === 'approval' ? (
-            <p className="text-sm text-warning" role="note">
+            <p
+              className="rounded-(--shape-radius-control) bg-warning-soft px-3 py-2 text-sm text-warning"
+              role="note"
+            >
               {t('participationCapacityFull')}
             </p>
           ) : null}
           {mode === 'directory' ? (
             <>
-              <nav aria-label={t('participationFilters')} className="flex flex-wrap gap-2">
-                {statuses.map((status) => (
-                  <Button
-                    key={status}
-                    aria-current={selectedStatus === status ? 'page' : undefined}
-                    onClick={() => {
-                      const next = new URLSearchParams(params);
-                      next.set('status', status);
-                      setParams(next);
-                    }}
-                    size="sm"
-                    variant={selectedStatus === status ? 'secondary' : 'ghost'}
-                  >
-                    {t(
-                      status === 'PENDING'
-                        ? 'countPending'
-                        : status === 'WAITLISTED'
-                          ? 'countWaitlisted'
-                          : status === activeStatus
-                            ? kind === 'communities'
-                              ? 'countActive'
-                              : 'countAccepted'
-                            : `participationStatus_${status}`,
-                    )}{' '}
-                    <span>
-                      {
-                        counts.data[
-                          status as 'PENDING' | 'WAITLISTED' | 'ACTIVE' | 'ACCEPTED' | 'ATTENDED' | 'NO_SHOW'
-                        ]
-                      }
-                    </span>
-                  </Button>
-                ))}
+              <nav
+                aria-label={t('participationFilters')}
+                className="flex gap-1 overflow-x-auto border-b border-border"
+              >
+                {statuses.map((status) => {
+                  const active = selectedStatus === status;
+                  return (
+                    <button
+                      key={status}
+                      type="button"
+                      aria-current={active ? 'page' : undefined}
+                      className={cn(
+                        '-mb-px flex min-h-11 shrink-0 items-center gap-2 whitespace-nowrap border-b-2 px-3 text-sm transition-colors',
+                        active
+                          ? 'border-primary font-semibold text-text'
+                          : 'border-transparent text-text-muted hover:text-text',
+                      )}
+                      onClick={() => {
+                        const next = new URLSearchParams(params);
+                        next.set('status', status);
+                        setParams(next);
+                      }}
+                    >
+                      {t(
+                        status === 'PENDING'
+                          ? 'countPending'
+                          : status === 'WAITLISTED'
+                            ? 'countWaitlisted'
+                            : status === activeStatus
+                              ? kind === 'communities'
+                                ? 'countActive'
+                                : 'countAccepted'
+                              : `participationStatus_${status}`,
+                      )}
+                      <span className="text-xs tabular-nums text-text-subtle">
+                        {
+                          counts.data[
+                            status as
+                              | 'PENDING'
+                              | 'WAITLISTED'
+                              | 'ACTIVE'
+                              | 'ACCEPTED'
+                              | 'ATTENDED'
+                              | 'NO_SHOW'
+                          ]
+                        }
+                      </span>
+                    </button>
+                  );
+                })}
               </nav>
-              <Field id="participant-review-search" label={t('searchParticipants')}>
+              <div className="max-w-md">
                 <SearchInput
                   aria-label={t('searchParticipants')}
                   id="participant-review-search"
+                  placeholder={t('searchParticipants')}
                   value={search}
                   onValueChange={setSearch}
                 />
-              </Field>
+              </div>
             </>
           ) : null}
           {visibleParticipants.length ? (
-            <ul className="grid gap-2">
+            <ul
+              className={cn(
+                'grid divide-y divide-border',
+                mode !== 'requests' && 'border-y border-border',
+              )}
+            >
               {visibleParticipants.map((participant) => (
                 <li
                   key={participant.id}
-                  className={cn(
-                    'items-center gap-x-3 gap-y-2 rounded-(--shape-radius-card) border border-border bg-card px-3 py-2',
-                    mode === 'requests'
-                      ? 'grid grid-cols-[minmax(0,1fr)_auto]'
-                      : mode === 'all'
-                        ? 'grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_auto]'
-                        : 'flex flex-wrap justify-between',
-                  )}
+                  className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 py-3"
                 >
                   <div className="flex min-w-0 items-center gap-3">
                     <span
@@ -347,29 +381,21 @@ export function OrganizerParticipationPanel({
                         participant.displayName.trim().slice(0, 1).toLocaleUpperCase()
                       )}
                     </span>
-                    <div className="min-w-0">
+                    <div className="grid min-w-0 gap-1">
                       <Link
                         className="block truncate text-sm font-semibold hover:underline"
                         to={`/users/${participant.userId}`}
                       >
                         {participant.displayName}
                       </Link>
-                      <p className="text-xs text-text-muted">
-                        {t(
-                          participant.status === 'PENDING'
-                            ? 'requestPendingLabel'
-                            : participant.status === 'WAITLISTED'
-                              ? 'requestWaitlistedLabel'
-                              : participant.status === 'ACTIVE'
-                                ? 'attendeeMember'
-                                : participant.status === 'ACCEPTED'
-                                  ? 'countAccepted'
-                                  : `participationStatus_${participant.status}`,
-                        )}
-                      </p>
+                      {mode !== 'directory' ? (
+                        <Badge variant={statusVariant(participant.status)}>
+                          {statusLabel(participant.status)}
+                        </Badge>
+                      ) : null}
                     </div>
                   </div>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap items-center justify-end gap-1">
                     {moderators.isSuccess &&
                     (kind === 'communities'
                       ? participant.status === 'ACTIVE'
@@ -401,7 +427,7 @@ export function OrganizerParticipationPanel({
                             !moderators.data.some((entry) => entry.userId === participant.userId),
                           )
                         }
-                        variant="outline"
+                        variant="ghost"
                         className={
                           processing?.participantId === participant.userId
                             ? '[&_svg]:animate-spin'
@@ -428,7 +454,7 @@ export function OrganizerParticipationPanel({
                           intent="success"
                           disabled={busy}
                           onClick={() => void decide(participant.id, 'approve')}
-                          variant="outline"
+                          variant="ghost"
                         >
                           {processing?.participantId === participant.id &&
                           processing.action === 'approve' ? (
@@ -454,7 +480,7 @@ export function OrganizerParticipationPanel({
                           intent="danger"
                           disabled={busy}
                           onClick={() => void decide(participant.id, 'reject')}
-                          variant="outline"
+                          variant="ghost"
                         >
                           {processing?.participantId === participant.id &&
                           processing.action === 'reject' ? (
@@ -492,7 +518,7 @@ export function OrganizerParticipationPanel({
                                 ? '[&_svg]:animate-spin'
                                 : undefined
                             }
-                            variant="outline"
+                            variant="ghost"
                           />
                         )}
                         <Button
@@ -512,7 +538,7 @@ export function OrganizerParticipationPanel({
                           intent="danger"
                           disabled={busy}
                           onClick={() => void decide(participant.id, 'reject')}
-                          variant="outline"
+                          variant="ghost"
                         >
                           {processing?.participantId === participant.id &&
                           processing.action === 'reject' ? (
@@ -550,7 +576,7 @@ export function OrganizerParticipationPanel({
                                 ? '[&_svg]:animate-spin'
                                 : undefined
                             }
-                            variant="outline"
+                            variant="ghost"
                           />
                         )}
                         {kind === 'events' && eventStarted && participant.status !== 'NO_SHOW' && (
@@ -576,7 +602,7 @@ export function OrganizerParticipationPanel({
                                 ? '[&_svg]:animate-spin'
                                 : undefined
                             }
-                            variant="outline"
+                            variant="ghost"
                           />
                         )}
                         {(kind === 'communities' || participant.status === 'ACCEPTED') && (
@@ -602,7 +628,7 @@ export function OrganizerParticipationPanel({
                                 ? '[&_svg]:animate-spin'
                                 : undefined
                             }
-                            variant="outline"
+                            variant="ghost"
                           />
                         )}
                       </>

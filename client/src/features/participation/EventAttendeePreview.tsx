@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { useParticipationControllerEventAttendeePreview } from '@/api/generated/participation/participation';
+import { Badge } from '@/components/ui/Badge';
 import { QueryError } from '@/components/feedback/QueryError';
 import { LoadingSkeleton } from '@/components/feedback/LoadingSkeleton';
 import { Avatar } from './ParticipantAvatar';
@@ -28,9 +29,7 @@ export function EventAttendeePreview({ eventId }: { eventId: string }): React.JS
         >
           {t('attendees')}
           {!members.isPending && !members.isError ? (
-            <span className="inline-flex min-w-8 items-center justify-center rounded-(--shape-radius-control) border border-border px-2 py-1 text-xs font-medium">
-              {total}
-            </span>
+          <Badge variant="neutral">{total}</Badge>
           ) : null}
         </h2>
         {members.data?.total ? (
