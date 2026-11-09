@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { Form, Link } from 'react-router';
+import { createPortal } from 'react-dom';
+import { Form, Link, useOutletContext } from 'react-router';
+import { Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useSeoMeta } from '@unhead/react';
 import { Button } from '@/components/ui/Button';
@@ -8,8 +10,8 @@ import { SearchableSelect } from '@/components/ui/SearchableSelect';
 import { QueryError } from '@/components/feedback/QueryError';
 import { localizedName } from '@/features/resources/resource-utils';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { HomeSection } from './HomeSection';
-import { HomeInterests } from './HomeInterests';
+import { HomeEventDiscovery, HomeSection } from './HomeSection';
+import { HomeInterests, HomeInterestEvents } from './HomeInterests';
 import { PersonalSidebar } from './PersonalSidebar';
 import { useHomeCity } from './useHomeCity';
 import type { LocationError } from './useHomeCity';
@@ -33,6 +35,7 @@ const locationErrorKeys: Record<LocationError, string> = {
 export function HomePage(): React.JSX.Element {
   const { t, i18n } = useTranslation();
   const { user, loading: authLoading } = useAuth();
+  const homeSearchSlot = useOutletContext<HTMLDivElement | null>();
   const [query, setQuery] = useState('');
   const isMac =
     typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/i.test(navigator.platform);
@@ -101,131 +104,143 @@ export function HomePage(): React.JSX.Element {
     ogDescription: t('starter'),
     ogType: 'website',
   });
+  const showHero = !authLoading && !user;
+  const searchForm = (
+    <Form
+      action="/discover"
+      aria-label={t('homeSearchLabel')}
+      className={`grid w-full min-w-0 ${user ? 'grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_auto] items-center gap-x-1 bg-surface p-1' : 'max-w-[54rem] gap-3 lg:grid-cols-3'}`}
+      method="get"
+      role="search"
+    >
+      <div className="relative min-w-0">
+        <SearchInput
+          aria-label={t('homeSearchLabel')}
+          aria-keyshortcuts={user ? 'Control+K Meta+K' : undefined}
+          className={
+            user
+              ? 'h-(--control-height-md)'
+              : 'h-12 border-border pe-16 shadow-(--elevation-xs)'
+          }
+          id="home-search"
+          name="q"
+          onValueChange={setQuery}
+          placeholder={t('homeSearchExample')}
+          value={query}
+        />
+        {!user && !query ? (
+          <kbd
+            aria-hidden="true"
+            dir="ltr"
+            className="pointer-events-none absolute end-3 top-1/2 -translate-y-1/2 rounded-(--shape-radius-sm) border border-border bg-surface px-1.5 py-1 text-xs font-medium text-text-muted"
+          >
+            {isMac ? '⌘ K' : 'Ctrl K'}
+          </kbd>
+        ) : null}
+      </div>
+      <input type="hidden" name="upcoming" value="true" />
+      <input type="hidden" name="nonCancelled" value="true" />
+      <input type="hidden" name="cityScope" value="include-online" />
+      {cityId ? <input type="hidden" name="city" value={cityId} /> : null}
+      <SearchableSelect
+        aria-label={cityId ? `${t('cityFilter')}: ${cityName}` : t('nationwide')}
+        aria-busy={cities.isPending}
+        className={user ? 'h-(--control-height-md)' : 'h-12'}
+        emptyMessage={t('noCitiesFound')}
+        id="home-city"
+        onValueChange={setCityId}
+        options={[
+          { value: '', label: t('nationwide') },
+          ...(cities.data ?? []).map((city) => ({
+            value: city.id,
+            label: localizedName(city, i18n.language),
+          })),
+        ]}
+        placeholder={
+          cities.isPending ? t('loadingCities') : cityId ? cityName : t('nationwide')
+        }
+        searchPlaceholder={t('searchCities')}
+        value={cityId}
+      />
+      <Button
+        aria-label={user ? t('search') : undefined}
+        className={user ? undefined : 'h-12 w-full'}
+        size={user ? 'icon' : undefined}
+        type="submit"
+      >
+        {user ? <Search aria-hidden="true" /> : t('search')}
+      </Button>
+      <div className="col-span-full grid gap-1 empty:hidden">
+        {cities.isError ? (
+          <QueryError message={t('homeCitiesError')} onRetry={() => void cities.refetch()} />
+        ) : null}
+        {locationBusy ? (
+          <p className="text-xs font-medium text-text-muted" role="status">
+            {t('locatingCity')}
+          </p>
+        ) : locationError ? (
+          <p className="text-xs text-text-muted" role="status">
+            {t(locationError)}
+          </p>
+        ) : null}
+      </div>
+    </Form>
+  );
+
   return (
     <div
       className={`grid min-w-0 gap-8 sm:gap-10 ${user ? 'xl:grid-cols-[clamp(15rem,19vw,17rem)_minmax(0,1fr)] rtl:xl:grid-cols-[minmax(0,1fr)_clamp(15rem,19vw,17rem)] xl:items-start xl:gap-x-6' : ''}`}
     >
-      <section
-        aria-labelledby="home-hero-heading"
-        className={`relative isolate order-1 overflow-hidden rounded-(--shape-radius-2xl) border border-border bg-[radial-gradient(ellipse_at_88%_22%,var(--color-primary-soft),transparent_44%),linear-gradient(135deg,var(--color-surface),var(--color-surface-soft))] shadow-(--shadow-card) ${user ? 'xl:col-start-2 rtl:xl:col-start-1' : ''}`}
-      >
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute end-[-5rem] top-20 size-72 rounded-full border border-primary/30 sm:size-80"
-        />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute end-[-2rem] top-32 size-48 rounded-full border border-primary/30 sm:size-56"
-        />
-        <div className="relative z-10 grid gap-8 p-6 sm:p-8 lg:p-10">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="inline-flex items-center gap-2 text-sm font-extrabold text-text">
-              <span
-                aria-hidden="true"
-                className="grid size-9 place-items-center rounded-(--shape-radius-md) bg-primary text-base text-primary-foreground"
-              >
-                w
-              </span>
-              <span>{t('brand')}</span>
-            </div>
-          </div>
-          <div className="grid w-full max-w-[54rem] content-start gap-3">
-            <p className="text-xs font-bold tracking-wide text-text-muted">
-              {t('homeHeroEyebrow')}
-            </p>
-            <h1
-              id="home-hero-heading"
-              className="max-w-full font-heading text-4xl font-extrabold leading-[1.1] sm:text-5xl lg:text-6xl rtl:leading-[1.3]"
-            >
-              {t('homeHeroTitle')}
-            </h1>
-            <p className="max-w-(--container-reading) text-base leading-relaxed text-text-muted sm:text-lg">
-              {t('homeHeroDescription')}
-            </p>
-          </div>
-
-          <Form
-            action="/discover"
-            aria-label={t('homeSearchLabel')}
-            className="grid w-full max-w-[54rem] min-w-0 gap-3 lg:grid-cols-3"
-            method="get"
-            role="search"
-          >
-            <div className="relative min-w-0">
-              <SearchInput
-                aria-label={t('homeSearchLabel')}
-                className="h-12 border-border pe-16 shadow-(--elevation-xs)"
-                id="home-search"
-                name="q"
-                onValueChange={setQuery}
-                placeholder={t('homeSearchExample')}
-                value={query}
-              />
-              {!query ? (
-                <kbd
+      {showHero ? (
+        <section
+          aria-labelledby="home-hero-heading"
+          className="relative isolate order-1 overflow-hidden rounded-(--shape-radius-2xl) border border-border bg-[radial-gradient(ellipse_at_88%_22%,var(--color-primary-soft),transparent_44%),linear-gradient(135deg,var(--color-surface),var(--color-surface-soft))] shadow-(--shadow-card)"
+        >
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute end-[-5rem] top-20 size-72 rounded-full border border-primary/30 sm:size-80"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute end-[-2rem] top-32 size-48 rounded-full border border-primary/30 sm:size-56"
+          />
+          <div className="relative z-10 grid gap-8 p-6 sm:p-8 lg:p-10">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="inline-flex items-center gap-2 text-sm font-extrabold text-text">
+                <span
                   aria-hidden="true"
-                  dir="ltr"
-                  className="pointer-events-none absolute end-3 top-1/2 -translate-y-1/2 rounded-(--shape-radius-sm) border border-border bg-surface px-1.5 py-1 text-xs font-medium text-text-muted"
+                  className="grid size-9 place-items-center rounded-(--shape-radius-md) bg-primary text-base text-primary-foreground"
                 >
-                  {isMac ? '⌘ K' : 'Ctrl K'}
-                </kbd>
-              ) : null}
+                  w
+                </span>
+                <span>{t('brand')}</span>
+              </div>
             </div>
-            <input type="hidden" name="upcoming" value="true" />
-            <input type="hidden" name="nonCancelled" value="true" />
-            <input type="hidden" name="cityScope" value="include-online" />
-            {cityId ? <input type="hidden" name="city" value={cityId} /> : null}
-            <SearchableSelect
-              aria-label={cityId ? `${t('cityFilter')}: ${cityName}` : t('nationwide')}
-              aria-busy={cities.isPending}
-              className="h-12"
-              emptyMessage={t('noCitiesFound')}
-              id="home-city"
-              onValueChange={setCityId}
-              options={[
-                { value: '', label: t('nationwide') },
-                ...(cities.data ?? []).map((city) => ({
-                  value: city.id,
-                  label: localizedName(city, i18n.language),
-                })),
-              ]}
-              placeholder={
-                cities.isPending ? t('loadingCities') : cityId ? cityName : t('nationwide')
-              }
-              searchPlaceholder={t('searchCities')}
-              value={cityId}
-            />
-            <Button className="h-12 w-full" type="submit">
-              {t('search')}
-            </Button>
-            <div className="grid gap-1 empty:hidden lg:col-span-3">
-              {cities.isError ? (
-                <QueryError message={t('homeCitiesError')} onRetry={() => void cities.refetch()} />
-              ) : null}
-              {locationBusy ? (
-                <p className="text-xs font-medium text-text-muted" role="status">
-                  {t('locatingCity')}
-                </p>
-              ) : locationError ? (
-                <p className="text-xs text-text-muted" role="status">
-                  {t(locationError)}
-                </p>
-              ) : null}
+            <div className="grid w-full max-w-[54rem] content-start gap-3">
+              <p className="text-xs font-bold tracking-wide text-text-muted">
+                {t('homeHeroEyebrow')}
+              </p>
+              <h1
+                id="home-hero-heading"
+                className="max-w-full font-heading text-4xl font-extrabold leading-[1.1] sm:text-5xl lg:text-6xl rtl:leading-[1.3]"
+              >
+                {t('homeHeroTitle')}
+              </h1>
+              <p className="max-w-(--container-reading) text-base leading-relaxed text-text-muted sm:text-lg">
+                {t('homeHeroDescription')}
+              </p>
             </div>
-          </Form>
-        </div>
-      </section>
 
-      {user ? (
-        <div className="order-2 min-w-0 xl:col-start-1 rtl:xl:col-start-2 xl:row-start-1 xl:row-span-3">
-          <PersonalSidebar />
-        </div>
-      ) : null}
-      <div className={`order-3 grid min-w-0 gap-8 sm:gap-10 ${user ? 'xl:col-start-2 rtl:xl:col-start-1' : ''}`}>
+            {searchForm}
+          </div>
+        </section>
+      ) : user && homeSearchSlot ? createPortal(searchForm, homeSearchSlot) : null}
+
+      <div className={`order-2 grid min-w-0 gap-8 sm:gap-10 ${user ? 'xl:col-start-2 rtl:xl:col-start-1 xl:row-start-1' : ''}`}>
         <HomeSection
           title={
             cityId && !fallback
-              ? t('upcomingEventsInCity', { city: cityName })
+              ? t(user ? 'homeNearbyEvents' : 'upcomingEventsInCity', { city: cityName })
               : t('upcomingEventsNationwide')
           }
           kind="events"
@@ -235,6 +250,8 @@ export function HomePage(): React.JSX.Element {
           isError={events.isError}
           onRetry={() => void events.refetch()}
           viewAll={`/events?${eventDestination}`}
+          total={user ? events.data?.total : undefined}
+          offsetShadow={Boolean(user)}
         />
         {!onlineEmpty && (
           <HomeSection
@@ -250,6 +267,8 @@ export function HomePage(): React.JSX.Element {
             viewAll={`/discover?${onlineDestination}`}
           />
         )}
+        {user ? <HomeInterestEvents cityId={cityId} cityReady={cityReady} lang={lang} /> : null}
+        {user ? <HomeEventDiscovery cityId={cityId} cityReady={cityReady} lang={lang} /> : null}
         <HomeSection
           title={
             cityId && !communityFallback
@@ -263,9 +282,15 @@ export function HomePage(): React.JSX.Element {
           isError={communities.isError}
           onRetry={() => void communities.refetch()}
           viewAll={`/communities?${communityDestination}`}
+          ranked={Boolean(user)}
         />
         <HomeInterests cityId={cityId} />
       </div>
+      {user ? (
+        <div className="order-3 min-w-0 xl:col-start-1 rtl:xl:col-start-2 xl:row-start-1 xl:row-span-2">
+          <PersonalSidebar />
+        </div>
+      ) : null}
       {!authLoading && !user ? (
         <section
           aria-labelledby="home-signup-heading"

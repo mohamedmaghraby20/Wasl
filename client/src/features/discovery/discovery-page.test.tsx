@@ -171,6 +171,32 @@ function mockDiscoveryApi(
 }
 
 describe('DiscoveryPage', () => {
+  it('reflects and updates the event format in the URL and event query', async () => {
+    const user = userEvent.setup();
+    const { urls } = mockDiscoveryApi();
+    renderPage('/events?modality=online&page=2');
+
+    const format = screen.getByRole('combobox', { name: 'Event format' });
+    expect(format).toHaveTextContent('Online');
+    expect(format).toHaveClass('bg-primary');
+    expect(screen.queryByRole('group', { name: 'Filters' })).not.toBeInTheDocument();
+
+    await user.click(format);
+    expect(screen.queryByRole('option', { name: 'All formats' })).not.toBeInTheDocument();
+    await user.click(await screen.findByRole('option', { name: 'On-site' }));
+    expect(screen.getByLabelText('Current URL')).toHaveTextContent(/^\/events$/);
+    await waitFor(() =>
+      expect(urls.some((url) => url.searchParams.get('modality') === 'in-person')).toBe(true),
+    );
+
+    expect(format).toHaveTextContent('On-site');
+    expect(format).toHaveClass('bg-primary');
+    await user.click(format);
+    await user.click(await screen.findByRole('option', { name: 'Online' }));
+    expect(screen.getByLabelText('Current URL')).toHaveTextContent(/^\/events\?modality=online$/);
+    expect(format).toHaveClass('bg-primary');
+  });
+
   afterEach(() => {
     vi.unstubAllGlobals();
     vi.unstubAllEnvs();

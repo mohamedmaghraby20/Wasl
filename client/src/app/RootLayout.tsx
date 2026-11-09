@@ -68,6 +68,8 @@ export function RootLayout(): React.JSX.Element {
   const routeRequiresAuth = requiresAuthentication(pathname);
   const privacy = usePrivacyControllerStatus({ query: { enabled: Boolean(user) } });
   const [navigationOpen, setNavigationOpen] = useState(false);
+  const [homeSearchSlot, setHomeSearchSlot] = useState<HTMLDivElement | null>(null);
+  const showHomeSearch = pathname === '/' && Boolean(user);
   const mainRef = useRef<HTMLElement>(null);
   const previousPathname = useRef(pathname);
   useEffect(() => setNavigationOpen(false), [pathname]);
@@ -112,10 +114,21 @@ export function RootLayout(): React.JSX.Element {
         {t('skipToContent')}
       </a>
       <header className="sticky top-0 z-(--z-sticky) border-b border-border/80 bg-card/85 backdrop-blur-md">
-        <div className="mx-auto flex h-16 max-w-(--container-max) items-center gap-4 px-4 sm:px-6">
+        <div
+          className={cn(
+            'mx-auto flex max-w-(--container-max) items-center gap-4 px-4 sm:px-6',
+            showHomeSearch ? 'min-h-16 flex-wrap gap-y-2 py-2 lg:flex-nowrap' : 'h-16',
+          )}
+        >
           <Brand />
-          <div className="ms-auto flex items-center gap-1.5">
-            <GlobalSearch />
+          {showHomeSearch ? (
+            <div
+              className="order-last w-full min-w-0 lg:order-none lg:max-w-(--container-reading) lg:flex-1"
+              ref={setHomeSearchSlot}
+            />
+          ) : null}
+          <div className="ms-auto flex shrink-0 items-center gap-1.5">
+            <GlobalSearch inlineSearch={showHomeSearch ? homeSearchSlot : null} />
             <Button
               aria-label={languageLabel}
               className="hidden md:inline-flex"
@@ -304,7 +317,7 @@ export function RootLayout(): React.JSX.Element {
             </Button>
           </div>
         ) : null}
-        <Outlet />
+        <Outlet context={homeSearchSlot} />
       </main>
       <AppFooter />
       <ScrollRestoration />

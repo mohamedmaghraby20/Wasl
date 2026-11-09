@@ -1,15 +1,16 @@
-import { ArrowRight, ChevronLeft, ChevronRight, SearchX } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { ArrowRight, ChevronLeft, ChevronRight, MapPin, SearchX, Ticket, UsersRound } from 'lucide-react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import type { CommunityPublicDto, EventPublicDto } from '@/api/generated/wasl-client.schemas';
+import { useDiscoveryControllerListEvents } from '@/api/generated/discovery/discovery';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { IconButton } from '@/components/ui/IconButton';
 import { HomeCompactEventCard } from './HomeCompactEventCard';
 import { ResourceCard } from '@/features/resources/ResourceCard';
 import { QueryError } from '@/components/feedback/QueryError';
-import type { ResourceKind } from '@/features/resources/resource-utils';
+import { localizedResourceTitle, turkeyDateParts, type ResourceKind } from '@/features/resources/resource-utils';
 
 export function HomeSection({
   title,
@@ -22,6 +23,9 @@ export function HomeSection({
   viewAll,
   sectionId = kind,
   compactEvents = false,
+  ranked = false,
+  offsetShadow = false,
+  total,
 }: {
   title: string;
   kind: ResourceKind;
@@ -33,6 +37,9 @@ export function HomeSection({
   viewAll?: string;
   sectionId?: string;
   compactEvents?: boolean;
+  ranked?: boolean;
+  offsetShadow?: boolean;
+  total?: number | undefined;
 }): React.JSX.Element {
   const { t } = useTranslation();
   const resource = title.toLocaleLowerCase(language);
@@ -76,9 +83,16 @@ export function HomeSection({
       aria-labelledby={`${sectionId}-heading`}
     >
       <div className="grid gap-1 sm:flex sm:items-end sm:justify-between sm:gap-3">
-        <h2 className="text-xl font-bold sm:text-2xl" id={`${sectionId}-heading`}>
-          {title}
-        </h2>
+        <div className="grid gap-1">
+          <h2 className="text-xl font-bold sm:text-2xl" id={`${sectionId}-heading`}>
+            {title}
+          </h2>
+          {total !== undefined && total > 0 ? (
+            <p className="text-sm text-text-muted">
+              {t('homeEventTotal', { count: total, formattedCount: new Intl.NumberFormat(language).format(total) })}
+            </p>
+          ) : null}
+        </div>
         <div className="flex items-center justify-end gap-2">
           {!isEventList && position.overflow && !isPending && !isError && items?.length ? (
             <div className="flex gap-2">
@@ -153,6 +167,31 @@ export function HomeSection({
           icon={SearchX}
           title={t('noHomeResultsTitle')}
         />
+      ) : ranked ? (
+        <ol className="divide-y divide-border border border-border bg-card">
+          {items.slice(0, 4).map((item, index) => (
+            <li key={item.id}>
+              <Link
+                className="flex min-h-16 min-w-0 items-center gap-3 p-3 transition-colors hover:bg-primary-soft sm:gap-4 sm:p-4"
+                to={`/communities/${item.slug}`}
+              >
+                <span aria-hidden="true" className="grid size-9 shrink-0 place-items-center bg-primary-soft text-sm font-bold tabular-nums text-primary-soft-text">
+                  {new Intl.NumberFormat(language, { minimumIntegerDigits: 2 }).format(index + 1)}
+                </span>
+                <span className="grid min-w-0 flex-1 gap-1">
+                  <span className="wrap-anywhere font-semibold">{localizedResourceTitle(item)}</span>
+                  {item.cityName ? <span className="text-xs text-text-muted">{item.cityName}</span> : null}
+                </span>
+                {'memberCount' in item ? (
+                  <span className="flex items-center gap-1.5 text-end text-sm text-text-muted">
+                    <UsersRound aria-hidden="true" className="size-4 shrink-0" />
+                    {t('communityMemberCount', { count: item.memberCount })}
+                  </span>
+                ) : null}
+              </Link>
+            </li>
+          ))}
+        </ol>
       ) : (
         <div
           aria-label={isEventList ? undefined : t('homeBrowseCards', { resource: title })}
@@ -178,7 +217,7 @@ export function HomeSection({
             <div
               className={
                 isEventList
-                  ? 'min-w-0 self-start'
+                  ? `min-w-0 self-start ${offsetShadow ? '[&>article]:shadow-(--shadow-card-hover)' : ''}`
                   : compactEvents
                     ? 'min-w-0'
                     : 'min-h-[18rem] min-w-0 [&>article]:h-full'
@@ -195,5 +234,191 @@ export function HomeSection({
         </div>
       )}
     </section>
+  );
+}
+
+/** The upcoming Saturday and Sunday, using the same Türkiye dates as discovery. */
+function weekendDates(): { from: string; to: string } {
+  const today = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Istanbul' }).format(new Date());
+  const saturday = new Date(today + 'T00:00:00Z');
+  const weekday = saturday.getUTCDay();
+  saturday.setUTCDate(saturday.getUTCDate() + (weekday === 0 ? -1 : 6 - weekday));
+  const sunday = new Date(saturday);
+  sunday.setUTCDate(saturday.getUTCDate() + 1);
+  return { from: saturday.toISOString().slice(0, 10), to: sunday.toISOString().slice(0, 10) };
+}
+
+function EventShelf({
+  id, title, pending, error, retry, empty, destination, children,
+}: {
+  id: string;
+  title: string;
+  pending: boolean;
+  error: boolean;
+  retry: () => void;
+  empty: string;
+  destination?: string;
+  children: ReactNode;
+}): React.JSX.Element {
+  const { t } = useTranslation();
+  return (
+    <section aria-labelledby={id} className="grid min-w-0 gap-4 border-t border-border pt-6">
+      <div className="flex flex-wrap items-center justify-between gap-x-4">
+        <h2 id={id} className="text-xl font-bold sm:text-2xl">{title}</h2>
+        {destination ? (
+          <Link className="inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-primary-soft-text hover:underline" to={destination}>
+            {t('exploreAll')}
+            <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />
+          </Link>
+        ) : null}
+      </div>
+      {error ? <QueryError message={t('loadError', { resource: title })} onRetry={retry} /> : pending ? (
+        <div role="status">
+          <span className="sr-only">{t('loading', { resource: title })}</span>
+          <Skeleton className="h-20 w-full" />
+        </div>
+      ) : children ?? <p className="text-sm text-text-muted">{empty}</p>}
+    </section>
+  );
+}
+
+/** Build signed-in discovery previews from date filters and a shared nationwide listing sample. */
+export function HomeEventDiscovery({ cityId, cityReady, lang }: {
+  cityId: string;
+  cityReady: boolean;
+  lang: 'ar' | 'en';
+}): React.JSX.Element {
+  const { t, i18n } = useTranslation();
+  const dates = weekendDates();
+  const filters = { modality: 'in-person', upcoming: true, nonCancelled: true } as const;
+  const weekendScope = { ...dates, ...(cityId ? { city: cityId } : {}) };
+  const weekend = useDiscoveryControllerListEvents(
+    { ...filters, ...weekendScope, lang, pageSize: 4 },
+    { query: { enabled: cityReady } },
+  );
+  const nationwide = useDiscoveryControllerListEvents({ ...filters, lang, pageSize: 48 });
+  const items = nationwide.data?.items ?? [];
+  const popular = items
+    .filter((event) => event.acceptedRegistrationCount > 0)
+    .sort((a, b) => b.acceptedRegistrationCount - a.acceptedRegistrationCount)
+    .slice(0, 3);
+  const limited = items.flatMap((event) => {
+    const remaining = event.capacity == null ? 0 : event.capacity - event.acceptedRegistrationCount;
+    return remaining > 0 && remaining <= 5 ? [{ event, remaining }] : [];
+  }).sort((a, b) => a.remaining - b.remaining).slice(0, 3);
+  const otherCities = new Map<string, EventPublicDto>();
+  for (const event of items) {
+    if (event.cityId && event.cityId !== cityId && event.cityName && !otherCities.has(event.cityId)) {
+      otherCities.set(event.cityId, event);
+    }
+    if (otherCities.size === 4) break;
+  }
+  const listings = { modality: filters.modality, upcoming: 'true', nonCancelled: 'true' };
+  const eventListing = (scope: Record<string, string>): string =>
+    '/events?' + new URLSearchParams({ ...listings, ...scope }).toString();
+  const nationalState = {
+    pending: nationwide.isPending,
+    error: nationwide.isError,
+    retry: () => void nationwide.refetch(),
+  };
+  const titleLink = 'min-w-0 wrap-anywhere font-semibold text-text hover:underline';
+
+  return (
+    <>
+      <EventShelf
+        id="home-weekend"
+        title={t('homeWeekend')}
+        pending={!cityReady || weekend.isPending}
+        error={weekend.isError}
+        retry={() => void weekend.refetch()}
+        empty={t('homeWeekendEmpty')}
+        destination={eventListing(weekendScope)}
+      >
+        {weekend.data?.items.length ? (
+          <ul className="divide-y divide-border border border-s-2 border-border border-s-primary bg-surface-soft shadow-(--shadow-card-hover)">
+            {weekend.data.items.map((event) => {
+              const date = turkeyDateParts(event.startsAt, i18n.language);
+              return (
+                <li key={event.id} className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3 p-3 sm:p-4">
+                  <time dateTime={event.startsAt} className="grid min-w-16 justify-items-center bg-primary-soft p-2 text-xs font-semibold text-primary-soft-text">
+                    <span>{date.weekday}</span>
+                    <span className="text-xl font-bold">{date.day}</span>
+                  </time>
+                  <div className="grid min-w-0 gap-1">
+                    <Link className={titleLink} to={'/events/' + event.slug}>{localizedResourceTitle(event)}</Link>
+                    <span className="text-sm text-text-muted">{[date.time, event.cityName].filter(Boolean).join(' · ')}</span>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        ) : null}
+      </EventShelf>
+      <EventShelf
+        id="home-popular-events"
+        title={t('homePopularEvents')}
+        empty={t('homePopularEventsEmpty')}
+        {...nationalState}
+      >
+        {popular.length ? (
+          <ol className="grid gap-3 sm:grid-cols-3">
+            {popular.map((event, index) => (
+              <li key={event.id} className="grid content-start gap-3 border border-border bg-card p-4 shadow-(--shadow-card-hover)">
+                <span aria-hidden="true" className="text-3xl font-extrabold tabular-nums text-primary-soft-text">
+                  {new Intl.NumberFormat(i18n.language, { minimumIntegerDigits: 2 }).format(index + 1)}
+                </span>
+                <Link className={titleLink} to={'/events/' + event.slug}>{localizedResourceTitle(event)}</Link>
+                <span className="flex items-center gap-2 text-sm text-text-muted">
+                  <UsersRound aria-hidden="true" className="size-4 shrink-0" />
+                  {t('eventRegisteredCount', { count: event.acceptedRegistrationCount })}
+                </span>
+              </li>
+            ))}
+          </ol>
+        ) : null}
+      </EventShelf>
+      <EventShelf
+        id="home-limited-events"
+        title={t('homeLimitedEvents')}
+        empty={t('homeLimitedEventsEmpty')}
+        {...nationalState}
+      >
+        {limited.length ? (
+          <ul className="grid gap-2">
+            {limited.map(({ event, remaining }) => (
+              <li key={event.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-stretch border border-border bg-card">
+                <Link className={titleLink + ' flex items-center p-3 sm:p-4'} to={'/events/' + event.slug}>
+                  {localizedResourceTitle(event)}
+                </Link>
+                <span className="flex max-w-40 items-center gap-2 border-s border-dashed border-border bg-primary-soft p-3 text-sm font-semibold text-primary-soft-text">
+                  <Ticket aria-hidden="true" className="size-4 shrink-0" />
+                  {t('eventPlacesLeft', { count: remaining })}
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </EventShelf>
+      <EventShelf
+        id="home-other-cities"
+        title={t(cityId ? 'homeOtherCities' : 'homeExploreCities')}
+        empty={t('homeExploreCitiesEmpty')}
+        {...nationalState}
+      >
+        {otherCities.size ? (
+          <ul className="grid gap-2 sm:grid-cols-2">
+            {Array.from(otherCities, ([city, event]) => (
+              <li key={city} className="min-w-0">
+                <Link className="flex min-h-14 items-center gap-2 border border-border bg-card px-3 py-2 font-semibold text-text hover:border-primary hover:text-primary-soft-text" to={eventListing({ city })}>
+                  <MapPin aria-hidden="true" className="size-4 shrink-0 text-primary-soft-text" />
+                  <span className="min-w-0 flex-1 wrap-anywhere">{event.cityName}</span>
+                  <ArrowRight aria-hidden="true" className="size-4 shrink-0 rtl:rotate-180" />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </EventShelf>
+    </>
   );
 }

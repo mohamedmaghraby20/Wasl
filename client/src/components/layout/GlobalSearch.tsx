@@ -13,7 +13,9 @@ import {
 import { SearchInput } from '@/components/ui/SearchInput';
 
 /** Site-wide shortcut for the same public discovery search used on the homepage. */
-export function GlobalSearch(): React.JSX.Element {
+export function GlobalSearch({
+  inlineSearch,
+}: { inlineSearch?: HTMLElement | null } = {}): React.JSX.Element | null {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
@@ -33,11 +35,15 @@ export function GlobalSearch(): React.JSX.Element {
         return;
       if (!open && document.querySelector('[role="dialog"], [role="alertdialog"]')) return;
       event.preventDefault();
+      if (inlineSearch) {
+        inlineSearch.querySelector<HTMLInputElement>('input[type="search"]')?.focus();
+        return;
+      }
       setOpen((previous) => !previous);
     };
     window.addEventListener('keydown', handleShortcut);
     return () => window.removeEventListener('keydown', handleShortcut);
-  }, [open]);
+  }, [inlineSearch, open]);
 
   const submit = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
@@ -56,6 +62,8 @@ export function GlobalSearch(): React.JSX.Element {
     setOpen(false);
     void navigate(`/discover?${params}`);
   };
+
+  if (inlineSearch) return null;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

@@ -11,6 +11,8 @@ async function mockHome(page: Page, count = 4) {
   await page.route('**/api/v1/**', (route) => {
     const url = new URL(route.request().url());
     if (url.pathname.endsWith('/reference/cities')) return route.fulfill({ json: cities });
+    if (url.pathname.endsWith('/users/me'))
+      return route.fulfill({ json: { interests: ['Music'] } });
     if (url.pathname.endsWith('/privacy/status'))
       return route.fulfill({ json: { requiresOnboarding: false } });
     if (url.pathname.endsWith('/mine')) return route.fulfill({ json: [] });
@@ -21,6 +23,8 @@ async function mockHome(page: Page, count = 4) {
       return route.fulfill({ json: [music] });
     const community = url.pathname.endsWith('/communities');
     const online = url.searchParams.get('modality') === 'online';
+    const nationwidePreview = !community && url.searchParams.get('pageSize') === '48' &&
+      url.searchParams.get('modality') === 'in-person';
     const items = Array.from({ length: count }, (_, index) => ({
       id: `${community ? 'community' : online ? 'online' : 'event'}-${index}`,
       slug: `${community ? 'community' : online ? 'online' : 'event'}-${index}`,
@@ -31,15 +35,15 @@ async function mockHome(page: Page, count = 4) {
       hostName: 'Wasl friends',
       hostType: 'user',
       online,
-      cityId: 'ankara',
-      cityName: 'Ankara',
-      categories: [music],
+      cityId: nationwidePreview && index === 3 ? 'izmir' : 'ankara',
+      cityName: nationwidePreview && index === 3 ? 'İzmir' : 'Ankara',
+      categories: index === 3 ? [] : [music],
       startsAt: '2099-11-03T12:00:00Z',
       cancelled: false,
       visibility: 'public',
       admissionMode: index === 1 ? 'approval' : 'instant',
       capacity: 10,
-      acceptedRegistrationCount: index === 0 ? 10 : 3,
+      acceptedRegistrationCount: index === 0 ? 10 : nationwidePreview && index === 1 ? 8 : 3,
       memberCount: 12,
     }));
     return route.fulfill({ json: { items, page: 1, pageSize: 4, total: count, hasMore: false } });
@@ -275,10 +279,44 @@ for (const kind of ['event', 'community']) {
     ).toBeVisible();
     await page.goto('/');
     await expect(page.getByRole('button', { name: 'Account menu' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Find your next community.' })).toHaveCount(0);
+    const navbarSearch = page.getByRole('banner').getByRole('search');
+    const searchbox = navbarSearch.getByRole('searchbox', { name: 'Search communities and events' });
+    await expect(searchbox).toBeVisible();
     await expect(page.getByRole('region', { name: 'Find your next gathering' })).toHaveCount(0);
     await expect(page.getByRole('region', { name: 'Bring people together' })).toBeVisible();
-    await expect(page.getByRole('article')).toHaveCount(12);
+    const nearby = page.getByRole('region', { name: 'Upcoming events across Türkiye' });
+    await expect(nearby.getByText('4 upcoming')).toBeVisible();
+    const interests = page.getByRole('region', { name: 'Events based on your interests' });
+    await expect(interests.getByRole('listitem')).toHaveCount(3);
+    await expect(interests.getByText('10 registered')).toBeVisible();
+    await expect(interests.getByRole('link', { name: /Ankara gathering 4/ })).toHaveCount(0);
+    const communities = page.getByRole('region', { name: 'Communities across Türkiye' });
+    await expect(communities.getByRole('listitem')).toHaveCount(4);
+    await expect(communities.getByText('12 members')).toHaveCount(4);
     await expect(page.locator('#home-city')).toBeEnabled();
+    await page.locator('#home-city').click();
+    await page.getByRole('option', { name: 'Ankara' }).click();
+    await expect(page.getByRole('heading', { name: 'Events near you in Ankara' })).toBeVisible();
+    const weekend = page.getByRole('region', { name: 'This weekend' });
+    const weekendLink = await weekend.getByRole('link', { name: 'Explore all' }).getAttribute('href');
+    const weekendParams = new URL(weekendLink!, page.url()).searchParams;
+    expect(weekendParams.get('city')).toBe('ankara');
+    expect(new Date(weekendParams.get('from')! + 'T00:00:00Z').getUTCDay()).toBe(6);
+    expect(new Date(weekendParams.get('to')! + 'T00:00:00Z').getUTCDay()).toBe(0);
+    const popular = page.getByRole('region', { name: 'Popular upcoming events' });
+    await expect(popular.getByRole('listitem').first()).toContainText('10 registered');
+    const limited = page.getByRole('region', { name: 'A few spots left' });
+    await expect(limited.getByRole('listitem')).toHaveCount(1);
+    await expect(limited.getByRole('link')).toHaveAttribute('href', '/events/event-1');
+    const otherCities = page.getByRole('region', { name: 'Explore other cities' });
+    await expect(otherCities.getByRole('link', { name: 'İzmir' })).toHaveAttribute('href', /city=izmir/);
+    await expect(otherCities.getByRole('link', { name: 'Ankara' })).toHaveCount(0);
+    await page.keyboard.press('Control+k');
+    await expect(searchbox).toBeFocused();
+    await searchbox.fill('football');
+    await navbarSearch.getByRole('button', { name: 'Search', exact: true }).click();
+    await expect(page).toHaveURL(/\/discover\?[^#]*\bq=football\b[^#]*\bcity=ankara\b/);
   });
 }
 

@@ -29,7 +29,7 @@ the app [`/docs/03-TECH-STACK.md`](/docs/03-TECH-STACK.md).
 - Keep React in `client/`, NestJS domain logic in `server/`, and cross-boundary contracts in `shared/`.
 - NestJS owns authorization and business rules. Do not query PostgreSQL from client code or share repositories across server modules.
 - When a task matches an installed skill under `.agents/skills/`, read its `SKILL.md` and follow that skill's task-specific workflow.
-- For every code-changing/task, read and follow `docs/VERSION_CONTROL.md` before making changes, regardless of the task type.
+- For every code-changing/task, read and follow `docs/GIT_CONVENTIONS.md` before making changes, regardless of the task type.
 
 ---
 

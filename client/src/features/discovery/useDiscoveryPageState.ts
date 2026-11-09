@@ -22,6 +22,8 @@ export function useDiscoveryPageState(language: string) {
     pathname.replace(/\/+$/, '') === '/communities' ? 'communities' : 'events';
   const requestedPage = Number(params.get('page') ?? 1);
   const page = Number.isInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
+  const modality: 'online' | 'in-person' =
+    params.get('modality') === 'online' ? 'online' : 'in-person';
   const filterKeys =
     kind === 'communities'
       ? ['q', 'city', 'category', 'order']
@@ -31,7 +33,6 @@ export function useDiscoveryPageState(language: string) {
           'category',
           'from',
           'to',
-          'modality',
           'cityScope',
           'upcoming',
           'nonCancelled',
@@ -51,9 +52,7 @@ export function useDiscoveryPageState(language: string) {
     pageSize: DISCOVERY_EVENT_PAGE_SIZE,
     ...(params.get('from') ? { from: params.get('from')! } : {}),
     ...(params.get('to') ? { to: params.get('to')! } : {}),
-    ...(params.get('modality') === 'online' || params.get('modality') === 'in-person'
-      ? { modality: params.get('modality') as 'online' | 'in-person' }
-      : {}),
+    modality,
     ...(params.get('cityScope') === 'include-online' || params.get('cityScope') === 'strict'
       ? { cityScope: params.get('cityScope') as 'include-online' | 'strict' }
       : {}),
@@ -77,9 +76,12 @@ export function useDiscoveryPageState(language: string) {
   const cities = useDiscoveryControllerCities();
   const categories = useDiscoveryControllerCategories();
 
-  const updateFilter = (key: 'q' | 'city' | 'category' | 'from' | 'to', value: string): void => {
+  const updateFilter = (
+    key: 'q' | 'city' | 'category' | 'from' | 'to' | 'modality',
+    value: string,
+  ): void => {
     const next = resetPage(params);
-    if (value) next.set(key, value);
+    if (value && !(key === 'modality' && value === 'in-person')) next.set(key, value);
     else next.delete(key);
     if (key === 'from' && value && next.get('to') && value > next.get('to')!) next.delete('to');
     setParams(next, { preventScrollReset: true });
@@ -127,6 +129,7 @@ export function useDiscoveryPageState(language: string) {
     kind,
     page,
     params,
+    modality,
     hasFilters,
     communities,
     events,
