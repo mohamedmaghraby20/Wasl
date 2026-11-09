@@ -132,6 +132,12 @@ Paths are relative to client/src. Consumers include direct static imports and li
 | features/resources/ResourceCard.tsx | ResourceCard | features/discovery/CommunityEvents.tsx, features/discovery/DiscoverySection.tsx, features/home/HomeSection.tsx, features/resources/ResourceCard.test.tsx | lucide-react, react, react-i18next, react-router |
 | main.tsx | Entry point or export list | — | react, react-dom/client, react-router |
 
+## Candidate preview mapping
+
+- Cacao drives primary actions, Terracotta drives primary hover, Cream is the canvas, and Blush is the soft accent. Stronger borders, 4 px corners, a flat resting card, and a solid hover shadow apply to Wasl light mode. Existing semantic names and adapter files carry the values through.
+- Retained Manrope and Tajawal for this review so English and Arabic typography can be evaluated separately from the palette. Derived a deeper Cacao for pressed actions and a deeper red for destructive hover because the candidate does not specify these states.
+- The discovery specimens use the app’s cover assets. The event example shows the date, registration count, capacity and approval state. The community example keeps the description, location, member count and detail action.
+
 ## Remaining work before design review
 
 1. Complete the source-level inventory, including component exports, call sites, dependencies and every supported variant and state. The table above is not exhaustive.
