@@ -12,7 +12,7 @@ The seed checks the latest Drizzle migration hash before writing. If it is missi
 
 - 18 fictional adult attendees plus the synthetic fallback host, with profile pictures, bios, cities, and interests.
 - 12 communities: personal and organization ownership, open/approval/automatic admission, several finite capacities, unlimited membership, a full queue, an archived community, and an empty community.
-- 36 events, including 20 in-person calendar fixtures across five Türkiye weekends and intervening weekdays: community/personal/organization hosts, all admission modes, public/unlisted visibility, online/in-person locations, upcoming/past/cancelled dates, limited/unlimited capacities, and full waitlists.
+- 61 events, including 20 in-person calendar fixtures and 25 online fixtures spread across five weeks: community/personal/organization hosts, all admission modes, public/unlisted visibility, online/in-person locations, upcoming/past/cancelled dates, limited/unlimited capacities, and full waitlists.
 - Every community status: active, pending, waitlisted, rejected, left, and removed.
 - Every event status: accepted, pending, waitlisted, rejected, user-cancelled, organizer-removed, attended, and no-show. Attendance outcomes belong to past events only.
 - Transition histories with timestamps, actors, and reasons; large enough request queues to exercise five-row previews and the full review page.

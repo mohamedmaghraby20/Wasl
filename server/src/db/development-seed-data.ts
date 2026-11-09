@@ -230,6 +230,74 @@ export function buildDevelopmentSeed(ownerId: string, hostName: string, now = ne
       calendarCategories.set(id, [category, 'social']);
     });
   });
+  const onlineTopics = [
+    [
+      'Arabic Conversation Lab',
+      'Remote Book Club',
+      'CV Review Clinic',
+      'Digital Board Game Night',
+      'Turkish Pronunciation Practice',
+    ],
+    [
+      'Writing Across Cultures',
+      'Short Story Discussion',
+      'Portfolio Feedback Circle',
+      'Online Trivia Social',
+      'Turkish Listening Lab',
+    ],
+    [
+      'Arabic for Everyday Life',
+      'Reading Hour',
+      'Career Q&A',
+      'Online Puzzle Night',
+      'Language Exchange Basics',
+    ],
+    [
+      'Bilingual Storytelling',
+      'Poetry Reading Group',
+      'Interview Practice',
+      'Online Strategy Games',
+      'Conversation for Beginners',
+    ],
+    [
+      'Community Translation Lab',
+      'Book Recommendations Circle',
+      'Networking Workshop',
+      'Virtual Game Social',
+      'Turkish Speaking Circle',
+    ],
+  ] as const;
+  const onlineSlots = [
+    { day: 1, template: 10, category: 'language', capacity: null, admissionMode: 'instant' },
+    { day: 2, template: 1, category: 'books', capacity: 12, admissionMode: 'approval' },
+    { day: 4, template: 11, category: 'business', capacity: 16, admissionMode: 'automatic' },
+    { day: 5, template: 1, category: 'gaming', capacity: 6, admissionMode: 'instant' },
+    { day: 6, template: 0, category: 'education', capacity: 24, admissionMode: 'instant' },
+  ] as const;
+  const onlineBase = new Date(localToday + 'T16:00:00Z');
+  onlineTopics.forEach((topics, week) => {
+    onlineSlots.forEach(({ day, template, category, capacity, admissionMode }, slot) => {
+      const id = 'dev-seed-event-online-' + (week + 1) + '-' + (slot + 1);
+      const startsAt = new Date(onlineBase.getTime() + (week * 7 + day) * 86_400_000);
+      eventRows.push({
+        ...eventRows[template]!,
+        id,
+        slug: id,
+        title: topics[slot] + ' (Sample)',
+        description:
+          'A fictional online session for practicing skills and meeting other members. Beginners are welcome. This demo uses a sample discussion and has no live meeting link.',
+        visibility: 'public',
+        cityId: null,
+        online: true,
+        locationName: 'Online — sample session',
+        startsAt,
+        endsAt: new Date(startsAt.getTime() + 3_600_000),
+        capacity,
+        admissionMode,
+      });
+      calendarCategories.set(id, [category, 'social']);
+    });
+  });
   const membershipRows = communityRows.flatMap((community, index) => {
     if (index === 11) return [];
     return attendees.map((person, offset) => {
@@ -285,27 +353,30 @@ export function buildDevelopmentSeed(ownerId: string, hostName: string, now = ne
       updatedAt: at(-5),
     };
   });
-  const ownerEventStatuses = new Map<number, EventStatus>(
+  const ownerEventStatuses = new Map<string, EventStatus>(
     ownerId === sampleOwnerId
       ? []
       : [
-          [2, 'ACCEPTED'],
-          [4, 'PENDING'],
-          [7, 'WAITLISTED'],
-          [10, 'ACCEPTED'],
-          [13, 'ATTENDED'],
-          [16, 'WAITLISTED'],
+          ['dev-seed-event-02', 'ACCEPTED'],
+          ['dev-seed-event-04', 'PENDING'],
+          ['dev-seed-event-07', 'WAITLISTED'],
+          ['dev-seed-event-10', 'ACCEPTED'],
+          ['dev-seed-event-13', 'ATTENDED'],
+          ['dev-seed-event-16', 'WAITLISTED'],
+          ['dev-seed-event-online-1-2', 'ACCEPTED'],
+          ['dev-seed-event-online-1-4', 'WAITLISTED'],
+          ['dev-seed-event-online-2-2', 'PENDING'],
+          ['dev-seed-event-online-3-2', 'ACCEPTED'],
         ],
   );
-  const ownerRegistrationRows = [...ownerEventStatuses].map(([number, status]) => {
-    const eventId = eventRows[number - 1]!.id;
+  const ownerRegistrationRows = [...ownerEventStatuses].map(([eventId, status]) => {
     return {
       id: seedId('registration:' + eventId + ':' + ownerId),
       eventId,
       userId: ownerId,
       status,
       requestedAt: at(-18),
-      updatedAt: number === 13 ? at(-14, 3) : at(-3),
+      updatedAt: status === 'ATTENDED' ? at(-14, 3) : at(-3),
     };
   });
   const threadRows = [

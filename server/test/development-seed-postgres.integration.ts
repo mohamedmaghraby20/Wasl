@@ -75,7 +75,7 @@ async function main(): Promise<void> {
     `);
     const report = result.rows[0]!.report;
     assert.equal(report.communities, 12);
-    assert.equal(report.events, 36);
+    assert.equal(report.events, 61);
     assert.equal(report.profiles, 18);
     assert.equal(report.organizations, 3);
     assert.deepEqual(
