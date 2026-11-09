@@ -128,7 +128,7 @@ export function ResourceCard({
               {event && !event.cancelled ? (
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   <Badge
-                    className="border-current px-2 text-xs"
+                    className="border-current px-2 text-xs shadow-[2px_2px_0_var(--color-primary)]"
                     variant="outline"
                   >
                     {remaining === null
@@ -139,7 +139,7 @@ export function ResourceCard({
                   </Badge>
                   {event.admissionMode === 'approval' ? (
                     <Badge
-                      className="border-current px-2 text-xs"
+                      className="border-current px-2 text-xs shadow-[2px_2px_0_var(--color-primary)]"
                       variant="outline"
                     >
                       {t('eventApprovalRequired')}
@@ -149,7 +149,7 @@ export function ResourceCard({
               ) : null}
               {event?.cancelled ? (
                 <Badge
-                  className="mt-2 border-current px-2 text-xs"
+                  className="mt-2 border-current px-2 text-xs shadow-[2px_2px_0_var(--color-primary)]"
                   variant="outline"
                 >
                   {t('cancelled')}
