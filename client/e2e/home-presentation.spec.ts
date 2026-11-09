@@ -151,7 +151,7 @@ test('one-item rows omit controls and narrow reflow keeps all cards reachable', 
 test('the homepage cap is four even if a collection returns more', async ({ page }) => {
   await mockHome(page, 6);
   await page.goto('/');
-  for (const id of ['events', 'communities', 'online-events']) {
+  for (const id of ['events', 'communities']) {
     await expect(
       page
         .locator('section')
@@ -159,6 +159,40 @@ test('the homepage cap is four even if a collection returns more', async ({ page
         .getByRole('article'),
     ).toHaveCount(4);
   }
+});
+
+test('upcoming online events use a compact, navigable carousel and filtered Discover link', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await mockHome(page, 8);
+  await page.goto('/');
+  const section = page.getByRole('region', { name: 'Upcoming online events' });
+  await expect(page.locator('section:has(> div #events-heading) + section')).toHaveAttribute(
+    'aria-labelledby',
+    'online-events-heading',
+  );
+  await expect(section.getByRole('article')).toHaveCount(8);
+  const row = section.getByRole('group');
+  await expect.poll(() => row.evaluate((element) => {
+    const bounds = element.getBoundingClientRect();
+    return Array.from(element.children).filter((child) => {
+      const card = child.getBoundingClientRect();
+      return card.left >= bounds.left - 1 && card.right <= bounds.right + 1;
+    }).length;
+  })).toBe(5);
+  const previous = section.getByRole('button', { name: 'Previous cards' });
+  await expect(previous).toBeDisabled();
+  await section.getByRole('button', { name: 'Next cards' }).click();
+  await expect(previous).toBeEnabled();
+  await previous.click();
+  await expect(previous).toBeDisabled();
+  await row.hover();
+  await page.mouse.wheel(320, 0);
+  await expect(previous).toBeEnabled();
+  await section.getByRole('link', { name: 'Explore all' }).click();
+  await expect(page).toHaveURL(/\/discover\?modality=online&upcoming=true&nonCancelled=true$/);
+  await expect(page.getByRole('link', { name: 'Online gathering 1', exact: true })).toBeVisible();
 });
 
 test('200-percent-equivalent desktop reflow keeps rows and destinations usable', async ({
@@ -407,8 +441,8 @@ test('discovery precedes one guest signup invitation and creation preserves the 
   const creation = page.getByRole('region', { name: 'Bring people together' });
   await expect(page.locator('main').getByRole('heading', { level: 2 })).toHaveText([
     'Upcoming events across Türkiye',
-    'Communities across Türkiye',
     'Upcoming online events',
+    'Communities across Türkiye',
     'Browse by interest',
     'Find your next gathering',
     'Bring people together',

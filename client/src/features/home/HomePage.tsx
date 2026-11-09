@@ -82,7 +82,7 @@ export function HomePage(): React.JSX.Element {
     ...(!fallback && cityId ? { city: cityId } : {}),
   });
   const onlineEvents = useDiscoveryControllerListEvents({
-    pageSize: 4,
+    pageSize: 10,
     lang,
     modality: 'online',
     upcoming: true,
@@ -236,6 +236,20 @@ export function HomePage(): React.JSX.Element {
           onRetry={() => void events.refetch()}
           viewAll={`/events?${eventDestination}`}
         />
+        {!onlineEmpty && (
+          <HomeSection
+            title={t('upcomingOnlineEvents')}
+            kind="events"
+            sectionId="online-events"
+            compactEvents
+            language={i18n.language}
+            items={onlineEvents.data?.items}
+            isPending={onlineEvents.isPending}
+            isError={onlineEvents.isError}
+            onRetry={() => void onlineEvents.refetch()}
+            viewAll={`/discover?${onlineDestination}`}
+          />
+        )}
         <HomeSection
           title={
             cityId && !communityFallback
@@ -250,19 +264,6 @@ export function HomePage(): React.JSX.Element {
           onRetry={() => void communities.refetch()}
           viewAll={`/communities?${communityDestination}`}
         />
-        {!onlineEmpty && (
-          <HomeSection
-            title={t('upcomingOnlineEvents')}
-            kind="events"
-            sectionId="online-events"
-            language={i18n.language}
-            items={onlineEvents.data?.items}
-            isPending={onlineEvents.isPending}
-            isError={onlineEvents.isError}
-            onRetry={() => void onlineEvents.refetch()}
-            viewAll={`/events?${onlineDestination}`}
-          />
-        )}
         <HomeInterests cityId={cityId} />
       </div>
       {!authLoading && !user ? (

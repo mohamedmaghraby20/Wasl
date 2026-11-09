@@ -6,6 +6,7 @@ import type { CommunityPublicDto, EventPublicDto } from '@/api/generated/wasl-cl
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { IconButton } from '@/components/ui/IconButton';
+import { HomeCompactEventCard } from './HomeCompactEventCard';
 import { ResourceCard } from '@/features/resources/ResourceCard';
 import { QueryError } from '@/components/feedback/QueryError';
 import type { ResourceKind } from '@/features/resources/resource-utils';
@@ -20,6 +21,7 @@ export function HomeSection({
   onRetry,
   viewAll,
   sectionId = kind,
+  compactEvents = false,
 }: {
   title: string;
   kind: ResourceKind;
@@ -30,10 +32,11 @@ export function HomeSection({
   onRetry: () => void;
   viewAll?: string;
   sectionId?: string;
+  compactEvents?: boolean;
 }): React.JSX.Element {
   const { t } = useTranslation();
   const resource = title.toLocaleLowerCase(language);
-  const isEventList = kind === 'events';
+  const isEventList = kind === 'events' && !compactEvents;
   const row = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState({ overflow: false, start: true, end: false });
   const rtl = language.startsWith('ar');
@@ -64,9 +67,14 @@ export function HomeSection({
   };
   const rowClass = isEventList
     ? 'grid min-w-0 gap-4 sm:grid-cols-2 xl:grid-cols-3'
-    : 'grid min-w-0 grid-flow-col auto-cols-[85%] gap-4 overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden p-1 -m-1 sm:auto-cols-[calc((100%-1rem)/2)] xl:auto-cols-[calc((100%-2rem)/3)]';
+    : compactEvents
+      ? 'grid min-w-0 grid-flow-col auto-cols-[70%] gap-3 overflow-x-auto overscroll-x-contain p-1 -m-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden @sm:auto-cols-[calc((100%-0.75rem)/2)] @xl:auto-cols-[calc((100%-1.5rem)/3)] @min-[42rem]:auto-cols-[calc((100%-2.25rem)/4)] @min-[54rem]:auto-cols-[calc((100%-3rem)/5)]'
+      : 'grid min-w-0 grid-flow-col auto-cols-[85%] gap-4 overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden p-1 -m-1 sm:auto-cols-[calc((100%-1rem)/2)] xl:auto-cols-[calc((100%-2rem)/3)]';
   return (
-    <section className="grid gap-4" aria-labelledby={`${sectionId}-heading`}>
+    <section
+      className={compactEvents ? '@container grid min-w-0 gap-4' : 'grid gap-4'}
+      aria-labelledby={`${sectionId}-heading`}
+    >
       <div className="grid gap-1 sm:flex sm:items-end sm:justify-between sm:gap-3">
         <h2 className="text-xl font-bold sm:text-2xl" id={`${sectionId}-heading`}>
           {title}
@@ -93,7 +101,7 @@ export function HomeSection({
             </div>
           ) : null}
           <Link
-            className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-sm text-sm font-semibold text-primary-soft-text hover:underline sm:me-28"
+            className={`inline-flex min-h-11 shrink-0 items-center gap-1 rounded-sm text-sm font-semibold text-primary-soft-text hover:underline ${compactEvents ? '' : 'sm:me-28'}`}
             to={viewAll ?? `/${kind}`}
           >
             {t('exploreAll')}
@@ -107,26 +115,34 @@ export function HomeSection({
             {t('loading', { resource })}
           </p>
           <div aria-hidden="true" className={rowClass}>
-            {Array.from({ length: 4 }, (_, index) => (
-              <div
-                className={`flex flex-col gap-2 rounded-(--shape-radius-card) border border-border bg-card p-4 ${kind === 'events' ? '' : 'min-h-[18rem]'}`}
-                key={index}
-              >
-                <Skeleton
-                  className={`-mx-4 -mt-4 rounded-b-none rounded-t-(--shape-radius-card) ${isEventList ? 'h-(--event-cover-height)' : 'aspect-video'}`}
-                />
-                <Skeleton className="h-6 w-3/4" />
-                <Skeleton className="h-4 w-1/2" />
-                <div className="flex gap-1.5">
-                  <Skeleton className="h-6 w-24" />
-                  <Skeleton className="h-6 w-20" />
+            {Array.from({ length: compactEvents ? 5 : 4 }, (_, index) =>
+              compactEvents ? (
+                <div className="grid gap-2" key={index}>
+                  <Skeleton className="aspect-video" />
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-3 w-1/2" />
                 </div>
-                <div className="mt-auto grid gap-2 border-t border-border pt-3">
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-6 w-2/3" />
+              ) : (
+                <div
+                  className={`flex flex-col gap-2 rounded-(--shape-radius-card) border border-border bg-card p-4 ${kind === 'events' ? '' : 'min-h-[18rem]'}`}
+                  key={index}
+                >
+                  <Skeleton
+                    className={`-mx-4 -mt-4 rounded-b-none rounded-t-(--shape-radius-card) ${isEventList ? 'h-(--event-cover-height)' : 'aspect-video'}`}
+                  />
+                  <Skeleton className="h-6 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
+                  <div className="flex gap-1.5">
+                    <Skeleton className="h-6 w-24" />
+                    <Skeleton className="h-6 w-20" />
+                  </div>
+                  <div className="mt-auto grid gap-2 border-t border-border pt-3">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-6 w-2/3" />
+                  </div>
                 </div>
-              </div>
-            ))}
+              ),
+            )}
           </div>
         </>
       ) : isError ? (
@@ -158,14 +174,22 @@ export function HomeSection({
             }
           }}
         >
-          {items.slice(0, 4).map((item) => (
+          {items.slice(0, compactEvents ? 10 : 4).map((item) => (
             <div
               className={
-                isEventList ? 'min-w-0 self-start' : 'min-h-[18rem] min-w-0 [&>article]:h-full'
+                isEventList
+                  ? 'min-w-0 self-start'
+                  : compactEvents
+                    ? 'min-w-0'
+                    : 'min-h-[18rem] min-w-0 [&>article]:h-full'
               }
               key={item.id}
             >
-              <ResourceCard item={item} kind={kind} />
+              {compactEvents && 'startsAt' in item ? (
+                <HomeCompactEventCard item={item} language={language} />
+              ) : (
+                <ResourceCard item={item} kind={kind} />
+              )}
             </div>
           ))}
         </div>
