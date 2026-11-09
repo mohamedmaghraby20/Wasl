@@ -161,14 +161,17 @@ export function ResourceCard({
             dir="ltr"
             className={`mt-auto grid items-center gap-2 border-t border-border text-text-muted ${event ? 'px-5 py-2 text-sm @xs:grid-cols-[minmax(0,1fr)_auto]' : 'grid-cols-[minmax(0,1fr)_auto] px-(--card-padding) py-4 text-xs'}`}
           >
-            <div dir={i18n.dir()} className="flex min-w-0 items-center gap-2">
+            <div
+              dir={i18n.dir()}
+              className={`flex min-w-0 items-center ${event ? 'gap-1.5' : 'gap-2'}`}
+            >
               {event ? (
-                <span aria-hidden="true" className="inline-flex shrink-0">
+                <span aria-hidden="true" className="inline-flex shrink-0 [&>span+span]:-ms-3">
                   {Array.from(
                     { length: Math.max(1, Math.min(3, event.acceptedRegistrationCount)) },
                     (_, index) => (
                       <span
-                        className="grid size-6 place-items-center rounded-full border border-card bg-primary-soft text-primary-soft-text not-first:-ms-2"
+                        className="grid size-6 place-items-center rounded-full border border-primary bg-card text-primary"
                         key={index}
                       >
                         <UserRound className="size-3" />
