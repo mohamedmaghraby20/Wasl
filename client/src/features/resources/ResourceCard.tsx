@@ -1,4 +1,4 @@
-import { CalendarDays, Clock3, MapPin, UserRound, UsersRound, Video } from 'lucide-react';
+import { CalendarDays, Clock3, MapPin, UsersRound, Video } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
@@ -168,10 +168,22 @@ export function ResourceCard({
                     { length: Math.min(3, event.acceptedRegistrationCount) },
                     (_, index) => (
                       <span
-                        className="relative grid size-[22px] shrink-0 place-items-center rounded-full border border-card bg-text text-card"
+                        className="relative size-[22px] shrink-0 overflow-hidden rounded-full border border-card bg-surface-soft text-primary"
                         key={index}
                       >
-                        <UserRound className="size-3" />
+                        <svg className="size-full" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M2 24v-2a10 10 0 0 1 20 0v2Z" opacity={0.55 + index * 0.2} />
+                          <circle cx="12" cy="9" r="5" opacity=".52" />
+                          <path
+                            d={
+                              [
+                                'M7 9a5 5 0 0 1 10 0l-3-2-7 2Z',
+                                'M7 10V8a5 5 0 0 1 10 0v2l-5-3-5 3Z',
+                                'M6.5 9a5.5 5.5 0 0 1 11 0l-4-2-7 2Z',
+                              ][index]
+                            }
+                          />
+                        </svg>
                       </span>
                     ),
                   )}
