@@ -249,7 +249,7 @@ export async function seedDevelopmentData(
           cityId: sql`excluded.city_id`,
           ownerType: sql`excluded.owner_type`,
           ownerId: sql`excluded.owner_id`,
-          createdByUserId: ownerId,
+          createdByUserId: sql`excluded.created_by_user_id`,
           hostName: sql`excluded.host_name`,
           admissionMode: sql`excluded.admission_mode`,
           capacity: sql`excluded.capacity`,
@@ -269,7 +269,7 @@ export async function seedDevelopmentData(
           hostType: sql`excluded.host_type`,
           hostId: sql`excluded.host_id`,
           communityId: sql`excluded.community_id`,
-          createdByUserId: ownerId,
+          createdByUserId: sql`excluded.created_by_user_id`,
           hostName: sql`excluded.host_name`,
           cityId: sql`excluded.city_id`,
           online: sql`excluded.online`,
@@ -295,7 +295,7 @@ export async function seedDevelopmentData(
       ),
     );
     await tx.insert(eventCategories).values(data.eventCategories);
-    const memberships = await tx
+    const syntheticMemberships = await tx
       .insert(communityMemberships)
       .values(data.membershipRows)
       .onConflictDoUpdate({
@@ -307,7 +307,7 @@ export async function seedDevelopmentData(
         },
       })
       .returning();
-    const registrations = await tx
+    const syntheticRegistrations = await tx
       .insert(eventRegistrations)
       .values(data.registrationRows)
       .onConflictDoUpdate({
@@ -319,13 +319,30 @@ export async function seedDevelopmentData(
         },
       })
       .returning();
+    // Keep any participation actions already taken by the signed-in account.
+    const ownerMemberships = data.ownerMembershipRows.length
+      ? await tx
+          .insert(communityMemberships)
+          .values(data.ownerMembershipRows)
+          .onConflictDoNothing()
+          .returning()
+      : [];
+    const ownerRegistrations = data.ownerRegistrationRows.length
+      ? await tx
+          .insert(eventRegistrations)
+          .values(data.ownerRegistrationRows)
+          .onConflictDoNothing()
+          .returning()
+      : [];
+    const memberships = [...syntheticMemberships, ...ownerMemberships];
+    const registrations = [...syntheticRegistrations, ...ownerRegistrations];
     await tx.execute(sql`update ${communities} c set capacity = occupied.n from (
       select community_id, count(*)::integer n from ${communityMemberships} where status = 'ACTIVE' group by community_id
     ) occupied where c.id = occupied.community_id and c.id in ${data.communityRows.map((row) => row.id)} and c.capacity < occupied.n`);
     await tx.execute(sql`update ${events} e set capacity = occupied.n from (
       select event_id, count(*)::integer n from ${eventRegistrations} where status in ('ACCEPTED', 'ATTENDED', 'NO_SHOW') group by event_id
     ) occupied where e.id = occupied.event_id and e.id in ${data.eventRows.map((row) => row.id)} and e.capacity < occupied.n`);
-    // Reset only synthetic participants' histories so reruns cannot leave a conflicting latest status.
+    // Refresh synthetic histories and add histories for newly inserted owner participation.
     await tx.delete(communityMembershipTransitions).where(
       inArray(
         communityMembershipTransitions.membershipId,
@@ -339,7 +356,11 @@ export async function seedDevelopmentData(
           membershipId: row.id,
           fromStatus: path[index - 1] ?? null,
           toStatus,
-          actorUserId: toStatus === 'LEFT' || index === 0 ? row.userId : ownerId,
+          actorUserId:
+            toStatus === 'LEFT' || index === 0
+              ? row.userId
+              : data.communityRows.find((community) => community.id === row.communityId)!
+                  .createdByUserId,
           reason: `Development sample: ${toStatus.toLowerCase().replaceAll('_', ' ')} membership.`,
           createdAt: index === path.length - 1 ? row.updatedAt : row.requestedAt,
         })),
@@ -358,7 +379,10 @@ export async function seedDevelopmentData(
           registrationId: row.id,
           fromStatus: path[index - 1] ?? null,
           toStatus,
-          actorUserId: toStatus === 'CANCELLED_BY_USER' || index === 0 ? row.userId : ownerId,
+          actorUserId:
+            toStatus === 'CANCELLED_BY_USER' || index === 0
+              ? row.userId
+              : data.eventRows.find((event) => event.id === row.eventId)!.createdByUserId,
           reason: `Development sample: ${toStatus.toLowerCase().replaceAll('_', ' ')} registration.`,
           createdAt: index === path.length - 1 ? row.updatedAt : row.requestedAt,
         })),
@@ -471,8 +495,8 @@ export async function seedDevelopmentData(
     organizations: data.organizationRows.length,
     communities: data.communityRows.length,
     events: data.eventRows.length,
-    memberships: data.membershipRows.length,
-    registrations: data.registrationRows.length,
+    memberships: data.membershipRows.length + data.ownerMembershipRows.length,
+    registrations: data.registrationRows.length + data.ownerRegistrationRows.length,
     threads: data.threadRows.length,
     posts: data.postRows.length,
   };

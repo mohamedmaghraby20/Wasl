@@ -27,6 +27,8 @@ Community and event IDs are text, including these stable sample IDs; moderation,
 
 Existing sample IDs are reused. Optional `WASL_SEED_OWNER_EMAIL` selects an existing signed-up owner; otherwise the existing signed-in owner of sample community 01 is preserved, falling back to the synthetic host only when necessary. This does not modify the real owner's profile or grant platform-admin access.
 
+A signed-in sample owner also gets active, pending, and waitlisted memberships plus upcoming registrations and past attendance. The fictional host owns those sample communities so the signed-in account can use participant actions. Existing memberships and registrations for the signed-in account take precedence over these fixtures.
+
 Rerunning refreshes sample resource fields, dates, categories, synthetic participation states and their histories. It does not delete real accounts, real memberships/registrations, or non-sample resources. Finite sample capacities are raised if needed to accommodate existing real participants. Reserved user IDs are checked against email addresses and authentication mappings before sample writes. Existing sample image files are reused.
 
 Synthetic users use `@wasl.invalid` addresses and have no Supabase Auth login. Invitation hashes are random with no saved redemption token. No email jobs, Stream channels/messages, real age-verification evidence, or approved legal text are fabricated. Legal documents stay draft; retention decisions remain `TBD_LEGAL`.

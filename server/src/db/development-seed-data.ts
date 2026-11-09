@@ -69,24 +69,41 @@ export function buildDevelopmentSeed(ownerId: string, hostName: string, now = ne
         updatedAt: at(-3),
       }) satisfies typeof organizations.$inferInsert,
   );
-  const communityRows = places.map(
-    ([slug, name, cityId], index) =>
-      ({
-        id: `dev-seed-community-${String(index + 1).padStart(2, '0')}`,
-        slug: `dev-seed-${slug}`,
-        name: `${name} (Sample)`,
-        description: `${name} brings neighbours together for friendly, adult-only activities in ${cityId}. We meet regularly, welcome beginners, and share practical details in community discussions. This is fictional development data, not a real organizer.`,
-        cityId,
-        ownerType: index === 7 || index === 8 ? 'organization' : 'user',
-        ownerId: index === 7 || index === 8 ? organizationRows[index - 7]!.id : ownerId,
-        createdByUserId: ownerId,
-        hostName: index === 7 || index === 8 ? organizationRows[index - 7]!.name : hostName,
-        admissionMode: ['approval', 'open', 'automatic'][index % 3]!,
-        capacity: capacities[index] ?? null,
-        archived: index === 10,
-        createdAt: at(-60 + index),
-      }) satisfies typeof communities.$inferInsert,
+  const participantCommunityStatuses = new Map<number, CommunityStatus>(
+    ownerId === sampleOwnerId
+      ? []
+      : [
+          [1, 'ACTIVE'],
+          [3, 'PENDING'],
+          [6, 'WAITLISTED'],
+          [9, 'ACTIVE'],
+        ],
   );
+  const communityRows = places.map(([slug, name, cityId], index) => {
+    const participantCommunity = participantCommunityStatuses.has(index);
+    const communityOwnerId = participantCommunity ? sampleOwnerId : ownerId;
+    return {
+      id: `dev-seed-community-${String(index + 1).padStart(2, '0')}`,
+      slug: `dev-seed-${slug}`,
+      name: `${name} (Sample)`,
+      description: `${name} brings neighbours together for friendly, adult-only activities in ${cityId}. We meet regularly, welcome beginners, and share practical details in community discussions. This is fictional development data, not a real organizer.`,
+      cityId,
+      ownerType: index === 7 || index === 8 ? 'organization' : 'user',
+      ownerId: index === 7 || index === 8 ? organizationRows[index - 7]!.id : communityOwnerId,
+      createdByUserId: communityOwnerId,
+      hostName:
+        index === 7 || index === 8
+          ? organizationRows[index - 7]!.name
+          : participantCommunity
+            ? 'Wasl Sample Host'
+            : hostName,
+      admissionMode: ['approval', 'open', 'automatic'][index % 3]!,
+      capacity:
+        participantCommunityStatuses.get(index) === 'WAITLISTED' ? 4 : (capacities[index] ?? null),
+      archived: index === 10,
+      createdAt: at(-60 + index),
+    } satisfies typeof communities.$inferInsert;
+  });
   const eventRows: (typeof events.$inferInsert)[] = communityRows
     .slice(0, 10)
     .map((community, index) => ({
@@ -98,7 +115,7 @@ export function buildDevelopmentSeed(ownerId: string, hostName: string, now = ne
       hostType: 'community',
       hostId: community.id,
       communityId: community.id,
-      createdByUserId: ownerId,
+      createdByUserId: community.createdByUserId,
       hostName: community.hostName,
       cityId: community.cityId,
       online: false,
@@ -118,7 +135,13 @@ export function buildDevelopmentSeed(ownerId: string, hostName: string, now = ne
     [15, 'Cancelled Garden Gathering', 18, false, 'public', true, 'community', 25],
     [16, 'Full Small-group Conversation', 9, false, 'public', false, 'community', 2],
   ] as const) {
-    const community = communityRows[offset === 15 ? 9 : 0]!;
+    const communityIndex =
+      offset === 15
+        ? 9
+        : participantCommunityStatuses.size && (offset === 13 || offset === 16)
+          ? 1
+          : 0;
+    const community = communityRows[communityIndex]!;
     eventRows.push({
       id: `dev-seed-event-${offset}`,
       slug: `dev-seed-${name.toLowerCase().replaceAll(' ', '-')}`,
@@ -133,8 +156,8 @@ export function buildDevelopmentSeed(ownerId: string, hostName: string, now = ne
             ? organizationRows[0]!.id
             : ownerId,
       communityId: hostType === 'community' ? community.id : null,
-      createdByUserId: ownerId,
-      hostName: hostType === 'organization' ? organizationRows[0]!.name : hostName,
+      createdByUserId: hostType === 'community' ? community.createdByUserId : ownerId,
+      hostName: hostType === 'organization' ? organizationRows[0]!.name : community.hostName,
       cityId: community.cityId,
       online,
       locationName: online
@@ -192,6 +215,40 @@ export function buildDevelopmentSeed(ownerId: string, hostName: string, now = ne
       };
     }),
   );
+  const ownerMembershipRows = [...participantCommunityStatuses].map(([index, status]) => {
+    const communityId = communityRows[index]!.id;
+    return {
+      id: seedId('membership:' + communityId + ':' + ownerId),
+      communityId,
+      userId: ownerId,
+      status,
+      requestedAt: at(-12),
+      updatedAt: at(-5),
+    };
+  });
+  const ownerEventStatuses = new Map<number, EventStatus>(
+    ownerId === sampleOwnerId
+      ? []
+      : [
+          [2, 'ACCEPTED'],
+          [4, 'PENDING'],
+          [7, 'WAITLISTED'],
+          [10, 'ACCEPTED'],
+          [13, 'ATTENDED'],
+          [16, 'WAITLISTED'],
+        ],
+  );
+  const ownerRegistrationRows = [...ownerEventStatuses].map(([number, status]) => {
+    const eventId = eventRows[number - 1]!.id;
+    return {
+      id: seedId('registration:' + eventId + ':' + ownerId),
+      eventId,
+      userId: ownerId,
+      status,
+      requestedAt: at(-18),
+      updatedAt: number === 13 ? at(-14, 3) : at(-3),
+    };
+  });
   const threadRows = [
     ...communityRows
       .filter((row) => row.id !== 'dev-seed-community-12')
@@ -297,6 +354,8 @@ export function buildDevelopmentSeed(ownerId: string, hostName: string, now = ne
     eventRows,
     membershipRows,
     registrationRows,
+    ownerMembershipRows,
+    ownerRegistrationRows,
     threadRows,
     postRows,
     invitationRows,
