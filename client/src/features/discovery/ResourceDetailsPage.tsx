@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Archive, ArrowLeft, CalendarX, ClipboardList, LogOut, MessageSquare, Pencil, Share2, TicketPlus, TicketX, Trash2, UserPlus } from 'lucide-react';
+import { Archive, CalendarX, ClipboardList, LogOut, MessageSquare, Pencil, Share2, TicketPlus, TicketX, Trash2, UserPlus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
@@ -34,6 +34,7 @@ import {
 } from '@/api/generated/discovery/discovery';
 import { ApiError } from '@/api/fetcher';
 import { getMessagingControllerConversationsQueryKey } from '@/api/generated/messaging/messaging';
+import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { IconButton } from '@/components/ui/IconButton';
 import { useConfirm } from '@/components/ui/ConfirmDialog';
@@ -57,7 +58,7 @@ import {
   useMessagingControllerCommunity,
   useMessagingControllerEvent,
 } from '@/api/generated/messaging/messaging';
-import { ResourceOverview } from './ResourceOverview';
+import { EventDetailsLayout } from './EventDetailsLayout';
 import { EventAttendeePreview } from '@/features/participation/EventAttendeePreview';
 import { CommunityDetailsLayout } from './CommunityDetailsLayout';
 
@@ -567,152 +568,181 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
       </>
     );
   }
-  return (
-    <article className="mx-auto grid max-w-(--container-reading) gap-6">
-      <div className="grid justify-items-start gap-3">
-        <Link
-          className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-text-muted transition-colors hover:text-text"
-          to={`/${kind}`}
-        >
-          <ArrowLeft aria-hidden="true" className="size-4 rtl:rotate-180" />
-          {t('backTo', { resource: t(kind) })}
-        </Link>
-        <div className="flex flex-wrap items-center gap-2">
-          <Button
-            aria-label={t('copyShare')}
-            onClick={() => void copyShareLink()}
-            size="icon-sm"
-            title={t('copyShare')}
-            variant="outline"
-          >
-            <Share2 aria-hidden="true" />
+  const participationBadge: Record<string, 'success' | 'warning' | 'danger' | 'neutral'> = {
+    ACCEPTED: 'success',
+    ACTIVE: 'success',
+    ATTENDED: 'success',
+    PENDING: 'warning',
+    WAITLISTED: 'warning',
+    NO_SHOW: 'warning',
+    REJECTED: 'danger',
+    REMOVED: 'danger',
+    REMOVED_BY_ORGANIZER: 'danger',
+    CANCELLED_BY_USER: 'neutral',
+    LEFT: 'neutral',
+  };
+  const eventRegistration =
+    eventItem &&
+    !isManager &&
+    !eventItem.cancelled &&
+    new Date(eventItem.startsAt).getTime() > Date.now() ? (
+      <div className="grid gap-3 border-t border-border pt-4">
+        {!user ? (
+          <Button asChild block>
+            <Link to={{ pathname: '/sign-in', search: `?returnTo=${encodeURIComponent(returnTo)}` }}>
+              <TicketPlus aria-hidden="true" />
+              {t('registerForEvent')}
+            </Link>
           </Button>
-          <ReportAction
-            targetType={kind === 'events' ? 'event' : 'community'}
-            targetId={item.id}
-          />
-          {isManager && eventItem ? (
-            <>
-              {!eventItem.cancelled ? (
-                <>
-                  <Button asChild aria-label={t('editEvent')} title={t('editEvent')} size="icon-sm" variant="outline">
-                    <Link to={`/events/${item.id}/edit`}><Pencil aria-hidden="true" /></Link>
-                  </Button>
-                  <IconButton icon={CalendarX} label={t('cancelEventAction')} intent="danger" disabled={cancelEvent.isPending} onClick={() => void cancel()} variant="outline" />
-                </>
-              ) : null}
-              <Button asChild aria-label={t('reviewRequests')} title={t('reviewRequests')} size="icon-sm" variant="outline">
-                <Link to={`/events/${item.id}/participants?status=PENDING`}><ClipboardList aria-hidden="true" /></Link>
-              </Button>
-            </>
-          ) : null}
-        </div>
-      </div>
-
-      <ResourceOverview item={item} hostPath={hostPath} admissionLabel={admissionLabel} />
-      {eventItem &&
-        currentUser.isSuccess &&
-        (isManager || ['ACCEPTED', 'ATTENDED', 'NO_SHOW'].includes(participationStatus ?? '')) ? (
-          <EventAttendeePreview eventId={eventItem.id} />
-        ) : null}
-      {eventItem && user && managerCheckPending ? (
-        <section className="grid gap-4 rounded-(--shape-radius-card) border border-border bg-card p-5">
-          <h2 className="font-heading text-xl font-bold">{t('manageRegistrations')}</h2>
-          <LoadingSkeleton message={t('loadingParticipants')} rows={3} />
-        </section>
-      ) : isManager && eventItem ? (
-        <section className="grid gap-4 rounded-(--shape-radius-card) border border-border bg-card p-5">
-          <OrganizerParticipationPanel
-            kind={kind}
-            resourceId={item.id}
-            eventStarted={Boolean(
-              eventItem && new Date(eventItem.startsAt).getTime() <= Date.now(),
-            )}
-          />
-        </section>
-      ) : null}
-      {currentUser.isSuccess &&
-        !isManager &&
-        !eventItem?.cancelled &&
-        !(eventItem && new Date(eventItem.startsAt).getTime() <= Date.now()) && (
-          <section
-            aria-live="polite"
-            className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3 rounded-(--shape-radius-card) border border-border bg-card p-4"
-          >
-            {user ? (
-              participationPending ? (
-                <p className="text-sm text-text-muted" role="status">
-                  {t('loadingParticipation')}
-                </p>
-              ) : participationError ? (
-                <p className="text-sm font-medium text-danger" role="alert">
-                  {t('participationActionError')}
-                </p>
-              ) : (
-                <>
-                  {participationStatus ? (
-                    <p className="text-sm font-medium text-text" role="status">
-                      {t(`participationStatus_${participationStatus}`)}
-                    </p>
-                  ) : null}
-                  {!(eventItem && ['ATTENDED', 'NO_SHOW'].includes(participationStatus ?? '')) && (
-                    <IconButton
-                      icon={participationLeaving ? TicketX : TicketPlus}
-                      label={t(participationLeaving ? 'cancelRegistration' : 'registerForEvent')}
-                      disabled={participationBusy}
-                      onClick={() => void runParticipationAction()}
-                      intent={participationLeaving ? 'danger' : undefined}
-                      variant={participationLeaving ? 'outline' : 'primary'}
-                    />
-                  )}
-                </>
-              )
-            ) : (
-              <Button asChild aria-label={t('registerForEvent')} title={t('registerForEvent')} size="icon-sm">
-                <Link
-                  to={{ pathname: '/sign-in', search: `?returnTo=${encodeURIComponent(returnTo)}` }}
-                >
-                  <TicketPlus aria-hidden="true" />
-                </Link>
-              </Button>
-            )}
-          </section>
-        )}
-      {user &&
-        !eventItem?.cancelled &&
-        (isManager ||
-          (kind === 'communities'
-            ? participationStatus === 'ACTIVE'
-            : participationStatus === 'ACCEPTED')) && (
-          <section className="flex flex-wrap items-center gap-3">
-            <IconButton
-              icon={MessageSquare}
-              label={t('openResourceChat')}
-              disabled={openCommunityChat.isPending || openEventChat.isPending}
-              onClick={() => void openChat()}
-              variant="outline"
-            />
-            {chatError ? (
-              <p className="text-sm font-medium text-danger" role="alert">
-                {t('resourceChatError')}
-              </p>
+        ) : currentUser.isPending || participationPending ? (
+          <p className="text-sm text-text-muted" role="status">
+            {t('loadingParticipation')}
+          </p>
+        ) : currentUser.isError || participationError ? (
+          <p className="text-sm font-medium text-danger" role="alert">
+            {t('participationActionError')}
+          </p>
+        ) : (
+          <>
+            {participationStatus ? (
+              <Badge
+                className="w-full justify-center"
+                role="status"
+                variant={participationBadge[participationStatus] ?? 'neutral'}
+              >
+                {t(`participationStatus_${participationStatus}`)}
+              </Badge>
             ) : null}
-          </section>
+            {!['ATTENDED', 'NO_SHOW'].includes(participationStatus ?? '') ? (
+              <Button
+                block
+                disabled={participationBusy}
+                intent={participationLeaving ? 'danger' : undefined}
+                onClick={() => void runParticipationAction()}
+                variant={participationLeaving ? 'outline' : 'primary'}
+              >
+                {participationLeaving ? (
+                  <TicketX aria-hidden="true" />
+                ) : (
+                  <TicketPlus aria-hidden="true" />
+                )}
+                {t(participationLeaving ? 'cancelRegistration' : 'registerForEvent')}
+              </Button>
+            ) : null}
+          </>
         )}
-      {eventItem && (
-        <EventDiscussion
-          eventId={eventItem.id}
-          signedIn={Boolean(user)}
-          canPost={Boolean(
-            user && (isManager || (!eventItem.cancelled && participationStatus === 'ACCEPTED')),
+      </div>
+    ) : null;
+  if (!eventItem) {
+    return (
+      <EmptyState
+        className="bg-card"
+        role="alert"
+        title={t('notFoundResource', { resource: resourceName })}
+      />
+    );
+  }
+  return (
+    <>
+      <EventDetailsLayout
+        item={eventItem}
+        hostPath={hostPath}
+        admissionLabel={admissionLabel}
+        headerActions={
+          <>
+            <Button
+              aria-label={t('copyShare')}
+              onClick={() => void copyShareLink()}
+              size="icon-sm"
+              title={t('copyShare')}
+              variant="outline"
+            >
+              <Share2 aria-hidden="true" />
+            </Button>
+            <ReportAction targetType="event" targetId={eventItem.id} />
+            {isManager ? (
+              <>
+                {!eventItem.cancelled ? (
+                  <>
+                    <Button asChild aria-label={t('editEvent')} title={t('editEvent')} size="icon-sm" variant="outline">
+                      <Link to={`/events/${eventItem.id}/edit`}><Pencil aria-hidden="true" /></Link>
+                    </Button>
+                    <IconButton icon={CalendarX} label={t('cancelEventAction')} intent="danger" disabled={cancelEvent.isPending} onClick={() => void cancel()} variant="outline" />
+                  </>
+                ) : null}
+                <Button asChild aria-label={t('reviewRequests')} title={t('reviewRequests')} size="icon-sm" variant="outline">
+                  <Link to={`/events/${eventItem.id}/participants?status=PENDING`}><ClipboardList aria-hidden="true" /></Link>
+                </Button>
+              </>
+            ) : null}
+          </>
+        }
+        registration={eventRegistration}
+      >
+        <section aria-labelledby="event-about-heading" className="grid gap-4">
+          <h2 className="font-heading text-2xl font-bold" id="event-about-heading">
+            {t('eventAbout')}
+          </h2>
+          <p className="max-w-prose whitespace-pre-wrap break-words text-sm leading-7 text-text-muted">
+            {eventItem.description}
+          </p>
+        </section>
+        {currentUser.isSuccess &&
+          (isManager || ['ACCEPTED', 'ATTENDED', 'NO_SHOW'].includes(participationStatus ?? '')) ? (
+            <EventAttendeePreview eventId={eventItem.id} />
+          ) : null}
+        {eventItem && user && managerCheckPending ? (
+          <section className="grid gap-4 rounded-(--shape-radius-card) border border-border bg-card p-5">
+            <h2 className="font-heading text-xl font-bold">{t('manageRegistrations')}</h2>
+            <LoadingSkeleton message={t('loadingParticipants')} rows={3} />
+          </section>
+        ) : isManager && eventItem ? (
+          <section className="grid gap-4 rounded-(--shape-radius-card) border border-border bg-card p-5">
+            <OrganizerParticipationPanel
+              kind={kind}
+              resourceId={item.id}
+              eventStarted={Boolean(
+                eventItem && new Date(eventItem.startsAt).getTime() <= Date.now(),
+              )}
+            />
+          </section>
+        ) : null}
+        {user &&
+          !eventItem?.cancelled &&
+          (isManager ||
+            (kind === 'communities'
+              ? participationStatus === 'ACTIVE'
+              : participationStatus === 'ACCEPTED')) && (
+            <section className="flex flex-wrap items-center gap-3">
+              <IconButton
+                icon={MessageSquare}
+                label={t('openResourceChat')}
+                disabled={openCommunityChat.isPending || openEventChat.isPending}
+                onClick={() => void openChat()}
+                variant="outline"
+              />
+              {chatError ? (
+                <p className="text-sm font-medium text-danger" role="alert">
+                  {t('resourceChatError')}
+                </p>
+              ) : null}
+            </section>
           )}
-          returnTo={returnTo}
-          viewerId={currentUser.data?.id}
-          moderator={Boolean(isManager || scopedPermissions.data?.moderator)}
-          canEditOthers={Boolean(isManager)}
-        />
-      )}
+        {eventItem && (
+          <EventDiscussion
+            eventId={eventItem.id}
+            signedIn={Boolean(user)}
+            canPost={Boolean(
+              user && (isManager || (!eventItem.cancelled && participationStatus === 'ACCEPTED')),
+            )}
+            returnTo={returnTo}
+            viewerId={currentUser.data?.id}
+            moderator={Boolean(isManager || scopedPermissions.data?.moderator)}
+            canEditOthers={Boolean(isManager)}
+          />
+        )}
+      </EventDetailsLayout>
       {dialog}
-    </article>
+    </>
   );
 }
