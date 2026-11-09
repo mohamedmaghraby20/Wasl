@@ -75,7 +75,7 @@ function isPublicRead(url: string, method = 'GET'): boolean {
     /^\/api\/v1\/health(?:\/ready)?$/,
     /^\/api\/v1\/reference\/(?:cities|categories)$/,
     /^\/api\/v1\/communities(?:\/(?!mine$)[^/]+(?:\/topics(?:\/[^/]+)?)?)?$/,
-    /^\/api\/v1\/events(?:\/[^/]+(?:\/discussion)?)?$/,
+    /^\/api\/v1\/events(?:\/(?!mine$)[^/]+(?:\/discussion)?)?$/,
     /^\/api\/v1\/organizations\/(?!mine$)[^/]+$/,
     /^\/api\/v1\/users\/[0-9a-f-]{36}$/i,
   ].some((pattern) => pattern.test(path));

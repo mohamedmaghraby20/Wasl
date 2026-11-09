@@ -63,6 +63,7 @@ describe('waslFetch', () => {
 
   it.each([
     ['/api/v1/communities/mine', 'GET'],
+    ['/api/v1/events/mine', 'GET'],
     ['/api/v1/organizations/mine', 'GET'],
     ['/api/v1/users/me', 'GET'],
     ['/api/v1/users/search?q=member', 'GET'],

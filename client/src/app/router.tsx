@@ -1,10 +1,23 @@
 import { createBrowserRouter } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import { RootLayout } from './RootLayout';
 import { RouteErrorBoundary } from './RouteErrorBoundary';
+
+/** Initial status while the first lazy route loads. */
+function InitialRouteFallback(): React.JSX.Element {
+  const { t } = useTranslation();
+
+  return (
+    <p className="p-6 text-sm text-text-muted" role="status">
+      {t('authWorking')}
+    </p>
+  );
+}
 
 export const router = createBrowserRouter([
   {
     Component: RootLayout,
+    HydrateFallback: InitialRouteFallback,
     ErrorBoundary: RouteErrorBoundary,
     children: [
       {
