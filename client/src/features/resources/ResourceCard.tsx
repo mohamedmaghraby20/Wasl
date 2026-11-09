@@ -63,7 +63,7 @@ export function ResourceCard({
           )}
         </div>
         <div className="flex min-w-0 flex-1 flex-col">
-          <div className={`grid flex-1 gap-3 ${event ? 'px-3 pt-3 pb-2' : 'p-(--card-padding)'}`}>
+          <div className={`grid flex-1 gap-3 ${event ? 'px-5 pt-5 pb-2' : 'p-(--card-padding)'}`}>
             <div className="min-w-0">
               {firstCategory ? (
                 <p
