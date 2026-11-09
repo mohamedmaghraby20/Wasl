@@ -12,6 +12,7 @@ import { Select } from '@/components/ui/Select';
 import { localizedName } from '@/features/resources/resource-utils';
 import type { ResourceKind } from '@/features/resources/resource-utils';
 import { cn } from '@/lib/cn';
+import { turkeyDateRange, type DateRangePreset } from './discovery-utils';
 
 const filterControlClass = 'shrink-0 sm:w-44';
 const allFilterValue = 'all';
@@ -50,6 +51,7 @@ export function DiscoveryFilters({
   categoriesPending,
   onSearch,
   onFilterChange,
+  onDateRangeChange,
   onKindChange,
   onRetryCities,
   onRetryCategories,
@@ -71,6 +73,7 @@ export function DiscoveryFilters({
   categoriesPending: boolean;
   onSearch: (value: string) => void;
   onFilterChange: (key: 'city' | 'category' | 'from' | 'to' | 'modality', value: string) => void;
+  onDateRangeChange: (from: string, to: string) => void;
   onKindChange: (kind: ResourceKind) => void;
   onRetryCities: () => void;
   onRetryCategories: () => void;
@@ -239,6 +242,38 @@ export function DiscoveryFilters({
           </>
         ) : null}
       </div>
+
+      {kind !== 'communities' ? (
+        <div
+          aria-label={t('quickDateFilters')}
+          className="flex flex-wrap items-center gap-2"
+          role="group"
+        >
+          {(['today', 'weekend', 'next-7-days'] as DateRangePreset[]).map((preset) => {
+            const range = turkeyDateRange(preset);
+            const active = fromValue === range.from && toValue === range.to;
+            return (
+              <Button
+                aria-pressed={active}
+                className={cn('h-9 px-3 text-xs', active && selectedFilterClass)}
+                key={preset}
+                onClick={() => onDateRangeChange(range.from, range.to)}
+                size="sm"
+                type="button"
+                variant="outline"
+              >
+                {t(
+                  preset === 'today'
+                    ? 'today'
+                    : preset === 'weekend'
+                      ? 'thisWeekend'
+                      : 'nextSevenDays',
+                )}
+              </Button>
+            );
+          })}
+        </div>
+      ) : null}
 
       {showClear ? (
         <div aria-label={t('filters')} className="flex flex-wrap items-center gap-2" role="group">

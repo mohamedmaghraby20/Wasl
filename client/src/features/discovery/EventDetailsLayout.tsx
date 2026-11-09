@@ -18,6 +18,8 @@ import {
   localizedName,
   localizedResourceTitle,
 } from '@/features/resources/resource-utils';
+import { ResourceShareLinks } from '@/features/resources/ResourceShareLinks';
+import { AddToCalendar } from './AddToCalendar';
 
 /**
  * Event page shell: full-width header and a two-column body where the facts and
@@ -29,6 +31,7 @@ export function EventDetailsLayout({
   admissionLabel,
   headerActions,
   registration,
+  onCopyShare,
   children,
 }: {
   item: EventPublicDto;
@@ -36,6 +39,7 @@ export function EventDetailsLayout({
   admissionLabel: string;
   headerActions: ReactNode;
   registration: ReactNode;
+  onCopyShare: () => void;
   children: ReactNode;
 }): React.JSX.Element {
   const { t, i18n } = useTranslation();
@@ -114,6 +118,11 @@ export function EventDetailsLayout({
                 ) : null}
               </div>
             </div>
+            {item.acceptedRegistrationCount > 0 ? (
+              <p className="text-sm text-text-muted">
+                {t('eventRegisteredCount', { count: item.acceptedRegistrationCount })}
+              </p>
+            ) : null}
             <dl className="grid gap-4">
               <div className="grid gap-1">
                 <dt className="inline-flex items-center gap-1.5 text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-text-subtle">
@@ -166,8 +175,15 @@ export function EventDetailsLayout({
                 </div>
               ) : null}
             </dl>
+            <AddToCalendar event={item} />
             {registration}
           </section>
+          <ResourceShareLinks
+            label={t('shareEvent')}
+            onCopy={onCopyShare}
+            path={`/events/${item.slug}`}
+            title={item.title}
+          />
         </aside>
         <div className="grid min-w-0 content-start gap-7">{children}</div>
       </div>

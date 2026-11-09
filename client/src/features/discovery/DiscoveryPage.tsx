@@ -17,6 +17,7 @@ export function DiscoveryPage(): React.JSX.Element {
     cities,
     categories,
     updateFilter,
+    setDateRange,
     changeKind,
     changePage,
     clearFilters,
@@ -58,6 +59,7 @@ export function DiscoveryPage(): React.JSX.Element {
         onClear={clearFilters}
         onSearch={(value) => updateFilter('q', value)}
         onFilterChange={updateFilter}
+        onDateRangeChange={setDateRange}
         onKindChange={changeKind}
       />
 
