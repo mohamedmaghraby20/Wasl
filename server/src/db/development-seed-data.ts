@@ -171,6 +171,65 @@ export function buildDevelopmentSeed(ownerId: string, hostName: string, now = ne
       createdAt: at(-30),
     });
   }
+  const localToday = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Istanbul' }).format(now);
+  const saturday = new Date(localToday + 'T12:00:00Z');
+  const weekday = saturday.getUTCDay();
+  saturday.setUTCDate(saturday.getUTCDate() + (weekday === 0 ? -1 : 6 - weekday));
+  const calendarTopics = [
+    [
+      'Conversation Café',
+      'Neighbourhood Photo Walk',
+      'Turkish Practice Table',
+      'Board Game Social',
+    ],
+    [
+      'Arabic Poetry Circle',
+      'City Sketch Walk',
+      'Language Exchange for Beginners',
+      'Coastal Nature Walk',
+    ],
+    ['Stories Across Cultures', 'Neighbourhood History Walk', 'Book Swap', 'Art Studio Meetup'],
+    [
+      'Multilingual Game Night',
+      'Outdoor Photography Practice',
+      'Community Study Table',
+      'Cycling Social',
+    ],
+    [
+      'Conversation and Coffee',
+      'Weekend Culture Walk',
+      'Language Learning Workshop',
+      'Garden Volunteer Meetup',
+    ],
+  ] as const;
+  const calendarCategories = new Map<string, string[]>();
+  calendarTopics.forEach((topics, week) => {
+    const regionalIndex = [4, 2, 5, 3, 9][week]!;
+    const slots = [
+      { day: 0, hour: 0, communityIndex: 0, category: 'language' },
+      { day: 1, hour: 0, communityIndex: 0, category: 'culture' },
+      { day: 3, hour: 2, communityIndex: 0, category: 'education' },
+      { day: 1, hour: -2, communityIndex: regionalIndex, category: places[regionalIndex]![3] },
+    ] as const;
+    slots.forEach(({ day, hour, communityIndex, category }, slot) => {
+      const template = eventRows[communityIndex]!;
+      const id = 'dev-seed-event-calendar-' + (week + 1) + '-' + (slot + 1);
+      const startsAt = new Date(saturday.getTime() + ((week * 7 + day) * 24 + hour) * 3_600_000);
+      eventRows.push({
+        ...template,
+        id,
+        slug: id,
+        title: topics[slot] + ' (Sample)',
+        description:
+          'A fictional in-person meetup for practicing new skills and meeting neighbours. Beginners are welcome. This is a demo event with a sample venue.',
+        startsAt,
+        endsAt: new Date(startsAt.getTime() + 2 * 3_600_000),
+        capacity: [24, 18, null, 16][slot] ?? null,
+        admissionMode: slot === 0 ? 'approval' : 'instant',
+      });
+      calendarCategories.set(id, [category, 'social']);
+    });
+  });
   const membershipRows = communityRows.flatMap((community, index) => {
     if (index === 11) return [];
     return attendees.map((person, offset) => {
@@ -363,7 +422,10 @@ export function buildDevelopmentSeed(ownerId: string, hostName: string, now = ne
       places[index]!.slice(3).map((categoryId) => ({ communityId: community.id, categoryId })),
     ),
     eventCategories: eventRows.flatMap((event, index) =>
-      places[index % 10]!.slice(3).map((categoryId) => ({ eventId: event.id, categoryId })),
+      (calendarCategories.get(event.id) ?? places[index % 10]!.slice(3)).map((categoryId) => ({
+        eventId: event.id,
+        categoryId,
+      })),
     ),
   };
 }

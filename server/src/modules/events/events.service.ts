@@ -8,7 +8,7 @@ import {
   Optional,
   ServiceUnavailableException,
 } from '@nestjs/common';
-import { and, count, eq, inArray } from 'drizzle-orm';
+import { and, count, desc, eq, inArray, or } from 'drizzle-orm';
 import { DATABASE, type Database } from '../../db/database.module';
 import {
   categories,
@@ -32,6 +32,37 @@ export class EventsService {
     private readonly organizations: OrganizationsService,
     @Optional() private readonly notifications?: NotificationsService,
   ) {}
+
+  async listMine(user: AuthenticatedUser) {
+    const db = this.database();
+    const [communities, organizations] = await Promise.all([
+      this.communities.listMine(user),
+      this.organizations.listMine(user.id),
+    ]);
+    return db
+      .select({ id: events.id, title: events.title, slug: events.slug })
+      .from(events)
+      .where(
+        or(
+          and(eq(events.hostType, 'user'), eq(events.hostId, user.id)),
+          and(
+            eq(events.hostType, 'community'),
+            inArray(
+              events.communityId,
+              communities.map(({ id }) => id),
+            ),
+          ),
+          and(
+            eq(events.hostType, 'organization'),
+            inArray(
+              events.hostId,
+              organizations.map(({ id }) => id),
+            ),
+          ),
+        ),
+      )
+      .orderBy(desc(events.startsAt), events.id);
+  }
 
   async create(user: AuthenticatedUser, input: CreateEventDto) {
     const db = this.database();

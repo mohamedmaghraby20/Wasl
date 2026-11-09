@@ -17,9 +17,12 @@ import type {
 } from 'msw';
 
 import type {
-  CreatedResourceDto
+  CreatedResourceDto,
+  ManagedEventDto
 } from '../../generated/wasl-client.schemas';
 
+
+export const getEventsControllerMineResponseMock = (): ManagedEventDto[] => (Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.alpha({length: {min: 10, max: 20}}), title: faker.string.alpha({length: {min: 10, max: 20}}), slug: faker.string.alpha({length: {min: 10, max: 20}})})))
 
 export const getEventsControllerCreateResponseMock = (overrideResponse: Partial<Extract<CreatedResourceDto, object>> = {}): CreatedResourceDto => ({id: faker.string.uuid(), slug: faker.string.alpha({length: {min: 10, max: 20}}), ...overrideResponse})
 
@@ -27,6 +30,18 @@ export const getEventsControllerUpdateResponseMock = (overrideResponse: Partial<
 
 export const getEventsControllerCancelResponseMock = (overrideResponse: Partial<Extract<CreatedResourceDto, object>> = {}): CreatedResourceDto => ({id: faker.string.uuid(), slug: faker.string.alpha({length: {min: 10, max: 20}}), ...overrideResponse})
 
+
+export const getEventsControllerMineMockHandler = (overrideResponse?: ManagedEventDto[] | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ManagedEventDto[]> | ManagedEventDto[]), options?: RequestHandlerOptions) => {
+  return http.get('*/api/v1/events/mine', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getEventsControllerMineResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
 
 export const getEventsControllerCreateMockHandler = (overrideResponse?: CreatedResourceDto | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<CreatedResourceDto> | CreatedResourceDto), options?: RequestHandlerOptions) => {
   return http.post('*/api/v1/events', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
@@ -64,6 +79,7 @@ export const getEventsControllerCancelMockHandler = (overrideResponse?: CreatedR
   }, options)
 }
 export const getEventsMock = () => [
+  getEventsControllerMineMockHandler(),
   getEventsControllerCreateMockHandler(),
   getEventsControllerUpdateMockHandler(),
   getEventsControllerCancelMockHandler()

@@ -505,6 +505,12 @@ export interface ReadNotificationDto {
   readAt: string;
 }
 
+export interface ManagedEventDto {
+  id: string;
+  title: string;
+  slug: string;
+}
+
 export type CreateEventDtoVisibility = typeof CreateEventDtoVisibility[keyof typeof CreateEventDtoVisibility];
 
 

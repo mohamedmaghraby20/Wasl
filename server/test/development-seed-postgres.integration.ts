@@ -75,7 +75,7 @@ async function main(): Promise<void> {
     `);
     const report = result.rows[0]!.report;
     assert.equal(report.communities, 12);
-    assert.equal(report.events, 16);
+    assert.equal(report.events, 36);
     assert.equal(report.profiles, 18);
     assert.equal(report.organizations, 3);
     assert.deepEqual(
@@ -132,7 +132,20 @@ async function main(): Promise<void> {
           new NotificationsService(db),
         );
         const participation = new ParticipationService(db, communities, events);
-        const communityId = 'dev-seed-community-07';
+        const [primary] = await tx
+          .select({ ownerId: schema.communities.ownerId })
+          .from(schema.communities)
+          .where(eq(schema.communities.id, 'dev-seed-community-01'));
+        assert.ok(primary);
+        const organizer = { id: primary.ownerId, authUserId: '' };
+        const [managedCommunities, managedEvents] = await Promise.all([
+          communities.listMine(organizer),
+          events.listMine(organizer),
+        ]);
+        assert.ok(managedCommunities.length > 1);
+        assert.ok(managedEvents.some((event) => event.id === 'dev-seed-event-calendar-1-1'));
+
+        const communityId = 'dev-seed-community-04';
         const [community] = await tx
           .select()
           .from(schema.communities)

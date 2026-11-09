@@ -5,18 +5,28 @@
  * OpenAPI spec version: v1
  */
 import {
-  useMutation
+  useMutation,
+  useQuery
 } from '@tanstack/react-query';
 import type {
+  DataTag,
+  DefinedInitialDataOptions,
+  DefinedUseQueryResult,
   MutationFunction,
   QueryClient,
+  QueryFunction,
+  QueryKey,
+  UndefinedInitialDataOptions,
   UseMutationOptions,
-  UseMutationResult
+  UseMutationResult,
+  UseQueryOptions,
+  UseQueryResult
 } from '@tanstack/react-query';
 
 import type {
   CreateEventDto,
   CreatedResourceDto,
+  ManagedEventDto,
   UpdateEventDto
 } from '../wasl-client.schemas';
 
@@ -24,6 +34,115 @@ import { waslFetch } from '../../fetcher';
 
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+
+
+const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKey: K } => {
+  const result = { queryKey } as T & { queryKey: K };
+  for (const key of Object.keys(query)) {
+    // The explicit queryKey always wins, matching the previous
+    // `{ ...query, queryKey }` spread where it was set last.
+    if (key === 'queryKey') continue;
+    Object.defineProperty(result, key, {
+      enumerable: true,
+      configurable: true,
+      get: () => (query as Record<string, unknown>)[key],
+    });
+  }
+  return result;
+};
+
+export const getEventsControllerMineUrl = () => {
+
+
+
+
+  return `/api/v1/events/mine`
+}
+
+export const eventsControllerMine = async ( options?: Parameters<typeof waslFetch>[1]): Promise<ManagedEventDto[]> => {
+
+  return waslFetch<ManagedEventDto[]>(getEventsControllerMineUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getEventsControllerMineQueryKey = () => {
+    return [
+    `/api/v1/events/mine`
+    ] as const;
+    }
+
+
+export const getEventsControllerMineQueryOptions = <TData = Awaited<ReturnType<typeof eventsControllerMine>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventsControllerMine>>, TError, TData>>, request?: SecondParameter<typeof waslFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getEventsControllerMineQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof eventsControllerMine>>> = ({ signal }) => eventsControllerMine({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof eventsControllerMine>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type EventsControllerMineQueryResult = NonNullable<Awaited<ReturnType<typeof eventsControllerMine>>>
+export type EventsControllerMineQueryError = unknown
+
+
+export function useEventsControllerMine<TData = Awaited<ReturnType<typeof eventsControllerMine>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventsControllerMine>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof eventsControllerMine>>,
+          TError,
+          Awaited<ReturnType<typeof eventsControllerMine>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof waslFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useEventsControllerMine<TData = Awaited<ReturnType<typeof eventsControllerMine>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventsControllerMine>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof eventsControllerMine>>,
+          TError,
+          Awaited<ReturnType<typeof eventsControllerMine>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof waslFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useEventsControllerMine<TData = Awaited<ReturnType<typeof eventsControllerMine>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventsControllerMine>>, TError, TData>>, request?: SecondParameter<typeof waslFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useEventsControllerMine<TData = Awaited<ReturnType<typeof eventsControllerMine>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventsControllerMine>>, TError, TData>>, request?: SecondParameter<typeof waslFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getEventsControllerMineQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
 
 
 

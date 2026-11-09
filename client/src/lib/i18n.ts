@@ -533,6 +533,8 @@ void i18n.use(initReactI18next).init({
         saveProfile: 'Save profile',
         cancel: 'Cancel',
         confirmAction: 'Confirm',
+        managedResourcesTitle: 'What you manage',
+        managedResourcesEmpty: 'You don’t manage any yet.',
         createTitle: 'Bring people together',
         createIntro:
           'Start with the kind of connection you want to make. You can shape the details before sharing it.',
@@ -1307,6 +1309,8 @@ void i18n.use(initReactI18next).init({
         saveProfile: 'حفظ الملف الشخصي',
         cancel: 'إلغاء',
         confirmAction: 'تأكيد',
+        managedResourcesTitle: 'ما تديره',
+        managedResourcesEmpty: 'لا تدير أيًّا منها بعد.',
         createTitle: 'اجمع الناس معًا',
         createIntro: 'ابدأ بنوع التواصل الذي تريد بناءه، ثم أضف التفاصيل قبل مشاركة صفحتك.',
         createCommunityTitle: 'إنشاء مجتمع',

@@ -2,13 +2,68 @@ import { useHead } from '@unhead/react';
 import { ArrowRight, Building2, CalendarPlus, UsersRound } from 'lucide-react';
 import { Link, Navigate, useLocation } from 'react-router';
 import { useTranslation } from 'react-i18next';
+import { useCommunitiesControllerMine } from '@/api/generated/communities/communities';
+import { useEventsControllerMine } from '@/api/generated/events/events';
+import { QueryError } from '@/components/feedback/QueryError';
 import { useAuth } from '@/features/auth/AuthProvider';
+
+function ManagedList({
+  kind,
+  query,
+}: {
+  kind: 'communities' | 'events';
+  query: {
+    data: { id: string; name: string }[] | undefined;
+    isPending: boolean;
+    isError: boolean;
+    refetch: () => unknown;
+  };
+}): React.JSX.Element {
+  const { t } = useTranslation();
+  const resource = t(kind);
+  return (
+    <section aria-labelledby={`managed-${kind}`} className="grid content-start gap-2">
+      <h3 id={`managed-${kind}`} className="font-semibold">
+        {resource}
+      </h3>
+      {query.isError ? (
+        <QueryError message={t('loadError', { resource })} onRetry={() => void query.refetch()} />
+      ) : query.isPending ? (
+        <p role="status" className="text-sm text-text-muted">
+          {t('loading', { resource })}
+        </p>
+      ) : query.data?.length ? (
+        <ul className="divide-y divide-border border border-border bg-card">
+          {query.data.map(({ id, name }) => (
+            <li key={id}>
+              <Link
+                className="flex min-h-11 items-center px-3 text-sm font-medium hover:underline"
+                to={`/${kind}/${id}`}
+              >
+                {name}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-sm text-text-muted">{t('managedResourcesEmpty')}</p>
+      )}
+    </section>
+  );
+}
 
 export function CreationStartPage(): React.JSX.Element {
   const { t } = useTranslation();
   const { user, loading } = useAuth();
   const location = useLocation();
   useHead({ title: t('create') });
+  const communities = useCommunitiesControllerMine({ query: { enabled: Boolean(user) } });
+  const events = useEventsControllerMine({
+    query: {
+      enabled: Boolean(user),
+      select: (items) => items.map(({ id, title }) => ({ id, name: title })),
+    },
+  });
 
   if (!loading && !user) {
     const returnTo = `${location.pathname}${location.search}${location.hash}`;
@@ -75,6 +130,18 @@ export function CreationStartPage(): React.JSX.Element {
           </Link>
         ))}
       </div>
+      <section
+        aria-labelledby="managed-resources-heading"
+        className="grid gap-4 border-t border-border pt-6"
+      >
+        <h2 id="managed-resources-heading" className="text-xl font-bold">
+          {t('managedResourcesTitle')}
+        </h2>
+        <div className="grid gap-6 sm:grid-cols-2">
+          <ManagedList kind="communities" query={communities} />
+          <ManagedList kind="events" query={events} />
+        </div>
+      </section>
     </section>
   );
 }

@@ -106,6 +106,31 @@ describe('development seed coverage', () => {
     }
   });
 
+  it('provides Istanbul in-person events each weekend for a month from a Monday seed', () => {
+    const seeded = buildDevelopmentSeed(
+      sampleOwnerId,
+      'Sample Host',
+      new Date('2026-11-09T10:00:00Z'),
+    );
+    const calendar = seeded.eventRows.filter((event) =>
+      event.id.startsWith('dev-seed-event-calendar-'),
+    );
+    expect(calendar).toHaveLength(20);
+    for (const saturday of ['11-14', '11-21', '11-28', '12-05', '12-12']) {
+      const start = new Date('2026-' + saturday + 'T00:00:00+03:00').getTime();
+      const weekend = calendar.filter(
+        (event) =>
+          event.cityId === 'istanbul' &&
+          !event.online &&
+          !event.cancelled &&
+          event.visibility === 'public' &&
+          event.startsAt.getTime() >= start &&
+          event.startsAt.getTime() < start + 48 * 3_600_000,
+      );
+      expect(weekend).toHaveLength(2);
+    }
+  });
+
   it('fills profile and organization fields with clearly fictional data and safe storage paths', () => {
     expect(data.attendees).toHaveLength(18);
     for (const person of data.attendees) {

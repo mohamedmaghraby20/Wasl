@@ -92,3 +92,9 @@ export class CreateEventDto {
 }
 
 export class UpdateEventDto extends CreateEventDto {}
+
+export class ManagedEventDto {
+  @ApiProperty() id!: string;
+  @ApiProperty() title!: string;
+  @ApiProperty() slug!: string;
+}
