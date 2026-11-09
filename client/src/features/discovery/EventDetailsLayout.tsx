@@ -64,30 +64,45 @@ export function EventDetailsLayout({
       </div>
 
       <header className="grid gap-5 rounded-(--shape-radius-card) border border-border bg-card p-6 shadow-sm sm:p-8">
-        <div className="grid gap-3">
-          {item.categories.length ? (
-            <ul aria-label={t('categoriesLabel')} className="flex flex-wrap gap-1.5">
-              {item.categories.map((category) => (
-                <li key={category.id}>
-                  <Badge variant="primary">{localizedName(category, i18n.language)}</Badge>
-                </li>
-              ))}
-            </ul>
-          ) : null}
-          <h1 className="text-3xl font-extrabold sm:text-4xl">{localizedResourceTitle(item)}</h1>
-          <p className="text-sm text-text-muted">
-            <span>{t('hostedByLabel')} </span>
-            {hostPath ? (
-              <Link
-                className="font-semibold text-primary-soft-text underline decoration-primary/40 decoration-2 underline-offset-4 transition-colors hover:decoration-primary"
-                to={hostPath}
-              >
-                {item.hostName}
-              </Link>
-            ) : (
-              <span className="font-medium text-text">{item.hostName}</span>
-            )}
-          </p>
+        <div className="grid items-center gap-6 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] md:gap-8">
+          <div className="relative isolate">
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 -z-10 translate-x-1 translate-y-2 rotate-1 rounded-(--shape-radius-2xl) bg-primary-soft sm:translate-x-2 rtl:-translate-x-1 sm:rtl:-translate-x-2"
+            />
+            <img
+              alt=""
+              className="aspect-[16/10] w-full rounded-(--shape-radius-2xl) border border-border object-cover shadow-xs"
+              height={675}
+              src="/images/community-covers/events-abstract.svg"
+              width={1200}
+            />
+          </div>
+          <div className="grid gap-3">
+            {item.categories.length ? (
+              <ul aria-label={t('categoriesLabel')} className="flex flex-wrap gap-1.5">
+                {item.categories.map((category) => (
+                  <li key={category.id}>
+                    <Badge variant="primary">{localizedName(category, i18n.language)}</Badge>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+            <h1 className="text-3xl font-extrabold sm:text-4xl">{localizedResourceTitle(item)}</h1>
+            <p className="text-sm text-text-muted">
+              <span>{t('hostedByLabel')} </span>
+              {hostPath ? (
+                <Link
+                  className="font-semibold text-primary-soft-text underline decoration-primary/40 decoration-2 underline-offset-4 transition-colors hover:decoration-primary"
+                  to={hostPath}
+                >
+                  {item.hostName}
+                </Link>
+              ) : (
+                <span className="font-medium text-text">{item.hostName}</span>
+              )}
+            </p>
+          </div>
         </div>
         {item.cancelled ? (
           <p
