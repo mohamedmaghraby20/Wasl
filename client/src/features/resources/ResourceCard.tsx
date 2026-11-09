@@ -6,6 +6,7 @@ import type { CommunityPublicDto, EventPublicDto } from '@/api/generated/wasl-cl
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import {
+  defaultCommunityCover,
   localizedName,
   localizedResourceTitle,
   turkeyDateParts,
@@ -23,7 +24,9 @@ export function ResourceCard({
   const event = kind === 'events' && 'startsAt' in item ? item : undefined;
   const date = event ? turkeyDateParts(event.startsAt, i18n.language) : undefined;
   const [firstCategory, ...otherCategories] = item.categories;
-  const cover = '/images/community-covers/' + kind + '-abstract.svg';
+  const cover = kind === 'communities'
+    ? defaultCommunityCover(item.categories)
+    : '/images/community-covers/events-abstract.svg';
   const [failedCover, setFailedCover] = useState<string>();
   const CoverIcon = event ? CalendarDays : UsersRound;
   const remaining =

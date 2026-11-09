@@ -20,7 +20,7 @@ import { Badge } from '@/components/ui/Badge';
 import { CommunityMemberPreview } from '@/features/participation/CommunityMemberPreview';
 import { CommunityMembersTab } from '@/features/participation/CommunityMembersTab';
 import { CommunityTopics } from '@/features/discussions/CommunityTopics';
-import { defaultResourceCover, localizedName } from '@/features/resources/resource-utils';
+import { defaultCommunityCover, localizedName } from '@/features/resources/resource-utils';
 import { CommunityEvents } from './CommunityEvents';
 import { ParticipationQueueLinks } from '@/features/participation/ParticipationQueueLinks';
 
@@ -30,10 +30,6 @@ const sections = [
   { id: 'members', label: 'communityMembers', Icon: UsersRound },
   { id: 'discussion', label: 'communityDiscussion', Icon: MessageSquare },
 ] as const;
-
-export function defaultCommunityCover(id: string): string {
-  return defaultResourceCover(id, 'communities');
-}
 
 export function CommunityDetailsLayout({
   item,
@@ -105,10 +101,10 @@ export function CommunityDetailsLayout({
             className="absolute inset-0 -z-10 translate-x-1 translate-y-2 rotate-1 rounded-(--shape-radius-2xl) bg-primary-soft sm:translate-x-2 rtl:-translate-x-1 sm:rtl:-translate-x-2"
           />
           <img
-            alt={t('defaultCommunityCoverAlt')}
+            alt=""
             className="aspect-[16/10] w-full rounded-(--shape-radius-2xl) border border-border object-cover shadow-xs"
             height={750}
-            src={defaultCommunityCover(item.id)}
+            src={defaultCommunityCover(item.categories)}
             width={1200}
           />
         </div>

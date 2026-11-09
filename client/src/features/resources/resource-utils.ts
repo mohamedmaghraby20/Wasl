@@ -3,12 +3,36 @@ import type { CommunityPublicDto, EventPublicDto } from '@/api/generated/wasl-cl
 export type ResourceKind = 'communities' | 'events';
 export type LanguageCode = 'en' | 'ar' | 'tr';
 
-/** Bundled illustrations, not photographs of the actual resource. */
+const communityCoverThemes = new Map([
+  ['books', 'learning'],
+  ['education', 'learning'],
+  ['technology', 'learning'],
+  ['business', 'learning'],
+  ['travel', 'outdoors'],
+  ['sports', 'outdoors'],
+  ['environment', 'outdoors'],
+  ['health', 'outdoors'],
+  ['arts', 'creative'],
+  ['music', 'creative'],
+  ['photography', 'creative'],
+  ['gaming', 'creative'],
+  ['food', 'food'],
+]);
+
+/** Use the first matching interest, with a general illustration for other communities. */
+export function defaultCommunityCover(categories: CommunityPublicDto['categories']): string {
+  for (const { id } of categories) {
+    const theme = communityCoverThemes.get(id);
+    if (theme) return `/images/community-covers/${theme}.svg`;
+  }
+  return '/images/community-covers/social.svg';
+}
+
+/** Bundled artwork for compact resource thumbnails. */
 export function defaultResourceCover(id: string, kind: ResourceKind): string {
-  const covers =
-    kind === 'events'
-      ? ['conversation', 'gathering', 'together']
-      : ['gathering', 'together', 'conversation'];
+  if (kind === 'communities') return defaultCommunityCover([]);
+
+  const covers = ['conversation', 'gathering', 'together'];
   const hash = Array.from(id).reduce(
     (value, character) => (value * 31 + character.charCodeAt(0)) >>> 0,
     0,

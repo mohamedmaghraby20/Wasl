@@ -5,7 +5,7 @@ import { MemoryRouter } from 'react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { CommunityPublicDto } from '@/api/generated/wasl-client.schemas';
 import { i18n } from '@/lib/i18n';
-import { CommunityDetailsLayout, defaultCommunityCover } from './CommunityDetailsLayout';
+import { CommunityDetailsLayout } from './CommunityDetailsLayout';
 
 vi.mock('@/features/participation/CommunityMemberPreview', () => ({
   CommunityMemberPreview: () => <p>Organizer sidebar</p>,
@@ -34,7 +34,7 @@ const community: CommunityPublicDto = {
   cityId: 'istanbul',
   cityName: 'Istanbul',
   memberCount: 8,
-  categories: [],
+  categories: [{ id: 'books', nameEn: 'Books', nameAr: 'كتب', nameTr: 'Kitaplar' }],
 };
 
 function renderLayout(owner = false, member = false): void {
@@ -64,10 +64,9 @@ describe('CommunityDetailsLayout', () => {
 
   it('uses a stable local cover and provides working share links', () => {
     renderLayout();
-    expect(defaultCommunityCover('community-1')).toBe(defaultCommunityCover('community-1'));
-    expect(screen.getByAltText('Illustrative community gathering')).toHaveAttribute(
+    expect(screen.getByAltText('')).toHaveAttribute(
       'src',
-      defaultCommunityCover('community-1'),
+      '/images/community-covers/learning.svg',
     );
     expect(screen.getByRole('link', { name: 'Share on Facebook' })).toHaveAttribute(
       'href',
