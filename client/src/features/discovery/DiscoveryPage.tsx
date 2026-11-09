@@ -10,6 +10,7 @@ export function DiscoveryPage(): React.JSX.Element {
     kind,
     page,
     params,
+    modality,
     hasFilters,
     communities,
     events,
@@ -42,6 +43,7 @@ export function DiscoveryPage(): React.JSX.Element {
         searchValue={params.get('q') ?? ''}
         cityValue={params.get('city') ?? ''}
         categoryValue={params.get('category') ?? ''}
+        modalityValue={modality}
         fromValue={params.get('from') ?? ''}
         toValue={params.get('to') ?? ''}
         cities={cities.data}

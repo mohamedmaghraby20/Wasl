@@ -35,6 +35,7 @@ export function DiscoveryFilters({
   searchValue,
   cityValue,
   categoryValue,
+  modalityValue,
   fromValue,
   toValue,
   cities,
@@ -55,6 +56,7 @@ export function DiscoveryFilters({
   searchValue: string;
   cityValue: string;
   categoryValue: string;
+  modalityValue: '' | 'online' | 'in-person';
   fromValue: string;
   toValue: string;
   cities: CityPublicDto[] | undefined;
@@ -64,7 +66,7 @@ export function DiscoveryFilters({
   citiesPending: boolean;
   categoriesPending: boolean;
   onSearch: (value: string) => void;
-  onFilterChange: (key: 'city' | 'category' | 'from' | 'to', value: string) => void;
+  onFilterChange: (key: 'city' | 'category' | 'from' | 'to' | 'modality', value: string) => void;
   onKindChange: (kind: ResourceKind) => void;
   onRetryCities: () => void;
   onRetryCategories: () => void;
@@ -107,6 +109,14 @@ export function DiscoveryFilters({
       label: t('categoryFilter'),
       value: categoryName,
       onRemove: () => onFilterChange('category', ''),
+    });
+  }
+  if (kind === 'events' && modalityValue) {
+    activeFilters.push({
+      key: 'modality',
+      label: t('eventFormat'),
+      value: modalityValue === 'online' ? t('online') : t('onSite'),
+      onRemove: () => onFilterChange('modality', ''),
     });
   }
   if (kind !== 'communities' && fromValue) {
@@ -195,6 +205,17 @@ export function DiscoveryFilters({
         />
         {kind !== 'communities' ? (
           <>
+            <Select
+              aria-label={t('eventFormat')}
+              className={filterControlClass}
+              onValueChange={(value) => onFilterChange('modality', value === 'all' ? '' : value)}
+              options={[
+                { value: 'all', label: t('allEventFormats') },
+                { value: 'online', label: t('online') },
+                { value: 'in-person', label: t('onSite') },
+              ]}
+              value={modalityValue || 'all'}
+            />
             <DatePicker
               align="start"
               className="w-full shrink-0 sm:w-44"
