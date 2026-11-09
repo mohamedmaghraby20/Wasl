@@ -3,24 +3,19 @@ import {
   ArrowLeft,
   BookOpen,
   CalendarDays,
-  Facebook,
-  Link2,
-  Linkedin,
-  Mail,
   MapPin,
-  MessageCircle,
   MessageSquare,
   UsersRound,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useSearchParams } from 'react-router';
 import type { CommunityPublicDto } from '@/api/generated/wasl-client.schemas';
-import { Button, buttonVariants } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { CommunityMemberPreview } from '@/features/participation/CommunityMemberPreview';
 import { CommunityMembersTab } from '@/features/participation/CommunityMembersTab';
 import { CommunityTopics } from '@/features/discussions/CommunityTopics';
 import { defaultCommunityCover, localizedName } from '@/features/resources/resource-utils';
+import { ResourceShareLinks } from '@/features/resources/ResourceShareLinks';
 import { CommunityEvents } from './CommunityEvents';
 import { ParticipationQueueLinks } from '@/features/participation/ParticipationQueueLinks';
 
@@ -60,30 +55,6 @@ export function CommunityDetailsLayout({
   const selected = sections.some((section) => section.id === params.get('tab'))
     ? params.get('tab')
     : 'about';
-  const shareUrl = `${window.location.origin}/communities/${item.slug}`;
-  const encodedUrl = encodeURIComponent(shareUrl);
-  const shares = [
-    {
-      label: t('shareFacebook'),
-      href: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
-      Icon: Facebook,
-    },
-    {
-      label: t('shareLinkedIn'),
-      href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
-      Icon: Linkedin,
-    },
-    {
-      label: t('shareWhatsApp'),
-      href: `https://wa.me/?text=${encodeURIComponent(`${item.name} ${shareUrl}`)}`,
-      Icon: MessageCircle,
-    },
-    {
-      label: t('shareEmail'),
-      href: `mailto:?subject=${encodeURIComponent(item.name)}&body=${encodedUrl}`,
-      Icon: Mail,
-    },
-  ];
 
   return (
     <article className="mx-auto grid w-full min-w-0 max-w-(--container-max) gap-8 sm:gap-10">
@@ -154,33 +125,12 @@ export function CommunityDetailsLayout({
               ))}
             </ul>
           ) : null}
-          <div className="grid justify-items-start gap-1 pt-1">
-            <p className="text-xs font-semibold text-text-muted">{t('shareCommunity')}</p>
-            <div className="flex flex-wrap items-center gap-1">
-              {shares.map(({ label, href, Icon }) => (
-                <a
-                  key={label}
-                  aria-label={label}
-                  className={buttonVariants({ size: 'icon-sm', variant: 'ghost' })}
-                  href={href}
-                  rel="noopener noreferrer"
-                  target={href.startsWith('mailto:') ? undefined : '_blank'}
-                  title={label}
-                >
-                  <Icon aria-hidden="true" />
-                </a>
-              ))}
-              <Button
-                aria-label={t('copyShare')}
-                onClick={onCopyShare}
-                size="icon-sm"
-                title={t('copyShare')}
-                variant="ghost"
-              >
-                <Link2 aria-hidden="true" />
-              </Button>
-            </div>
-          </div>
+          <ResourceShareLinks
+            label={t('shareCommunity')}
+            onCopy={onCopyShare}
+            path={`/communities/${item.slug}`}
+            title={item.name}
+          />
         </div>
       </header>
 

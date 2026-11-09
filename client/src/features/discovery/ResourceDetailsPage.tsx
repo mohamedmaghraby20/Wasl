@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Archive, CalendarX, ClipboardList, LogOut, MessageSquare, Pencil, Share2, TicketPlus, TicketX, Trash2, UserPlus } from 'lucide-react';
+import { Archive, CalendarX, ClipboardList, LogOut, MessageSquare, Pencil, TicketPlus, TicketX, Trash2, UserPlus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
@@ -59,6 +59,7 @@ import {
   useMessagingControllerEvent,
 } from '@/api/generated/messaging/messaging';
 import { EventDetailsLayout } from './EventDetailsLayout';
+import { RelatedEvents } from './RelatedEvents';
 import { EventAttendeePreview } from '@/features/participation/EventAttendeePreview';
 import { CommunityDetailsLayout } from './CommunityDetailsLayout';
 
@@ -650,15 +651,6 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
         admissionLabel={admissionLabel}
         headerActions={
           <>
-            <Button
-              aria-label={t('copyShare')}
-              onClick={() => void copyShareLink()}
-              size="icon-sm"
-              title={t('copyShare')}
-              variant="outline"
-            >
-              <Share2 aria-hidden="true" />
-            </Button>
             <ReportAction targetType="event" targetId={eventItem.id} />
             {isManager ? (
               <>
@@ -678,6 +670,7 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
           </>
         }
         registration={eventRegistration}
+        onCopyShare={() => void copyShareLink()}
       >
         <section aria-labelledby="event-about-heading" className="grid gap-4">
           <h2 className="font-heading text-2xl font-bold" id="event-about-heading">
@@ -741,6 +734,7 @@ export function ResourceDetailsPage({ kind }: { kind: ResourceKind }): React.JSX
             canEditOthers={Boolean(isManager)}
           />
         )}
+        <RelatedEvents event={eventItem} />
       </EventDetailsLayout>
       {dialog}
     </>

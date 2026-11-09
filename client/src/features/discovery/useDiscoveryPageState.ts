@@ -106,8 +106,16 @@ export function useDiscoveryPageState(language: string) {
     setParams(next, { preventScrollReset: true });
   };
 
-  const clearFilters = (): void => {
-    const next = new URLSearchParams(params);
+  const setDateRange = (from: string, to: string): void => {
+    const next = resetPage(params);
+    if (from) next.set('from', from);
+    else next.delete('from');
+    if (to) next.set('to', to);
+    else next.delete('to');
+    setParams(next, { preventScrollReset: true });
+  };
+
+  const clearFilters = (): void => {    const next = new URLSearchParams(params);
     for (const key of [
       'q',
       'city',
@@ -136,6 +144,7 @@ export function useDiscoveryPageState(language: string) {
     cities,
     categories,
     updateFilter,
+    setDateRange,
     changeKind,
     changePage,
     clearFilters,

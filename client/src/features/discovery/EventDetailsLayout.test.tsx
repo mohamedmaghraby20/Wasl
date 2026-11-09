@@ -39,6 +39,7 @@ function renderLayout(): void {
             admissionLabel="admissionInstant"
             headerActions={<button>Share</button>}
             registration={<button>Register for event</button>}
+            onCopyShare={() => undefined}
           >
             <p>Event description</p>
           </EventDetailsLayout>
