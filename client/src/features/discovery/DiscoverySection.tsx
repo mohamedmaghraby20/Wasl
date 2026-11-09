@@ -32,8 +32,7 @@ export function DiscoverySection({
   onPageChange: (page: number) => void;
 }): React.JSX.Element {
   const { t, i18n } = useTranslation();
-  const gridClass =
-    kind === 'events' ? 'grid min-w-0 gap-4' : 'grid gap-4 sm:grid-cols-2 lg:grid-cols-3';
+  const gridClass = 'grid min-w-0 gap-4 sm:grid-cols-2 lg:grid-cols-3';
   const headingId = `${kind}-heading`;
   const resource = t(kind).toLocaleLowerCase(i18n.language);
   const resultTotal = total ?? 0;
@@ -65,7 +64,7 @@ export function DiscoverySection({
                 key={index}
               >
                 <Skeleton
-                  className={`-mx-5 -mt-5 rounded-b-none rounded-t-(--shape-radius-card) ${kind === 'events' ? 'h-24' : 'aspect-video'}`}
+                  className={`-mx-5 -mt-5 rounded-b-none rounded-t-(--shape-radius-card) ${kind === 'events' ? 'h-20' : 'aspect-video'}`}
                 />
                 <div className="flex items-center justify-between">
                   <Skeleton className="size-11 rounded-lg" />

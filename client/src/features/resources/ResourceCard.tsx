@@ -43,9 +43,9 @@ export function ResourceCard({
       data-card
       className="group @container relative flex h-full min-w-0 flex-col overflow-hidden rounded-(--shape-radius-card) border border-border bg-card shadow-(--shadow-card) transition-[box-shadow,translate] duration-(--motion-duration-base) ease-(--motion-ease-standard) hover:-translate-y-0.5 hover:shadow-(--shadow-card-hover) motion-reduce:transform-none motion-reduce:transition-none has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-ring has-[a:focus-visible]:ring-offset-2 has-[a:focus-visible]:ring-offset-background"
     >
-      <div className={`flex flex-1 flex-col ${event ? '@lg:flex-row' : ''}`}>
+      <div className="flex flex-1 flex-col">
         <div
-          className={`relative grid place-items-center overflow-hidden bg-primary-soft text-primary-soft-text ${event ? 'h-20 shrink-0 @lg:h-auto @lg:w-1/4' : 'h-(--community-cover-height)'}`}
+          className={`relative grid place-items-center overflow-hidden bg-primary-soft text-primary-soft-text ${event ? 'h-20 shrink-0' : 'h-(--community-cover-height)'}`}
         >
           {failedCover === cover ? (
             <CoverIcon aria-hidden="true" className="size-10" strokeWidth={1.75} />
@@ -64,14 +64,8 @@ export function ResourceCard({
         </div>
         <div className="flex min-w-0 flex-1 flex-col">
           <div
-            className={`grid flex-1 gap-3 ${date ? 'p-3 @sm:grid-cols-[3.5rem_minmax(0,1fr)] @lg:grid-cols-[4.5rem_minmax(0,1fr)] @lg:p-4' : 'p-(--card-padding)'}`}
+            className={`grid flex-1 gap-3 ${event ? 'p-3' : 'p-(--card-padding)'}`}
           >
-            {date ? (
-              <div className="hidden min-h-16 flex-col @sm:flex items-center justify-center self-start rounded-(--shape-radius-control) border border-border bg-surface-soft">
-                <span className="text-base font-bold text-text-muted">{date.month}</span>
-                <strong className="text-3xl leading-tight">{date.day}</strong>
-              </div>
-            ) : null}
             <div className="min-w-0">
               {firstCategory ? (
                 <p

@@ -46,7 +46,7 @@ export function CommunityEvents({
         ) : null}
       </div>
       {query.isPending ? (
-        <LoadingSkeleton layout="list" message={t('loadingDetails')} rows={4} />
+        <LoadingSkeleton layout="grid" message={t('loadingDetails')} rows={4} />
       ) : query.isError ? (
         <QueryError
           message={t('loadError', { resource: t('events') })}
@@ -54,7 +54,7 @@ export function CommunityEvents({
         />
       ) : query.data.items.length ? (
         <>
-          <div className="grid min-w-0 gap-4">
+          <div className="grid min-w-0 gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {query.data.items.map((event) => (
               <ResourceCard key={event.id} item={event} kind="events" />
             ))}

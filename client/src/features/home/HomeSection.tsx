@@ -63,7 +63,7 @@ export function HomeSection({
     element.scrollBy({ left: element.clientWidth * (forward ? 1 : -1) * (rtl ? -1 : 1) });
   };
   const rowClass = isEventList
-    ? 'grid min-w-0 gap-4'
+    ? 'grid min-w-0 gap-4 sm:grid-cols-2 xl:grid-cols-3'
     : 'grid min-w-0 grid-flow-col auto-cols-[85%] gap-4 overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden p-1 -m-1 sm:auto-cols-[calc((100%-1rem)/2)] xl:auto-cols-[calc((100%-2rem)/3)]';
   return (
     <section className="grid gap-4" aria-labelledby={`${sectionId}-heading`}>
@@ -113,7 +113,7 @@ export function HomeSection({
                 key={index}
               >
                 <Skeleton
-                  className={`-mx-4 -mt-4 rounded-b-none rounded-t-(--shape-radius-card) ${isEventList ? 'h-24' : 'aspect-video'}`}
+                  className={`-mx-4 -mt-4 rounded-b-none rounded-t-(--shape-radius-card) ${isEventList ? 'h-20' : 'aspect-video'}`}
                 />
                 <Skeleton className="h-6 w-3/4" />
                 <Skeleton className="h-4 w-1/2" />
