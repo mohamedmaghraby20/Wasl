@@ -1,4 +1,4 @@
-import { CalendarDays, Clock3, MapPin, UserRound, UsersRound, Video } from 'lucide-react';
+import { CalendarDays, Clock3, MapPin, UsersRound, Video } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
@@ -161,27 +161,8 @@ export function ResourceCard({
             dir="ltr"
             className={`mt-auto grid items-center gap-2 border-t border-border text-text-muted ${event ? 'px-5 py-2 text-sm @xs:grid-cols-[minmax(0,1fr)_auto]' : 'grid-cols-[minmax(0,1fr)_auto] px-(--card-padding) py-4 text-xs'}`}
           >
-            <div
-              dir={i18n.dir()}
-              className={`flex min-w-0 items-center ${event ? 'gap-1.5' : 'gap-2'}`}
-            >
-              {event ? (
-                <span aria-hidden="true" className="inline-flex shrink-0 [&>span+span]:-ms-3">
-                  {Array.from(
-                    { length: Math.max(1, Math.min(3, event.acceptedRegistrationCount)) },
-                    (_, index) => (
-                      <span
-                        className="grid size-6 place-items-center rounded-full border border-primary bg-card text-primary"
-                        key={index}
-                      >
-                        <UserRound className="size-3" />
-                      </span>
-                    ),
-                  )}
-                </span>
-              ) : (
-                <UsersRound aria-hidden="true" className="size-4 shrink-0" />
-              )}
+            <div dir={i18n.dir()} className="flex min-w-0 items-center gap-2">
+              {!event && <UsersRound aria-hidden="true" className="size-4 shrink-0" />}
               {attendeeCount !== null ? (
                 <span className="min-w-0 text-text-muted">
                   {event
