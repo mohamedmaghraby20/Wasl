@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { inArray, sql } from 'drizzle-orm';
+import { and, eq, inArray, sql } from 'drizzle-orm';
 import type { Database } from './database.module';
 import {
   buildDevelopmentSeed,
@@ -160,6 +160,28 @@ export async function seedDevelopmentData(
           updatedAt: sql`excluded.updated_at`,
         },
       });
+    if (ownerId !== sampleOwnerId) {
+      await tx
+        .update(profiles)
+        .set({
+          avatarPath: sql`coalesce(${profiles.avatarPath}, ${'dev-seed/' + sampleOwnerId + '.jpg'})`,
+          cityId: sql`coalesce(${profiles.cityId}, 'istanbul')`,
+          bio: sql`case when btrim(${profiles.bio}) = ''
+            then 'Wasl demo organizer exploring language exchanges, cultural events, and local volunteering.'
+            else ${profiles.bio} end`,
+          interests: sql`case when cardinality(${profiles.interests}) = 0
+            then array['language', 'culture', 'education', 'volunteering']::text[]
+            else ${profiles.interests} end`,
+          updatedAt: new Date(),
+        })
+        .where(
+          and(
+            eq(profiles.id, ownerId),
+            sql`(${profiles.avatarPath} is null or ${profiles.cityId} is null
+              or btrim(${profiles.bio}) = '' or cardinality(${profiles.interests}) = 0)`,
+          ),
+        );
+    }
     await tx
       .insert(ageEligibilities)
       .values(

@@ -25,9 +25,9 @@ Community and event IDs are text, including these stable sample IDs; moderation,
 
 ## Safety and reruns
 
-Existing sample IDs are reused. Optional `WASL_SEED_OWNER_EMAIL` selects an existing signed-up owner; otherwise the existing signed-in owner of sample community 01 is preserved, falling back to the synthetic host only when necessary. This does not modify the real owner's profile or grant platform-admin access.
+Existing sample IDs are reused. Optional `WASL_SEED_OWNER_EMAIL` selects an existing signed-up owner; otherwise the existing signed-in owner of sample community 01 is preserved, falling back to the synthetic host only when necessary. The signed-in sample owner's blank city, bio, photo, and interests receive demo defaults. Existing profile values are preserved and the seed grants no platform-admin access.
 
-A signed-in sample owner also gets active, pending, and waitlisted memberships plus upcoming registrations and past attendance. The fictional host owns those sample communities so the signed-in account can use participant actions. Existing memberships and registrations for the signed-in account take precedence over these fixtures.
+A signed-in sample owner also gets active, pending, and waitlisted memberships plus upcoming registrations and past attendance. The fictional host owns those sample communities so the signed-in account can use participant actions. Existing memberships and registrations for the signed-in account take precedence over these fixtures. The signed-in owner also personally owns five active sample communities, including the full approval community, and can manage their discussions and requests.
 
 Rerunning refreshes sample resource fields, dates, categories, synthetic participation states and their histories. It does not delete real accounts, real memberships/registrations, or non-sample resources. Finite sample capacities are raised if needed to accommodate existing real participants. Reserved user IDs are checked against email addresses and authentication mappings before sample writes. Existing sample image files are reused.
 
