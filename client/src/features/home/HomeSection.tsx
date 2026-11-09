@@ -160,7 +160,9 @@ export function HomeSection({
         >
           {items.slice(0, 4).map((item) => (
             <div
-              className={`min-w-0 [&>article]:h-full ${kind === 'events' ? 'min-h-[24.5rem]' : 'min-h-[18rem]'}`}
+              className={
+                isEventList ? 'min-w-0 self-start' : 'min-h-[18rem] min-w-0 [&>article]:h-full'
+              }
               key={item.id}
             >
               <ResourceCard item={item} kind={kind} />

@@ -41,7 +41,7 @@ export function ResourceCard({
   return (
     <article
       data-card
-      className="group @container relative flex h-full min-w-0 flex-col overflow-hidden rounded-(--shape-radius-card) border border-border bg-card shadow-(--shadow-card) transition-[box-shadow,translate] duration-(--motion-duration-base) ease-(--motion-ease-standard) hover:-translate-y-0.5 hover:shadow-(--shadow-card-hover) motion-reduce:transform-none motion-reduce:transition-none has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-ring has-[a:focus-visible]:ring-offset-2 has-[a:focus-visible]:ring-offset-background"
+      className={`group @container relative flex min-w-0 flex-col overflow-hidden rounded-(--shape-radius-card) border border-border bg-card shadow-(--shadow-card) transition-[box-shadow,translate] duration-(--motion-duration-base) ease-(--motion-ease-standard) hover:-translate-y-0.5 hover:shadow-(--shadow-card-hover) motion-reduce:transform-none motion-reduce:transition-none has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-ring has-[a:focus-visible]:ring-offset-2 has-[a:focus-visible]:ring-offset-background ${event ? 'self-start' : 'h-full'}`}
     >
       <div className="flex flex-1 flex-col">
         <div
@@ -63,9 +63,7 @@ export function ResourceCard({
           )}
         </div>
         <div className="flex min-w-0 flex-1 flex-col">
-          <div
-            className={`grid flex-1 gap-3 ${event ? 'p-3' : 'p-(--card-padding)'}`}
-          >
+          <div className={`grid flex-1 gap-3 ${event ? 'px-3 pt-3 pb-2' : 'p-(--card-padding)'}`}>
             <div className="min-w-0">
               {firstCategory ? (
                 <p
