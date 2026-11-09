@@ -32,6 +32,8 @@ export function DiscoverySection({
   onPageChange: (page: number) => void;
 }): React.JSX.Element {
   const { t, i18n } = useTranslation();
+  const gridClass =
+    kind === 'events' ? 'grid min-w-0 gap-4' : 'grid gap-4 sm:grid-cols-2 lg:grid-cols-3';
   const headingId = `${kind}-heading`;
   const resource = t(kind).toLocaleLowerCase(i18n.language);
   const resultTotal = total ?? 0;
@@ -56,13 +58,15 @@ export function DiscoverySection({
           <p className="sr-only" role="status">
             {t('loading', { resource })}
           </p>
-          <div aria-hidden="true" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div aria-hidden="true" className={gridClass}>
             {Array.from({ length: 6 }, (_, index) => (
               <div
                 className="grid gap-4 rounded-(--shape-radius-card) border border-border bg-card p-5"
                 key={index}
               >
-                <Skeleton className="-mx-5 -mt-5 aspect-video rounded-b-none rounded-t-(--shape-radius-card)" />
+                <Skeleton
+                  className={`-mx-5 -mt-5 rounded-b-none rounded-t-(--shape-radius-card) ${kind === 'events' ? 'h-24' : 'aspect-video'}`}
+                />
                 <div className="flex items-center justify-between">
                   <Skeleton className="size-11 rounded-lg" />
                   <Skeleton className="h-5 w-20 rounded-(--shape-radius-control)" />
@@ -84,7 +88,7 @@ export function DiscoverySection({
           title={t('noResultsTitle')}
         />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className={gridClass}>
           {results.map((item) => (
             <ResourceCard key={item.id} item={item} kind={kind} />
           ))}

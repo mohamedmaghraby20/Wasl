@@ -32,7 +32,13 @@ export function CommunityEvents({
           {t('events')}
         </h2>
         {canManage ? (
-          <Button asChild aria-label={t('createEventTitle')} title={t('createEventTitle')} size="icon-sm" variant="outline">
+          <Button
+            asChild
+            aria-label={t('createEventTitle')}
+            title={t('createEventTitle')}
+            size="icon-sm"
+            variant="outline"
+          >
             <Link to={`/create/event?communityId=${encodeURIComponent(communityId)}`}>
               <CalendarPlus aria-hidden="true" />
             </Link>
@@ -40,7 +46,7 @@ export function CommunityEvents({
         ) : null}
       </div>
       {query.isPending ? (
-        <LoadingSkeleton layout="grid" message={t('loadingDetails')} rows={4} />
+        <LoadingSkeleton layout="list" message={t('loadingDetails')} rows={4} />
       ) : query.isError ? (
         <QueryError
           message={t('loadError', { resource: t('events') })}
@@ -48,7 +54,7 @@ export function CommunityEvents({
         />
       ) : query.data.items.length ? (
         <>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid min-w-0 gap-4">
             {query.data.items.map((event) => (
               <ResourceCard key={event.id} item={event} kind="events" />
             ))}
