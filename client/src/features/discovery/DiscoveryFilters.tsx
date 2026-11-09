@@ -14,6 +14,7 @@ import type { ResourceKind } from '@/features/resources/resource-utils';
 import { cn } from '@/lib/cn';
 
 const filterControlClass = 'shrink-0 sm:w-44';
+const allFilterValue = 'all';
 const selectedFilterClass =
   'border-primary bg-primary font-semibold text-primary-foreground hover:border-primary [&>svg]:text-current';
 
@@ -174,14 +175,17 @@ export function DiscoveryFilters({
           disabled={citiesPending || citiesError || !cities}
           emptyMessage={t('noCitiesFound')}
           id="discovery-city"
-          onValueChange={(value) => onFilterChange('city', value)}
-          options={(cities ?? []).map((city) => ({
-            value: city.id,
-            label: localizedName(city, i18n.language),
-          }))}
+          onValueChange={(value) => onFilterChange('city', value === allFilterValue ? '' : value)}
+          options={[
+            { value: allFilterValue, label: t('allCities') },
+            ...(cities ?? []).map((city) => ({
+              value: city.id,
+              label: localizedName(city, i18n.language),
+            })),
+          ]}
           placeholder={citiesPending ? t('loadingCities') : t('allCities')}
           searchPlaceholder={t('searchCities')}
-          value={cityValue}
+          value={cityValue || (citiesPending ? '' : allFilterValue)}
         />
         <Select
           aria-busy={categoriesPending}
@@ -190,13 +194,18 @@ export function DiscoveryFilters({
           }
           className={cn(filterControlClass, categoryValue && selectedFilterClass)}
           disabled={categoriesPending || categoriesError || !categories}
-          onValueChange={(value) => onFilterChange('category', value)}
-          options={(categories ?? []).map((category) => ({
-            value: category.id,
-            label: localizedName(category, i18n.language),
-          }))}
+          onValueChange={(value) =>
+            onFilterChange('category', value === allFilterValue ? '' : value)
+          }
+          options={[
+            { value: allFilterValue, label: t('allCategories') },
+            ...(categories ?? []).map((category) => ({
+              value: category.id,
+              label: localizedName(category, i18n.language),
+            })),
+          ]}
           placeholder={categoriesPending ? t('loadingCategories') : t('allCategories')}
-          value={categoryValue}
+          value={categoryValue || (categoriesPending ? '' : allFilterValue)}
         />
         {kind !== 'communities' ? (
           <>
