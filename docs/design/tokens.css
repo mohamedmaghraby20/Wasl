@@ -182,7 +182,7 @@
   --tracking-tight: 0;
 }
 
-/* Wasl monochrome theme. */
+/* Wasl monochrome theme with a sky-blue accent. */
 :root[data-theme="wasl"][data-mode="light"] {
   color-scheme: light;
   --color-canvas: #FFFFFF;
@@ -200,9 +200,9 @@
   --color-primary-hover: #292929;
   --color-primary-active: #141414;
   --color-on-primary: #FFFFFF;
-  --color-primary-soft: #EEEEEE;
+  --color-primary-soft: #E5F8FE;
   --color-primary-soft-text: #141414;
-  --color-ring: #454545;
+  --color-ring: #26718A;
   --color-success: #276343;
   --color-success-soft: #E7F3E9;
   --color-warning: #704700;
@@ -238,9 +238,9 @@
   --color-primary-hover: #DEDEDE;
   --color-primary-active: #C4C4C4;
   --color-on-primary: #101010;
-  --color-primary-soft: #2B2B2B;
+  --color-primary-soft: #223238;
   --color-primary-soft-text: #FAFAFA;
-  --color-ring: #D4D4D4;
+  --color-ring: #7DDDFA;
   --color-success: var(--color-green-300);
   --color-success-soft: var(--color-green-900);
   --color-warning: #F1C46E;
