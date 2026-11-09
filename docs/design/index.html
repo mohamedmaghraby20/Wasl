@@ -51,6 +51,7 @@
       <a class="sidebar-link" href="#buttons"><span class="nav-dot"></span> Buttons & badges</a>
       <a class="sidebar-link" href="#forms"><span class="nav-dot"></span> Form controls</a>
       <a class="sidebar-link" href="#cards"><span class="nav-dot"></span> Community cards</a>
+      <a class="sidebar-link" href="#catalog"><span class="nav-dot"></span> Component catalog</a>
       <a class="sidebar-link" href="#states"><span class="nav-dot"></span> Feedback states</a>
       <div class="sidebar-note">
         <span class="status-pip" aria-hidden="true"></span>
@@ -148,6 +149,45 @@
           <div class="component-row"><div class="component-label"><strong>Button variants</strong><span>Default size</span></div><div class="button-samples"><button class="button button-primary" type="button">Join community <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button><button class="button button-secondary" type="button">View details</button><button class="button button-outline" type="button">Learn more</button><button class="button button-ghost" type="button">Cancel</button><button class="button button-danger" type="button">Remove</button></div></div>
           <div class="component-row"><div class="component-label"><strong>Button sizes</strong><span>Shared height tokens</span></div><div class="button-samples align-center"><button class="button button-primary button-sm" type="button">Small</button><button class="button button-primary button-md" type="button">Medium</button><button class="button button-primary button-lg" type="button">Large action</button><button class="button button-icon" type="button" aria-label="Save event"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4.5h12v16l-6-4-6 4z"/></svg></button></div></div>
           <div class="component-row"><div class="component-label"><strong>Status badges</strong><span>Compact, readable</span></div><div class="badge-samples"><span class="badge badge-brand">New</span><span class="badge badge-success"><span></span> Open</span><span class="badge badge-warning">Almost full</span><span class="badge badge-danger">Cancelled</span><span class="badge badge-neutral">Community</span><span class="badge badge-outline">Verified organizer</span></div></div>
+
+          <div class="component-row"><div class="component-label"><strong>Default and hover</strong><span>Compare each pair without a pointer</span></div><div class="button-samples">
+            <div class="hover-specimen">
+              <strong>primary</strong>
+              <button class="button button-primary" type="button">Join community</button>
+              <button class="button button-primary" type="button" data-preview-hover>Join community · hover</button>
+            </div>
+            <div class="hover-specimen">
+              <strong>secondary</strong>
+              <button class="button button-secondary" type="button">View details</button>
+              <button class="button button-secondary" type="button" data-preview-hover>View details · hover</button>
+            </div>
+            <div class="hover-specimen">
+              <strong>outline</strong>
+              <button class="button button-outline" type="button">Browse events</button>
+              <button class="button button-outline" type="button" data-preview-hover>Browse events · hover</button>
+            </div>
+            <div class="hover-specimen">
+              <strong>ghost</strong>
+              <button class="button button-ghost" type="button">Cancel</button>
+              <button class="button button-ghost" type="button" data-preview-hover>Cancel · hover</button>
+            </div>
+            <div class="hover-specimen">
+              <strong>danger</strong>
+              <button class="button button-danger" type="button">Remove</button>
+              <button class="button button-danger" type="button" data-preview-hover>Remove · hover</button>
+            </div>
+            <div class="hover-specimen">
+              <strong>danger-ghost</strong>
+              <button class="button button-danger-ghost" type="button">Delete draft</button>
+              <button class="button button-danger-ghost" type="button" data-preview-hover>Delete draft · hover</button>
+            </div>
+            <div class="hover-specimen">
+              <strong>link</strong>
+              <button class="button button-link" type="button">See all</button>
+              <button class="button button-link" type="button" data-preview-hover>See all · hover</button>
+            </div>
+            <div class="hover-specimen"><strong>Disabled</strong><button class="button button-primary" type="button" disabled>Publish</button></div>
+          </div></div>
           <div class="component-row"><div class="component-label"><strong>Keyboard focus</strong><span>Visible and consistent</span></div><div class="button-samples focus-sample"><button class="button button-primary demo-focus" type="button">Focused action</button><span class="muted-small">Tab through controls to see focus states.</span></div></div>
         </div>
       </section>
@@ -166,7 +206,7 @@
             <div class="form-card-heading"><div><strong>Input states</strong><p>Feedback should explain what to do next.</p></div></div>
             <div class="field"><label class="field-label" for="input-default">Default</label><input class="input-control" id="input-default" type="text" placeholder="Your community name"></div>
             <div class="field"><label class="field-label" for="input-filled">Filled</label><input class="input-control" id="input-filled" type="text" value="Istanbul Runners" readonly></div>
-            <div class="field"><label class="field-label" for="input-error">Validation error</label><input class="input-control input-error" id="input-error" type="email" value="not-an-email" aria-describedby="input-error-help"><span class="field-error" id="input-error-help">Enter a valid email address.</span></div>
+            <div class="field"><label class="field-label" for="input-error">Validation error</label><input class="input-control input-error" id="input-error" type="email" value="not-an-email" aria-invalid="true" aria-describedby="input-error-help"><span class="field-error" id="input-error-help">Enter a valid email address.</span></div>
             <div class="field"><label class="field-label" for="input-disabled">Disabled</label><input class="input-control" id="input-disabled" type="text" value="Managed by organizer" disabled></div>
             <label class="checkbox-row"><input type="checkbox" checked><span class="checkbox-visual"></span><span>Notify me about new events</span></label>
           </div>
@@ -183,13 +223,100 @@
           </article>
           <article class="community-card">
             <div class="community-cover resource-cover"><img src="../../client/public/images/community-covers/communities-abstract.svg" alt="" width="1200" height="675"></div>
-            <div class="community-body"><div class="community-title-row"><div><span class="event-category">SPORTS · ISTANBUL</span><h3>Istanbul Runners</h3></div></div><p>A friendly running community for every pace, from first 5Ks to weekend trail routes.</p><div class="community-footer"><span class="member-count"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg> 248 members</span><button class="button button-outline button-sm" type="button">Explore</button></div></div>
+            <div class="community-body"><div class="community-title-row"><div><span class="event-category">Sports</span><h3>Istanbul Runners</h3></div></div><p>A friendly running community for every pace, from first 5Ks to weekend trail routes.</p><p class="event-meta">Istanbul</p><div class="community-footer"><span class="member-count"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg> 248 members</span><button class="button button-outline button-sm" type="button">Explore</button></div></div>
           </article>
         </div>
       </section>
 
+
+      <section class="system-section" id="catalog">
+        <div class="section-heading"><div><span class="section-number">07</span><h2>Component catalog</h2><p>Browser specimens for the shared controls and compositions used in Wasl.</p></div></div>
+        <div class="catalog-grid">
+          <article class="catalog-panel">
+            <h3>Search and selection</h3>
+            <div class="field"><label class="field-label" for="catalog-search">Search communities</label><input class="input-control" id="catalog-search" type="search" placeholder="Try a community name"></div>
+            <div class="field"><label class="field-label" for="catalog-city">Searchable city</label><input class="input-control" id="catalog-city" list="catalog-cities" placeholder="Type a city"><datalist id="catalog-cities"><option value="Istanbul"><option value="Ankara"><option value="Izmir"></datalist></div>
+            <div class="field"><label class="field-label" for="catalog-tags">Tags</label><div class="button-samples"><span class="badge badge-brand">Outdoors</span><span class="badge badge-neutral">Weekend</span></div><input class="input-control" id="catalog-tags" placeholder="Add a tag"></div>
+          </article>
+          <article class="catalog-panel">
+            <h3>Calendar and scheduling</h3>
+            <div class="field"><label class="field-label" for="catalog-date">Event date</label><input class="input-control" type="date" id="catalog-date" value="2026-11-14"></div>
+            <div class="field"><label class="field-label" for="catalog-time">Date and time</label><input class="input-control" type="datetime-local" id="catalog-time" value="2026-11-14T10:00" aria-describedby="catalog-time-help"><span class="catalog-note" id="catalog-time-help">Türkiye time</span></div>
+            <p class="catalog-note">Native controls demonstrate the field styling. The app uses its own calendar and picker composition.</p>
+          </article>
+          <article class="catalog-panel">
+            <h3>Menus and overlays</h3>
+            <details class="catalog-menu"><summary>Event actions</summary><ul class="catalog-list"><li><a class="button button-ghost" href="#cards">View event card</a></li><li><button type="button" class="button button-outline" data-open-dialog="catalog-delete">Delete draft</button></li></ul></details>
+            <details class="catalog-menu"><summary>Admission information</summary><p class="catalog-note">An organizer reviews each request to join.</p></details>
+            <div class="button-samples"><button type="button" class="button button-outline" data-open-dialog="catalog-dialog">Dialog</button><button type="button" class="button button-outline" data-open-dialog="catalog-confirm">Confirm</button><button type="button" class="button button-outline" data-open-dialog="catalog-delete">Delete</button><button type="button" class="button button-outline" data-open-dialog="catalog-prompt">Text prompt</button><button type="button" class="button button-outline" data-open-dialog="catalog-sheet">Filters sheet</button></div>
+          </article>
+          <article class="catalog-panel">
+            <h3>Results and pagination</h3>
+            <div class="button-samples"><span class="badge badge-brand">Istanbul</span><span class="badge badge-neutral">Events</span></div>
+            <p class="catalog-note">1–12 of 24 results</p>
+            <nav class="button-samples" aria-label="Example results pages"><button class="button button-outline" type="button" disabled>Previous</button><button class="button button-primary" type="button" aria-current="page">1</button><button class="button button-outline" type="button">2</button></nav>
+          </article>
+          <article class="catalog-panel">
+            <h3>Empty, loading and error</h3>
+            <p><strong>No events match these filters.</strong></p><a class="button button-link" href="#forms">Review filters</a>
+            <div class="catalog-skeleton" aria-hidden="true"><span></span><span></span><span></span></div><p class="catalog-note">Loading events…</p>
+            <div class="alert alert-danger"><div><strong>Events couldn’t load</strong><p>Try again in a moment.</p></div><button class="button button-outline" type="button">Retry</button></div>
+          </article>
+          <article class="catalog-panel">
+            <h3>Email validation</h3>
+            <div class="field"><label class="field-label" for="catalog-email">Email address</label><input class="input-control input-error" id="catalog-email" type="email" value="sam@" aria-invalid="true" aria-describedby="catalog-email-error"><span class="field-error" id="catalog-email-error">Enter a complete email address.</span></div>
+            <button class="button button-primary" type="button">Send verification email</button>
+          </article>
+          <article class="catalog-panel catalog-rtl" dir="rtl" lang="ar">
+            <h3>البحث عن فعاليات في إسطنبول</h3>
+            <div class="field"><label class="field-label" for="catalog-arabic">اسم الفعالية أو المجتمع</label><input class="input-control" type="search" id="catalog-arabic" placeholder="مثال: نادي المشي في إسطنبول"></div>
+            <div class="button-samples"><button class="button button-primary" type="button">ابحث عن فعالية</button><button class="button button-secondary" type="button">عرض التفاصيل</button></div>
+          </article>
+        </div>
+
+          <dialog id="catalog-dialog" class="catalog-overlay " aria-labelledby="catalog-dialog-title">
+            <form method="dialog">
+              <h3 id="catalog-dialog-title">Event details</h3>
+              <p>Saturday, 10:00 at Belgrad Forest.</p>
+              <div class="button-samples"><button type="submit" class="button button-outline" value="cancel" formnovalidate autofocus>Cancel</button><button type="submit" class="button button-primary" value="confirm">Done</button></div>
+            </form>
+          </dialog>
+
+          <dialog id="catalog-confirm" class="catalog-overlay " aria-labelledby="catalog-confirm-title">
+            <form method="dialog">
+              <h3 id="catalog-confirm-title">Leave this community?</h3>
+              <p>You can request to join again later.</p>
+              <div class="button-samples"><button type="submit" class="button button-outline" value="cancel" formnovalidate autofocus>Cancel</button><button type="submit" class="button button-danger" value="confirm">Leave</button></div>
+            </form>
+          </dialog>
+
+          <dialog id="catalog-delete" class="catalog-overlay " aria-labelledby="catalog-delete-title">
+            <form method="dialog">
+              <h3 id="catalog-delete-title">Delete this draft?</h3>
+              <p>Type <strong>DELETE</strong> to confirm.</p><div class="field"><label class="field-label" for="catalog-delete-text">Confirmation</label><input class="input-control" id="catalog-delete-text" required pattern="DELETE"></div>
+              <div class="button-samples"><button type="submit" class="button button-outline" value="cancel" formnovalidate autofocus>Cancel</button><button type="submit" class="button button-danger" value="confirm">Delete draft</button></div>
+            </form>
+          </dialog>
+
+          <dialog id="catalog-prompt" class="catalog-overlay " aria-labelledby="catalog-prompt-title">
+            <form method="dialog">
+              <h3 id="catalog-prompt-title">Add a review note</h3>
+              <div class="field"><label class="field-label" for="catalog-note">Note</label><textarea class="input-control" id="catalog-note" rows="3" required></textarea></div>
+              <div class="button-samples"><button type="submit" class="button button-outline" value="cancel" formnovalidate autofocus>Cancel</button><button type="submit" class="button button-primary" value="confirm">Save note</button></div>
+            </form>
+          </dialog>
+
+          <dialog id="catalog-sheet" class="catalog-overlay catalog-sheet" aria-labelledby="catalog-sheet-title">
+            <form method="dialog">
+              <h3 id="catalog-sheet-title">Discovery filters</h3>
+              <div class="field"><label class="field-label" for="catalog-filter">City</label><select class="input-control" id="catalog-filter"><option>All cities</option><option>Istanbul</option><option>Ankara</option></select></div>
+              <div class="button-samples"><button type="submit" class="button button-outline" value="cancel" formnovalidate autofocus>Cancel</button><button type="submit" class="button button-primary" value="confirm">Apply filters</button></div>
+            </form>
+          </dialog>
+      </section>
+
       <section class="system-section" id="states">
-        <div class="section-heading"><div><span class="section-number">07</span><h2>Feedback & system states</h2><p>Keep messages specific, accessible, and visually consistent across themes.</p></div><span class="section-tag">STATES</span></div>
+        <div class="section-heading"><div><span class="section-number">08</span><h2>Feedback & system states</h2><p>Keep messages specific, accessible, and visually consistent across themes.</p></div><span class="section-tag">STATES</span></div>
         <div class="feedback-grid">
           <div class="alert alert-success" role="status"><span class="alert-icon">✓</span><div><strong>You're on the list!</strong><p>Your request to join Istanbul Runners has been sent to the organizers.</p></div><button class="alert-close" aria-label="Dismiss success message" type="button">×</button></div>
           <div class="alert alert-info" role="status"><span class="alert-icon">i</span><div><strong>Complete your profile</strong><p>Add your interests to get more relevant community recommendations.</p></div><button class="alert-close" aria-label="Dismiss information message" type="button">×</button></div>

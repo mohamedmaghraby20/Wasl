@@ -138,6 +138,23 @@ Paths are relative to client/src. Consumers include direct static imports and li
 - Retained Manrope and Tajawal for this review so English and Arabic typography can be evaluated separately from the palette. Derived a deeper Cacao for pressed actions and a deeper red for destructive hover because the candidate does not specify these states.
 - The discovery specimens use the app’s cover assets. The event example shows the date, registration count, capacity and approval state. The community example keeps the description, location, member count and detail action.
 
+## Preview enhancement review
+
+| Frontend sources | Preview specimens | Integration checks |
+| --- | --- | --- |
+| Button, IconButton, Badge | Default and hover pairs for seven button variants, size examples, focus and disabled | Verify compound intents, pressed states, icon sizing and the asChild link contract in React. |
+| Field, Label, Input, Textarea, Checkbox, Select, SearchInput, SearchableSelect, TagInput | Labeled form fields, invalid and disabled examples, search, city suggestions, tag display and Arabic fields | Check clear, query, selection, tag removal and validation semantics against each React implementation. |
+| Calendar, DatePicker, DateTimePicker | Native date and date-time control specimens | Still needs the DayPicker grid, range states and keyboard behavior. |
+| Dialog, AlertDialog, ConfirmDialog, DeleteDialog, TextPromptDialog, Sheet | Native modal, destructive confirmation, typed confirmation, prompt and filter sheet | Verify app focus restoration, pending states and sheet placement variants. |
+| DropdownMenu, Popover | Disclosure specimens for actions and admission help | Still needs menu arrow keys, nested menus, collision handling and Radix positioning. |
+| EmptyState, Skeleton, LoadingSkeleton, LoadingState, QueryError | Empty results, skeleton, loading message and retry treatment | Verify recovery and announcement in actual data flows. |
+| EmailValidationForm | Invalid email and verification action | Verify submit, sending, success and server error states. |
+| DiscoveryFilters, DiscoveryPagination, ResourceCard | Active filter labels, pagination, balanced resource cards and capacity metadata | Verify URL state, card variants, links, cover fallback and long bilingual copy. |
+
+The light palette follows the supplied Cacao, Terracotta, Cream and Blush reference. Secondary actions use Cacao on Blush, with the pair reversed on hover. The primary hover uses white on Terracotta. Paired foreground and background changes happen together so a color reversal avoids a low-contrast intermediate frame.
+
+In Edge, the seven enabled default/hover pairs ranged from 5.89:1 to 16.68:1 across Wasl light and dark. At 1440, 390 and 320 CSS pixels the preview had no horizontal overflow. Escape closed the confirm dialog and returned focus to its trigger. Coverage here is for preview specimens. Screen-reader operation, all token pairs, and feature-specific compositions still need review. Visual comparison used the candidate HTML and design specification. The Gumroad screenshots named by the specification were not found in this checkout.
+
 ## Remaining work before design review
 
 1. Complete the source-level inventory, including component exports, call sites, dependencies and every supported variant and state. The table above is not exhaustive.

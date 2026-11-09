@@ -52,6 +52,12 @@
     sections.forEach(section => observer.observe(section));
   }
 
+  // Native dialogs let the review catalog exercise focus and Escape.
+  document.querySelectorAll("[data-open-dialog]").forEach((button) => {
+    const dialog = document.getElementById(button.dataset.openDialog);
+    button.addEventListener("click", () => dialog.showModal());
+  });
+
   // Dismissible feedback examples in the component showcase.
   document.querySelectorAll(".alert-close").forEach((button) => {
     button.addEventListener("click", () => {
