@@ -45,7 +45,7 @@ export function ResourceCard({
     >
       <div className="flex flex-1 flex-col">
         <div
-          className={`relative grid place-items-center overflow-hidden bg-primary-soft text-primary-soft-text ${event ? 'h-20 shrink-0' : 'h-(--community-cover-height)'}`}
+          className={`relative grid place-items-center overflow-hidden bg-primary-soft text-primary-soft-text ${event ? 'h-(--event-cover-height) shrink-0' : 'h-(--community-cover-height)'}`}
         >
           {failedCover === cover ? (
             <CoverIcon aria-hidden="true" className="size-10" strokeWidth={1.75} />

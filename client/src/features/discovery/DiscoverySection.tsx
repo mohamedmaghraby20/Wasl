@@ -64,7 +64,7 @@ export function DiscoverySection({
                 key={index}
               >
                 <Skeleton
-                  className={`-mx-5 -mt-5 rounded-b-none rounded-t-(--shape-radius-card) ${kind === 'events' ? 'h-20' : 'aspect-video'}`}
+                  className={`-mx-5 -mt-5 rounded-b-none rounded-t-(--shape-radius-card) ${kind === 'events' ? 'h-(--event-cover-height)' : 'aspect-video'}`}
                 />
                 <div className="flex items-center justify-between">
                   <Skeleton className="size-11 rounded-lg" />

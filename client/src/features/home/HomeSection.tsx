@@ -113,7 +113,7 @@ export function HomeSection({
                 key={index}
               >
                 <Skeleton
-                  className={`-mx-4 -mt-4 rounded-b-none rounded-t-(--shape-radius-card) ${isEventList ? 'h-20' : 'aspect-video'}`}
+                  className={`-mx-4 -mt-4 rounded-b-none rounded-t-(--shape-radius-card) ${isEventList ? 'h-(--event-cover-height)' : 'aspect-video'}`}
                 />
                 <Skeleton className="h-6 w-3/4" />
                 <Skeleton className="h-4 w-1/2" />
